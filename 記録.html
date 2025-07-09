@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>水泳記録管理</title>
+    <link
+      rel="icon"
+      href="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
+      type="image/jpeg"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 0;
+        background-color: #f9f9f9;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      form,
+      table {
+        width: 100%;
+        margin: 0 auto 20px;
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      td button {
+        margin: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 5px;
+      }
+
+      td button.edit-btn {
+        background-color: #4caf50;
+      }
+
+      .best-label {
+        font-weight: RED;
+        color: #ff9800;
+        margin-left: 5px;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      select {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+
+      #searchInput {
+        width: 30%;
+        display: inline-block;
+        margin-right: 10px;
+      }
+
+      #filterType {
+        width: 30%;
+        display: inline-block;
+      }
+
+      .pagination {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .pagination button {
+        padding: 10px;
+        cursor: pointer;
+        border: none;
+        background-color: #ddd;
+        margin: 0 5px;
+        border-radius: 5px;
+      }
+
+      .pagination button:hover {
+        background-color: #888;
+      }
+
+      @media screen and (max-width: 600px) {
+        table,
+        form {
+          width: 100%;
+        }
+        #searchInput,
+        #filterType {
+          width: 48%;
+          display: inline-block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>水泳記録管理システム</h1>
+
+    <form id="form">
+      <div>
+        <label for="entryType">記録タイプ:</label>
+        <select id="entryType" required>
+          <option value="記録">記録</option>
+          <option value="エントリー">エントリー</option>
+        </select>
+      </div>
+      <div>
+        <label for="eventName">大会名:</label>
+        <input type="text" id="eventName" required />
+      </div>
+      <div>
+        <label for="eventDate">大会日:</label>
+        <input type="date" id="eventDate" required />
+      </div>
+      <div>
+        <label for="eventType">種目:</label>
+        <select id="eventType" required>
+          <option value="自由形">自由形</option>
+          <option value="バタフライ">バタフライ</option>
+          <option value="平泳ぎ">平泳ぎ</option>
+          <option value="背泳ぎ">背泳ぎ</option>
+          <option value="個人メドレー">個人メドレー</option>
+          <option value="フリーリレー">フリーリレー</option>
+          <option value="メドレーリレー">メドレーリレー</option>
+        </select>
+      </div>
+      <div>
+        <label for="distance">距離:</label>
+        <select id="distance" required>
+          <option value="25">25m</option>
+          <option value="50">50m</option>
+          <option value="100">100m</option>
+          <option value="200">200m</option>
+          <option value="400">400m</option>
+        </select>
+      </div>
+      <div>
+        <label for="time">タイム:</label>
+        <input type="text" id="time" placeholder="mm:ss.SS" required />
+      </div>
+      <div>
+        <label for="location">会場:</label>
+        <input type="text" id="location" required />
+      </div>
+      <button type="submit">記録を追加</button>
+    </form>
+
+    <div>
+      <input type="text" id="searchInput" placeholder="検索..." />
+      <select id="filterType">
+        <option value="">すべて</option>
+        <option value="記録">記録</option>
+        <option value="エントリー">エントリー</option>
+      </select>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>記録タイプ</th>
+          <th>大会名</th>
+          <th>大会日</th>
+          <th>種目</th>
+          <th>距離</th>
+          <th>タイム</th>
+          <th>会場</th>
+          <th>送信時間</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+
+    <div class="pagination" id="pagination"></div>
+
+    <script>
+      const form = document.getElementById("form");
+      const tableBody = document.getElementById("tableBody");
+      const searchInput = document.getElementById("searchInput");
+      const filterType = document.getElementById("filterType");
+      const pagination = document.getElementById("pagination");
+
+      let records = JSON.parse(localStorage.getItem("swimRecords")) || [];
+      let currentPage = 1;
+      const recordsPerPage = 5;
+
+      // タイムを比較するための関数
+      const compareTimes = (time1, time2) => {
+        const [min1, sec1] = time1.split(":").map(parseFloat);
+        const [min2, sec2] = time2.split(":").map(parseFloat);
+        return (min1 - min2) * 60 + (sec1 - sec2);
+      };
+
+      // 記録を表示
+      const renderRecords = () => {
+        const searchQuery = searchInput.value.toLowerCase();
+        const filterValue = filterType.value;
+
+        const filteredRecords = records.filter((record) => {
+          const matchesSearch =
+            record.eventName.toLowerCase().includes(searchQuery) ||
+            record.eventType.toLowerCase().includes(searchQuery);
+          const matchesFilter =
+            !filterValue || record.entryType === filterValue;
+          return matchesSearch && matchesFilter;
+        });
+
+        // 種目と距離ごとの最速タイムを計算
+        const bestTimes = {};
+        filteredRecords.forEach((record) => {
+          const key = ${record.eventName}-${record.distance};
+          if (
+            !bestTimes[key] ||
+            compareTimes(record.time, bestTimes[key]) < 0
+          ) {
+            bestTimes[key] = record.time;
+          }
+        });
+
+        const paginatedRecords = filteredRecords.slice(
+          (currentPage - 1) * recordsPerPage,
+          currentPage * recordsPerPage
+        );
+
+        tableBody.innerHTML = "";
+        paginatedRecords.forEach((record, index) => {
+          const key = ${record.eventName}-${record.distance};
+          const isBest = record.time === bestTimes[key];
+
+          const row = document.createElement("tr");
+          row.innerHTML =
+          <td>${record.entryType}</td>
+          <td>${record.eventName}</td>
+          <td>${record.eventDate}</td>
+          <td>${record.eventType}</td>
+          <td>${record.distance}m</td>
+          <td>${record.time} ${
+            isBest ? '<span class="best-label">BEST</span>' : ""
+          }</td>
+          <td>${record.location}</td>
+          <td>${record.timestamp}</td>
+          <td>
+            <button class="edit-btn" onclick="editRecord(${index})">編集する</button>
+            <button class="delete-btn" onclick="deleteRecord(${index})">削除する</button>
+          </td>
+        ;
+          tableBody.appendChild(row);
+        });
+
+        // ページネーション
+        pagination.innerHTML = "";
+        const totalPages = Math.ceil(filteredRecords.length / recordsPerPage);
+        for (let i = 1; i <= totalPages; i++) {
+          const pageButton = document.createElement("button");
+          pageButton.innerText = i;
+          pageButton.onclick = () => {
+            currentPage = i;
+            renderRecords();
+          };
+          pagination.appendChild(pageButton);
+        }
+      };
+
+      // 記録の追加
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const newRecord = {
+          entryType: form.entryType.value,
+          eventName: form.eventName.value,
+          eventDate: form.eventDate.value,
+          eventType: form.eventType.value,
+          distance: form.distance.value,
+          time: form.time.value,
+          location: form.location.value,
+          timestamp: new Date().toLocaleString(),
+        };
+
+        records.push(newRecord);
+        localStorage.setItem("swimRecords", JSON.stringify(records));
+        form.reset();
+        renderRecords();
+      });
+
+      // 記録の削除
+      const deleteRecord = (index) => {
+        records.splice(index, 1);
+        localStorage.setItem("swimRecords", JSON.stringify(records));
+        renderRecords();
+      };
+
+      // 記録の編集
+      const editRecord = (index) => {
+        const record = records[index];
+        form.entryType.value = record.entryType;
+        form.eventName.value = record.eventName;
+        form.eventDate.value = record.eventDate;
+        form.eventType.value = record.eventType;
+        form.distance.value = record.distance;
+        form.time.value = record.time;
+        form.location.value = record.location;
+        deleteRecord(index);
+      };
+
+      // 初期表示
+      renderRecords();
+    </script>
+  </body>
+</html>

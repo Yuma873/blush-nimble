@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>水泳メニュー</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+      }
+      h1 {
+        text-align: center;
+        background-color: #4caf50;
+        color: white;
+        margin: 0;
+        padding: 10px 0;
+      }
+      .container {
+        width: 90%;
+        margin: 20px auto;
+      }
+      .toggle-button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+      }
+      .toggle-button:hover {
+        background-color: #45a049;
+      }
+      .table-container {
+        display: none;
+        margin-bottom: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        background-color: #f4f4f4;
+        position: sticky;
+        top: 0;
+      }
+      tbody tr:nth-child(odd) {
+        background-color: #f9f9f9;
+      }
+      tbody tr:hover {
+        background-color: #f1f1f1;
+      }
+      caption {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+      }
+      .add-row {
+        margin-top: 10px;
+        background-color: #4caf50;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      .add-row:hover {
+        background-color: #45a049;
+      }
+    </style>
+    <script>
+      function toggleTable(id) {
+        const tableContainer = document.getElementById(id);
+        if (tableContainer.style.display === "none") {
+          tableContainer.style.display = "block";
+        } else {
+          tableContainer.style.display = "none";
+        }
+      }
+
+      function addRow(tableId) {
+        const table = document
+          .getElementById(tableId)
+          .querySelector("table tbody");
+        const newRow = document.createElement("tr");
+
+        // Add editable cells
+        for (let i = 0; i < 9; i++) {
+          const newCell = document.createElement("td");
+          newCell.contentEditable = "true";
+          newCell.textContent = i === 0 ? "New Data" : ""; // Add placeholder text
+          newRow.appendChild(newCell);
+        }
+
+        table.appendChild(newRow);
+      }
+    </script>
+  </head>
+  <body>
+    <h1>水泳メニュー</h1>
+    <div class="container">
+      <!-- 1日目 -->
+      <button class="toggle-button" onclick="toggleTable('day1')">
+        1日目 メニュー
+      </button>
+      <div class="table-container" id="day1">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>距離 (m)</th>
+              <th>種目</th>
+              <th>本数</th>
+              <th>Set数</th>
+              <th>Cycle</th>
+              <th>内容</th>
+              <th>時間 (分)</th>
+              <th>距離合計 (m)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>W-up</td>
+              <td>200</td>
+              <td>Choice</td>
+              <td>1</td>
+              <td>1</td>
+              <td>4:00</td>
+              <td></td>
+              <td>4</td>
+              <td>200</td>
+            </tr>
+            <tr>
+              <td>Swim</td>
+              <td>25</td>
+              <td>IM</td>
+              <td>4</td>
+              <td>3</td>
+              <td>0:45</td>
+              <td>IM By.1</td>
+              <td>9</td>
+              <td>300</td>
+            </tr>
+            <tr>
+              <td>Drill</td>
+              <td>25</td>
+              <td>Choice</td>
+              <td>12</td>
+              <td>1</td>
+              <td>1:00</td>
+              <td>Choice</td>
+              <td>12</td>
+              <td>300</td>
+            </tr>
+            <tr>
+              <td>Rest</td>
+              <td>50</td>
+              <td></td>
+              <td>1</td>
+              <td>1</td>
+              <td>3:00</td>
+              <td></td>
+              <td>3</td>
+              <td>50</td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="add-row" onclick="addRow('day1')">行を追加</button>
+      </div>
+
+      <!-- 2日目 午前 -->
+      <button class="toggle-button" onclick="toggleTable('day2am')">
+        2日目 午前 メニュー
+      </button>
+      <div class="table-container" id="day2am">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>距離 (m)</th>
+              <th>種目</th>
+              <th>本数</th>
+              <th>Set数</th>
+              <th>Cycle</th>
+              <th>内容</th>
+              <th>時間 (分)</th>
+              <th>距離合計 (m)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>W-up</td>
+              <td>200</td>
+              <td>Choice</td>
+              <td>1</td>
+              <td>1</td>
+              <td>4:00</td>
+              <td></td>
+              <td>4</td>
+              <td>200</td>
+            </tr>
+            <tr>
+              <td>Kick</td>
+              <td>20</td>
+              <td>Fr</td>
+              <td>4</td>
+              <td>1</td>
+              <td>1:30</td>
+              <td>with Fin Floating Start Hard</td>
+              <td>6</td>
+              <td>80</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- 2日目 午後 -->
+      <button class="toggle-button" onclick="toggleTable('day2pm')">
+        2日目 午後 メニュー
+      </button>
+      <div class="table-container" id="day2pm">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>距離 (m)</th>
+              <th>種目</th>
+              <th>本数</th>
+              <th>Set数</th>
+              <th>Cycle</th>
+              <th>内容</th>
+              <th>時間 (分)</th>
+              <th>距離合計 (m)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>W-up</td>
+              <td>200</td>
+              <td>Choice</td>
+              <td>1</td>
+              <td>1</td>
+              <td>5:00</td>
+              <td></td>
+              <td>5</td>
+              <td>200</td>
+            </tr>
+            <tr>
+              <td>Swim</td>
+              <td>25</td>
+              <td>Ba</td>
+              <td>6</td>
+              <td>2</td>
+              <td>0:50</td>
+              <td>Underwater Dolphin</td>
+              <td>10</td>
+              <td>300</td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="add-row" onclick="addRow('day2pm')">行を追加</button>
+      </div>
+
+      <!-- 3日目 -->
+      <button class="toggle-button" onclick="toggleTable('day3')">
+        3日目 メニュー
+      </button>
+      <div class="table-container" id="day3">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>距離 (m)</th>
+              <th>種目</th>
+              <th>本数</th>
+              <th>Set数</th>
+              <th>Cycle</th>
+              <th>内容</th>
+              <th>時間 (分)</th>
+              <th>距離合計 (m)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>W-up</td>
+              <td>200</td>
+              <td>Choice</td>
+              <td>1</td>
+              <td>1</td>
+              <td>4:00</td>
+              <td>各自</td>
+              <td>4</td>
+              <td>200</td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="add-row" onclick="addRow('day3')">行を追加</button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+     
+    <meta charset="UTF-8" />
+     
+    <title>わたしの予定ボード</title>
+     
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     
+    <style>
+         html, body {
+           overscroll-behavior: none;
+         }
+
+         body {
+           font-family: sans-serif;
+           margin: 0;
+           padding: 16px;
+           transition: background 0.5s;
+         }
+
+         .box {
+           background: #ffffffcc;
+           padding: 16px;
+           border-radius: 8px;
+           max-width: 480px;
+           margin: auto;
+         }
+
+         h2 { margin: 0.5em 0 0.3em; font-size: 1.2em; }
+         h3 { margin: 0.8em 0 0.3em; font-size: 1em; }
+         ul  { padding-left: 1em; margin: 0.2em 0 1em; }
+         li  { line-height: 1.5em; }
+
+         .message {
+           font-size: 1em;
+           font-weight: bold;
+           margin: 0.5em 0;
+         }
+
+         .blink {
+           animation: blink 1.5s step-start infinite;
+         }
+
+         @keyframes blink {
+           50% { opacity: 0; }
+         }
+       
+    </style>
+  </head>
+  <body>
+     
+    <div class="box">
+         
+      <h2 id="today"></h2>
+         
+      <div class="message" id="current-task"></div>
+
+         
+      <h3>【カウントダウン】</h3>
+         
+      <ul id="countdown-list"></ul>
+
+         
+      <h3>【今週の予定】</h3>
+         
+      <ul>
+             
+        <li>月：学校</li>
+             
+        <li>火：祝日</li>
+             
+        <li>水：学校</li>
+             
+        <li>木：学校、部活</li>
+             
+        <li>金：学校</li>
+             
+        <li>土：祝日</li>
+             
+        <li>日：自分時間</li>
+           
+      </ul>
+
+         
+      <h3>【今月の目標】</h3>
+         
+      <ul>
+             
+        <li>［個人］自主練を増やす</li>
+             
+        <li>［クラス］挨拶</li>
+             
+        <li>［学年］行事の準備を万全に</li>
+           
+      </ul>
+
+         
+      <h3>【やることリスト】</h3>
+         
+      <ul>
+             
+        <li>[ ] イセスイの出欠</li>
+             
+        <li>[ ] 作文</li>
+             
+        <li>[ ]</li>
+             
+        <li>[ ]</li>
+           
+      </ul>
+       
+    </div>
+
+     
+    <script>
+      const today = new Date();
+      const hour = today.getHours();
+      const day = today.getDay();
+      const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+      document.getElementById("today").innerText = `${today.getFullYear()}年${
+        today.getMonth() + 1
+      }月${today.getDate()}日（${weekdays[day]}）`;
+
+      const taskEl = document.getElementById("current-task");
+
+      if (day === 0) {
+        document.body.style.background = "#f3e5f5";
+        taskEl.innerText = "今日はおやすみ。自分時間の日です。";
+      } else {
+        const schedule = [
+          { hour: 7, task: "移動", color: "#fce4ec" },
+          {
+            hour: 8,
+            task: "移動/準備",
+            color: "#fff9c4",
+            blink: true,
+          },
+          { hour: 9, task: "集中!", color: "#e8f5e9" },
+          { hour: 10, task: "集中!", color: "#e8f5e9" },
+          { hour: 11, task: "集中!", color: "#e8f5e9" },
+          { hour: 12, task: "昼休憩", color: "#fff3e0" },
+          { hour: 13, task: "休憩/集中!", color: "#ede7f6" },
+          { hour: 14, task: "集中!", color: "#ede7f6" },
+          { hour: 15, task: "集中!/休憩", color: "#fff9c4", blink: true },
+          { hour: 16, task: "帰宅/風呂", color: "#f1f8e9" },
+          { hour: 17, task: "自主学習", color: "#f1f8e9" },
+          { hour: 18, task: "食事", color: "#e1f5fe" },
+          { hour: 19, task: "食事/休憩", color: "#e1f5fe" },
+          { hour: 20, task: "自由時間", color: "#e3f2fd" },
+          { hour: 21, task: "明日の準備", color: "#e3f2fd" },
+          { hour: 22, task: "おやすみ", color: "#ede7f6" },
+          { hour: 23, task: "おやすみ", color: "#ede7f6" },
+        ];
+
+        const current = schedule.find((s) => s.hour === hour);
+        if (current) {
+          document.body.style.background = current.color;
+          taskEl.innerText = `今は「${current.task}」の時間です。`;
+          if (current.blink) taskEl.classList.add("blink");
+        } else {
+          taskEl.innerText = "今日はどんなふうに過ごす？";
+          document.body.style.background = "#f0f0f0";
+        }
+      }
+
+      const events = [
+        { name: "中ブロック交流会", date: "2025-07-05" },
+        { name: "市大会", date: "2025-07-12" },
+        { name: "市総体", date: "2025-07-27" },
+        { name: "県総体", date: "2025-08-13" },
+        { name: "県私立大会", date: "2025-08-28" },
+      ];
+
+      const list = document.getElementById("countdown-list");
+      events.forEach((e) => {
+        const d = Math.ceil((new Date(e.date) - today) / (1000 * 60 * 60 * 24));
+        let c = "#666";
+        if (d <= 7) c = "red";
+        else if (d <= 30) c = "orange";
+        else if (d <= 50) c = "goldenrod";
+
+        const li = document.createElement("li");
+        if (d > 60) {
+          li.innerHTML = `<span style="color:#aaa; font-size:0.9em;">${e.name}：あと ${d}日</span>`;
+        } else {
+          li.innerHTML = `${e.name}：あと <strong style="color:${c}">${d}日</strong>`;
+        }
+        list.appendChild(li);
+      });
+    </script>
+  </body>
+</html>

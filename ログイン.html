@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ログイン</title>
+    <link
+      rel="icon"
+      href="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
+      type="image/jpeg"
+    />
+    <style>
+      /* ページ全体の背景と中央寄せ */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f4f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      /* ログインフォームのスタイル */
+      form {
+        background-color: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 300px;
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      label {
+        font-size: 14px;
+        color: #333;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .error {
+        color: red;
+        font-size: 14px;
+        text-align: center;
+        margin-top: 10px;
+      }
+    </style>
+    <script>
+      // ログイン認証用の関数
+      function authenticate() {
+        // ユーザーから入力されたIDとパスワードを取得
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+
+        // 正しいIDとパスワードの確認
+        if (username === "oshiki" && password === "Oshiki") {
+          // 正しい場合はトップページへリダイレクト
+          window.location.href =
+            "https://blush-nimble-airport.glitch.me/top.html"; // トップページのURLに置き換えてください
+        } else {
+          // 誤ったIDまたはパスワードの場合はエラーメッセージを表示
+          alert("IDまたはパスワードが間違っています。");
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <form onsubmit="event.preventDefault(); authenticate();">
+      <h2>LOGIN PAGE</h2>
+      <h3>
+        
+      </h3>
+
+      <label for="username">ID:</label>
+      <input type="text" id="username" name="username" required />
+
+      <label for="password">パスワード:</label>
+      <input type="password" id="password" name="password" required />
+
+      <button type="submit">ログイン</button>
+    </form>
+  </body>
+</html>

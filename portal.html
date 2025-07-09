@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ポータルサイト - トップ</title>
+    <link rel="stylesheet" href="portal-style.css" />
+    <meta http-equiv="refresh" content="60" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        display: flex;
+        background-color: #f5f5f5;
+      }
+      nav {
+        width: 220px;
+        background-color: #2c3e50;
+        color: white;
+        padding: 10px;
+        min-height: 100vh;
+      }
+      nav a {
+        display: block;
+        color: white;
+        text-decoration: none;
+        padding: 12px;
+        margin: 8px 0;
+        background-color: #34495e;
+        border-radius: 6px;
+        transition: background-color 0.3s;
+      }
+      nav a:hover {
+        background-color: #1abc9c;
+      }
+      main {
+        flex: 1;
+        padding: 30px;
+        padding-bottom: 50px; /* テロップと重ならないように追加 */
+      }
+      header {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+      section {
+        margin-bottom: 40px;
+      }
+      ul {
+        list-style: disc;
+        padding-left: 20px;
+      }
+      .update-time {
+        font-size: 0.9em;
+        color: #888;
+      }
+      input[type="text"] {
+        padding: 6px;
+        width: 80%;
+        margin-top: 10px;
+        margin-bottom: 20px;
+      }
+      iframe {
+        border: none;
+        width: 100%;
+        height: 400px;
+        margin-top: 10px;
+      }
+      @media screen and (max-width: 600px) {
+        body {
+          flex-direction: column;
+        }
+        nav {
+          width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-around;
+          min-height: auto;
+        }
+        nav a {
+          flex: 1 1 40%;
+          margin: 5px;
+          text-align: center;
+        }
+      }
+
+      /* スクロールテロップスタイル */
+      .ticker-wrap {
+        width: 100%;
+        overflow: hidden;
+        background-color: #2c3e50;
+        color: white;
+        padding: 8px 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 9999;
+      }
+
+      .ticker {
+        display: inline-block;
+        white-space: nowrap;
+        animation: tickerScroll 25s linear infinite;
+        padding-left: 100%;
+      }
+
+      @keyframes tickerScroll {
+        from {
+          transform: translateX(0%);
+        }
+        to {
+          transform: translateX(-100%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <img
+        src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
+        alt="メニュー画像"
+        style="width: 100%; border-radius: 5px; margin-bottom: 10px"
+      />
+      <a href="portal.html">🏠 トップ</a>
+      <a href="portal-news.html">📰 お知らせ</a>
+      <a href="portal-tool.html">🛠 ツール</a>
+      <a href="portal-renraku.html">📢 掲示板連絡</a>
+      <a href="portal-umekomi.html">🧰水泳関連 ツールポータル</a>
+      <a href="portal-tenki.html">⛅️今後の天気【プール練の参考に】</a>
+    </nav>
+
+    <main>
+      <section>
+        <header>🆕 新着情報</header>
+        <ul>
+          <li>2025/6/28 - 交流会まで残り1週間です!</li>
+          <li>
+            2025/6/28 - 資料ダウンロードページに市総体のR+個人を追加しました
+          </li>
+          <li>
+            2025/6/24 - 資料ダウンロードページに交流会のR+個人を追加しました
+          </li>
+          <li>2025/6/20 - 持ちもの一覧を追加しました。</li>
+          <li>
+            2025/06/05 - <strong>高校総体</strong> の要項が更新されました。
+          </li>
+          <li>2025/04/30 - 5月の予定を追加しました。</li>
+          <li>2025/01/20 - 新しいツールを追加しました。</li>
+        </ul>
+        <p class="update-time">最終更新: <span id="lastUpdated"></span></p>
+      </section>
+
+      <section>
+        <header>📌 サイトのご案内</header>
+        <ul>
+          <li>最新のお知らせ、大会情報、連絡を一括で確認できます。</li>
+          <li>スマートフォンでも見やすい構成です。</li>
+        </ul>
+      </section>
+
+      <section class="download-section">
+        <header>📄 資料ダウンロード</header>
+        <ul class="download-list">
+          <li>
+            <a
+              href="http://isa.php.xdomain.jp/htdocs/?action=common_download_main&upload_id=705"
+              target="_blank"
+              download
+            >
+              📎 <strong>0727 市総体 要項</strong>（PDF）
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.dropbox.com/scl/fi/zo8oxjmrg0713wlsyaajg/r-_cropped-1.pdf?rlkey=hbq1tc5a1ncdf7xdipy0r9hn9&st=a1mh6389&dl=0"
+              target="_blank"
+              download
+            >
+              📎 <strong>0727 市総体 R＋個人一覧</strong>（PDF）
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.dropbox.com/scl/fi/aay4on67k7sgscx83b3i8/0712.pdf?rlkey=9r9mxq1iouhpha3vdkhewz30p&st=ltac07gb&dl=0"
+              target="_blank"
+              download
+            >
+              📎 <strong>0712 市大会 要項</strong>（PDF）
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.dropbox.com/scl/fi/w7idxe9yihiu457c9ays8/0705.pdf?rlkey=3zrwdmdr0o3hdpfbp7pomhulc&st=jrdrau3w&dl=0"
+              target="_blank"
+              download
+            >
+              📎 <strong>0705 中ブロック交流会 要項</strong>（PDF）
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.dropbox.com/scl/fi/i1my5z7e4bq0vlpwkezyc/r.pdf?rlkey=oeobsw8bl1e8ibtbftbqgww8k&st=25uof3sg&dl=0"
+              target="_blank"
+              download
+            >
+              📎 <strong>0705 中ブロック交流会 R＋個人一覧</strong>（PDF）
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <header>🔍 ページ内検索</header>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="キーワードで検索..."
+          onkeyup="searchInPage()"
+        />
+      </section>
+
+      <section>
+        <header>📅 カレンダー</header>
+        <iframe
+          src="https://calendar.google.com/calendar/embed?src=7od2p14qjdbdqv1bk0kq88gmdndrj8av%40import.calendar.google.com&ctz=Asia%2FTokyo"
+        ></iframe>
+      </section>
+
+      <section>
+        <header
+          style="
+            cursor: pointer;
+            background-color: #2c3e50;
+            color: white;
+            padding: 8px;
+          "
+          onclick="toggleSection()"
+        >
+          🌤 今後の天気[練習の参考に]▼
+        </header>
+
+        <div
+          id="toggleContent"
+          style="display: none; border: 1px solid #ccc; padding: 10px"
+        >
+          <iframe
+            src="https://ritska.com/clock/clock-5x4c.html?AREA_CODE=46106&COLORSET=0&CLOCK24H=1&COLON_BLINK=1&ZEROPAD=1&DEBUG=0"
+            width="100%"
+            height="180"
+            style="border: none"
+            title="天気と時計"
+            loading="lazy"
+          ></iframe>
+          <section>
+            <header>🌤</header>
+            <section>
+              <header>🌡 暑さ指数（WBGT）</header>
+              <iframe
+                src="https://atsusa.jp/wbgt/46091.html"
+                width="100%"
+                height="600"
+                style="border: 1px solid #ccc"
+                title="暑さ指数（WBGT）"
+                loading="lazy"
+              ></iframe>
+            </section>
+
+            <!-- 伊勢原市 -->
+            <div id="booked-widget-h13bs0hdj6q" style="margin-bottom: 20px">
+              <a href="https://booked.jp/weather/isehara-270586">伊勢原市</a>
+            </div>
+            <script type="text/javascript">
+              (function () {
+                const widgetUrl = encodeURIComponent(location.href);
+                async function fetchWidgetData() {
+                  let WUrl =
+                    "https://weather-widget.booked.net/api/template?&cityId=270586&id=sidebar1&langId=16&iconPack=grd_fill&rand_id=h13bs0hdj6q";
+                  WUrl += "&ref=" + widgetUrl;
+                  let response = await fetch(WUrl);
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                  }
+                  const data = await response.json();
+                  if (data.patternHTML) {
+                    document.getElementById(
+                      "booked-widget-h13bs0hdj6q"
+                    ).innerHTML = data.patternHTML;
+                  }
+                }
+                fetchWidgetData();
+              })();
+            </script>
+            <iframe
+              src="https://www.wbgt.env.go.jp/wbgt_data.php"
+              width="100%"
+              height="600"
+              style="border: 1px solid #ccc"
+            ></iframe>
+            <iframe
+              src="https://embed.windy.com/embed2.html?lat=35.38&lon=139.25&detailLat=35.38&detailLon=139.25&width=650&height=450&zoom=10&level=surface&overlay=rain&product=radar&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
+              width="100%"
+              height="400"
+              style="border: none"
+              title="Windyレーダー"
+              loading="lazy"
+            ></iframe>
+          </section>
+        </div>
+      </section>
+
+      <script>
+        function toggleSection() {
+          const content = document.getElementById("toggleContent");
+          if (content.style.display === "none") {
+            content.style.display = "block";
+          } else {
+            content.style.display = "none";
+          }
+        }
+      </script>
+
+      <section>
+        <header>📊 稼働状況</header>
+        <style>
+          .status-list {
+            list-style: none;
+            padding-left: 0;
+          }
+          .status-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          }
+          .status-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+          }
+          .status-ok {
+            color: green;
+          }
+          .status-warning {
+            color: orange;
+          }
+          .status-error {
+            color: red;
+          }
+        </style>
+        <ul class="status-list">
+          <li class="status-item">
+            <img
+              src="https://twemoji.maxcdn.com/v/latest/72x72/1f324.png"
+              class="status-icon"
+              alt="sun behind cloud"
+            />
+            <span
+              ><strong>トップページ：</strong>
+              <span class="status-ok">正常稼働中</span></span
+            >
+          </li>
+          <li class="status-item">
+            <img
+              src="https://twemoji.maxcdn.com/v/latest/72x72/1f4c5.png"
+              class="status-icon"
+              alt="calendar"
+            />
+            <span
+              ><strong>天気情報：</strong>
+              <span class="status-ok">正常稼働中</span></span
+            >
+          </li>
+          <li class="status-item">
+            <img
+              src="https://twemoji.maxcdn.com/v/latest/72x72/1f4e5.png"
+              class="status-icon"
+              alt="inbox tray"
+            />
+            <span
+              ><strong>資料ダウンロード：</strong>
+              <span class="status-warning"
+                >現在、リンク順次登録中です。</span
+              ></span
+            >
+          </li>
+          <li class="status-item">
+            <img
+              src="https://twemoji.maxcdn.com/v/latest/72x72/1f6ab.png"
+              class="status-icon"
+              alt="prohibited"
+            />
+            <span
+              ><strong>お知らせ・掲示板情報：</strong>
+              <span class="status-ok">正常稼働中</span></span
+            >
+          </li>
+          <li class="status-item">
+            <img
+              src="https://twemoji.maxcdn.com/v/latest/72x72/1f6ab.png"
+              class="status-icon"
+              alt="prohibited"
+            />
+            <span
+              ><strong>その他：</strong>
+              <span class="status-warning"
+                >一部画像・ウィジェットが表示、更新されない現象が起きています。対応中です。</span
+              ></span
+            >
+          </li>
+        </ul>
+      </section>
+
+      <!-- ポータルサイトの任意の場所にこのセクションを貼ってね -->
+      <section class="swim-world-records">
+        <h2>🏆 長水路・世界記録（男女種目）</h2>
+        <div id="world-record-box">
+          <p><strong>種目：</strong><span id="wr-event">読み込み中…</span></p>
+          <p><strong>記録：</strong><span id="wr-time">-</span></p>
+          <p><strong>選手：</strong><span id="wr-athlete">-</span></p>
+          <p><strong>国籍：</strong><span id="wr-nation">-</span></p>
+          <p><strong>樹立日：</strong><span id="wr-date">-</span></p>
+          <p><strong>大会：</strong><span id="wr-meet">-</span></p>
+        </div>
+      </section>
+
+      <style>
+        .swim-world-records {
+          background-color: #ffffff;
+          border-left: 5px solid #1abc9c;
+          padding: 1rem;
+          margin: 1rem 0;
+          border-radius: 10px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+          font-family: "Yu Gothic", "ヒラギノ角ゴ Pro", Meiryo, sans-serif;
+        }
+        #world-record-box {
+          font-size: 0.9rem;
+          color: #2c3e50;
+        }
+      </style>
+
+      <script>
+        const worldRecords = [
+          // 男子
+          {
+            event: "男子 50m 自由形",
+            time: "20.91",
+            athlete: "César Cielo",
+            nation: "ブラジル",
+            date: "2009年12月18日",
+            meet: "世界選手権（ローマ）",
+          },
+          {
+            event: "男子 100m 自由形",
+            time: "46.86",
+            athlete: "David Popovici",
+            nation: "ルーマニア",
+            date: "2022年8月13日",
+            meet: "ヨーロッパ選手権（ローマ）",
+          },
+          {
+            event: "男子 200m 自由形",
+            time: "1:42.00",
+            athlete: "Paul Biedermann",
+            nation: "ドイツ",
+            date: "2009年7月28日",
+            meet: "世界選手権（ローマ）",
+          },
+          {
+            event: "男子 100m 背泳ぎ",
+            time: "51.60",
+            athlete: "Thomas Ceccon",
+            nation: "イタリア",
+            date: "2022年6月15日",
+            meet: "欧州選手権（ローマ）",
+          },
+          {
+            event: "男子 100m 平泳ぎ",
+            time: "56.88",
+            athlete: "Adam Peaty",
+            nation: "イギリス",
+            date: "2019年7月21日",
+            meet: "世界選手権（光州）",
+          },
+          {
+            event: "男子 100m バタフライ",
+            time: "49.45",
+            athlete: "Caeleb Dressel",
+            nation: "アメリカ",
+            date: "2021年6月19日",
+            meet: "世界選手権（ブダペスト）",
+          },
+          {
+            event: "男子 200m 個人メドレー",
+            time: "1:54.00",
+            athlete: "Michael Phelps",
+            nation: "アメリカ",
+            date: "2011年7月31日",
+            meet: "世界選手権（上海）",
+          },
+          // 女子
+          {
+            event: "女子 50m 自由形",
+            time: "23.61",
+            athlete: "Sarah Sjöström",
+            nation: "スウェーデン",
+            date: "2023年5月21日",
+            meet: "世界選手権（福岡）",
+          },
+          {
+            event: "女子 100m 自由形",
+            time: "51.71",
+            athlete: "Sarah Sjöström",
+            nation: "スウェーデン",
+            date: "2017年7月23日",
+            meet: "世界選手権（ブダペスト）",
+          },
+          {
+            event: "女子 200m 自由形",
+            time: "1:52.98",
+            athlete: "Li Bingjie",
+            nation: "中国",
+            date: "2023年7月27日",
+            meet: "世界選手権（福岡）",
+          },
+          {
+            event: "女子 100m 背泳ぎ",
+            time: "57.26",
+            athlete: "Regan Smith",
+            nation: "アメリカ",
+            date: "2019年7月28日",
+            meet: "世界選手権（光州）",
+          },
+          {
+            event: "女子 100m 平泳ぎ",
+            time: "1:04.13",
+            athlete: "Ruta Meilutyte",
+            nation: "リトアニア",
+            date: "2013年7月29日",
+            meet: "世界選手権（バルセロナ）",
+          },
+          {
+            event: "女子 100m バタフライ",
+            time: "55.48",
+            athlete: "Sarah Sjöström",
+            nation: "スウェーデン",
+            date: "2016年8月7日",
+            meet: "リオ五輪",
+          },
+          {
+            event: "女子 200m 個人メドレー",
+            time: "2:06.12",
+            athlete: "Katinka Hosszú",
+            nation: "ハンガリー",
+            date: "2015年8月9日",
+            meet: "世界選手権（カザン）",
+          },
+        ];
+
+        let wrIndex = 0;
+
+        function updateWR() {
+          const r = worldRecords[wrIndex];
+          document.getElementById("wr-event").textContent = r.event;
+          document.getElementById("wr-time").textContent = r.time + "秒";
+          document.getElementById("wr-athlete").textContent = r.athlete;
+          document.getElementById("wr-nation").textContent = r.nation;
+          document.getElementById("wr-date").textContent = r.date;
+          document.getElementById("wr-meet").textContent = r.meet;
+          wrIndex = (wrIndex + 1) % worldRecords.length;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          updateWR();
+          setInterval(updateWR, 10000);
+        });
+      </script>
+      <section
+        style="
+          max-width: 600px;
+          margin: 40px auto;
+          padding: 20px;
+          background: linear-gradient(135deg, #1abc9c, #16a085);
+          border-radius: 12px;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+          color: white;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        "
+      >
+        <header
+          style="
+            font-size: 1.8em;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+          "
+        >
+          💬 今日の名言
+        </header>
+        <p
+          id="daily-quote"
+          style="
+            font-style: italic;
+            font-size: 1.3em;
+            line-height: 1.6;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+          "
+        >
+          <!-- 名言ここに入る -->
+        </p>
+      </section>
+
+      <script>
+        const quotes = [
+          "マイケル・フェルプス: “何よりも、勝ちたいという強い気持ちが大切。”",
+          "北島康介: “挑戦を恐れずに、自分を信じて泳ぎ続けろ。”",
+          "池江璃花子: “どんなに苦しくても前を向く。”",
+          "萩野公介: “自分の限界を超えた時、成長がある。”",
+          "瀬戸大也: “大事なのは自分との闘い。”",
+          "松田丈志: “勝つために必要なのは日々の積み重ね。”",
+          "古橋広夢: “泳ぐことは自分自身を知る旅。”",
+          "池江璃花子: “小さな努力が大きな結果を生む。”",
+          "瀬戸大也: “努力は決して裏切らない。”",
+          "大橋悠依: “自分を信じて限界を超えよう。”",
+          "萩野公介: “困難に立ち向かう勇気が大事。”",
+          "池江璃花子: “夢に向かって突き進むのみ。”",
+          "北島康介: “努力なくして成功なし。”",
+          "松田丈志: “毎日の積み重ねが未来を作る。”",
+          "古橋広夢: “水中での自由こそ最高の喜び。”",
+          "石原佳純: “勝つために必要なのは強い心。”",
+          "萩野公介: “苦しみを乗り越えてこそ成長がある。”",
+          "池江璃花子: “前を向いて泳ぐ限り道は開ける。”",
+          "瀬戸大也: “水の中にいるときが一番生きている実感がある。”",
+          "大橋悠依: “自分のペースを信じて進め。”",
+          "北島康介: “挑戦なくして栄光なし。”",
+          "マイケル・フェルプス: “失敗してもあきらめるな。”",
+          "松田丈志: “勝ちたい気持ちが力になる。”",
+          "古橋広夢: “泳ぎは心の表現。”",
+          "池江璃花子: “諦めないことが勝利への鍵。”",
+          "萩野公介: “自分を信じて全力を尽くせ。”",
+          "池江璃花子: “どんな壁も乗り越えられる。”",
+          "瀬戸大也: “努力の先に夢がある。”",
+          "大橋悠依: “限界を決めるのは自分自身だ。”",
+        ];
+
+        const today = new Date();
+        const day = today.getDate();
+        const index = (day - 1) % quotes.length;
+
+        document.getElementById("daily-quote").textContent = quotes[index];
+      </script>
+    </main>
+
+    <!-- テロップ表示部分 -->
+    <div class="ticker-wrap">
+      <div class="ticker">
+        <span
+          >🚨 大会が増えてきます ／ 📢 次回の部活は7/8 プール練習
+          <u><b>大会前です!!</b></u> ／ 🆕 伊勢原市総合体育大会の費用
+          1000円と申込書 7/10まで／入水可能水温・塩素濃度： OAT+WT≥50,RC ≥ 0.4
+          mg/L</span
+        >
+      </div>
+    </div>
+
+    <script>
+      document.getElementById("lastUpdated").textContent = new Date(
+        document.lastModified
+      ).toLocaleString();
+
+      function searchInPage() {
+        const input = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const bodyText = document.body.innerText.toLowerCase();
+        if (!bodyText.includes(input)) {
+          alert("該当するキーワードは見つかりませんでした。");
+        }
+      }
+    </script>
+  </body>
+</html>

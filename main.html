@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>ログイン画面</title>
+</head>
+<body>
+
+  <h2>ログインフォーム</h2>
+  <label for="username">ユーザー名:</label>
+  <input type="text" id="username" /><br />
+
+  <label for="pass">パスワード:</label>
+  <input type="password" id="pass" />
+  <input type="checkbox" id="showpassword" onclick="showOrHide()" />
+  <label for="showpassword">パスワードを表示</label><br />
+
+  <button onclick="login()">ログイン</button>
+
+  <hr />
+
+  <div id="container2">
+    <p id="user">ユーザー名:</p>
+    <p id="age">年齢:</p>
+    <p id="email">Eメール:</p>
+    <p id="password2">リンク:</p>
+  </div>
+
+  <script>
+    function showOrHide() {
+      let showpass = document.getElementById("pass");
+      let check = document.getElementById("showpassword");
+      if (check.checked) {
+        showpass.type = "text";
+      } else {
+        showpass.type = "password";
+      }
+    }
+
+    let userdata = [
+      {
+        name: "administrator",
+        age: 20,
+        email: "Administrator@example.com",
+        password: "Administrator",
+      },
+      {
+        name: "oshiki",
+        age: 0,
+        email: "s123025@jishukan.ed.jp",
+        password: "Oshiki",
+        link: "https://blush-nimble-airport.glitch.me/portal.html",
+      },
+      {
+        name: "kanri",
+        age: 999,
+        email: "wlnhh22791@yahoo.co.jp",
+        password: "wlnhh22791",
+      },
+      { name: "user3", age: 23, email: "user3@example.com", password: "user-3" },
+    ];
+
+    function login() {
+      let loginuser = "";
+      let username = document.getElementById("username").value;
+      let password = document.getElementById("pass").value;
+
+      let found = false;
+      let i = 0;
+
+      while (!found && i < userdata.length) {
+        loginuser = userdata[i];
+        if (
+          loginuser.hasOwnProperty("name") &&
+          loginuser.hasOwnProperty("password")
+        ) {
+          if (loginuser.name === username && loginuser.password === password) {
+            found = true;
+          }
+        }
+        i++;
+      }
+
+      if (found) {
+        alert(`こんにちは。${username}さん。`);
+        console.log(`logined is ${username}`);
+        document.getElementById("user").textContent =
+          "ユーザー名: " + loginuser.name;
+        document.getElementById("age").textContent = "年齢: " + loginuser.age;
+        document.getElementById("email").textContent = "Eメール: " + loginuser.email;
+
+        if (loginuser.link) {
+          document.getElementById("password2").innerHTML =
+            `リンク: <a href="${loginuser.link}" target="_blank">ページへジャンプする</a>`;
+        } else {
+          document.getElementById("password2").textContent = "リンク: なし";
+        }
+      } else {
+        alert(
+          "ログインに失敗しました。入力している内容がデータと一致しませんでした。間違いがない場合は、ユーザーデータが破損している可能性があります。入力内容に誤りのない場合は、javascriptファイルのuserdata変数を確認してください。\nEnglish...Login failed. Data in the user data variable may be corrupted or entered incorrectly. If there are no typos in what you entered, please check the userdata variable in javascript."
+        );
+        console.log(
+          "Login failed. Data in the user data variable may be corrupted or entered incorrectly. If there are no typos in what you entered, please check the userdata variable in javascript."
+        );
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ポータルサイト - 掲示板連絡</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        display: flex;
+        background-color: #f5f5f5;
+      }
+      nav {
+        width: 220px;
+        background-color: #2c3e50;
+        color: white;
+        padding: 10px;
+        min-height: 100vh;
+      }
+      nav a {
+        display: block;
+        color: white;
+        text-decoration: none;
+        padding: 12px;
+        margin: 8px 0;
+        background-color: #34495e;
+        border-radius: 6px;
+        transition: background-color 0.3s;
+      }
+      nav a:hover {
+        background-color: #1abc9c;
+      }
+      main {
+        flex: 1;
+        padding: 30px;
+        position: relative;
+        padding-bottom: 60px; /* フッター（テロップ）用のスペース確保 */
+      }
+      header {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+      .board {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      }
+      .board-item {
+        border-bottom: 1px solid #ddd;
+        padding: 10px 0;
+      }
+      .board-item:last-child {
+        border-bottom: none;
+      }
+      .board-item .date {
+        color: #888;
+        font-size: 0.85em;
+        margin-bottom: 5px;
+      }
+      .board-item .content {
+        font-size: 1.1em;
+        color: #34495e;
+      }
+
+      /* テロップのスタイル */
+      .ticker-wrap {
+        width: 100%;
+        overflow: hidden;
+        background-color: #2c3e50;
+        color: white;
+        padding: 8px 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 9999;
+      }
+      .ticker {
+        display: inline-block;
+        white-space: nowrap;
+        animation: tickerScroll 25s linear infinite;
+        padding-left: 100%;
+      }
+      @keyframes tickerScroll {
+        from {
+          transform: translateX(0%);
+        }
+        to {
+          transform: translateX(-100%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <img
+        src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
+        alt="メニュー画像"
+        style="width: 100%; border-radius: 5px; margin-bottom: 10px"
+      />
+      <a href="portal.html">🏠 トップ</a>
+      <a href="portal-news.html">📰 お知らせ</a>
+      <a href="portal-tool.html">🛠 ツール</a>
+      <a href="portal-renraku.html">📢 掲示板連絡</a>
+      <a href="portal-umekomi.html">🧰水泳関連 ツールポータル</a>
+      <a href="portal-tenki.html">⛅️今後の天気【プール練の参考に】</a>
+    </nav>
+
+    <main>
+      <header>📢 掲示板連絡</header>
+      <section class="board">
+        <div class="board-item">
+          <div class="date">2025/06/29</div>
+          <div class="content">
+            <b>7/12 伊勢原地区水泳競技大会について</b><br />
+            集合…成瀬中学校<br />
+            集合時刻…8:45　解散時刻…13時頃（未定）<br />
+            持ち物…水着、サンダル、飲み物、タオル<br />
+            服装…部活動の練習着もしくは学校の体操服（私服不可）
+          </div>
+        </div>
+
+        <div class="board-item">
+          <div class="date">2025/06/29</div>
+          <div class="content">
+            <b>7/5 中ブロック交流会について</b><br />
+            集合…トッケイセキュリティ平塚総合体育館温水プール<br />
+            時刻…8:15集合　13:00解散<br />
+            持ち物…水着、飲み物、軽食（プールサイドは食事不可）、サンダル、タオル<br />
+            服装…部活動の練習着もしくは学校の体操服（私服不可）
+          </div>
+        </div>
+
+        <div class="board-item">
+          <div class="date">2025/06/26</div>
+          <div class="content">
+            市総体の申込書を配布しました。1000円といっしょに、7/10までに顧問まで提出してください。
+          </div>
+        </div>
+
+        <div class="board-item">
+          <div class="date">2025/06/14</div>
+          <div class="content">
+            交流会、市総体のエントリーは24日までです。<br />
+            リレーを含めて変更したい場合は、6/24 23:59までにお願いします。<br />
+            未入力の場合には大会に参加できません。
+          </div>
+        </div>
+
+        <div class="board-item">
+          <div class="date">2025/06/20</div>
+          <div class="content">
+            <b>【6/24の予定】</b><br /><br />
+
+            ■活動時間<br />
+            13:00〜15:00<br />
+            ・SB行き → 愛甲12:30／平塚12:10<br />
+            ・SB帰り → 15:30（自習ありの場合 17:10）<br /><br />
+
+            ※昼食は不要。早めに家で食べてきてください。<br />
+            ※朝の自習もOK。その場合は朝のSBに乗って、お弁当など昼食が必要です。<br /><br />
+
+            ■持ち物<br />
+            ・制服（登校時の服装は通常通り）<br />
+            ・水泳道具（水着、タオル、帽子、ゴーグルなど）<br />
+            ・プルブイ<br />
+            ・フィン、パドル（なくてもOK）<br />
+            ・サンダル（使わない人が多い）<br />
+            ・日焼け止め（曇りでも焼けます）<br />
+            ・飲み物<br />
+            ・体操着などの運動着（※雨なら陸トレの可能性あり）<br />
+            ・羽織るもの（プール後の日陰は寒いかもしれません）<br /><br />
+
+            ■その他<br />
+            ・欠席・遅刻する場合はJOINで顧問に連絡。<br />
+            ・天気が悪くなるかもしれないので、室内練習の準備もしておいてください。
+          </div>
+        </div>
+
+        <div class="board-item">
+          <div class="date">2025/05/15</div>
+          <div class="content">
+            掲示板の使い方について質問があれば作成者まで。
+          </div>
+        </div>
+      </section>
+
+      <button
+        onclick="location.href='portal.html'"
+        style="
+          padding: 10px 20px;
+          font-size: 1em;
+          background-color: #1abc9c;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          margin-top: 20px;
+        "
+      >
+        ポータルトップへ戻る
+      </button>
+    </main>
+
+    <div class="ticker-wrap">
+      <div class="ticker">
+        <span>
+          🚨 雷の兆候がある際は活動を控えて ／ 📢
+          随時Classroomにも投稿しています ／ 🆕 市大会エントリー受付中
+        </span>
+      </div>
+    </div>
+  </body>
+</html>

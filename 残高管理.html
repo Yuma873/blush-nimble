@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>交通系ICカード管理</title>
+    <link
+      rel="icon"
+      href="data:image/jpeg;base64,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"
+      type="image/jpeg"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f9;
+      }
+
+      .container {
+        width: 60%;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1,
+      h2 {
+        color: #333;
+      }
+
+      input[type="number"],
+      input[type="text"],
+      input[type="date"] {
+        padding: 8px;
+        margin: 10px 0;
+        width: calc(100% - 20px);
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        padding: 10px 15px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 5px;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      button.delete {
+        background-color: #e74c3c;
+      }
+
+      button.delete:hover {
+        background-color: #c0392b;
+      }
+
+      #historyList {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      #historyList li {
+        padding: 10px;
+        margin: 5px 0;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>交通系ICカードの管理</h1>
+
+      <!-- ICカード情報の入力フォーム -->
+      <div class="balance-form">
+        <h2>現在の残高</h2>
+        <input type="number" id="balance" placeholder="残高を入力" min="0" />
+        <button id="saveBalance">残高保存</button>
+        <input
+          type="number"
+          id="chargeAmount"
+          placeholder="チャージ額"
+          min="0"
+        />
+        <button id="chargeBalance">チャージ</button>
+        <button id="resetBalance" class="delete">残高リセット</button>
+      </div>
+
+      <div class="history-form">
+        <h2>使用履歴</h2>
+        <input type="date" id="transactionDate" />
+        <input type="text" id="departureStation" placeholder="出発駅" />
+        <input type="text" id="arrivalStation" placeholder="到着駅" />
+        <input type="text" id="routeName" placeholder="路線名" />
+        <input type="text" id="railCompany" placeholder="鉄道会社" />
+        <input
+          type="number"
+          id="fare"
+          placeholder="運賃 (自動入力されます)"
+          readonly
+        />
+        <button id="saveTransaction">履歴追加</button>
+      </div>
+
+      <!-- 残高と履歴の表示 -->
+      <div id="currentBalanceDisplay">
+        <h3>現在の残高: ¥<span id="balanceDisplay">0</span></h3>
+      </div>
+
+      <h2>使用履歴</h2>
+      <ul id="historyList"></ul>
+      <button id="clearHistory" class="delete">履歴を全て削除</button>
+    </div>
+
+    <script>
+      // 運賃データ (出発駅⇔到着駅)
+      const fareData = {
+        "茅ケ崎⇔横浜": 506,
+        "茅ケ崎⇔上溝": 506,
+        "茅ケ崎⇔関内": 594,
+        "茅ケ崎⇔厚木": 242,
+        "茅ケ崎⇔橋本": 594,
+        "橋本⇔八王子": 178,
+        "八王子⇔藤野": 330,
+        "厚木⇔伊勢原": 199,
+        "茅ケ崎⇔日本大通り": 730,
+        "横浜⇔北山田": 335,
+        "横浜⇔日吉": 227,
+        "日吉⇔北山田": 242,
+      };
+
+      window.onload = function () {
+        loadData();
+      };
+
+      function saveData(balance, history) {
+        localStorage.setItem("balance", balance);
+        localStorage.setItem("history", JSON.stringify(history));
+      }
+
+      function loadData() {
+        const balance = localStorage.getItem("balance") || 0;
+        const history = JSON.parse(localStorage.getItem("history")) || [];
+
+        document.getElementById("balanceDisplay").textContent = balance;
+
+        const historyList = document.getElementById("historyList");
+        historyList.innerHTML = "";
+        history.forEach((item) => {
+          const li = document.createElement("li");
+          li.textContent = `${item.date} - ${item.departureStation} ⇔ ${item.arrivalStation} - ¥${item.fare} (${item.routeName}, ${item.railCompany})`;
+          historyList.appendChild(li);
+        });
+      }
+
+      document.getElementById("saveBalance").addEventListener("click", () => {
+        const balance = document.getElementById("balance").value;
+        if (balance && balance >= 0) {
+          document.getElementById("balanceDisplay").textContent = balance;
+          saveData(balance, JSON.parse(localStorage.getItem("history")) || []);
+        } else {
+          alert("正しい残高を入力してください");
+        }
+      });
+
+      document.getElementById("chargeBalance").addEventListener("click", () => {
+        const chargeAmount = document.getElementById("chargeAmount").value;
+        if (chargeAmount && chargeAmount > 0) {
+          let currentBalance = parseInt(
+            document.getElementById("balanceDisplay").textContent
+          );
+          currentBalance += parseInt(chargeAmount);
+          document.getElementById("balanceDisplay").textContent =
+            currentBalance;
+          saveData(
+            currentBalance,
+            JSON.parse(localStorage.getItem("history")) || []
+          );
+          document.getElementById("chargeAmount").value = "";
+        } else {
+          alert("正しいチャージ額を入力してください");
+        }
+      });
+
+      document.getElementById("resetBalance").addEventListener("click", () => {
+        localStorage.setItem("balance", 0);
+        document.getElementById("balanceDisplay").textContent = 0;
+        alert("残高がリセットされました");
+      });
+
+      function updateFare() {
+        const departureStation =
+          document.getElementById("departureStation").value;
+        const arrivalStation = document.getElementById("arrivalStation").value;
+        const stationPair = `${departureStation}⇔${arrivalStation}`;
+        document.getElementById("fare").value = fareData[stationPair] || "";
+      }
+
+      document
+        .getElementById("departureStation")
+        .addEventListener("input", updateFare);
+      document
+        .getElementById("arrivalStation")
+        .addEventListener("input", updateFare);
+
+      document
+        .getElementById("saveTransaction")
+        .addEventListener("click", () => {
+          const date = document.getElementById("transactionDate").value;
+          const departureStation =
+            document.getElementById("departureStation").value;
+          const arrivalStation =
+            document.getElementById("arrivalStation").value;
+          const routeName = document.getElementById("routeName").value;
+          const railCompany = document.getElementById("railCompany").value;
+          let fare = document.getElementById("fare").value;
+
+          if (
+            !date ||
+            !departureStation ||
+            !arrivalStation ||
+            !routeName ||
+            !railCompany ||
+            !fare
+          ) {
+            alert("すべての項目を入力してください");
+            return;
+          }
+
+          let currentBalance = parseInt(
+            document.getElementById("balanceDisplay").textContent
+          );
+          if (currentBalance >= fare) {
+            currentBalance -= fare;
+            document.getElementById("balanceDisplay").textContent =
+              currentBalance;
+
+            const history = JSON.parse(localStorage.getItem("history")) || [];
+            history.push({
+              date,
+              departureStation,
+              arrivalStation,
+              routeName,
+              railCompany,
+              fare,
+            });
+            saveData(currentBalance, history);
+
+            loadData();
+          } else {
+            alert("残高不足です");
+          }
+        });
+
+      document.getElementById("clearHistory").addEventListener("click", () => {
+        localStorage.removeItem("history");
+        loadData();
+        alert("使用履歴が削除されました");
+      });
+    </script>
+  </body>
+</html>

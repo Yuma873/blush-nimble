@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>次回大会情報</title>
+    <link
+      rel="icon"
+      href="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
+      type="image/jpeg"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+        color: #333;
+      }
+      header {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 0;
+        text-align: center;
+      }
+      .container {
+        padding: 20px;
+      }
+      .event-details,
+      .train-details {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .event-details h2,
+      .train-details h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      .event-details p,
+      .train-details p {
+        font-size: 18px;
+        margin: 5px 0;
+      }
+      .event-details .highlight,
+      .train-details .highlight {
+        font-weight: bold;
+        color: #4caf50;
+      }
+      .entry-form,
+      .train-form {
+        margin-top: 20px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .entry-form label,
+      .train-form label {
+        font-size: 16px;
+        margin-top: 10px;
+      }
+      .entry-form input,
+      .entry-form select,
+      .train-form input {
+        padding: 8px;
+        margin-top: 5px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .entry-form button,
+      .train-form button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 18px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 20px;
+      }
+      .entry-form button:hover,
+      .train-form button:hover {
+        background-color: #45a049;
+      }
+      .saved-info {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+      }
+      .saved-info h3 {
+        font-size: 22px;
+        margin-bottom: 10px;
+      }
+      .saved-info p {
+        font-size: 16px;
+        margin: 5px 0;
+      }
+      .edit-button {
+        background-color: #ffa500;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 18px;
+        cursor: pointer;
+        margin-top: 20px;
+        width: 100%;
+      }
+      .edit-button:hover {
+        background-color: #e68900;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>次回大会情報</h1>
+    </header>
+
+    <div class="container">
+      <!-- イベント詳細 -->
+      <div class="event-details">
+        <h2>中ブロック交流会</h2>
+        <p><span class="highlight">日程:</span> 7月5日(土)</p>
+        <p><span class="highlight">場所:</span> 平塚</p>
+        <p><span class="highlight">要項:</span> 未定</p>
+      </div>
+
+      <!-- エントリーフォーム -->
+      <div class="entry-form">
+        <h3>エントリー内容</h3>
+        <label for="num-events">エントリーする種目数:</label>
+        <select id="num-events">
+          <option value="0">選択しない</option>
+          <option value="1">1種目</option>
+          <option value="2">2種目</option>
+          <option value="3">3種目</option>
+          <option value="4">4種目</option>
+        </select>
+
+        <div id="event-details"></div>
+
+        <button id="save-button">エントリー内容を保存</button>
+      </div>
+
+      <!-- 電車情報フォーム -->
+      <div class="train-form">
+        <h3>電車情報</h3>
+        <label for="departure-station">出発駅:</label>
+        <input
+          type="text"
+          id="departure-station"
+          name="departure-station"
+          placeholder="出発駅を入力"
+        />
+
+        <label for="departure-time">出発時間:</label>
+        <input type="time" id="departure-time" name="departure-time" />
+
+        <label for="transit-station1">経由地①:</label>
+        <input
+          type="text"
+          id="transit-station1"
+          name="transit-station1"
+          placeholder="経由地①を入力"
+        />
+
+        <label for="transit-time1">経由地①出発時間:</label>
+        <input type="time" id="transit-time1" name="transit-time1" />
+
+        <label for="transit-station2">経由地②:</label>
+        <input
+          type="text"
+          id="transit-station2"
+          name="transit-station2"
+          placeholder="経由地②を入力"
+        />
+
+        <label for="transit-time2">経由地②出発時間:</label>
+        <input type="time" id="transit-time2" name="transit-time2" />
+
+        <label for="arrival-station">到着駅:</label>
+        <input
+          type="text"
+          id="arrival-station"
+          name="arrival-station"
+          placeholder="到着駅を入力"
+        />
+
+        <label for="arrival-time">到着時間:</label>
+        <input type="time" id="arrival-time" name="arrival-time" />
+
+        <label for="train-fare">料金:</label>
+        <input
+          type="number"
+          id="train-fare"
+          name="train-fare"
+          placeholder="料金を入力"
+        />
+
+        <button id="save-train-button">電車情報を保存</button>
+      </div>
+
+      <!-- 保存された情報表示 -->
+      <div id="saved-info" class="saved-info" style="display: none">
+        <h3>保存されたエントリー内容</h3>
+        <p id="event-info"></p>
+        <h3>保存された電車情報</h3>
+        <p id="train-info"></p>
+        <button class="edit-button" onclick="editInfo()">編集</button>
+      </div>
+    </div>
+
+    <script>
+      // ページがロードされたときにローカルストレージから保存された内容を読み込む
+      window.onload = function () {
+        loadEntryData();
+        loadTrainData();
+      };
+
+      // 種目数の選択に応じて入力フォームを表示
+      document
+        .getElementById("num-events")
+        .addEventListener("change", function () {
+          const numEvents = parseInt(this.value);
+          const eventDetailsDiv = document.getElementById("event-details");
+          eventDetailsDiv.innerHTML = ""; // 既存のフォームをクリア
+
+          // 必要な入力フォームを生成
+          for (let i = 1; i <= numEvents; i++) {
+            const eventDiv = document.createElement("div");
+            eventDiv.innerHTML = `
+                    <h4>種目${i}</h4>
+                    <label for="distance-${i}">距離:</label>
+                    <input type="text" id="distance-${i}" name="distance-${i}">
+                    <label for="type-${i}">種別:</label>
+                    <input type="text" id="type-${i}" name="type-${i}">
+                    <label for="time-${i}">エントリータイム:</label>
+                    <input type="text" id="time-${i}" name="time-${i}">
+                `;
+            eventDetailsDiv.appendChild(eventDiv);
+          }
+        });
+
+      // エントリー内容をローカルストレージに保存
+      document
+        .getElementById("save-button")
+        .addEventListener("click", function () {
+          const numEvents = parseInt(
+            document.getElementById("num-events").value
+          );
+          let entryData = {};
+
+          for (let i = 1; i <= numEvents; i++) {
+            entryData[`event-${i}`] = {
+              distance: document.getElementById(`distance-${i}`).value,
+              type: document.getElementById(`type-${i}`).value,
+              time: document.getElementById(`time-${i}`).value,
+            };
+          }
+
+          localStorage.setItem("entryData", JSON.stringify(entryData));
+          alert("エントリー内容が保存されました！");
+          displaySavedInfo();
+        });
+
+      // 電車情報をローカルストレージに保存
+      document
+        .getElementById("save-train-button")
+        .addEventListener("click", function () {
+          const trainData = {
+            departureStation:
+              document.getElementById("departure-station").value,
+            departureTime: document.getElementById("departure-time").value,
+            transitStation1: document.getElementById("transit-station1").value,
+            transitTime1: document.getElementById("transit-time1").value,
+            transitStation2: document.getElementById("transit-station2").value,
+            transitTime2: document.getElementById("transit-time2").value,
+            arrivalStation: document.getElementById("arrival-station").value,
+            arrivalTime: document.getElementById("arrival-time").value,
+            trainFare: document.getElementById("train-fare").value,
+          };
+
+          localStorage.setItem("trainData", JSON.stringify(trainData));
+          alert("電車情報が保存されました！");
+          displaySavedInfo();
+        });
+
+      // 保存されたエントリー内容と電車情報を表示
+      function displaySavedInfo() {
+        const savedEntryData = JSON.parse(localStorage.getItem("entryData"));
+        const savedTrainData = JSON.parse(localStorage.getItem("trainData"));
+
+        // エントリー情報
+        if (savedEntryData) {
+          let eventInfo = "エントリー内容: <br>";
+          for (let i = 1; i <= Object.keys(savedEntryData).length; i++) {
+            eventInfo += `
+              種目${i}: 距離 - ${savedEntryData[`event-${i}`].distance}, 
+              種別 - ${savedEntryData[`event-${i}`].type}, 
+              タイム - ${savedEntryData[`event-${i}`].time} <br>`;
+          }
+          document.getElementById("event-info").innerHTML = eventInfo;
+        }
+
+        // 電車情報
+        if (savedTrainData) {
+          const trainInfo = `
+            出発駅: ${savedTrainData.departureStation} 
+            出発時間: ${savedTrainData.departureTime} <br>
+            経由地①: ${savedTrainData.transitStation1} 
+            経由地①出発時間: ${savedTrainData.transitTime1} <br>
+            経由地②: ${savedTrainData.transitStation2} 
+            経由地②出発時間: ${savedTrainData.transitTime2} <br>
+            到着駅: ${savedTrainData.arrivalStation} 
+            到着時間: ${savedTrainData.arrivalTime} <br>
+            料金: ${savedTrainData.trainFare} 円`;
+          document.getElementById("train-info").innerHTML = trainInfo;
+        }
+
+        document.getElementById("saved-info").style.display = "block";
+      }
+
+      // 編集ボタンを押したときの処理
+      function editInfo() {
+        // 必要な編集用フォームを表示して、保存された内容を再編集できるようにする
+        document.getElementById("saved-info").style.display = "none";
+      }
+
+      // ローカルストレージから保存されたエントリー内容を読み込む
+      function loadEntryData() {
+        const savedEntryData = JSON.parse(localStorage.getItem("entryData"));
+        if (savedEntryData) {
+          displaySavedInfo();
+        }
+      }
+
+      // ローカルストレージから保存された電車情報を読み込む
+      function loadTrainData() {
+        const savedTrainData = JSON.parse(localStorage.getItem("trainData"));
+        if (savedTrainData) {
+          displaySavedInfo();
+        }
+      }
+    </script>
+  </body>
+</html>

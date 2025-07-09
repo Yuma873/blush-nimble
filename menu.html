@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>水泳メニュー表作成機</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        max-width: 900px;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #aaa;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        background-color: #cce7ff;
+      }
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+      }
+      button {
+        padding: 6px 12px;
+        margin-bottom: 20px;
+        cursor: pointer;
+      }
+      tfoot td {
+        font-weight: bold;
+        background-color: #eee;
+      }
+
+      /* 印刷用スタイル */
+      @media print {
+        button {
+          display: none;
+        }
+        h1 {
+          display: none;
+        }
+        input {
+          border: none;
+          background: transparent;
+          box-shadow: none;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          pointer-events: none;
+          font-size: 14px;
+          color: black;
+          text-align: center;
+          width: auto;
+          padding: 0;
+          margin: 0;
+        }
+        table,
+        th,
+        td {
+          border: none !important;
+        }
+        tbody tr {
+          page-break-inside: avoid;
+        }
+        tbody tr + tr {
+          border-top: 15px solid white;
+        }
+        tfoot tr {
+          page-break-before: always;
+          border-top: none !important;
+        }
+        tfoot {
+          margin-top: 60px;
+          display: table-footer-group;
+        }
+        tbody tr.empty-row,
+        tbody tr.empty-row input {
+          color: transparent !important;
+          -webkit-text-fill-color: transparent !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>水泳メニュー表メーカー</h1>
+
+    <button id="addRowBtn">＋ 行を追加</button>
+    <button onclick="window.print()">🖨 印刷する</button>
+    <button id="saveBtn">💾 保存する</button>
+    <button id="loadBtn">📂 読み込む</button>
+    <input type="file" id="fileInput" accept=".json" style="display: none" />
+
+    <table id="menuTable">
+      <thead>
+        <tr>
+          <th>種別</th>
+          <th>種目</th>
+          <th>距離(m)</th>
+          <th>本数</th>
+          <th>サイクル (分:秒)</th>
+          <th>Note</th>
+          <th>合計距離(m)</th>
+          <th>合計時間</th>
+          <th>削除</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="6">TOTAL 合計距離(m)</td>
+          <td id="totalDistance">0</td>
+          <td id="totalTime">0:00</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <script>
+      function timeToSeconds(t) {
+        const parts = t.split(":");
+        if (parts.length !== 2) return 0;
+        const m = parseInt(parts[0]);
+        const s = parseInt(parts[1]);
+        if (isNaN(m) || isNaN(s)) return 0;
+        return m * 60 + s;
+      }
+
+      function secondsToTime(sec) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return m + ":" + (s < 10 ? "0" : "") + s;
+      }
+
+      function updateRow(row) {
+        const distance = parseInt(row.querySelector(".distance").value) || 0;
+        const count = parseInt(row.querySelector(".count").value) || 0;
+        const cycle = row.querySelector(".cycle").value;
+        const cycleSec = timeToSeconds(cycle);
+
+        const totalDistance = distance * count;
+        const totalTimeSec = cycleSec * count;
+
+        row.querySelector(".totalDistance").textContent =
+          totalDistance > 0 ? totalDistance : "";
+        row.querySelector(".totalTime").textContent =
+          totalTimeSec > 0 ? secondsToTime(totalTimeSec) : "";
+
+        // 空白行判定（距離と本数が0のとき）
+        if (distance === 0 && count === 0) {
+          row.classList.add("empty-row");
+        } else {
+          row.classList.remove("empty-row");
+        }
+      }
+
+      function updateTotals() {
+        const rows = document.querySelectorAll("#menuTable tbody tr");
+        let sumDistance = 0;
+        let sumTime = 0;
+        rows.forEach((row) => {
+          const distText = row.querySelector(".totalDistance").textContent;
+          const timeText = row.querySelector(".totalTime").textContent;
+          sumDistance += distText ? parseInt(distText) : 0;
+          sumTime += timeText ? timeToSeconds(timeText) : 0;
+        });
+        document.getElementById("totalDistance").textContent = sumDistance;
+        document.getElementById("totalTime").textContent =
+          secondsToTime(sumTime);
+      }
+
+      function addRow(data) {
+        const tbody = document.querySelector("#menuTable tbody");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+      <td><input type="text" class="type" placeholder="Swim, Kickなど" value="${
+        data?.type || ""
+      }"></td>
+      <td><input type="text" class="stroke" placeholder="Fr, Baなど" value="${
+        data?.stroke || ""
+      }"></td>
+      <td><input type="number" class="distance" min="0" step="5" value="${
+        data?.distance || 0
+      }"></td>
+      <td><input type="number" class="count" min="0" value="${
+        data?.count || 0
+      }"></td>
+      <td><input type="text" class="cycle" placeholder="分:秒" value="${
+        data?.cycle || ""
+      }"></td>
+      <td><input type="text" class="note" placeholder="備考" value="${
+        data?.note || ""
+      }"></td>
+      <td class="totalDistance"></td>
+      <td class="totalTime"></td>
+      <td><button class="deleteBtn">×</button></td>
+    `;
+        tbody.appendChild(tr);
+
+        ["distance", "count", "cycle"].forEach((cls) => {
+          tr.querySelector("." + cls).addEventListener("input", () => {
+            updateRow(tr);
+            updateTotals();
+          });
+        });
+
+        tr.querySelector(".deleteBtn").addEventListener("click", () => {
+          tr.remove();
+          updateTotals();
+        });
+
+        updateRow(tr);
+        updateTotals();
+      }
+
+      // 保存ボタン処理
+      document.getElementById("saveBtn").addEventListener("click", () => {
+        const rows = document.querySelectorAll("#menuTable tbody tr");
+        const data = [];
+        rows.forEach((row) => {
+          const d = {
+            type: row.querySelector(".type").value,
+            stroke: row.querySelector(".stroke").value,
+            distance: row.querySelector(".distance").value,
+            count: row.querySelector(".count").value,
+            cycle: row.querySelector(".cycle").value,
+            note: row.querySelector(".note").value,
+          };
+          data.push(d);
+        });
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "swim_menu.json";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      // 読み込みボタン処理
+      document.getElementById("loadBtn").addEventListener("click", () => {
+        document.getElementById("fileInput").click();
+      });
+
+      // ファイル選択時の読み込み処理
+      document.getElementById("fileInput").addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const json = JSON.parse(event.target.result);
+            if (!Array.isArray(json)) throw new Error("不正なファイル形式です");
+            // テーブル初期化
+            const tbody = document.querySelector("#menuTable tbody");
+            tbody.innerHTML = "";
+            json.forEach((rowData) => addRow(rowData));
+            updateTotals();
+          } catch (err) {
+            alert("ファイルの読み込みに失敗しました: " + err.message);
+          }
+        };
+        reader.readAsText(file);
+        e.target.value = ""; // ファイル選択をリセット
+      });
+
+      document
+        .getElementById("addRowBtn")
+        .addEventListener("click", () => addRow());
+
+      addRow();
+    </script>
+  </body>
+</html>

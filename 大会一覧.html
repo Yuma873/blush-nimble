@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>大会一覧</title>
+    <link
+      rel="icon"
+      href="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
+      type="image/jpeg"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f9;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+      th {
+        background-color: #f2f2f2;
+        cursor: pointer;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      .sorted-asc::after {
+        content: " ↑";
+      }
+      .sorted-desc::after {
+        content: " ↓";
+      }
+    </style>
+  </head>
+  <body>
+    <h1>大会一覧</h1>
+
+    <table id="eventTable">
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)">大会名</th>
+          <th onclick="sortTable(1)">日付</th>
+          <th onclick="sortTable(2)">会場</th>
+          <th onclick="sortTable(3)">出場資格者</th>
+          <th onclick="sortTable(4)">備考</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>中ブロック交流会</td>
+          <td>7月5日（土）</td>
+          <td>平塚総合体育館</td>
+          <td>前期生</td>
+          <td>スタート練習あり</td>
+        </tr>
+        <tr>
+          <td>伊勢原市大会</td>
+          <td>7月12日（土）</td>
+          <td>成瀬中学校</td>
+          <td>前期生</td>
+          <td>記録突破した者は中ブロック大会出場可</td>
+        </tr>
+        <tr>
+          <td>中ブロック大会</td>
+          <td>8月2日（土）</td>
+          <td>平塚総合体育館</td>
+          <td><font color="red">前期生/記録突破者</font></td>
+          <td>記録突破した者は県総体出場可</td>
+        </tr>
+        <tr>
+          <td>伊勢原市総合体育大会</td>
+          <td>未定</td>
+          <td>未定</td>
+          <td>全区分</td>
+          <td>なし</td>
+        </tr>
+        <tr>
+          <td>県総体</td>
+          <td>8月13日付近</td>
+          <td>横浜国際プール/さがみはらグリーンプール</td>
+          <td><font color="red">前期生/記録突破者</font></td>
+          <td>なし</td>
+        </tr>
+        <tr>
+          <td>神奈川県私立大会</td>
+          <td>未定</td>
+          <td>未定</td>
+          <td>未定</td>
+          <td>なし</td>
+        </tr>
+        <tr>
+          <td>中ブロック新人戦</td>
+          <td>未定</td>
+          <td>未定</td>
+          <td>未定</td>
+          <td>なし</td>
+        </tr>
+        <tr>
+          <td>伊勢原市水泳選手権</td>
+          <td>未定</td>
+          <td>未定</td>
+          <td>未定</td>
+          <td>なし</td>
+        </tr>
+        <tr>
+          <td>湘南スイムミート</td>
+          <td>未定</td>
+          <td>未定</td>
+          <td>未定</td>
+          <td>なし</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <script>
+      function sortTable(columnIndex) {
+        const table = document.getElementById("eventTable");
+        const rows = Array.from(table.rows).slice(1);
+        let ascending = true;
+
+        const th = table.querySelectorAll("th")[columnIndex];
+        if (th.classList.contains("sorted-asc")) {
+          ascending = false;
+          th.classList.remove("sorted-asc");
+          th.classList.add("sorted-desc");
+        } else {
+          th.classList.remove("sorted-desc");
+          th.classList.add("sorted-asc");
+        }
+
+        rows.sort((rowA, rowB) => {
+          const cellA = rowA.cells[columnIndex].innerText;
+          const cellB = rowB.cells[columnIndex].innerText;
+
+          if (columnIndex === 1) {
+            // 日付の列（未定の場合も文字列として扱う）
+            return ascending
+              ? cellA.localeCompare(cellB)
+              : cellB.localeCompare(cellA);
+          } else {
+            // その他の列（テキスト）
+            return ascending
+              ? cellA.localeCompare(cellB)
+              : cellB.localeCompare(cellA);
+          }
+        });
+
+        rows.forEach((row) => table.appendChild(row));
+      }
+    </script>
+  </body>
+</html>

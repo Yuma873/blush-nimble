@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ポータルサイト - お知らせ</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        display: flex;
+        background-color: #f5f5f5;
+      }
+      nav {
+        width: 220px;
+        background-color: #2c3e50;
+        color: white;
+        padding: 10px;
+        min-height: 100vh;
+      }
+      nav a {
+        display: block;
+        color: white;
+        text-decoration: none;
+        padding: 12px;
+        margin: 8px 0;
+        background-color: #34495e;
+        border-radius: 6px;
+        transition: background-color 0.3s;
+      }
+      nav a:hover {
+        background-color: #1abc9c;
+      }
+      main {
+        flex: 1;
+        padding: 30px;
+      }
+      header {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+      section {
+        margin-bottom: 40px;
+      }
+      ul {
+        list-style: disc;
+        padding-left: 20px;
+      }
+      .update-time {
+        font-size: 0.9em;
+        color: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <img
+        src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
+        alt="メニュー画像"
+        style="width: 100%; border-radius: 5px; margin-bottom: 10px"
+      />
+      <a href="portal.html">🏠 トップ</a>
+      <a href="portal-news.html">📰 お知らせ</a>
+      <a href="portal-tool.html">🛠 ツール</a>
+      <a href="portal-renraku.html">📢 掲示板連絡</a>
+      <a href="portal-umekomi.html">🧰水泳関連 ツールポータル</a>
+      <a href="portal-tenki.html">⛅️今後の天気【プール練の参考に】</a>
+    </nav>
+    <main>
+      <section>
+        <header>📰 最新のお知らせ</header>
+        <ul>
+          <li>2025/6/26 - <strong>7/1日の部活</strong>は前期生のみです。スタート練習をメインにする予定です。</li>
+          <li>2025/6/20 - <strong>24日の部活</strong>はプールです。水着等、泳げる準備をしてください。</li>
+          <li>
+            2025/06/10 - <strong>14日（土）は全員で13:30～15:00まで陸トレ
+</strong>に変更します。急な変更で申し訳ありません。
+          </li>
+          <li>2025/05/20 - 【後期】夏季記録会の要項を確認してください。</li>
+          <li>2025/04/15 - 新年度のスケジュールを公開しました。</li>
+        </ul>
+      </section>
+
+      <section>
+        <header>📢 大会関連情報</header>
+        <ul>
+          <li>
+            2025/06/14 -
+            <strong>市総体</strong
+            >のエントリーシートは7/10までに代金と一緒に顧問に提出してください。
+            </li>
+          <li>
+            2025/06/14 -
+            <strong>市総体</strong
+            >に参加するかを考えています。
+          </li>
+          <li>
+            2025/06/01 -
+            <strong>中ブロック交流会</strong
+            >のエントリーはしばらくお待ち下さい。
+          </li>
+          <li>
+            2025/05/10 -
+            <strong>市総体・選手権大会</strong>は参加しない方針となっています。
+          </li>
+        </ul>
+      </section>
+
+      <!-- カウントダウン追加部分 -->
+      <section>
+        <header>⏳ 大会カウントダウン</header>
+        <ul id="countdown-list"></ul>
+      </section>
+
+      <section class="update-time">最終更新: 2025/6/9 14:00</section>
+      <button
+        onclick="location.href='portal.html'"
+        style="
+          padding: 10px 20px;
+          font-size: 1em;
+          background-color: #1abc9c;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        "
+      >
+        ポータルトップへ戻る
+      </button>
+    </main>
+
+    <!-- JavaScriptを追加 -->
+    <script>
+      const events = [
+        { name: "中ブロック交流会", date: "2025-07-05" },
+        { name: "市大会", date: "2025-07-12" },
+        { name: "市総体", date: "2025-07-27" },
+        { name: "県総体", date: "2025-08-13" },
+        { name: "県私立大会", date: "2025-08-28" },
+      ];
+
+      const today = new Date();
+      const list = document.getElementById("countdown-list");
+
+      events.forEach((e) => {
+        const d = Math.ceil((new Date(e.date) - today) / (1000 * 60 * 60 * 24));
+        let c = "#666";
+        if (d <= 7) c = "red";
+        else if (d <= 30) c = "orange";
+        else if (d <= 50) c = "goldenrod";
+
+        const li = document.createElement("li");
+        if (d > 60) {
+          li.innerHTML = `<span style="color:#aaa; font-size:0.9em;">${e.name}：あと ${d}日</span>`;
+        } else {
+          li.innerHTML = `${e.name}：あと <strong style="color:${c}">${d}日</strong>`;
+        }
+        list.appendChild(li);
+      });
+    </script>
+    <div class="ticker-wrap">
+      <div class="ticker">
+        <span>🚨 大会に向けて調整を進めましょう ／ 📢 目指せ県総体進出 </span>
+      </div>
+    </div>
+
+    <style>
+      .ticker-wrap {
+        width: 100%;
+        overflow: hidden;
+        background-color: #2c3e50;
+        color: white;
+        padding: 8px 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 9999;
+      }
+
+      .ticker {
+        display: inline-block;
+        white-space: nowrap;
+        animation: tickerScroll 25s linear infinite;
+        padding-left: 100%;
+      }
+
+      @keyframes tickerScroll {
+        from {
+          transform: translateX(0%);
+        }
+        to {
+          transform: translateX(-100%);
+        }
+      }
+    </style>
+  </body>
+</html>
