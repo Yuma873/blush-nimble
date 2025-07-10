@@ -44,9 +44,20 @@
       border: 1px solid #ccc;
       border-radius: 5px;
       box-sizing: border-box;
+      transition: border-color 0.3s;
     }
 
-    input[type="checkbox"] {
+    input.error {
+      border-color: red;
+    }
+
+    .password-toggle {
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
+    }
+
+    .password-toggle input[type="checkbox"] {
       margin-right: 5px;
     }
 
@@ -66,16 +77,10 @@
       background-color: #1a7e9d;
     }
 
-    #container2 {
-      margin-top: 20px;
-      background-color: #f9f9f9;
-      padding: 15px;
-      border-radius: 5px;
-      display: none;
-    }
-
-    #container2 p {
-      margin: 5px 0;
+    .error-message {
+      color: red;
+      margin-top: 10px;
+      text-align: center;
     }
   </style>
 </head>
@@ -83,33 +88,26 @@
 
   <div class="login-container">
     <h2>ログインフォーム</h2>
+
     <label for="username">ユーザー名:</label>
-    <input type="text" id="username" />
+    <input type="text" id="username" placeholder="例: oshiki" />
 
     <label for="pass">パスワード:</label>
-    <input type="password" id="pass" />
-    <label>
+    <input type="password" id="pass" placeholder="パスワードを入力" />
+
+    <div class="password-toggle">
       <input type="checkbox" id="showpassword" onclick="showOrHide()" />
-      パスワードを表示
-    </label>
+      <label for="showpassword">パスワードを表示</label>
+    </div>
 
     <button onclick="login()">ログイン</button>
 
-    <div id="container2">
-      <p id="user">ユーザー名:</p>
-      <p id="age">年齢:</p>
-      <p id="email">Eメール:</p>
-      <p id="password2">リンク:</p>
-    </div>
+    <div class="error-message" id="error-msg"></div>
   </div>
 
   <script>
-    function showOrHide() {
-      let passField = document.getElementById("pass");
-      passField.type = document.getElementById("showpassword").checked ? "text" : "password";
-    }
-
-    let userdata = [
+    // ユーザーデータ
+    const userdata = [
       {
         name: "administrator",
         age: 20,
@@ -129,33 +127,59 @@
         email: "wlnhh22791@yahoo.co.jp",
         password: "wlnhh22791",
       },
-      { name: "user3", age: 23, email: "user3@example.com", password: "user-3" },
+      {
+        name: "user3",
+        age: 23,
+        email: "user3@example.com",
+        password: "user-3",
+      }
     ];
 
-    function login() {
-      let username = document.getElementById("username").value;
-      let password = document.getElementById("pass").value;
+    // パスワード表示切替
+    function showOrHide() {
+      const passField = document.getElementById("pass");
+      passField.type = document.getElementById("showpassword").checked ? "text" : "password";
+    }
 
-      let user = userdata.find(u => u.name === username && u.password === password);
+    // エラーメッセージ表示
+    function showError(msg) {
+      const errorMsg = document.getElementById("error-msg");
+      errorMsg.textContent = msg;
+    }
+
+    // ログイン処理
+    function login() {
+      const username = document.getElementById("username");
+      const password = document.getElementById("pass");
+      const errorMsg = document.getElementById("error-msg");
+
+      // 入力チェック
+      username.classList.remove("error");
+      password.classList.remove("error");
+      errorMsg.textContent = "";
+
+      const user = userdata.find(u => u.name === username.value && u.password === password.value);
 
       if (user) {
-        alert(`こんにちは、${username}さん。`);
-        document.getElementById("user").textContent = "ユーザー名: " + user.name;
-        document.getElementById("age").textContent = "年齢: " + user.age;
-        document.getElementById("email").textContent = "Eメール: " + user.email;
+        console.log(`ログイン成功: ${user.name}`);
+        alert(`こんにちは、${user.name}さん。ページへ移動します。`);
 
-        if (user.link) {
-          document.getElementById("password2").innerHTML = `リンク: <a href="${user.link}" target="_blank">ページへジャンプする</a>`;
-        } else {
-          document.getElementById("password2").textContent = "リンク: なし";
-        }
-
-        document.getElementById("container2").style.display = "block";
+        // 目的ページへジャンプ
+        location.href = user.link || "https://yuma873.github.io/blush-nimble/portal.html";
       } else {
-        alert("ログインに失敗しました。ユーザー名またはパスワードが正しくありません。");
-        document.getElementById("container2").style.display = "none";
+        console.log("ログイン失敗");
+        showError("ユーザー名またはパスワードが正しくありません。");
+        username.classList.add("error");
+        password.classList.add("error");
       }
     }
+
+    // Enterキーでログイン
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        login();
+      }
+    });
   </script>
 
 </body>
