@@ -2,39 +2,111 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ログイン画面</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #6dd5ed, #2193b0);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #2193b0;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1a7e9d;
+    }
+
+    #container2 {
+      margin-top: 20px;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+      display: none;
+    }
+
+    #container2 p {
+      margin: 5px 0;
+    }
+  </style>
 </head>
 <body>
 
-  <h2>ログインフォーム</h2>
-  <label for="username">ユーザー名:</label>
-  <input type="text" id="username" /><br />
+  <div class="login-container">
+    <h2>ログインフォーム</h2>
+    <label for="username">ユーザー名:</label>
+    <input type="text" id="username" />
 
-  <label for="pass">パスワード:</label>
-  <input type="password" id="pass" />
-  <input type="checkbox" id="showpassword" onclick="showOrHide()" />
-  <label for="showpassword">パスワードを表示</label><br />
+    <label for="pass">パスワード:</label>
+    <input type="password" id="pass" />
+    <label>
+      <input type="checkbox" id="showpassword" onclick="showOrHide()" />
+      パスワードを表示
+    </label>
 
-  <button onclick="login()">ログイン</button>
+    <button onclick="login()">ログイン</button>
 
-  <hr />
-
-  <div id="container2">
-    <p id="user">ユーザー名:</p>
-    <p id="age">年齢:</p>
-    <p id="email">Eメール:</p>
-    <p id="password2">リンク:</p>
+    <div id="container2">
+      <p id="user">ユーザー名:</p>
+      <p id="age">年齢:</p>
+      <p id="email">Eメール:</p>
+      <p id="password2">リンク:</p>
+    </div>
   </div>
 
   <script>
     function showOrHide() {
-      let showpass = document.getElementById("pass");
-      let check = document.getElementById("showpassword");
-      if (check.checked) {
-        showpass.type = "text";
-      } else {
-        showpass.type = "password";
-      }
+      let passField = document.getElementById("pass");
+      passField.type = document.getElementById("showpassword").checked ? "text" : "password";
     }
 
     let userdata = [
@@ -61,49 +133,30 @@
     ];
 
     function login() {
-      let loginuser = "";
       let username = document.getElementById("username").value;
       let password = document.getElementById("pass").value;
 
-      let found = false;
-      let i = 0;
+      let user = userdata.find(u => u.name === username && u.password === password);
 
-      while (!found && i < userdata.length) {
-        loginuser = userdata[i];
-        if (
-          loginuser.hasOwnProperty("name") &&
-          loginuser.hasOwnProperty("password")
-        ) {
-          if (loginuser.name === username && loginuser.password === password) {
-            found = true;
-          }
-        }
-        i++;
-      }
+      if (user) {
+        alert(`こんにちは、${username}さん。`);
+        document.getElementById("user").textContent = "ユーザー名: " + user.name;
+        document.getElementById("age").textContent = "年齢: " + user.age;
+        document.getElementById("email").textContent = "Eメール: " + user.email;
 
-      if (found) {
-        alert(`こんにちは。${username}さん。`);
-        console.log(`logined is ${username}`);
-        document.getElementById("user").textContent =
-          "ユーザー名: " + loginuser.name;
-        document.getElementById("age").textContent = "年齢: " + loginuser.age;
-        document.getElementById("email").textContent = "Eメール: " + loginuser.email;
-
-        if (loginuser.link) {
-          document.getElementById("password2").innerHTML =
-            `リンク: <a href="${loginuser.link}" target="_blank">ページへジャンプする</a>`;
+        if (user.link) {
+          document.getElementById("password2").innerHTML = `リンク: <a href="${user.link}" target="_blank">ページへジャンプする</a>`;
         } else {
           document.getElementById("password2").textContent = "リンク: なし";
         }
+
+        document.getElementById("container2").style.display = "block";
       } else {
-        alert(
-          "ログインに失敗しました。入力している内容がデータと一致しませんでした。間違いがない場合は、ユーザーデータが破損している可能性があります。入力内容に誤りのない場合は、javascriptファイルのuserdata変数を確認してください。\nEnglish...Login failed. Data in the user data variable may be corrupted or entered incorrectly. If there are no typos in what you entered, please check the userdata variable in javascript."
-        );
-        console.log(
-          "Login failed. Data in the user data variable may be corrupted or entered incorrectly. If there are no typos in what you entered, please check the userdata variable in javascript."
-        );
+        alert("ログインに失敗しました。ユーザー名またはパスワードが正しくありません。");
+        document.getElementById("container2").style.display = "none";
       }
     }
   </script>
+
 </body>
 </html>
