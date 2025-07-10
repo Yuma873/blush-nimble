@@ -9,7 +9,7 @@
       margin: 0;
       padding: 0;
       font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(to right, #6dd5ed, #2193b0);
+      background-color: #f5f5f5;
       height: 100vh;
       display: flex;
       justify-content: center;
@@ -17,35 +17,38 @@
     }
 
     .login-container {
-      background-color: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      width: 90%;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      padding: 40px 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
       max-width: 400px;
-      position: relative;
     }
 
     h2 {
       text-align: center;
+      font-size: 22px;
+      margin-bottom: 30px;
       color: #333;
     }
 
     label {
       display: block;
-      margin-top: 15px;
-      color: #555;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #333;
     }
 
     input[type="text"],
     input[type="password"] {
       width: 100%;
       padding: 10px;
-      margin-top: 5px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 4px;
       box-sizing: border-box;
-      transition: border-color 0.3s;
+      margin-bottom: 20px;
+      font-size: 14px;
     }
 
     input.error {
@@ -55,7 +58,8 @@
     .password-toggle {
       display: flex;
       align-items: center;
-      margin-top: 5px;
+      margin-bottom: 20px;
+      font-size: 13px;
     }
 
     .password-toggle input[type="checkbox"] {
@@ -63,30 +67,30 @@
     }
 
     button {
-      margin-top: 20px;
       width: 100%;
       padding: 10px;
-      background-color: #2193b0;
+      background-color: #005bac;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       font-size: 16px;
       cursor: pointer;
     }
 
     button:disabled {
-      background-color: #999;
+      background-color: #aaa;
       cursor: not-allowed;
     }
 
     button:hover:enabled {
-      background-color: #1a7e9d;
+      background-color: #004a91;
     }
 
     .error-message {
       color: red;
       margin-top: 10px;
       text-align: center;
+      font-size: 13px;
     }
 
     .loading {
@@ -106,11 +110,11 @@
     }
 
     .spinner {
-      border: 5px solid #ccc;
-      border-top: 5px solid #2193b0;
+      border: 4px solid #ccc;
+      border-top: 4px solid #005bac;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       animation: spin 1s linear infinite;
       margin-right: 10px;
     }
@@ -124,12 +128,12 @@
 <body>
 
   <div class="login-container">
-    <h2>LOG IN [ログイン]</h2>
+    <h2>ログイン</h2>
 
-    <label for="username">ユーザー名:</label>
+    <label for="username">ユーザー名</label>
     <input type="text" id="username" placeholder="Your ID" />
 
-    <label for="pass">パスワード:</label>
+    <label for="pass">パスワード</label>
     <input type="password" id="pass" placeholder="Your PASS" />
 
     <div class="password-toggle">
@@ -179,13 +183,11 @@
 
     let loginAttempts = 3;
 
-    // パスワード表示切替
     function showOrHide() {
       const passField = document.getElementById("pass");
       passField.type = document.getElementById("showpassword").checked ? "text" : "password";
     }
 
-    // エラーメッセージ表示
     function showError(msg) {
       const errorMsg = document.getElementById("error-msg");
       errorMsg.textContent = msg;
@@ -196,14 +198,12 @@
       showError("ログイン回数が上限に達しました。再読み込みしてください。");
     }
 
-    // ログイン処理
     function login() {
       const username = document.getElementById("username");
       const password = document.getElementById("pass");
       const errorMsg = document.getElementById("error-msg");
       const loading = document.getElementById("loading");
 
-      // 入力初期化
       username.classList.remove("error");
       password.classList.remove("error");
       errorMsg.textContent = "";
@@ -211,17 +211,12 @@
       const user = userdata.find(u => u.name === username.value && u.password === password.value);
 
       if (user) {
-        console.log(`ログイン成功: ${user.name}`);
-        loading.style.display = "flex"; // ローディング画面表示
-
-        // 2秒後にジャンプ
+        loading.style.display = "flex";
         setTimeout(() => {
           location.href = user.link || "https://yuma873.github.io/blush-nimble/portal.html";
         }, 2000);
-
       } else {
         loginAttempts--;
-        console.warn(`ログイン失敗: 残り${loginAttempts}回`);
         showError(`ユーザー名またはパスワードが間違っています（残り${loginAttempts}回）`);
         username.classList.add("error");
         password.classList.add("error");
@@ -232,7 +227,6 @@
       }
     }
 
-    // Enterキーでログイン
     document.addEventListener("keydown", function(e) {
       if (e.key === "Enter") {
         login();
