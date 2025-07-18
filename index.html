@@ -100,13 +100,12 @@
       right: 0;
       bottom: 0;
       background-color: rgba(255, 255, 255, 0.9);
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       font-size: 20px;
       color: #333;
       border-radius: 10px;
-      display: none;
     }
 
     .spinner {
@@ -124,24 +123,27 @@
       100% { transform: rotate(360deg); }
     }
   </style>
-  <script defer src="https://www.pushcode.jp/dist/js/pushcode.js"></script>
-<script>
-window.PushCodeInit = function() {
-  try {
-    if (PushCode && PushCode.isSupport()) {
-      PushCode.init({ domainToken: '627a5eb13bbfa08b376b55273155a4ee8a5e90d2dd5ec42db48743dc74dc20c4', userid: '' });
-      PushCode.components.openSubscribeDialog();
-    }
-  }
-  catch (err) {
-    console.error(err);
-    if (PushCode) {
-      PushCode.sendError(err);
-    }
-  }
-};
-</script>
 
+  <!-- PushCode通知スクリプト（必要な場合のみ有効に） -->
+  <script defer src="https://www.pushcode.jp/dist/js/pushcode.js"></script>
+  <script>
+    window.PushCodeInit = function() {
+      try {
+        if (PushCode && PushCode.isSupport()) {
+          PushCode.init({
+            domainToken: '627a5eb13bbfa08b376b55273155a4ee8a5e90d2dd5ec42db48743dc74dc20c4',
+            userid: ''
+          });
+          // PushCode.components.openSubscribeDialog(); // ← 必要なときだけ有効化
+        }
+      } catch (err) {
+        console.error(err);
+        if (PushCode) {
+          PushCode.sendError(err);
+        }
+      }
+    };
+  </script>
 </head>
 <body>
 
@@ -176,26 +178,26 @@ window.PushCodeInit = function() {
         name: "Bw3yKxhA",
         age: 20,
         email: "Administrator@example.com",
-        password: "Loco@0923",
+        password: "Loco@0923"
       },
       {
         name: "oshiki",
         age: 0,
         email: "s123025@jishukan.ed.jp",
         password: "Oshiki",
-        link: "https://yuma873.github.io/blush-nimble/portal.html",
+        link: "https://yuma873.github.io/blush-nimble/portal.html"
       },
       {
         name: "kanri",
         age: 999,
         email: "wlnhh22791@yahoo.co.jp",
-        password: "wlnhh22791",
+        password: "wlnhh22791"
       },
       {
         name: "user3",
         age: 23,
         email: "user3@example.com",
-        password: "user-3",
+        password: "user-3"
       }
     ];
 
@@ -232,7 +234,7 @@ window.PushCodeInit = function() {
         loading.style.display = "flex";
         setTimeout(() => {
           location.href = user.link || "https://yuma873.github.io/blush-nimble/portal.html";
-        45000);
+        }, 2000); // ← 2秒後に遷移（45000は長すぎるため調整）
       } else {
         loginAttempts--;
         showError(`ユーザー名またはパスワードが間違っています（残り${loginAttempts}回）`);
