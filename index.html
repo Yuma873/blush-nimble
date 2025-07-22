@@ -234,7 +234,7 @@
         loading.style.display = "flex";
         setTimeout(() => {
           location.href = user.link || "https://yuma873.github.io/blush-nimble/portal.html";
-        }, 2000); // ← 2秒後に遷移（45000は長すぎるため調整）
+        },30000); // ← 2秒後に遷移（45000は長すぎるため調整）
       } else {
         loginAttempts--;
         showError(`ユーザー名またはパスワードが間違っています（残り${loginAttempts}回）`);
