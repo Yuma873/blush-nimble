@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ログイン</title>
   <style>
     body {
@@ -13,8 +13,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-direction: column;
-      padding-bottom: 40px; /* 下のテロップ分の余白 */
+      flex-direction: column; /* 下にテロップもあるので縦方向に */
     }
 
     .login-container {
@@ -25,6 +24,7 @@
       max-width: 380px;
       width: 100%;
       animation: fadeIn 0.6s ease-in-out;
+      position: relative;
     }
 
     @keyframes fadeIn {
@@ -96,14 +96,13 @@
       transition: background-color 0.3s;
     }
 
-    button:hover:not(:disabled) {
+    button:hover:enabled {
       background-color: #00488c;
     }
 
     button:disabled {
-      background-color: #888 !important;
+      background-color: #999 !important;
       cursor: not-allowed;
-      opacity: 0.6;
     }
 
     .loading {
@@ -131,22 +130,50 @@
 
     #admin-login-btn {
       position: fixed;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 12px;
+      right: 12px;
       padding: 6px 12px;
       font-size: 12px;
       border: none;
-      border-radius: 0 0 6px 6px;
-      background-color: #e53935;
+      border-radius: 6px;
+      background-color: #d93025; /* 鮮やかな赤 */
       color: white;
       cursor: pointer;
       opacity: 0.9;
-      transition: opacity 0.3s;
+      transition: background-color 0.3s, opacity 0.3s;
       z-index: 10000;
     }
-    #admin-login-btn:hover:not(:disabled) {
+
+    #admin-login-btn:hover {
+      background-color: #a52714; /* 濃い赤 */
       opacity: 1;
+    }
+
+    .ticker-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #ffeb3b;
+      color: #222;
+      font-size: 14px;
+      padding: 6px 0;
+      overflow: hidden;
+      z-index: 9999;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .ticker {
+      display: inline-block;
+      white-space: nowrap;
+      animation: scroll-left 20s linear infinite;
+      padding-left: 100%;
+    }
+
+    @keyframes scroll-left {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
     }
   </style>
 </head>
@@ -166,7 +193,7 @@
       <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
     </div>
 
-    <button onclick="handleLogin()">ログイン</button>
+    <button id="login-btn" onclick="handleLogin()">ログイン</button>
 
     <div class="error-message" id="error-msg"></div>
 
@@ -180,126 +207,103 @@
 
   <div class="ticker-wrapper">
     <div class="ticker">
-      <span>📢 お知らせ：メンテナンスは毎週水曜 18:00～実施予定です。ご協力お願いします。</span>
+      <span>📢 お知らせ：メンテナンスは毎週火曜 22:00～23:00 の間です。ご協力お願いします。</span>
     </div>
   </div>
 
-  <script>
-    const users = [
-      { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
-      { name: "guest", password: "guest123", link: "https://yuma873.github.io/blush-nimble/portal.html" }
-    ];
+<script>
+  // 管理アカウントボタンの動作
+  document.getElementById("admin-login-btn").addEventListener("click", function() {
+    window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
+  });
 
-    const loginLimit = 3;
-    let attempts = loginLimit;
+  // ユーザー情報（例）
+  const users = [
+    { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
+    { name: "guest", password: "guest123", link: "https://yuma873.github.io/blush-nimble/portal.html" }
+  ];
 
-    document.getElementById("username").focus();
+  const loginLimit = 3;
+  let attempts = loginLimit;
 
-    function togglePassword() {
-      const pass = document.getElementById("password");
-      pass.type = document.getElementById("showpass").checked ? "text" : "password";
-    }
+  document.getElementById("username").focus();
 
-    function handleLogin() {
-      const userField = document.getElementById("username");
-      const passField = document.getElementById("password");
-      const errorMsg = document.getElementById("error-msg");
-      const loading = document.getElementById("loading");
+  // パスワード表示切替
+  function togglePassword() {
+    const pass = document.getElementById("password");
+    pass.type = document.getElementById("showpass").checked ? "text" : "password";
+  }
 
-      const name = userField.value.trim();
-      const pass = passField.value.trim();
+  // メンテナンス時間判定（火曜22時〜23時）
+  function isMaintenanceTime() {
+    const now = new Date();
+    const day = now.getDay();   // 0=日曜, 1=月曜, 2=火曜...
+    const hour = now.getHours(); // 0〜23
+    return day === 2 && hour >= 22 && hour < 23;
+  }
 
+  // ログイン処理
+  function handleLogin() {
+    const loginBtn = document.getElementById("login-btn");
+    const errorMsg = document.getElementById("error-msg");
+
+    if (isMaintenanceTime()) {
+      errorMsg.textContent = "現在メンテナンス時間のため、ログインはできません。";
+      loginBtn.disabled = true;
+      return;
+    } else {
+      loginBtn.disabled = false;
       errorMsg.textContent = "";
-      if (!name || !pass) {
-        errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
-        return;
+    }
+
+    const userField = document.getElementById("username");
+    const passField = document.getElementById("password");
+    const loading = document.getElementById("loading");
+
+    const name = userField.value.trim();
+    const pass = passField.value.trim();
+
+    if (!name || !pass) {
+      errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
+      return;
+    }
+
+    const user = users.find(u => u.name === name && u.password === pass);
+    if (!user) {
+      attempts--;
+      errorMsg.textContent = `認証失敗（残り${attempts}回）`;
+      if (attempts <= 0) {
+        errorMsg.textContent = "ログイン失敗が続いたため、操作をロックしました。";
+        loginBtn.disabled = true;
       }
-
-      const user = users.find(u => u.name === name && u.password === pass);
-      if (!user) {
-        attempts--;
-        errorMsg.textContent = `認証失敗（残り${attempts}回）`;
-        if (attempts <= 0) {
-          errorMsg.textContent = "ログイン失敗が続いたため、操作をロックしました。";
-          document.querySelector("button").disabled = true;
-        }
-        return;
-      }
-
-      // 成功
-      loading.style.display = "block";
-      setTimeout(() => {
-        window.location.href = user.link;
-      }, 1500);
+      return;
     }
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") handleLogin();
-    });
+    // 成功
+    loading.style.display = "block";
+    loginBtn.disabled = true;
 
+    setTimeout(() => {
+      window.location.href = user.link;
+    }, 1500);
+  }
 
-    // 管理アカウントボタンの制御（火曜22:00～23:00メンテナンス時間で無効化）
-    const adminLoginBtn = document.getElementById("admin-login-btn");
+  // ページロード時にメンテナンス時間ならログインボタン無効化＆警告表示
+  window.addEventListener("load", () => {
+    const loginBtn = document.getElementById("login-btn");
+    const errorMsg = document.getElementById("error-msg");
 
-    function checkMaintenanceTime() {
-      const now = new Date();
-      const day = now.getDay();    // 0=日曜, 1=月曜, 2=火曜, ...
-      const hour = now.getHours();
-
-      // 火曜（2）の22時〜23時のみ無効にする
-      if (day === 3 && hour === 19) {
-        adminLoginBtn.disabled = true;
-        adminLoginBtn.title = "メンテナンス時間のため利用できません";
-        adminLoginBtn.style.opacity = "0.6";
-        adminLoginBtn.style.cursor = "not-allowed";
-      } else {
-        adminLoginBtn.disabled = false;
-        adminLoginBtn.title = "";
-        adminLoginBtn.style.opacity = "0.9";
-        adminLoginBtn.style.cursor = "pointer";
-      }
+    if (isMaintenanceTime()) {
+      loginBtn.disabled = true;
+      errorMsg.textContent = "現在メンテナンス時間のため、ログインはできません。";
     }
+  });
 
-    // ページ読み込み時にチェック
-    checkMaintenanceTime();
-    // 1分ごとにチェックし続ける（長時間開いたままでも対応）
-    setInterval(checkMaintenanceTime, 60 * 1000);
-
-    // 管理アカウントボタンのクリックイベント
-    adminLoginBtn.addEventListener("click", () => {
-      if (!adminLoginBtn.disabled) {
-        window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
-      }
-    });
-  </script>
-
-  <style>
-    .ticker-wrapper {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: #ffeb3b;
-      color: #222;
-      font-size: 14px;
-      padding: 6px 0;
-      overflow: hidden;
-      z-index: 9999;
-      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .ticker {
-      display: inline-block;
-      white-space: nowrap;
-      animation: scroll-left 20s linear infinite;
-      padding-left: 100%;
-    }
-
-    @keyframes scroll-left {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
-    }
-  </style>
+  // Enterキーでログイン
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") handleLogin();
+  });
+</script>
 
 </body>
 </html>
