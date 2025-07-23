@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ログイン</title>
   <style>
     body {
@@ -13,6 +13,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
+      padding-bottom: 40px; /* 下のテロップ分の余白 */
     }
 
     .login-container {
@@ -94,8 +96,14 @@
       transition: background-color 0.3s;
     }
 
-    button:hover {
+    button:hover:not(:disabled) {
       background-color: #00488c;
+    }
+
+    button:disabled {
+      background-color: #888 !important;
+      cursor: not-allowed;
+      opacity: 0.6;
     }
 
     .loading {
@@ -119,6 +127,26 @@
     @keyframes spin {
       0% { transform: rotate(0deg);}
       100% { transform: rotate(360deg);}
+    }
+
+    #admin-login-btn {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 12px;
+      font-size: 12px;
+      border: none;
+      border-radius: 0 0 6px 6px;
+      background-color: #e53935;
+      color: white;
+      cursor: pointer;
+      opacity: 0.9;
+      transition: opacity 0.3s;
+      z-index: 10000;
+    }
+    #admin-login-btn:hover:not(:disabled) {
+      opacity: 1;
     }
   </style>
 </head>
@@ -147,39 +175,14 @@
       ログインしています...*この読み込みは時間がかかる場合があります
     </div>
   </div>
+
   <button id="admin-login-btn" type="button" aria-label="管理アカウントでログイン">管理アカウントでログイン</button>
 
-<style>
-#admin-login-btn {
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 6px 12px;
-  font-size: 12px;
-  border: none;
-  border-radius: 0 0 6px 6px;
-  background-color: #e53935; /* 赤系 */
-  color: white;
-  cursor: pointer;
-  opacity: 0.9;
-  transition: opacity 0.3s;
-  z-index: 10000;
-}
-
-
-#admin-login-btn:hover {
-  background-color: #a52714; /* もう少し濃い赤 */
-  opacity: 1;
-}
-  
-</style>
-
-<script>
-  document.getElementById("admin-login-btn").addEventListener("click", function() {
-    window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
-  });
-</script>
+  <div class="ticker-wrapper">
+    <div class="ticker">
+      <span>📢 お知らせ：メンテナンスは毎週水曜 18:00～実施予定です。ご協力お願いします。</span>
+    </div>
+  </div>
 
   <script>
     const users = [
@@ -233,40 +236,70 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") handleLogin();
     });
+
+
+    // 管理アカウントボタンの制御（火曜22:00～23:00メンテナンス時間で無効化）
+    const adminLoginBtn = document.getElementById("admin-login-btn");
+
+    function checkMaintenanceTime() {
+      const now = new Date();
+      const day = now.getDay();    // 0=日曜, 1=月曜, 2=火曜, ...
+      const hour = now.getHours();
+
+      // 火曜（2）の22時〜23時のみ無効にする
+      if (day === 2 && hour === 22) {
+        adminLoginBtn.disabled = true;
+        adminLoginBtn.title = "メンテナンス時間のため利用できません";
+        adminLoginBtn.style.opacity = "0.6";
+        adminLoginBtn.style.cursor = "not-allowed";
+      } else {
+        adminLoginBtn.disabled = false;
+        adminLoginBtn.title = "";
+        adminLoginBtn.style.opacity = "0.9";
+        adminLoginBtn.style.cursor = "pointer";
+      }
+    }
+
+    // ページ読み込み時にチェック
+    checkMaintenanceTime();
+    // 1分ごとにチェックし続ける（長時間開いたままでも対応）
+    setInterval(checkMaintenanceTime, 60 * 1000);
+
+    // 管理アカウントボタンのクリックイベント
+    adminLoginBtn.addEventListener("click", () => {
+      if (!adminLoginBtn.disabled) {
+        window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
+      }
+    });
   </script>
 
-  <div class="ticker-wrapper">
-  <div class="ticker">
-    <span>📢 お知らせ：メンテナンスは毎週水曜 18:00～実施予定です。ご協力お願いします。</span>
-  </div>
-</div>
+  <style>
+    .ticker-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #ffeb3b;
+      color: #222;
+      font-size: 14px;
+      padding: 6px 0;
+      overflow: hidden;
+      z-index: 9999;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
 
-<style>
-  .ticker-wrapper {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #ffeb3b;
-    color: #222;
-    font-size: 14px;
-    padding: 6px 0;
-    overflow: hidden;
-    z-index: 9999;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-  }
+    .ticker {
+      display: inline-block;
+      white-space: nowrap;
+      animation: scroll-left 20s linear infinite;
+      padding-left: 100%;
+    }
 
-  .ticker {
-    display: inline-block;
-    white-space: nowrap;
-    animation: scroll-left 20s linear infinite;
-    padding-left: 100%;
-  }
+    @keyframes scroll-left {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
 
-  @keyframes scroll-left {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-  }
-</style>
 </body>
 </html>
