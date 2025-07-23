@@ -23,6 +23,8 @@
       max-width: 380px;
       width: 100%;
       animation: fadeIn 0.6s ease-in-out;
+      position: relative;
+      z-index: 1;
     }
 
     @keyframes fadeIn {
@@ -98,12 +100,22 @@
       background-color: #00488c;
     }
 
+    /* 全画面ローディングオーバーレイ */
     .loading {
       display: none;
-      margin-top: 20px;
-      text-align: center;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
       color: #005bac;
-      font-size: 14px;
+      font-size: 16px;
+      user-select: none;
     }
 
     .spinner {
@@ -124,13 +136,13 @@
 </head>
 <body>
 
-  <div class="login-container">
+  <div class="login-container" role="main">
     <h2>ログイン</h2>
     <label for="username">ユーザー名</label>
-    <input type="text" id="username" placeholder="例: user123" />
+    <input type="text" id="username" placeholder="例: user123" autocomplete="username" />
 
     <label for="password">パスワード</label>
-    <input type="password" id="password" placeholder="例: password" />
+    <input type="password" id="password" placeholder="例: password" autocomplete="current-password" />
 
     <div class="toggle">
       <input type="checkbox" id="showpass" onclick="togglePassword()" />
@@ -138,14 +150,15 @@
       <div class="warn">※公共の場では非表示をおすすめします</div>
     </div>
 
-    <button onclick="handleLogin()">ログイン</button>
+    <button onclick="handleLogin()" aria-label="ログインボタン">ログイン</button>
 
-    <div class="error-message" id="error-msg"></div>
+    <div class="error-message" id="error-msg" role="alert" aria-live="polite"></div>
 
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-      ログイン中...
-    </div>
+  </div>
+
+  <div class="loading" id="loading" aria-hidden="true" aria-live="assertive" aria-busy="true">
+    <div class="spinner" role="img" aria-label="読み込み中"></div>
+    ログイン中...
   </div>
 
   <script>
@@ -191,7 +204,11 @@
       }
 
       // 成功
-      loading.style.display = "block";
+      loading.style.display = "flex";
+      document.querySelector("button").disabled = true;
+      userField.disabled = true;
+      passField.disabled = true;
+
       setTimeout(() => {
         window.location.href = user.link;
       }, 1500);
