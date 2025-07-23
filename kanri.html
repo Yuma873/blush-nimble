@@ -150,21 +150,23 @@
   <button id="admin-login-btn" type="button" aria-label="管理アカウントでログイン">一般アカウントでログイン</button>
 
 <style>
-  #admin-login-btn {
+ #admin-login-btn {
   position: fixed;
-  bottom: 12px;
-  right: 12px;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   padding: 6px 12px;
   font-size: 12px;
   border: none;
-  border-radius: 6px;
-  background-color: #d93025; /* 鮮やかな赤 */
+  border-radius: 0 0 6px 6px;
+  background-color: #e53935; /* 赤系 */
   color: white;
   cursor: pointer;
   opacity: 0.9;
-  transition: background-color 0.3s, opacity 0.3s;
+  transition: opacity 0.3s;
   z-index: 10000;
 }
+
 
 #admin-login-btn:hover {
   background-color: #a52714; /* もう少し濃い赤 */
