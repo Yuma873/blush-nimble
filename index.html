@@ -248,7 +248,7 @@
     const errorMsg = document.getElementById("error-msg");
 
     if (isMaintenanceTime()) {
-      errorMsg.textContent = "現在メンテナンス時間のため、ログインはできません。";
+      errorMsg.textContent = "現在ポータルサイトのメンテナンス時間のため、ログインできません。メンテナンス終了までお待ち下さい。";
       loginBtn.disabled = true;
       return;
     } else {
