@@ -3,237 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>多機能ログイン</title>
+  <title>ログイン</title>
   <style>
-    :root {
-      --bg: #f5f5f5;
-      --card-bg: #fff;
-      --text: #333;
-      --primary: #005bac;
-      --error: red;
-    }
-
-    [data-theme="dark"] {
-      --bg: #1e1e1e;
-      --card-bg: #2b2b2b;
-      --text: #f0f0f0;
-      --primary: #4ea1f3;
-    }
-
     body {
       margin: 0;
+      padding: 0;
       font-family: "Segoe UI", sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      height: 100vh;
+      background-color: #f5f5f5;
       display: flex;
-      align-items: center;
       justify-content: center;
-      transition: 0.3s;
+      align-items: center;
+      height: 100vh;
     }
 
-    .container {
-      background: var(--card-bg);
-      padding: 30px;
+    .login-container {
+      background-color: white;
+      padding: 40px;
       border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      width: 100%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 90%;
       max-width: 400px;
     }
 
     h2 {
+      margin-bottom: 24px;
+      color: #333;
       text-align: center;
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin: 10px 0 5px;
     }
 
     input[type="text"],
     input[type="password"] {
       width: 100%;
-      padding: 10px;
-      font-size: 14px;
+      padding: 12px;
+      margin-bottom: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      box-sizing: border-box;
+      font-size: 16px;
     }
 
-    .checkbox {
-      margin: 10px 0;
-      font-size: 13px;
-    }
-
-    .checkbox input {
-      margin-right: 5px;
-    }
-
-    button {
+    .login-button {
       width: 100%;
       padding: 12px;
-      background: var(--primary);
+      background-color: #1abc9c;
       color: white;
       border: none;
-      font-size: 16px;
       border-radius: 6px;
-      margin-top: 10px;
+      font-size: 16px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
 
-    .error-message {
-      color: var(--error);
-      font-size: 13px;
-      margin-top: 10px;
+    .login-button:hover {
+      background-color: #16a085;
+    }
+
+    .error {
+      color: red;
       text-align: center;
-    }
-
-    .loading {
       display: none;
-      margin-top: 15px;
-      text-align: center;
-    }
-
-    .spinner {
-      border: 4px solid #ccc;
-      border-top: 4px solid var(--primary);
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      margin: auto;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .theme-switch {
-      text-align: right;
-      margin-bottom: 10px;
-    }
-
-    .last-login {
-      font-size: 12px;
-      text-align: center;
-      margin-top: 10px;
-      color: gray;
     }
   </style>
 </head>
-<body data-theme="light">
-
-  <div class="container">
-    <div class="theme-switch">
-      <button onclick="toggleTheme()">🌙 / ☀️</button>
-    </div>
-
-    <h2>ログイン</h2>
-
-    <label for="username">ユーザー名</label>
-    <input type="text" id="username" placeholder="例: oshiki" />
-
-    <label for="password">パスワード</label>
+<body>
+  <div class="login-container">
+    <h2>ログインページ</h2>
+    <input type="text" id="username" placeholder="ログインID" />
     <input type="password" id="password" placeholder="パスワード" />
-
-    <div class="checkbox">
-      <input type="checkbox" id="showpass" onclick="togglePassword()" />
-      <label for="showpass">パスワードを表示</label>
-    </div>
-
-    <div class="checkbox">
-      <input type="checkbox" id="remember" />
-      <label for="remember">ログイン状態を保持</label>
-    </div>
-
-    <button onclick="login()">ログイン</button>
-    <div class="error-message" id="error-msg"></div>
-    <div class="last-login" id="last-login"></div>
-
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-      <p>ログイン中...</p>
-    </div>
+    <button class="login-button" onclick="login()">ログイン</button>
+    <p class="error" id="errorMsg">ログインIDまたはパスワードが間違っています</p>
   </div>
 
   <script>
-    const users = [
-      { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
-      { name: "guest", password: "guest123", link: "#" }
-    ];
-
-    let attempts = 3;
-
-    window.onload = () => {
-      const lastLogin = localStorage.getItem("lastLogin");
-      const rememberedUser = localStorage.getItem("rememberUser");
-      if (rememberedUser) {
-        document.getElementById("username").value = rememberedUser;
-        document.getElementById("remember").checked = true;
-      }
-      if (lastLogin) {
-        document.getElementById("last-login").textContent = "前回のログイン: " + lastLogin;
-      }
-    };
-
-    function togglePassword() {
-      const pass = document.getElementById("password");
-      pass.type = pass.type === "password" ? "text" : "password";
-    }
-
-    function toggleTheme() {
-      const body = document.body;
-      const theme = body.getAttribute("data-theme") === "dark" ? "light" : "dark";
-      body.setAttribute("data-theme", theme);
-    }
-
     function login() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
-      const errorMsg = document.getElementById("error-msg");
-      const loading = document.getElementById("loading");
 
-      errorMsg.textContent = "";
+      // 管理者ログイン情報（必要に応じて変更）
+      const adminId = "admin";
+      const adminPass = "adminpass";
 
-      if (!username || !password) {
-        errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
-        return;
-      }
-
-      const user = users.find(u => u.name === username && u.password === password);
-
-      if (!user) {
-        attempts--;
-        errorMsg.textContent = `ログイン失敗（残り${attempts}回）`;
-        if (attempts <= 0) {
-          errorMsg.textContent = "ログイン失敗が上限に達しました。ページを再読み込みしてください。";
-          document.querySelector("button").disabled = true;
-        }
-        return;
-      }
-
-      // ログイン成功
-      loading.style.display = "block";
-
-      if (document.getElementById("remember").checked) {
-        localStorage.setItem("rememberUser", username);
+      if (username === adminId && password === adminPass) {
+        // 管理者の場合のリダイレクト
+        window.location.href = "https://github.com/Yuma873/blush-nimble";
+      } else if (username && password) {
+        // 一般ユーザー向け仮動作（適宜処理を追加）
+        alert("一般ユーザーとしてログインしました。");
+        // ここに一般ユーザー用のページへの遷移など追加できます
       } else {
-        localStorage.removeItem("rememberUser");
+        // 入力不足やエラー表示
+        document.getElementById("errorMsg").style.display = "block";
       }
-
-      const now = new Date().toLocaleString();
-      localStorage.setItem("lastLogin", now);
-
-      setTimeout(() => {
-        window.location.href = user.link;
-      }, 1500);
     }
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") login();
-    });
   </script>
-
 </body>
 </html>
