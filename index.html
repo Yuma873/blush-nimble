@@ -7,93 +7,200 @@
   <style>
     body {
       margin: 0;
-      padding: 0;
+      background: linear-gradient(135deg, #005bac, #0081cc);
       font-family: "Segoe UI", sans-serif;
-      background-color: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .login-container {
-      background-color: white;
-      padding: 40px;
+      background: white;
+      padding: 40px 30px;
       border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 400px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      max-width: 380px;
+      width: 100%;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     h2 {
-      margin-bottom: 24px;
-      color: #333;
+      margin-bottom: 20px;
       text-align: center;
+      color: #005bac;
+      font-size: 24px;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      color: #333;
+      font-size: 14px;
     }
 
     input[type="text"],
     input[type="password"] {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 16px;
+      padding: 10px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      font-size: 16px;
+      box-sizing: border-box;
+      font-size: 14px;
+      transition: border-color 0.3s;
     }
 
-    .login-button {
+    input:focus {
+      border-color: #005bac;
+      outline: none;
+    }
+
+    .toggle {
+      margin: 10px 0;
+      font-size: 13px;
+    }
+
+    .toggle input {
+      margin-right: 5px;
+    }
+
+    .warn {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    button {
+      margin-top: 20px;
       width: 100%;
       padding: 12px;
-      background-color: #1abc9c;
-      color: white;
-      border: none;
-      border-radius: 6px;
       font-size: 16px;
+      border: none;
+      background-color: #005bac;
+      color: white;
+      border-radius: 6px;
       cursor: pointer;
       transition: background-color 0.3s;
     }
 
-    .login-button:hover {
-      background-color: #16a085;
+    button:hover {
+      background-color: #00488c;
     }
 
-    .error {
-      color: red;
-      text-align: center;
+    .loading {
       display: none;
+      margin-top: 20px;
+      text-align: center;
+      color: #005bac;
+      font-size: 14px;
+    }
+
+    .spinner {
+      margin: 10px auto;
+      width: 30px;
+      height: 30px;
+      border: 4px solid #ccc;
+      border-top: 4px solid #005bac;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
     }
   </style>
 </head>
 <body>
+
   <div class="login-container">
-    <h2>ログインページ</h2>
-    <input type="text" id="username" placeholder="ログインID" />
-    <input type="password" id="password" placeholder="パスワード" />
-    <button class="login-button" onclick="login()">ログイン</button>
-    <p class="error" id="errorMsg">ログインIDまたはパスワードが間違っています</p>
+    <h2>ログイン</h2>
+    <label for="username">ユーザー名</label>
+    <input type="text" id="username" placeholder="例: user123" />
+
+    <label for="password">パスワード</label>
+    <input type="password" id="password" placeholder="例: password" />
+
+    <div class="toggle">
+      <input type="checkbox" id="showpass" onclick="togglePassword()" />
+      <label for="showpass">パスワードを表示</label>
+      <div class="warn">※公共の場では非表示をおすすめします</div>
+    </div>
+
+    <button onclick="handleLogin()">ログイン</button>
+
+    <div class="error-message" id="error-msg"></div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      ログイン中...
+    </div>
   </div>
 
   <script>
-    function login() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
+    const users = [
+      { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
+      { name: "guest", password: "guest123", link: "#" }
+    ];
 
-      // 管理者ログイン情報（必要に応じて変更）
-      const adminId = "admin";
-      const adminPass = "adminpass";
+    const loginLimit = 3;
+    let attempts = loginLimit;
 
-      if (username === adminId && password === adminPass) {
-        // 管理者の場合のリダイレクト
-        window.location.href = "https://github.com/Yuma873/blush-nimble";
-      } else if (username && password) {
-        // 一般ユーザー向け仮動作（適宜処理を追加）
-        alert("一般ユーザーとしてログインしました。");
-        // ここに一般ユーザー用のページへの遷移など追加できます
-      } else {
-        // 入力不足やエラー表示
-        document.getElementById("errorMsg").style.display = "block";
-      }
+    document.getElementById("username").focus();
+
+    function togglePassword() {
+      const pass = document.getElementById("password");
+      pass.type = document.getElementById("showpass").checked ? "text" : "password";
     }
+
+    function handleLogin() {
+      const userField = document.getElementById("username");
+      const passField = document.getElementById("password");
+      const errorMsg = document.getElementById("error-msg");
+      const loading = document.getElementById("loading");
+
+      const name = userField.value.trim();
+      const pass = passField.value.trim();
+
+      errorMsg.textContent = "";
+      if (!name || !pass) {
+        errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
+        return;
+      }
+
+      const user = users.find(u => u.name === name && u.password === pass);
+      if (!user) {
+        attempts--;
+        errorMsg.textContent = `認証失敗（残り${attempts}回）`;
+        if (attempts <= 0) {
+          errorMsg.textContent = "ログイン失敗が続いたため、操作をロックしました。";
+          document.querySelector("button").disabled = true;
+        }
+        return;
+      }
+
+      // 成功
+      loading.style.display = "block";
+      setTimeout(() => {
+        window.location.href = user.link;
+      }, 1500);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") handleLogin();
+    });
   </script>
+
 </body>
 </html>
