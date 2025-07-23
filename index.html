@@ -127,7 +127,7 @@
   <div class="login-container">
     <h2>ログイン</h2>
     <label for="username">ユーザー名</label>
-    <input type="text" id="username" placeholder="例: user123" />
+    <input type="text" id="username" placeholder="例: username" />
 
     <label for="password">パスワード</label>
     <input type="password" id="password" placeholder="例: password" />
@@ -135,7 +135,7 @@
     <div class="toggle">
       <input type="checkbox" id="showpass" onclick="togglePassword()" />
       <label for="showpass">パスワードを表示</label>
-      <div class="warn">※公共の場では非表示をおすすめします</div>
+      <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
     </div>
 
     <button onclick="handleLogin()">ログイン</button>
@@ -144,14 +144,44 @@
 
     <div class="loading" id="loading">
       <div class="spinner"></div>
-      ログイン中...
+      ログインしています...*この読み込みは時間がかかる場合があります
     </div>
   </div>
+  <button id="admin-login-btn" type="button" aria-label="管理アカウントでログイン">管理アカウントでログイン</button>
+
+<style>
+  #admin-login-btn {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    font-size: 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #005baccc;
+    color: white;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+    z-index: 10000;
+  }
+
+  #admin-login-btn:hover {
+    opacity: 1;
+    background-color: #00488c;
+  }
+</style>
+
+<script>
+  document.getElementById("admin-login-btn").addEventListener("click", function() {
+    window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
+  });
+</script>
 
   <script>
     const users = [
       { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
-      { name: "guest", password: "guest123", link: "#" }
+      { name: "guest", password: "guest123", link: "https://yuma873.github.io/blush-nimble/portal.html" }
     ];
 
     const loginLimit = 3;
