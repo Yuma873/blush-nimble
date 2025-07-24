@@ -181,8 +181,8 @@
 
   <div class="login-container">
     <h2>ログイン</h2>
-    <label for="username">ユーザー名</label>
-    <input type="text" id="username" placeholder="例: username" />
+    <label for="username">ユーザーID</label>
+    <input type="text" id="username" placeholder="例: userID" />
 
     <label for="password">パスワード</label>
     <input type="password" id="password" placeholder="例: password" />
@@ -271,7 +271,7 @@
     const user = users.find(u => u.name === name && u.password === pass);
     if (!user) {
       attempts--;
-      errorMsg.textContent = `認証失敗（残り${attempts}回）`;
+      errorMsg.textContent = `ユーザーIDまたはパスワードが異なります。　ロックまで（残り${attempts}回）`;
       if (attempts <= 0) {
         errorMsg.textContent = "ログイン失敗が続いたため、操作をロックしました。";
         loginBtn.disabled = true;
