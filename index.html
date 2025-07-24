@@ -182,10 +182,10 @@
   <div class="login-container">
     <h2>ログイン</h2>
     <label for="username">ユーザーID</label>
-    <input type="text" id="username" placeholder="例: userID" />
+    <input type="text" id="username" placeholder="userID" />
 
     <label for="password">パスワード</label>
-    <input type="password" id="password" placeholder="例: password" />
+    <input type="password" id="password" placeholder="password" />
 
     <div class="toggle">
       <input type="checkbox" id="showpass" onclick="togglePassword()" />
@@ -234,12 +234,12 @@
     pass.type = document.getElementById("showpass").checked ? "text" : "password";
   }
 
-  // メンテナンス時間判定（火曜22時〜23時）
+  // メンテナンス時間判定
   function isMaintenanceTime() {
     const now = new Date();
-    const day = now.getDay();   // 0=日曜, 1=月曜, 2=火曜...
+    const day = now.getDay();   // 0=日曜, 1=月曜, 2=火曜 3=水曜 4=木曜 5=金曜 6=土曜
     const hour = now.getHours(); // 0〜23
-    return day === 3 && hour >= 20 && hour < 21;
+    return day === 5 && hour >= 8 && hour < 12;
   }
 
   // ログイン処理
