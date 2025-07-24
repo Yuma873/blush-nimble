@@ -126,11 +126,11 @@
 
   <div class="login-container">
     <h2><b><u>管理用アカウント</u></b> ログイン</h2>
-    <label for="username">ユーザー名</label>
-    <input type="text" id="username" placeholder="例: username" />
+    <label for="username">管理ID</label>
+    <input type="text" id="username" placeholder="例: KANRI ID" />
 
-    <label for="password">パスワード</label>
-    <input type="password" id="password" placeholder="例: password" />
+    <label for="password">PASS</label>
+    <input type="password" id="password" placeholder="PASS" />
 
     <div class="toggle">
       <input type="checkbox" id="showpass" onclick="togglePassword()" />
@@ -214,7 +214,7 @@
       const user = users.find(u => u.name === name && u.password === pass);
       if (!user) {
         attempts--;
-        errorMsg.textContent = `認証失敗（残り${attempts}回）`;
+        errorMsg.textContent = `認証に失敗しました。（残り${attempts}回）`;
         if (attempts <= 0) {
           errorMsg.textContent = "ログイン失敗が続いたため、操作をロックしました。";
           document.querySelector("button").disabled = true;
