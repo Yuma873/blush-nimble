@@ -185,6 +185,17 @@
   50% { opacity: 0; }
 }
 
+    .blinking-bg {
+  animation: blink-bg 0.8s step-start infinite;
+  color: red;
+  font-weight: bold;
+}
+
+@keyframes blink-bg {
+  50% { background-color: yellow; }
+  0%, 100% { background-color: transparent; }
+}
+
   </style>
 </head>
 <body>
