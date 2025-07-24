@@ -175,6 +175,16 @@
       0% { transform: translateX(0); }
       100% { transform: translateX(-100%); }
     }
+    .blinking {
+  animation: blink 0.4s step-start infinite;
+  color: red;
+  font-weight: bold;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
   </style>
 </head>
 <body>
@@ -207,7 +217,8 @@
 
   <div class="ticker-wrapper">
     <div class="ticker">
-  <span>📢 お知らせ：定期メンテナンスは毎週火曜 20:00～21:00 の間です。緊急または臨時のメンテナンスを行っている場合があります。</span>
+<p>📢 お知らせ：<span class="blinking">定期メンテナンス</span>は毎週火曜 20:00～21:00 の間です。</p>
+
     </div>
   </div>
 
