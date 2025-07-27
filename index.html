@@ -228,7 +228,7 @@
 
   <div class="ticker-wrapper">
     <div class="ticker">
-<p>📢 お知らせ：<span class="blinking">｛緊急メンテナンスのお知らせ｝</span>7/25 8:00~12:00(予定)でメンテナンスを行います。</p>
+<p>📢 お知らせ：<span class="blinking">【メンテナンス】</span>定期メンテナンスは火曜の22:00~23:00です。</p>
 
     </div>
   </div>
@@ -261,7 +261,7 @@
     const now = new Date();
     const day = now.getDay();   // 0=日曜, 1=月曜, 2=火曜 3=水曜 4=木曜 5=金曜 6=土曜
     const hour = now.getHours(); // 0〜23
-    return day === 5 && hour >= 8 && hour < 12;
+    return day === 2 && hour >= 22 && hour < 23;
   }
 
   // ログイン処理
