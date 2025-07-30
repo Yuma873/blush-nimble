@@ -178,7 +178,7 @@
 
 <script>
   async function fetchNHKTopix() {
-    const url = 'https://www.nhk.or.jp/rss/news/cat0.xml';
+    const url = 'https://news.yahoo.co.jp/rss/topics/top-picks.xml';
     try {
       const resp = await fetch(url);
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
