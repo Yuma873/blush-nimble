@@ -112,6 +112,28 @@
           transform: translateX(-100%);
         }
       }
+      .topix-section {
+  background-color: #ff4444;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+}
+
+.blinking-text {
+  font-size: 1.2em;
+  font-weight: bold;
+  animation: blinker 1s linear infinite;
+  text-align: center;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
     </style>
   </head>
   <body>
@@ -131,6 +153,11 @@
     </nav>
 
     <main>
+      <section class="topix-section">
+  <header>🌀 TOPIX</header>
+  <p class="blinking-text">津波警報発令中</p>
+</section>
+
       <section>
         <header>🆕 新着情報</header>
         <ul>
