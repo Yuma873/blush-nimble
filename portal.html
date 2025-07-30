@@ -152,11 +152,13 @@
 <a href="https://yuma873.github.io/blush-nimble/index.html" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">🚪ログアウト</a>
     </nav>
 
-    <main>
-      <section class="topix-section">
+    <section class="topix-section">
   <header>🌀 TOPIX</header>
   <p class="blinking-text">津波警報発令中</p>
+  <ul id="rss-news-list" style="margin-top: 10px;"></ul>
 </section>
+
+    
 
       <section>
         <header>🆕 新着情報</header>
@@ -749,6 +751,40 @@
           alert("該当するキーワードは見つかりませんでした。");
         }
       }
+      <script>
+  async function fetchRSSNews() {
+    const rssUrl = encodeURIComponent("https://news.yahoo.co.jp/rss/topics/top-picks.xml"); // 任意のRSS URL
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
+
+    try {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      const newsList = document.getElementById("rss-news-list");
+      newsList.innerHTML = ""; // 既存リストクリア
+
+      data.items.slice(0, 5).forEach((item) => {
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = item.link;
+        link.textContent = `📰 ${item.title}`;
+        link.target = "_blank";
+        link.style.color = "white";
+        link.style.textDecoration = "underline";
+        li.appendChild(link);
+        newsList.appendChild(li);
+      });
+    } catch (error) {
+      console.error("RSSの読み込みに失敗しました:", error);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    fetchRSSNews();
+    setInterval(fetchRSSNews, 60000); // 60秒ごとに更新
+  });
+</script>
+
     </script>
   </body>
 </html>
