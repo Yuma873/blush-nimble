@@ -89,12 +89,29 @@
       overflow: hidden;
       box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
       height: 80vh;
+      margin-bottom: 10px;
     }
 
     iframe {
       width: 100%;
       height: 100%;
       border: none;
+    }
+
+    .fallback-link {
+      margin-top: 10px;
+      font-size: 0.95em;
+      color: #555;
+    }
+
+    .fallback-link a {
+      color: #1abc9c;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .fallback-link a:hover {
+      text-decoration: underline;
     }
 
     .ticker-wrap {
@@ -157,6 +174,10 @@
       <div class="iframe-container">
         <iframe id="pdfViewer" src="http://isa.php.xdomain.jp/htdocs/?action=common_download_main&upload_id=705"></iframe>
       </div>
+
+      <p class="fallback-link">
+        表示されない場合は <a id="openInNewTab" href="http://isa.php.xdomain.jp/htdocs/?action=common_download_main&upload_id=705" target="_blank" rel="noopener">こちら</a> をクリックして開いてください。
+      </p>
     </section>
   </main>
 
@@ -167,9 +188,12 @@
   <script>
     const pdfSelector = document.getElementById('pdfSelector');
     const pdfViewer = document.getElementById('pdfViewer');
+    const openInNewTab = document.getElementById('openInNewTab');
 
     pdfSelector.addEventListener('change', function () {
-      pdfViewer.src = this.value;
+      const selectedUrl = this.value;
+      pdfViewer.src = selectedUrl;
+      openInNewTab.href = selectedUrl;
     });
   </script>
 </body>
