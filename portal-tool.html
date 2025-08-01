@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>ポータルサイト - ツール</title>
     <style>
       body {
@@ -17,6 +17,7 @@
         color: white;
         padding: 10px;
         min-height: 100vh;
+        box-sizing: border-box;
       }
       nav a {
         display: block;
@@ -34,34 +35,93 @@
       main {
         flex: 1;
         padding: 30px;
+        box-sizing: border-box;
       }
       header {
         font-size: 1.8em;
         margin-bottom: 15px;
         color: #2c3e50;
       }
-      section {
-        margin-bottom: 40px;
-      }
-      ul {
-        list-style-type: none;
-        padding-left: 0;
-      }
-      ul li {
-        background-color: #fff;
-        margin-bottom: 12px;
+      details {
+        background: #fff;
+        margin-bottom: 20px;
         padding: 15px 20px;
         border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+      }
+      summary {
+        font-size: 1.3em;
+        font-weight: bold;
+        cursor: pointer;
+        outline: none;
+        user-select: none;
+        color: #2c3e50;
+      }
+      summary::-webkit-details-marker {
+        display: none;
+      }
+      summary::before {
+        content: "▶ ";
+        display: inline-block;
+        transform-origin: center;
+        transition: transform 0.2s ease;
+      }
+      details[open] summary::before {
+        transform: rotate(90deg);
+      }
+      ul {
+        margin-top: 12px;
+        padding-left: 20px;
+        list-style-type: disc;
+      }
+      ul li {
+        margin-bottom: 10px;
         font-size: 1.1em;
       }
       ul li a {
-        color: #2c3e50;
+        color: #1abc9c;
         text-decoration: none;
-        font-weight: bold;
+        font-weight: 600;
       }
       ul li a:hover {
-        color: #1abc9c;
+        text-decoration: underline;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 1em;
+        background-color: #1abc9c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+      }
+      /* 固定フッター（お知らせテキスト） */
+      .ticker-wrap {
+        width: 100%;
+        overflow: hidden;
+        background-color: #2c3e50;
+        color: white;
+        padding: 8px 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 9999;
+        font-size: 0.9em;
+      }
+      .ticker {
+        display: inline-block;
+        white-space: nowrap;
+        animation: tickerScroll 25s linear infinite;
+        padding-left: 100%;
+      }
+      @keyframes tickerScroll {
+        from {
+          transform: translateX(0%);
+        }
+        to {
+          transform: translateX(-100%);
+        }
       }
     </style>
   </head>
@@ -80,106 +140,77 @@
       <a href="portal-tenki.html">⛅️今後の天気【プール練の参考に】</a>
       <a href="portal-pdf.html">📁ファイル一覧</a>
       <a href="https://yuma873.github.io/blush-nimble/index.html" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">🚪ログアウト</a>
-
     </nav>
+
     <main>
-      <section>
-        <header>🛠 ツール一覧</header>
-<ul>
-  <!-- 🕒 時間・タイマー系 -->
-  <li><a href="https://labotaki.com/stopwatch">タイマー</a> - 練習や作業用のシンプルなタイマー</li>
-  <li><a href="https://www.timeanddate.com/timer/">世界タイマー</a> - 多機能カウントダウン＆アラーム</li>
-  <li><a href="https://www.online-stopwatch.com/">オンラインストップウォッチ</a> - カスタム音ありの便利ツール</li>
+      <header>🛠 ツール一覧</header>
 
-  <!-- 🏊‍♀️ 水泳・スポーツ系 -->
-  <li><a href="https://swimane.com/dashboard">タイム管理</a> - 水泳の記録管理ができる</li>
-  <li><a href="https://www.calculator.net/pace-calculator.html">ペース計算機</a> - 距離と時間からペース自動算出</li>
-  <li><a href="https://swim-media.com/">フォーム動画集</a> - 水泳フォーム動画でチェック</li>
-  <li><a href="https://note.com/keyword/水泳">水泳記事まとめ（note）</a> - 練習理論やコラムも満載</li>
-  <li><a href="https://swim-net.jp/">SwimNet</a> - 日本の大会エントリー・結果確認</li>
-
-  <!-- 📅 スケジュール・メモ -->
-  <li><a href="https://calendar.google.com/">日程カレンダー</a> - Googleカレンダーで予定管理</li>
-  <li><a href="https://keep.google.com/">Google Keep</a> - 練習メモやToDoをすぐ記録</li>
-  <li><a href="https://asana.com/ja">Asana</a> - チームで練習タスク共有に最適</li>
-  <li><a href="https://trello.com/">Trello</a> - カンバン式で視覚的に練習を整理</li>
-
-  <!-- ⛅️ 天気・気象 -->
-  <li><a href="https://www.jma.go.jp/bosai/forecast/">気象庁（天気予報）</a> - 正確な天気・警報情報</li>
-  <li><a href="https://www.accuweather.com/ja/jp/japan-weather">AccuWeather</a> - 地域別詳細な天気情報</li>
-  <li><a href="https://tenki.jp/">tenki.jp</a> - 民間天気サイト、時間ごとに確認可</li>
-
-  <!-- 🧘‍♀️ コンディショニング・健康 -->
-  <li><a href="https://www.nutrientoptimiser.com/">栄養管理ツール</a> - 食事の栄養バランスチェック</li>
-  <li><a href="https://fitonapp.com/">FitOn</a> - ストレッチ・筋トレ動画が無料で見られる</li>
-  <li><a href="https://www.sleepcycle.com/">Sleep Cycle</a> - 睡眠の質を分析・改善</li>
-  <li><a href="https://www.calm.com/">Calm</a> - リラックスできる瞑想アプリ</li>
-
-  <!-- 🎓 学習・集中 -->
-  <li><a href="https://pomofocus.io/">Pomofocus</a> - ポモドーロ・タイマーで集中力UP</li>
-  <li><a href="https://www.deepl.com/translator">DeepL 翻訳</a> - 英語などの翻訳でフォーム解説も理解</li>
-  <li><a href="https://www.typingclub.com/">TypingClub</a> - タイピング練習で記録入力が速くなる</li>
-          <li>
-            <a href="https://yuma873.github.io/blush-nimble/toolshu.html"
-              >その他ツール</a
-            >
-            - ツールトップページへ
-          </li>
+      <details open>
+        <summary>🕒 時間・タイマー系</summary>
+        <ul>
+          <li><a href="https://labotaki.com/stopwatch" target="_blank" rel="noopener">タイマー</a> - 練習や作業用のシンプルなタイマー</li>
+          <li><a href="https://www.timeanddate.com/timer/" target="_blank" rel="noopener">世界タイマー</a> - 多機能カウントダウン＆アラーム</li>
+          <li><a href="https://www.online-stopwatch.com/" target="_blank" rel="noopener">オンラインストップウォッチ</a> - カスタム音ありの便利ツール</li>
         </ul>
-      </section>
-      <button
-        onclick="location.href='portal.html'"
-        style="
-          padding: 10px 20px;
-          font-size: 1em;
-          background-color: #1abc9c;
-          color: white;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-        "
-      >
-        ポータルトップへ戻る
-      </button>
+      </details>
+
+      <details>
+        <summary>🏊‍♀️ 水泳・スポーツ系</summary>
+        <ul>
+          <li><a href="https://swimane.com/dashboard" target="_blank" rel="noopener">タイム管理</a> - 水泳の記録管理ができる</li>
+          <li><a href="https://www.calculator.net/pace-calculator.html" target="_blank" rel="noopener">ペース計算機</a> - 距離と時間からペース自動算出</li>
+          <li><a href="https://swim-media.com/" target="_blank" rel="noopener">フォーム動画集</a> - 水泳フォーム動画でチェック</li>
+          <li><a href="https://note.com/keyword/水泳" target="_blank" rel="noopener">水泳記事まとめ（note）</a> - 練習理論やコラムも満載</li>
+          <li><a href="https://swim-net.jp/" target="_blank" rel="noopener">SwimNet</a> - 日本の大会エントリー・結果確認</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>📅 スケジュール・メモ</summary>
+        <ul>
+          <li><a href="https://calendar.google.com/" target="_blank" rel="noopener">日程カレンダー</a> - Googleカレンダーで予定管理</li>
+          <li><a href="https://keep.google.com/" target="_blank" rel="noopener">Google Keep</a> - 練習メモやToDoをすぐ記録</li>
+          <li><a href="https://asana.com/ja" target="_blank" rel="noopener">Asana</a> - チームで練習タスク共有に最適</li>
+          <li><a href="https://trello.com/" target="_blank" rel="noopener">Trello</a> - カンバン式で視覚的に練習を整理</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>⛅️ 天気・気象</summary>
+        <ul>
+          <li><a href="https://www.jma.go.jp/bosai/forecast/" target="_blank" rel="noopener">気象庁（天気予報）</a> - 正確な天気・警報情報</li>
+          <li><a href="https://www.accuweather.com/ja/jp/japan-weather" target="_blank" rel="noopener">AccuWeather</a> - 地域別詳細な天気情報</li>
+          <li><a href="https://tenki.jp/" target="_blank" rel="noopener">tenki.jp</a> - 民間天気サイト、時間ごとに確認可</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>🧘‍♀️ コンディショニング・健康</summary>
+        <ul>
+          <li><a href="https://www.nutrientoptimiser.com/" target="_blank" rel="noopener">栄養管理ツール</a> - 食事の栄養バランスチェック</li>
+          <li><a href="https://fitonapp.com/" target="_blank" rel="noopener">FitOn</a> - ストレッチ・筋トレ動画が無料で見られる</li>
+          <li><a href="https://www.sleepcycle.com/" target="_blank" rel="noopener">Sleep Cycle</a> - 睡眠の質を分析・改善</li>
+          <li><a href="https://www.calm.com/" target="_blank" rel="noopener">Calm</a> - リラックスできる瞑想アプリ</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>🎓 学習・集中</summary>
+        <ul>
+          <li><a href="https://pomofocus.io/" target="_blank" rel="noopener">Pomofocus</a> - ポモドーロ・タイマーで集中力UP</li>
+          <li><a href="https://www.deepl.com/translator" target="_blank" rel="noopener">DeepL 翻訳</a> - 英語などの翻訳でフォーム解説も理解</li>
+          <li><a href="https://www.typingclub.com/" target="_blank" rel="noopener">TypingClub</a> - タイピング練習で記録入力が速くなる</li>
+          <li><a href="https://yuma873.github.io/blush-nimble/toolshu.html" target="_blank" rel="noopener">その他ツール</a> - ツールトップページへ</li>
+        </ul>
+      </details>
+
+      <button onclick="location.href='portal.html'">ポータルトップへ戻る</button>
     </main>
+
     <div class="ticker-wrap">
       <div class="ticker">
-        <span
-          >🚨 このページは現在編集中です ／ 📢
-          こちらからツールページに移行するとログインが不要です ／ 🆕
-          タイム管理でSwimaneにリンクします</span
-        >
+        <span>🚨 このページは現在編集中です ／ 📢 こちらからツールページに移行するとログインが不要です ／ 🆕 タイム管理でSwimaneにリンクします</span>
       </div>
     </div>
-
-    <style>
-      .ticker-wrap {
-        width: 100%;
-        overflow: hidden;
-        background-color: #2c3e50;
-        color: white;
-        padding: 8px 0;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        z-index: 9999;
-      }
-
-      .ticker {
-        display: inline-block;
-        white-space: nowrap;
-        animation: tickerScroll 25s linear infinite;
-        padding-left: 100%;
-      }
-
-      @keyframes tickerScroll {
-        from {
-          transform: translateX(0%);
-        }
-        to {
-          transform: translateX(-100%);
-        }
-      }
-    </style>
   </body>
 </html>
