@@ -65,10 +65,14 @@ canvas {
   border-radius: 4px;
   background-color: #00121b;
 }
-.status-ok { color: #00ff99; font-weight: bold; }
+/* ログ用色分け */
+.status-info { color: #00ccff; }
+.status-success { color: #00ff99; font-weight: bold; }
 .status-warning { color: #ffaa00; font-weight: bold; }
 .status-error { color: #ff5555; font-weight: bold; animation: blink 1s step-start infinite; }
+.status-maintenance { color: #ff88ff; font-weight: bold; }
 @keyframes blink { 50% { opacity: 0; } }
+
 .log-panel {
   grid-column: 1 / -1;
   background-color: #00121b;
@@ -83,11 +87,12 @@ canvas {
 </head>
 <body>
 <header>
-  System Monitoring Dashboard - 現在のポータルサイトの稼働状況がご確認いただけます
+  System Monitoring Dashboard
   <span id="time-display"></span>
 </header>
 
 <div class="main">
+
   <!-- トップページ -->
   <div class="panel" id="top-page">
     <h3>☀️ トップページ</h3>
@@ -110,9 +115,9 @@ canvas {
   <div class="panel" id="bulletin">
     <h3>📝 お知らせ・掲示板情報</h3>
     <div class="services" id="services">
-      <div class="service-item"><span>掲示板サーバー</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>掲示板サーバー</span><span class="status-success">正常</span></div>
       <div class="service-item"><span>通知サーバー</span><span class="status-warning">一部不具合あり</span></div>
-            <div class="service-item"><span>常時更新サーバー</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>常時更新サーバー</span><span class="status-success">正常</span></div>
     </div>
   </div>
 
@@ -121,7 +126,7 @@ canvas {
     <h3>⚠️ その他</h3>
     <div class="services">
       <div class="service-item"><span>ウィジェット更新</span><span class="status-error">エラー</span></div>
-      <div class="service-item"><span>画像ロード</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>画像ロード</span><span class="status-success">正常</span></div>
       <div class="service-item"><span>メールマガジン配信</span><span class="status-error">大幅遅延あり</span></div>
     </div>
   </div>
@@ -130,9 +135,9 @@ canvas {
   <div class="panel" id="tools">
     <h3>🛠 ツール</h3>
     <div class="services">
-      <div class="service-item"><span>計算スクリプト</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>計算スクリプト</span><span class="status-success">正常</span></div>
       <div class="service-item"><span>データ解析ツール</span><span class="status-warning">一部メンテナンス中</span></div>
-      <div class="service-item"><span>画像変換ツール</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>画像変換ツール</span><span class="status-success">正常</span></div>
     </div>
   </div>
 
@@ -140,9 +145,9 @@ canvas {
   <div class="panel" id="realtime">
     <h3>🔄 リアルタイム更新</h3>
     <div class="services">
-      <div class="service-item"><span>RSS取得</span><span class="status-ok">更新中</span></div>
+      <div class="service-item"><span>RSS取得</span><span class="status-success">更新中</span></div>
       <div class="service-item"><span>API同期</span><span class="status-warning">遅延あり</span></div>
-      <div class="service-item"><span>データベース反映</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>データベース反映</span><span class="status-success">正常</span></div>
     </div>
   </div>
 
@@ -150,7 +155,7 @@ canvas {
   <div class="panel" id="menu">
     <h3>📋 メニュー</h3>
     <div class="services">
-      <div class="service-item"><span>ポータルメニュー</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>ポータルメニュー</span><span class="status-success">正常</span></div>
       <div class="service-item"><span>ユーザーアクセス</span><span class="status-warning">高負荷</span></div>
     </div>
   </div>
@@ -175,6 +180,7 @@ canvas {
   <div class="log-panel" id="log">
     <p>ログパネル：システム情報がここに流れます</p>
   </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -202,8 +208,9 @@ const weatherChart=createChart(document.getElementById('weatherChart').getContex
 const filesChart=createChart(document.getElementById('filesChart').getContext('2d'),'#ffaa00');
 const serverChart=createChart(document.getElementById('serverChart').getContext('2d'),'#ff55ff');
 
+// ログ追加関数
 const logEl=document.getElementById('log');
-function addLog(msg,type='info'){
+function addLog(msg,type='status-info'){
   const p=document.createElement('p'); p.className=type; p.textContent=msg;
   logEl.appendChild(p); logEl.scrollTop = logEl.scrollHeight;
 }
@@ -222,17 +229,16 @@ function update(){
   serverChart.data.datasets[0].data.push(serverVal); serverChart.data.datasets[0].data.shift(); serverChart.update();
 
   const now = new Date(); const time = now.toLocaleTimeString();
-
   const r=Math.random();
-  if (r < 0.05)
-  addLog(`${time}: サーバーエラー発生!`, 'status-error');
-else if (r < 0.10)
-  addLog(`${time}: データベース復旧 遅延あり`, 'status-warning');
-else if (r < 0.30)
-  addLog(`${time}: メールサーバー負荷高め`, 'status-warning');
-else
-  addLog(`${time}: システム正常稼働`, 'info');
-  
+
+  if (r < 0.05) addLog(`${time}: サーバーエラー発生`, "status-error");
+  else if (r < 0.10) addLog(`${time}: データベース復旧 遅延あり`, "status-warning");
+  else if (r < 0.15) addLog(`${time}: メールサーバー負荷高`, "status-warning");
+  else if (r < 0.18) addLog(`${time}: ファイルページPDF読込不可`, "status-warning");
+  else if (r < 0.20) addLog(`${time}: 天気情報更新失敗`, "status-warning");
+  else if (r < 0.22) addLog(`${time}: ウィジェット更新エラー`, "status-error");
+  else if (r < 0.25) addLog(`${time}: 臨時メンテナンス実施中`, "status-maintenance");
+  else addLog(`${time}: システム正常稼働`, "status-success");
 }
 
 setInterval(update,1000);
