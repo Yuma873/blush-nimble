@@ -13,7 +13,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
 }
 header {
   background-color: #081026;
@@ -23,12 +23,13 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 .main {
-  flex: 1;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 10px;
   padding: 10px;
 }
@@ -43,6 +44,9 @@ header {
 .panel h3 {
   margin: 0 0 10px 0;
   color: #00ff99;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 canvas {
   background-color: #00121b;
@@ -66,12 +70,13 @@ canvas {
 .status-error { color: #ff5555; font-weight: bold; animation: blink 1s step-start infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 .log-panel {
-  grid-column: 1 / span 3;
+  grid-column: 1 / -1;
   background-color: #00121b;
   border: 1px solid #00ff99;
   border-radius: 6px;
   padding: 5px;
   overflow-y: auto;
+  max-height: 200px;
   font-size: 12px;
 }
 </style>
@@ -83,37 +88,89 @@ canvas {
 </header>
 
 <div class="main">
+  <!-- トップページ -->
   <div class="panel" id="top-page">
-    <h3>トップページ</h3>
+    <h3>☀️ トップページ</h3>
     <canvas id="cpuChart"></canvas>
   </div>
 
+  <!-- 天気 -->
   <div class="panel" id="weather">
-    <h3>天気情報</h3>
+    <h3>🌤 天気情報</h3>
     <canvas id="weatherChart"></canvas>
   </div>
 
+  <!-- ファイル -->
   <div class="panel" id="files">
-    <h3>ファイル</h3>
+    <h3>📂 ファイル</h3>
     <canvas id="filesChart"></canvas>
   </div>
 
+  <!-- 掲示板 -->
   <div class="panel" id="bulletin">
-    <h3>お知らせ・掲示板情報</h3>
+    <h3>📝 お知らせ・掲示板情報</h3>
     <div class="services" id="services">
       <div class="service-item"><span>掲示板サーバー</span><span class="status-ok">正常</span></div>
       <div class="service-item"><span>通知サーバー</span><span class="status-warning">注意</span></div>
     </div>
   </div>
 
+  <!-- その他 -->
   <div class="panel" id="other">
-    <h3>その他</h3>
+    <h3>⚠️ その他</h3>
     <div class="services">
       <div class="service-item"><span>ウィジェット更新</span><span class="status-error">エラー</span></div>
       <div class="service-item"><span>画像ロード</span><span class="status-ok">正常</span></div>
     </div>
   </div>
 
+  <!-- ツール -->
+  <div class="panel" id="tools">
+    <h3>🛠 ツール</h3>
+    <div class="services">
+      <div class="service-item"><span>計算スクリプト</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>データ解析ツール</span><span class="status-warning">注意</span></div>
+      <div class="service-item"><span>画像変換ツール</span><span class="status-ok">正常</span></div>
+    </div>
+  </div>
+
+  <!-- リアルタイム更新 -->
+  <div class="panel" id="realtime">
+    <h3>🔄 リアルタイム更新</h3>
+    <div class="services">
+      <div class="service-item"><span>RSS取得</span><span class="status-ok">更新中</span></div>
+      <div class="service-item"><span>API同期</span><span class="status-warning">遅延あり</span></div>
+      <div class="service-item"><span>データベース反映</span><span class="status-ok">正常</span></div>
+    </div>
+  </div>
+
+  <!-- メニュー -->
+  <div class="panel" id="menu">
+    <h3>📋 メニュー</h3>
+    <div class="services">
+      <div class="service-item"><span>ポータルメニュー</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>ユーザーアクセス</span><span class="status-warning">高負荷</span></div>
+    </div>
+  </div>
+
+  <!-- サーバー -->
+  <div class="panel" id="server">
+    <h3>💻 サーバー</h3>
+    <canvas id="serverChart"></canvas>
+  </div>
+
+  <!-- 臨時情報 -->
+  <div class="panel" id="temporary">
+    <h3>📝 臨時情報 (ここに直接書き込めます)</h3>
+    <div id="tempLog" contenteditable="true" style="background-color:#00121b; padding:8px; border-radius:6px; min-height:100px; max-height:200px; overflow-y:auto; color:#00ff99;">
+      <!-- ここに直接入力可能 -->
+      12:30: サーバー負荷高めのため監視強化中<br>
+      13:10: 新しいウィジェットを追加予定<br>
+      13:45: メンテナンス完了、正常稼働中
+    </div>
+  </div>
+
+  <!-- ログ -->
   <div class="log-panel" id="log">
     <p>ログパネル：システム情報がここに流れます</p>
   </div>
@@ -121,11 +178,16 @@ canvas {
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const cpuCtx = document.getElementById('cpuChart').getContext('2d');
-const weatherCtx = document.getElementById('weatherChart').getContext('2d');
-const filesCtx = document.getElementById('filesChart').getContext('2d');
+// 現実時間表示
+function updateTime() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString();
+  document.getElementById('time-display').textContent = timeStr;
+}
+setInterval(updateTime, 1000);
 
-function createChart(ctx,color){
+// チャート生成関数
+function createChart(ctx, color){
   return new Chart(ctx,{
     type:'line',
     data:{labels:Array(20).fill(''),datasets:[{label:'',data:Array(20).fill(0),borderColor:color,backgroundColor:color+'33',fill:true,tension:0.3}]},
@@ -133,14 +195,16 @@ function createChart(ctx,color){
   });
 }
 
-const cpuChart=createChart(cpuCtx,'#00ff99');
-const weatherChart=createChart(weatherCtx,'#00ccff');
-const filesChart=createChart(filesCtx,'#ffaa00');
+// 既存パネル
+const cpuChart=createChart(document.getElementById('cpuChart').getContext('2d'),'#00ff99');
+const weatherChart=createChart(document.getElementById('weatherChart').getContext('2d'),'#00ccff');
+const filesChart=createChart(document.getElementById('filesChart').getContext('2d'),'#ffaa00');
+const serverChart=createChart(document.getElementById('serverChart').getContext('2d'),'#ff55ff');
 
 const logEl=document.getElementById('log');
 function addLog(msg,type='info'){
   const p=document.createElement('p'); p.className=type; p.textContent=msg;
-  logEl.appendChild(p); logEl.scrollTop=logEl.scrollHeight;
+  logEl.appendChild(p); logEl.scrollTop = logEl.scrollHeight;
 }
 
 function getRandomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
@@ -149,17 +213,18 @@ function update(){
   const cpuVal=getRandomInt(5,90);
   const weatherVal=getRandomInt(50,100);
   const filesVal=getRandomInt(10,95);
+  const serverVal=getRandomInt(20,80);
 
   cpuChart.data.datasets[0].data.push(cpuVal); cpuChart.data.datasets[0].data.shift(); cpuChart.update();
   weatherChart.data.datasets[0].data.push(weatherVal); weatherChart.data.datasets[0].data.shift(); weatherChart.update();
   filesChart.data.datasets[0].data.push(filesVal); filesChart.data.datasets[0].data.shift(); filesChart.update();
+  serverChart.data.datasets[0].data.push(serverVal); serverChart.data.datasets[0].data.shift(); serverChart.update();
 
-  const now=new Date(); const time=now.toISOString().split('T')[1].split('.')[0];
-  document.getElementById('time-display').textContent=time;
+  const now = new Date(); const time = now.toLocaleTimeString();
 
   const r=Math.random();
-  if(r<0.05) addLog(`${time}: その他システムにエラー発生!`,'status-error');
-  else if(r<0.15) addLog(`${time}: 注意 - メールサーバー負荷高い`,'status-warning');
+  if(r<0.05) addLog(`${time}: サーバーエラー発生!`,'status-error');
+  else if(r<0.15) addLog(`${time}: 注意 - メールサーバー負荷高め`,'status-warning');
   else addLog(`${time}: 情報 - システム正常稼働`,'info');
 }
 
