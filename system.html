@@ -92,7 +92,6 @@ canvas {
 </header>
 
 <div class="main">
-
   <!-- トップページ -->
   <div class="panel" id="top-page">
     <h3>☀️ トップページ</h3>
@@ -108,16 +107,25 @@ canvas {
   <!-- ファイル -->
   <div class="panel" id="files">
     <h3>📂 ファイル</h3>
-    <canvas id="filesChart"></canvas>
+    <div class="services">
+      <div class="service-item"><span>PDFロード</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>CSV生成</span><span class="status-warning">遅延あり</span></div>
+      <div class="service-item"><span>バックアップ</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>画像ロード</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>圧縮ファイル展開</span><span class="status-warning">負荷高</span></div>
+    </div>
   </div>
 
-  <!-- 掲示板 -->
+  <!-- 掲示板・お知らせ -->
   <div class="panel" id="bulletin">
     <h3>📝 お知らせ・掲示板情報</h3>
-    <div class="services" id="services">
-      <div class="service-item"><span>掲示板サーバー</span><span class="status-success">正常</span></div>
-      <div class="service-item"><span>通知サーバー</span><span class="status-warning">一部不具合あり</span></div>
-      <div class="service-item"><span>常時更新サーバー</span><span class="status-success">正常</span></div>
+    <div class="services">
+      <div class="service-item"><span>掲示板サーバー</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>通知サーバー</span><span class="status-warning">一部不具合</span></div>
+      <div class="service-item"><span>常時更新サーバー</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>掲示板画像ロード</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>コメント監視</span><span class="status-warning">遅延あり</span></div>
+      <div class="service-item"><span>新規投稿反映</span><span class="status-ok">正常</span></div>
     </div>
   </div>
 
@@ -126,8 +134,12 @@ canvas {
     <h3>⚠️ その他</h3>
     <div class="services">
       <div class="service-item"><span>ウィジェット更新</span><span class="status-error">エラー</span></div>
-      <div class="service-item"><span>画像ロード</span><span class="status-success">正常</span></div>
-      <div class="service-item"><span>メールマガジン配信</span><span class="status-error">大幅遅延あり</span></div>
+      <div class="service-item"><span>画像ロード</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>メールマガジン配信</span><span class="status-error">遅延あり</span></div>
+      <div class="service-item"><span>動画変換</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>バックアップ</span><span class="status-warning">進行中</span></div>
+      <div class="service-item"><span>キャッシュ更新</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>通知送信</span><span class="status-ok">正常</span></div>
     </div>
   </div>
 
@@ -135,9 +147,11 @@ canvas {
   <div class="panel" id="tools">
     <h3>🛠 ツール</h3>
     <div class="services">
-      <div class="service-item"><span>計算スクリプト</span><span class="status-success">正常</span></div>
-      <div class="service-item"><span>データ解析ツール</span><span class="status-maintenance">一部メンテナンス中</span></div>
-      <div class="service-item"><span>画像変換ツール</span><span class="status-success">正常</span></div>
+      <div class="service-item"><span>計算スクリプト</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>データ解析ツール</span><span class="status-warning">一部メンテ中</span></div>
+      <div class="service-item"><span>画像変換ツール</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>PDF生成</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>ファイル圧縮</span><span class="status-warning">負荷高</span></div>
     </div>
   </div>
 
@@ -145,9 +159,10 @@ canvas {
   <div class="panel" id="realtime">
     <h3>🔄 リアルタイム更新</h3>
     <div class="services">
-      <div class="service-item"><span>RSS取得</span><span class="status-success">更新中</span></div>
+      <div class="service-item"><span>RSS取得</span><span class="status-ok">更新中</span></div>
       <div class="service-item"><span>API同期</span><span class="status-warning">遅延あり</span></div>
-      <div class="service-item"><span>データベース反映</span><span class="status-success">正常</span></div>
+      <div class="service-item"><span>データベース反映</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>セキュリティスキャン</span><span class="status-ok">正常</span></div>
     </div>
   </div>
 
@@ -155,8 +170,9 @@ canvas {
   <div class="panel" id="menu">
     <h3>📋 メニュー</h3>
     <div class="services">
-      <div class="service-item"><span>ポータルメニュー</span><span class="status-success">正常</span></div>
+      <div class="service-item"><span>ポータルメニュー</span><span class="status-ok">正常</span></div>
       <div class="service-item"><span>ユーザーアクセス</span><span class="status-warning">高負荷</span></div>
+      <div class="service-item"><span>管理者モード</span><span class="status-ok">正常</span></div>
     </div>
   </div>
 
