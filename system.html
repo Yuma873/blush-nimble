@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Monitoring Dashboard</title>
+<style>
+body {
+  margin: 0;
+  font-family: "Courier New", monospace;
+  background-color: #0a0f1e;
+  color: #00ff99;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+header {
+  background-color: #081026;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-bottom: 2px solid #00ff99;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  padding: 10px;
+}
+.panel {
+  background-color: #081026;
+  border: 1px solid #00ff99;
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.panel h3 {
+  margin: 0 0 10px 0;
+  color: #00ff99;
+}
+canvas {
+  background-color: #00121b;
+  border-radius: 6px;
+  flex: 1;
+}
+.services {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.service-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background-color: #00121b;
+}
+.status-ok { color: #00ff99; font-weight: bold; }
+.status-warning { color: #ffaa00; font-weight: bold; }
+.status-error { color: #ff5555; font-weight: bold; animation: blink 1s step-start infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.log-panel {
+  grid-column: 1 / span 3;
+  background-color: #00121b;
+  border: 1px solid #00ff99;
+  border-radius: 6px;
+  padding: 5px;
+  overflow-y: auto;
+  font-size: 12px;
+}
+</style>
+</head>
+<body>
+<header>
+  📊 稼働状況監視ダッシュボード
+  <span id="time-display"></span>
+</header>
+
+<div class="main">
+  <div class="panel" id="top-page">
+    <h3>トップページ</h3>
+    <canvas id="cpuChart"></canvas>
+  </div>
+
+  <div class="panel" id="weather">
+    <h3>天気情報</h3>
+    <canvas id="weatherChart"></canvas>
+  </div>
+
+  <div class="panel" id="files">
+    <h3>ファイル</h3>
+    <canvas id="filesChart"></canvas>
+  </div>
+
+  <div class="panel" id="bulletin">
+    <h3>お知らせ・掲示板情報</h3>
+    <div class="services" id="services">
+      <div class="service-item"><span>掲示板サーバー</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>通知サーバー</span><span class="status-warning">注意</span></div>
+    </div>
+  </div>
+
+  <div class="panel" id="other">
+    <h3>その他</h3>
+    <div class="services">
+      <div class="service-item"><span>ウィジェット更新</span><span class="status-error">エラー</span></div>
+      <div class="service-item"><span>画像ロード</span><span class="status-ok">正常</span></div>
+    </div>
+  </div>
+
+  <div class="log-panel" id="log">
+    <p>ログパネル：システム情報がここに流れます</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const cpuCtx = document.getElementById('cpuChart').getContext('2d');
+const weatherCtx = document.getElementById('weatherChart').getContext('2d');
+const filesCtx = document.getElementById('filesChart').getContext('2d');
+
+function createChart(ctx,color){
+  return new Chart(ctx,{
+    type:'line',
+    data:{labels:Array(20).fill(''),datasets:[{label:'',data:Array(20).fill(0),borderColor:color,backgroundColor:color+'33',fill:true,tension:0.3}]},
+    options:{animation:false,responsive:true,plugins:{legend:{display:false}},scales:{y:{min:0,max:100},x:{display:false}}}
+  });
+}
+
+const cpuChart=createChart(cpuCtx,'#00ff99');
+const weatherChart=createChart(weatherCtx,'#00ccff');
+const filesChart=createChart(filesCtx,'#ffaa00');
+
+const logEl=document.getElementById('log');
+function addLog(msg,type='info'){
+  const p=document.createElement('p'); p.className=type; p.textContent=msg;
+  logEl.appendChild(p); logEl.scrollTop=logEl.scrollHeight;
+}
+
+function getRandomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+function update(){
+  const cpuVal=getRandomInt(5,90);
+  const weatherVal=getRandomInt(50,100);
+  const filesVal=getRandomInt(10,95);
+
+  cpuChart.data.datasets[0].data.push(cpuVal); cpuChart.data.datasets[0].data.shift(); cpuChart.update();
+  weatherChart.data.datasets[0].data.push(weatherVal); weatherChart.data.datasets[0].data.shift(); weatherChart.update();
+  filesChart.data.datasets[0].data.push(filesVal); filesChart.data.datasets[0].data.shift(); filesChart.update();
+
+  const now=new Date(); const time=now.toISOString().split('T')[1].split('.')[0];
+  document.getElementById('time-display').textContent=time;
+
+  const r=Math.random();
+  if(r<0.05) addLog(`${time}: その他システムにエラー発生!`,'status-error');
+  else if(r<0.15) addLog(`${time}: 注意 - メールサーバー負荷高い`,'status-warning');
+  else addLog(`${time}: 情報 - システム正常稼働`,'info');
+}
+
+setInterval(update,1000);
+</script>
+</body>
+</html>
