@@ -83,7 +83,7 @@ canvas {
 </head>
 <body>
 <header>
-  📊 稼働状況監視ダッシュボード
+  System Monitoring Dashboard - 現在のポータルサイトの稼働状況がご確認いただけます
   <span id="time-display"></span>
 </header>
 
@@ -111,7 +111,8 @@ canvas {
     <h3>📝 お知らせ・掲示板情報</h3>
     <div class="services" id="services">
       <div class="service-item"><span>掲示板サーバー</span><span class="status-ok">正常</span></div>
-      <div class="service-item"><span>通知サーバー</span><span class="status-warning">注意</span></div>
+      <div class="service-item"><span>通知サーバー</span><span class="status-warning">一部不具合あり</span></div>
+            <div class="service-item"><span>常時更新サーバー</span><span class="status-ok">正常</span></div>
     </div>
   </div>
 
@@ -121,6 +122,7 @@ canvas {
     <div class="services">
       <div class="service-item"><span>ウィジェット更新</span><span class="status-error">エラー</span></div>
       <div class="service-item"><span>画像ロード</span><span class="status-ok">正常</span></div>
+      <div class="service-item"><span>メールマガジン配信</span><span class="status-error">大幅遅延あり</span></div>
     </div>
   </div>
 
@@ -129,7 +131,7 @@ canvas {
     <h3>🛠 ツール</h3>
     <div class="services">
       <div class="service-item"><span>計算スクリプト</span><span class="status-ok">正常</span></div>
-      <div class="service-item"><span>データ解析ツール</span><span class="status-warning">注意</span></div>
+      <div class="service-item"><span>データ解析ツール</span><span class="status-warning">一部メンテナンス中</span></div>
       <div class="service-item"><span>画像変換ツール</span><span class="status-ok">正常</span></div>
     </div>
   </div>
@@ -161,12 +163,11 @@ canvas {
 
   <!-- 臨時情報 -->
   <div class="panel" id="temporary">
-    <h3>📝 臨時情報 (ここに直接書き込めます)</h3>
+    <h3>🛈 臨時情報 </h3>
     <div id="tempLog" contenteditable="true" style="background-color:#00121b; padding:8px; border-radius:6px; min-height:100px; max-height:200px; overflow-y:auto; color:#00ff99;">
-      <!-- ここに直接入力可能 -->
-      12:30: サーバー負荷高めのため監視強化中<br>
-      13:10: 新しいウィジェットを追加予定<br>
-      13:45: メンテナンス完了、正常稼働中
+      8/17 09:13:サーバー負荷高めのため監視強化中<br>
+      8/17 23:44:サーバー負荷の軽減対応メンテナンス実施<br>
+      N O W : メンテナンス完了、正常稼働中
     </div>
   </div>
 
@@ -223,9 +224,15 @@ function update(){
   const now = new Date(); const time = now.toLocaleTimeString();
 
   const r=Math.random();
-  if(r<0.05) addLog(`${time}: サーバーエラー発生!`,'status-error');
-  else if(r<0.15) addLog(`${time}: 注意 - メールサーバー負荷高め`,'status-warning');
-  else addLog(`${time}: 情報 - システム正常稼働`,'info');
+  if (r < 0.05)
+  addLog(`${time}: サーバーエラー発生!`, 'status-error');
+else if (r < 0.10)
+  addLog(`${time}: データベース復旧 遅延あり`, 'status-warning');
+else if (r < 0.30)
+  addLog(`${time}: メールサーバー負荷高め`, 'status-warning');
+else
+  addLog(`${time}: システム正常稼働`, 'info');
+  
 }
 
 setInterval(update,1000);
