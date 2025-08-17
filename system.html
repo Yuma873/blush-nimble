@@ -136,7 +136,7 @@ canvas {
     <h3>🛠 ツール</h3>
     <div class="services">
       <div class="service-item"><span>計算スクリプト</span><span class="status-success">正常</span></div>
-      <div class="service-item"><span>データ解析ツール</span><span class="status-warning">一部メンテナンス中</span></div>
+      <div class="service-item"><span>データ解析ツール</span><span class="status-maintenance">一部メンテナンス中</span></div>
       <div class="service-item"><span>画像変換ツール</span><span class="status-success">正常</span></div>
     </div>
   </div>
@@ -237,7 +237,7 @@ function update(){
   else if (r < 0.18) addLog(`${time}: ファイルページPDF読込不可`, "status-warning");
   else if (r < 0.20) addLog(`${time}: 天気情報更新失敗`, "status-warning");
   else if (r < 0.22) addLog(`${time}: ウィジェット更新エラー`, "status-error");
-  else if (r < 0.25) addLog(`${time}: 臨時メンテナンス実施中`, "status-maintenance");
+  else if (r < 0.25) addLog(`${time}: 瞬時メンテナンス実施`, "status-maintenance");
   else addLog(`${time}: システム正常稼働`, "status-success");
 }
 
