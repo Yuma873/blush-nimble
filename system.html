@@ -212,11 +212,12 @@ function getRandomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;
 
 // 通常チャート更新（1秒ごと）
 function updateNormal(){
-  const cpuVal=getRandomInt(5,90);
-  const weatherVal=getRandomInt(50,100);
-  const filesVal=getRandomInt(10,95);
-  const serverVal=getRandomInt(20,80);
-
+  const cpuVal=getRandomInt(60,100);
+  const weatherVal=getRandomInt(30,100);
+  const filesVal=getRandomInt(10,75);
+  const serverVal=getRandomInt(30,100);
+  const topixVal=getRandomInt(20,80);
+  
   cpuChart.data.datasets[0].data.push(cpuVal); cpuChart.data.datasets[0].data.shift(); cpuChart.update();
   weatherChart.data.datasets[0].data.push(weatherVal); weatherChart.data.datasets[0].data.shift(); weatherChart.update();
   filesChart.data.datasets[0].data.push(filesVal); filesChart.data.datasets[0].data.shift(); filesChart.update();
