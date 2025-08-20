@@ -97,7 +97,7 @@ canvas {
   <div class="panel"><h3>🌤 天気情報</h3><canvas id="weatherChart"></canvas></div>
   <div class="panel"><h3>📂 ファイル</h3><canvas id="filesChart"></canvas></div>
   <div class="panel"><h3>💻 サーバー</h3><canvas id="serverChart"></canvas></div>
-  <div class="panel"><h3>🛠️メンテナンス用第二サーバー</h3><canvas id="serverChart2"></canvas></div>
+  <div class="panel"><h3>🛠️瞬時メンテナンス用第二サーバー<p>瞬メのため約10秒に1度の更新</p></h3><canvas id="serverChart2"></canvas></div>
   <div class="panel"><h3>🛠️TOPIX更新</h3><canvas id="topixChart"></canvas></div>
 
   <!-- ファイルサービス -->
@@ -194,7 +194,7 @@ function updateMaintenance(){
   const val=getRandomInt(10,90);
   serverChart2.data.datasets[0].data.push(val); serverChart2.data.datasets[0].data.shift(); serverChart2.update();
 }
-setInterval(updateMaintenance,5000);
+setInterval(updateMaintenance,15000);
 </script>
 </body>
 </html>
