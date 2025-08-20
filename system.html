@@ -238,7 +238,7 @@ function updateMaintenance(){
   const val=getRandomInt(10,90);
   serverChart2.data.datasets[0].data.push(val); serverChart2.data.datasets[0].data.shift(); serverChart2.update();
 }
-setInterval(updateMaintenance,10000);
+setInterval(updateMaintenance,5000);
 </script>
 </body>
 </html>
