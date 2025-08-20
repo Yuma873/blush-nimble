@@ -13,7 +13,6 @@
       height: 100vh;
       overflow: hidden;
     }
-
     nav {
       width: 220px;
       background-color: #2c3e50;
@@ -21,7 +20,6 @@
       padding: 10px;
       box-sizing: border-box;
     }
-
     nav a {
       display: block;
       color: white;
@@ -32,17 +30,14 @@
       border-radius: 6px;
       transition: background-color 0.3s;
     }
-
     nav a:hover {
       background-color: #1abc9c;
     }
-
     nav img {
       width: 100%;
       border-radius: 5px;
       margin-bottom: 10px;
     }
-
     main {
       flex: 1;
       padding: 20px 30px 70px;
@@ -51,7 +46,6 @@
       box-sizing: border-box;
       overflow-y: auto;
     }
-
     .pdf-viewer-section {
       background-color: white;
       padding: 20px;
@@ -61,10 +55,7 @@
       width: 100%;
       margin: 0 auto;
       flex-grow: 1;
-      display: flex;
-      flex-direction: column;
     }
-
     .pdf-viewer-section header {
       font-size: 1.5em;
       margin-bottom: 20px;
@@ -73,45 +64,28 @@
       padding-bottom: 8px;
     }
 
-    select {
-      padding: 10px;
-      font-size: 1em;
-      margin-bottom: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      max-width: 400px;
+    /* カード一覧 */
+    .pdf-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
     }
-
-    .iframe-container {
-      flex: 1;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-      height: 80vh;
-      margin-bottom: 10px;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    .fallback-link {
-      margin-top: 10px;
-      font-size: 0.95em;
-      color: #555;
-    }
-
-    .fallback-link a {
-      color: #1abc9c;
-      font-weight: bold;
+    .pdf-card {
+      display: block;
+      padding: 15px;
+      background-color: #ecf0f1;
+      color: #2c3e50;
       text-decoration: none;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      font-weight: bold;
+      transition: all 0.2s;
+      text-align: center;
     }
-
-    .fallback-link a:hover {
-      text-decoration: underline;
+    .pdf-card:hover {
+      background-color: #1abc9c;
+      color: white;
+      transform: translateY(-3px);
     }
 
     .ticker-wrap {
@@ -125,30 +99,21 @@
       left: 0;
       z-index: 9999;
     }
-
     .ticker {
       display: inline-block;
       white-space: nowrap;
       animation: tickerScroll 25s linear infinite;
       padding-left: 100%;
     }
-
     @keyframes tickerScroll {
-      from {
-        transform: translateX(0%);
-      }
-      to {
-        transform: translateX(-100%);
-      }
+      from { transform: translateX(0%); }
+      to { transform: translateX(-100%); }
     }
   </style>
 </head>
 <body>
   <nav>
-    <img
-      src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
-      alt="メニュー画像"
-    />
+    <img src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg" alt="メニュー画像" />
     <a href="portal.html">🏠 トップ</a>
     <a href="portal-news.html">📰 お知らせ</a>
     <a href="portal-tool.html">🛠 ツール</a>
@@ -156,55 +121,30 @@
     <a href="portal-umekomi.html">🧰水泳関連 ツールポータル</a>
     <a href="portal-tenki.html">⛅️今後の天気【プール練の参考に】</a>
     <a href="portal-pdf.html">📁ファイル一覧</a>
-    <a href="https://yuma873.github.io/blush-nimble/index.html" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">🚪ログアウト</a>
+    <a href="https://yuma873.github.io/blush-nimble/index.html" style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">🚪ログアウト</a>
   </nav>
 
   <main>
     <section class="pdf-viewer-section">
-      <header>📄 資料プレビュー(chrome版)</header>
-      <label for="pdfSelector">表示するPDFを選択:</label>
-      <select id="pdfSelector">
-
-       <option value="https://www.dropbox.com/scl/fi/bhuwts84oxd5du665vklq/25.pdf?rlkey=3cr9ayurxtaw7t8lfixbsef4j&st=o7goa4ul&dl=0">【後期】県新人</option>
-　　　　　<option value="https://www.dropbox.com/scl/fi/9aas17qnc47q27i9lee02/25.pdf?rlkey=m2t5x8qxtnidu74u58se1rc8u&st=mo2eqcxu&dl=0">【後期】北相新人</option>
-        <option value="https://www.dropbox.com/scl/fi/shf20aexsc86hm6vppug1/25.pdf?rlkey=japddjdetqcs1qdc17ziysr40&st=lquqmhic&dl=0">【後期】北相地区大会</option>
-        <option value="https://www.dropbox.com/scl/fi/75pj97jyi13dkddtbcuyj/25.pdf?rlkey=9my8wdltnjpogtezgn89b86dr&st=7lmhf559&dl=0">【後期】県総体</option>
-        <option value="https://www.dropbox.com/scl/fi/8isg5hhbrf558rtnaoj81/25.pdf?rlkey=0tqfh9j7bdb17rh08sdzbqjl8&st=46xzijaw&dl=0">【後期】夏季記録会</option>
-        <option value="https://www.dropbox.com/scl/fi/096dvcuvs8onp4048av8f/25.pdf?rlkey=9bqz7sairnhnfr3ur2qoveodl&st=d5z3ww52&dl=0">【後期】春季記録会</option>
-        <option value="https://www.dropbox.com/scl/fi/g6epj1d4uer1jr7xhk145/0802.pdf?rlkey=wrhb85cojynnern7mh3vxtay5&st=hgxre7za&dl=0">0802中ブロック要項</option>
-        <option valie="https://www.dropbox.com/scl/fi/zix8sp45rgkeexjyge5km/20250805100036.pdf?rlkey=4cdail7druhxyhay4y99ni2v6&st=2gcpmi9r&dl=0">0802結果</option>
-        <option value="https://www.dropbox.com/scl/fi/ik09wzysaiu0bcujsronx/0727-scan.pdf?rlkey=68kdo8muc2k27b5kvk0xn82pt&st=0dr89pf8&dl=0">0727結果</option>
-        <option value="https://www.dropbox.com/scl/fi/jvl91qoqtvunf8gwbewzz/0712.pdf?rlkey=e5g4qrbulvt0ty91a7mp4nt1g&st=fczrt2as&dl=0">0712結果</option>
-      </select>
-
-      <div class="iframe-container">
-        <iframe id="pdfViewer" src="https://www.dropbox.com/scl/fi/4w6qhzk6kjaiaforh2tty/.pdf?rlkey=6zxelc2fxye1uof2p8t35h3u5&st=9yzfd4jt&dl=0"></iframe>
+      <header>📄 資料リンク一覧</header>
+      <div class="pdf-list">
+        <a href="https://www.dropbox.com/scl/fi/bhuwts84oxd5du665vklq/25.pdf?raw=1" target="_blank" class="pdf-card">【後期】県新人</a>
+        <a href="https://www.dropbox.com/scl/fi/9aas17qnc47q27i9lee02/25.pdf?raw=1" target="_blank" class="pdf-card">【後期】北相新人</a>
+        <a href="https://www.dropbox.com/scl/fi/shf20aexsc86hm6vppug1/25.pdf?raw=1" target="_blank" class="pdf-card">【後期】北相地区大会</a>
+        <a href="https://www.dropbox.com/scl/fi/75pj97jyi13dkddtbcuyj/25.pdf?raw=1" target="_blank" class="pdf-card">【後期】県総体</a>
+        <a href="https://www.dropbox.com/scl/fi/8isg5hhbrf558rtnaoj81/25.pdf?raw=1" target="_blank" class="pdf-card">【後期】夏季記録会</a>
+        <a href="https://www.dropbox.com/scl/fi/096dvcuvs8onp4048av8f/25.pdf?raw=1" target="_blank" class="pdf-card">【後期】春季記録会</a>
+        <a href="https://www.dropbox.com/scl/fi/g6epj1d4uer1jr7xhk145/0802.pdf?raw=1" target="_blank" class="pdf-card">0802中ブロック要項</a>
+        <a href="https://www.dropbox.com/scl/fi/zix8sp45rgkeexjyge5km/20250805100036.pdf?raw=1" target="_blank" class="pdf-card">0802結果</a>
+        <a href="https://www.dropbox.com/scl/fi/ik09wzysaiu0bcujsronx/0727-scan.pdf?raw=1" target="_blank" class="pdf-card">0727結果</a>
+        <a href="https://www.dropbox.com/scl/fi/jvl91qoqtvunf8gwbewzz/0712.pdf?raw=1" target="_blank" class="pdf-card">0712結果</a>
       </div>
-
-      <p class="fallback-link">
-        表示されない場合は <a id="openInNewTab" href="https://www.dropbox.com/scl/fi/4w6qhzk6kjaiaforh2tty/.pdf?rlkey=6zxelc2fxye1uof2p8t35h3u5&st=9yzfd4jt&dl=0" target="_blank" rel="noopener">こちら</a> をクリックして開いてください。
-      </p>
-          <div style="text-align: right; margin-top: 10px;">
-  <a href="portal-pdf.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
-    通常版へ戻る ▶
-  </a>
+      
     </section>
   </main>
 
   <div class="ticker-wrap">
-    <div class="ticker">PDF VIEWER等の拡張機能を利用している場合は、<b><u>開くことができない場合があります。</u></b>拡張機能を利用していない状態で閲覧するか、選択したうえで新しいタブで開いてください。</div>
+    <div class="ticker">PDFはiframeでは表示せず、新しいタブで直接開く仕様にしています。ご了承ください。</div>
   </div>
-
-  <script>
-    const pdfSelector = document.getElementById('pdfSelector');
-    const pdfViewer = document.getElementById('pdfViewer');
-    const openInNewTab = document.getElementById('openInNewTab');
-
-    pdfSelector.addEventListener('change', function () {
-      const selectedUrl = this.value;
-      pdfViewer.src = selectedUrl;
-      openInNewTab.href = selectedUrl;
-    });
-  </script>
 </body>
 </html>
