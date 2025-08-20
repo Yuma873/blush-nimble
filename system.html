@@ -188,7 +188,7 @@ canvas {
 <script>
 // 時間表示
 function updateTime() { document.getElementById('time-display').textContent = new Date().toLocaleTimeString(); }
-setInterval(updateTime,2000);
+setInterval(updateTime,500);
 
 // チャート生成
 function createChart(ctx,color){ return new Chart(ctx,{
@@ -222,6 +222,8 @@ function updateNormal(){
   weatherChart.data.datasets[0].data.push(weatherVal); weatherChart.data.datasets[0].data.shift(); weatherChart.update();
   filesChart.data.datasets[0].data.push(filesVal); filesChart.data.datasets[0].data.shift(); filesChart.update();
   serverChart.data.datasets[0].data.push(serverVal); serverChart.data.datasets[0].data.shift(); serverChart.update();
+    topixChart.data.datasets[0].data.push(topixVal); topixChart.data.datasets[0].data.shift(); topixChart.update();
+
 
   const time = new Date().toLocaleTimeString();
   const r=Math.random();
