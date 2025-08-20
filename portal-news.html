@@ -1,183 +1,205 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ポータルサイト - お知らせ</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        display: flex;
-        background-color: #f5f5f5;
-      }
-      nav {
-        width: 220px;
-        background-color: #2c3e50;
-        color: white;
-        padding: 10px;
-        min-height: 100vh;
-      }
-      nav a {
-        display: block;
-        color: white;
-        text-decoration: none;
-        padding: 12px;
-        margin: 8px 0;
-        background-color: #34495e;
-        border-radius: 6px;
-        transition: background-color 0.3s;
-      }
-      nav a:hover {
-        background-color: #1abc9c;
-      }
-      main {
-        flex: 1;
-        padding: 30px;
-      }
-      header {
-        font-size: 1.8em;
-        margin-bottom: 15px;
-        color: #2c3e50;
-      }
-      section {
-        margin-bottom: 40px;
-      }
-      ul {
-        list-style: disc;
-        padding-left: 20px;
-      }
-      .update-time {
-        font-size: 0.9em;
-        color: #888;
-      }
-    </style>
-  </head>
-  <body>
-    <nav>
-      <img
-        src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
-        alt="メニュー画像"
-        style="width: 100%; border-radius: 5px; margin-bottom: 10px"
-      />
-      <a href="portal.html">🏠 トップ</a>
-      <a href="portal-news.html">📰 お知らせ</a>
-      <a href="portal-tool.html">🛠 ツール</a>
-      <a href="portal-renraku.html">📢 掲示板連絡</a>
-      <a href="portal-umekomi.html">🧰水泳関連 ツールポータル</a>
-      <a href="portal-tenki.html">⛅️今後の天気【プール練の参考に】</a>
-      <a href="portal-pdf.html">📁ファイル一覧</a>
-      <a href="https://yuma873.github.io/blush-nimble/index.html" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">🚪ログアウト</a>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ポータルサイト - PDFリンク</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    background-color: #f5f5f5;
+    height: 100vh;
+    overflow: hidden;
+  }
+  nav {
+    width: 220px;
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  nav a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px;
+    margin: 8px 0;
+    background-color: #34495e;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+  }
+  nav a:hover {
+    background-color: #1abc9c;
+  }
+  nav img {
+    width: 100%;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  main {
+    flex: 1;
+    padding: 20px 30px 70px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  .pdf-viewer-section {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .pdf-viewer-section header {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #34495e;
+    border-bottom: 2px solid #1abc9c;
+    padding-bottom: 8px;
+  }
 
-    </nav>
-    <main>
-      <section>
-        <header>📰 最新のお知らせ</header>
-        <ul>
-          <li>2025/8/17 - 夏休み明け1回目or2回目でAVGやります</li>
-          <li>2025/7/23 - 夏休み中の学校練習のスクールバスは、平塚[7:50]愛甲[8:10]。帰りのバスは[11:30]。</li>
-          <li>2025/04/15 - 新年度のスケジュールを公開しました。</li>
-        </ul>
-      </section>
+  /* アコーディオン */
+  .accordion input { display: none; }
+  .accordion label {
+    display: block;
+    background-color: #34495e;
+    color: white;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+  }
+  .accordion label:hover { background-color: #1abc9c; }
+  .accordion .content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    margin-bottom: 10px;
+  }
+  .accordion input:checked ~ .content { max-height: 1000px; }
 
-      <section>
-        <header>📢 大会関連情報</header>
-        <ul>
-           <li>
-            2025/05/10 -
-            <strong>市総体・選手権大会</strong>は参加しない方針となっています。
-          </li>
-        </ul>
-      </section>
+  .pdf-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+  }
+  .pdf-card {
+    display: block;
+    padding: 15px;
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    text-decoration: none;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    font-weight: bold;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .pdf-card:hover {
+    background-color: #1abc9c;
+    color: white;
+    transform: translateY(-3px);
+  }
 
-      <!-- カウントダウン追加部分 -->
-      <section>
-        <header>⏳ 大会カウントダウン(2025年の日程で2026年度版を登録済み)</header>
-        <ul id="countdown-list"></ul>
-      </section>
+  .ticker-wrap {
+    width: 100%;
+    overflow: hidden;
+    background-color: #2c3e50;
+    color: white;
+    padding: 8px 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 9999;
+  }
+  .ticker {
+    display: inline-block;
+    white-space: nowrap;
+    animation: tickerScroll 25s linear infinite;
+    padding-left: 100%;
+  }
+  @keyframes tickerScroll {
+    from { transform: translateX(0%); }
+    to { transform: translateX(-100%); }
+  }
+</style>
+</head>
+<body>
+  <nav>
+    <img src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg" alt="メニュー画像" />
+    <a href="portal.html">🏠 トップ</a>
+    <a href="portal-news.html">📰 お知らせ</a>
+    <a href="portal-tool.html">🛠 ツール</a>
+    <a href="portal-renraku.html">📢 連絡</a>
+    <a href="portal-umekomi.html">🧰水泳関連 ツールポータル</a>
+    <a href="portal-tenki.html">⛅️今後の天気【プール練の参考に】</a>
+    <a href="portal-pdf.html">📁ファイル一覧</a>
+    <a href="https://yuma873.github.io/blush-nimble/index.html" style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">🚪ログアウト</a>
+  </nav>
 
-      <section class="update-time">最終更新: 2025/8/15 8:17.22</section>
-      <button
-        onclick="location.href='portal.html'"
-        style="
-          padding: 10px 20px;
-          font-size: 1em;
-          background-color: #1abc9c;
-          color: white;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-        "
-      >
-        ポータルトップへ戻る
-      </button>
-    </main>
+  <main>
+    <section class="pdf-viewer-section">
+      <header>📄 PDFリンク一覧</header>
+      <div class="accordion">
 
-    <!-- JavaScriptを追加 -->
-    <script>
-      const events = [
-        { name: "春季記録会(24-25)", date: "2026-05-24" },
-        { name: "夏季記録会", date: "2026-06-15" },
-        { name: "県高校総体(20-22)", date: "2026-06-20" },
-        { name: "北相地区大会", date: "2026-07-28" },
-        { name: "北相地区新人", date: "2026-09-13" },
-        { name: "県新人(27-28)", date: "2026-09-27" },
-        
-      ];
+        <!-- 2025年度 前期 -->
+        <input type="checkbox" id="front2025">
+        <label for="front2025">2025年度 前期 </label>
+        <div class="content">
+          <div class="pdf-list">
+            <a href="https://www.dropbox.com/scl/fi/g6epj1d4uer1jr7xhk145/0802.pdf?dl=0" target="_blank" class="pdf-card">0802中ブロック要項</a>
+            <a href="https://www.dropbox.com/scl/fi/zix8sp45rgkeexjyge5km/20250805100036.pdf?dl=0" target="_blank" class="pdf-card">0802結果</a>
+            <a href="https://www.dropbox.com/scl/fi/ik09wzysaiu0bcujsronx/0727-scan.pdf?dl=0" target="_blank" class="pdf-card">0727結果</a>
+            <a href="https://www.dropbox.com/scl/fi/jvl91qoqtvunf8gwbewzz/0712.pdf?dl=0" target="_blank" class="pdf-card">0712結果</a>
+          </div>
+        </div>
 
-      const today = new Date();
-      const list = document.getElementById("countdown-list");
+        <!-- 2025年度 後期 -->
+        <input type="checkbox" id="back2025">
+        <label for="back2025">2025年度 後期 </label>
+        <div class="content">
+          <div class="pdf-list">
+            <a href="https://www.dropbox.com/scl/fi/096dvcuvs8onp4048av8f/25.pdf?dl=0" target="_blank" class="pdf-card">春季記録会 2025-05-24,25</a>
+            <a href="https://www.dropbox.com/scl/fi/8isg5hhbrf558rtnaoj81/25.pdf?dl=0" target="_blank" class="pdf-card">夏季記録会 2025-06-15</a>
+            <a href="https://www.dropbox.com/scl/fi/75pj97jyi13dkddtbcuyj/25.pdf?dl=0" target="_blank" class="pdf-card">県高校総体 2025-06-20,21,22</a>
+            <a href="https://www.dropbox.com/scl/fi/shf20aexsc86hm6vppug1/25.pdf?dl=0" target="_blank" class="pdf-card">北相地区大会 2025-07-28</a>
+            <a href="https://www.dropbox.com/scl/fi/9aas17qnc47q27i9lee02/25.pdf?dl=0" target="_blank" class="pdf-card">北相地区新人 2025-09-13</a>
+            <a href="https://www.dropbox.com/scl/fi/bhuwts84oxd5du665vklq/25.pdf?dl=0" target="_blank" class="pdf-card">県新人 2025-09-27,28</a>
+          </div>
+        </div>
 
-      events.forEach((e) => {
-        const d = Math.ceil((new Date(e.date) - today) / (1000 * 60 * 60 * 24));
-        let c = "#666";
-        if (d <= 7) c = "red";
-        else if (d <= 30) c = "orange";
-        else if (d <= 50) c = "goldenrod";
+        <!-- 2026年度 前期 -->
+        <input type="checkbox" id="front2026">
+        <label for="front2026">2026年度 前期</label>
+        <div class="content">
+          <div class="pdf-list">
+            <a href="#" target="_blank" class="pdf-card">ファイル未登録</a>
+          </div>
+        </div>
 
-        const li = document.createElement("li");
-        if (d > 60) {
-          li.innerHTML = `<span style="color:#aaa; font-size:0.9em;">${e.name}：あと ${d}日</span>`;
-        } else {
-          li.innerHTML = `${e.name}：あと <strong style="color:${c}">${d}日</strong>`;
-        }
-        list.appendChild(li);
-      });
-    </script>
-    <div class="ticker-wrap">
-      <div class="ticker">
-        <span>🚨 大会に向けて調整を進めましょう ／ 📢 目指せ高校総体進出 </span>
+        <!-- 2026年度 後期 -->
+        <input type="checkbox" id="back2026">
+        <label for="back2026">2026年度 後期 </label>
+        <div class="content">
+          <div class="pdf-list">
+            <a href="#" target="_blank" class="pdf-card">ファイル未登録</a>
+          </div>
+        </div>
+
       </div>
-    </div>
+    </section>
+  </main>
 
-    <style>
-      .ticker-wrap {
-        width: 100%;
-        overflow: hidden;
-        background-color: #2c3e50;
-        color: white;
-        padding: 8px 0;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        z-index: 9999;
-      }
-
-      .ticker {
-        display: inline-block;
-        white-space: nowrap;
-        animation: tickerScroll 25s linear infinite;
-        padding-left: 100%;
-      }
-
-      @keyframes tickerScroll {
-        from {
-          transform: translateX(0%);
-        }
-        to {
-          transform: translateX(-100%);
-        }
-      }
-    </style>
-  </body>
+  <div class="ticker-wrap">
+    <div class="ticker">PDFはiframeでは表示せず、新しいタブで直接開く仕様にしています。学校PCでも確実に開けます。</div>
+  </div>
+</body>
 </html>
