@@ -231,7 +231,7 @@ function updateNormal(){
   else if(r<0.05)addLog(`${time}: データベース復旧 遅延あり`,'status-warning');
   else addLog(`${time}: システム正常稼働`,'status-success');
 }
-setInterval(updateNormal,500);
+setInterval(updateNormal,30);
 
 // メンテナンスチャートのみ10秒ごと更新
 function updateMaintenance(){
