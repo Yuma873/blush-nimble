@@ -10,7 +10,6 @@
       margin: 0;
       background-color: #f5f5f5;
       display: flex;
-      flex-direction: row;
       min-height: 100vh;
     }
 
@@ -48,18 +47,19 @@
       padding: 30px;
     }
 
-    header {
-      font-size: 1.4em;
-      margin-bottom: 20px;
+    header h1 {
+      font-size: 1.2em;
       color: #2c3e50;
+      margin-bottom: 25px;
+      text-align: center;
     }
 
     .section-card {
       background: white;
       padding: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
     .section-card h2 {
@@ -68,6 +68,14 @@
       border-bottom: 2px solid #1abc9c;
       padding-bottom: 5px;
     }
+
+    .checklist li {
+      margin: 5px 0;
+      line-height: 1.5;
+    }
+
+    .checklist li.essential { color: #e74c3c; font-weight: bold; }
+    .checklist li.optional { color: #f39c12; }
 
     table {
       width: 100%;
@@ -86,8 +94,8 @@
       color: white;
     }
 
-    .checklist li {
-      margin: 5px 0;
+    table tbody tr:nth-child(even) {
+      background-color: #f2f2f2;
     }
 
     .button-link {
@@ -97,7 +105,7 @@
       padding: 10px 20px;
       border-radius: 6px;
       text-decoration: none;
-      margin: 5px 0;
+      margin: 10px 0;
     }
 
     .button-link:hover {
@@ -106,7 +114,7 @@
 
     footer {
       text-align: center;
-      padding: 10px;
+      padding: 15px;
       background-color: #2c3e50;
       color: white;
       margin-top: 20px;
@@ -131,8 +139,10 @@
   <a href="portal-umekomi.html">🧰 水泳関連 ツールポータル</a>
   <a href="portal-tenki.html">⛅️ 今後の天気</a>
   <a href="portal-pdf.html">📁 ファイル一覧</a>
-        <a href="https://yuma873.github.io/blush-nimble/index.html" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">🚪ログアウト</a>
-
+  <a href="https://yuma873.github.io/blush-nimble/index.html" 
+     style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+     🚪 ログアウト
+  </a>
 </nav>
 
 <main>
@@ -140,17 +150,18 @@
     <h1>9/23 選手権大会 特設ページ</h1>
   </header>
 
+  <!-- 大会情報 -->
   <section class="section-card">
     <h2>大会情報</h2>
-    <p><strong>大会名：</strong>第30回伊勢原市水泳選手権大会</p>
-    <p><strong>日付：</strong>2025年9月23日（火）</p>
-    <p><strong>場所：</strong>NITTANパークおおね（秦野市立おおね公園）</p>
-    <p><strong>集合時間・場所：</strong>未定</p>
-    <p><strong>対象：</strong>前期生（大会は全年齢対象）</p>
-    <p><strong>主催：</strong>伊勢原市スポーツ協会　伊勢原市水泳協会</p>
-    <a href="https://www.dropbox.com/scl/fi/y4ipmttxg5ix793ykwoe7/0923.pdf?rlkey=c9e45pm0vz32lncft5k7pihg0&st=dpljjmlg&dl=0" target="_blank" class="button-link">大会要項を見る</a>
+    <p>📅 <strong>日付：</strong>2025年9月23日（火）</p>
+    <p>📍 <strong>場所：</strong>NITTANパークおおね（秦野市立おおね公園）</p>
+    <p>⏰ <strong>集合時間・場所：</strong>未定</p>
+    <p>🎯 <strong>対象：</strong>前期生（大会は全年齢対象）</p>
+    <p>🏢 <strong>主催：</strong>伊勢原市スポーツ協会　伊勢原市水泳協会</p>
+    <a href="https://www.dropbox.com/scl/fi/y4ipmttxg5ix793ykwoe7/0923.pdf?rlkey=c9e45pm0vz32lncft5k7pihg0&st=dpljjmlg&dl=0" target="_blank" class="button-link">📄 大会要項を見る</a>
   </section>
 
+  <!-- 種目一覧 -->
   <section class="section-card">
     <h2>種目一覧</h2>
     <ul class="checklist">
@@ -163,6 +174,7 @@
     </ul>
   </section>
 
+  <!-- タイムスケジュール -->
   <section class="section-card">
     <h2>タイムスケジュール</h2>
     <table>
@@ -178,40 +190,43 @@
     </table>
   </section>
 
+  <!-- 結果URL -->
   <section class="section-card">
     <h2>結果URL</h2>
-    <a href="about:blank" target="_blank" class="button-link">終了次第、結果を見る</a>
+    <a href="about:blank" target="_blank" class="button-link">📊 結果を見る</a>
   </section>
 
+  <!-- アクセス -->
   <section class="section-card">
     <h2>アクセス</h2>
-    <p>NITTANパークおおね<br>
-    住所：〒257-0007神奈川県秦野市鶴巻940番地<br>
-    電車：小田急小田原線『東海大学前駅』下車徒歩15分<br>
-    バス：神奈川中央バス 鶴巻温泉駅発東海大学行『下落幡』下車徒歩1分</p>
+    <p>📍 NITTANパークおおね</p>
+    <p>住所：〒257-0007 神奈川県秦野市鶴巻940番地</p>
+    <p>🚃 電車：小田急小田原線『東海大学前駅』下車 徒歩15分</p>
+    <p>🚌 バス：神奈川中央バス 鶴巻温泉駅発 東海大学行『下落幡』下車 徒歩1分</p>
   </section>
 
+  <!-- 持ち物・注意事項 -->
   <section class="section-card">
     <h2>持ち物・注意事項</h2>
     <h3>必須なもの</h3>
     <ul class="checklist">
-      <li>✅ サンダル（中用）とサンダル袋</li>
-      <li>✅ 外靴袋・靴下袋</li>
-      <li>📝 筆記用具</li>
-      <li>💧 水着・キャップ・ゴーグル・タオル</li>
-      <li>👕 濡れてもよいTシャツや短パン（体操着でも可）</li>
-      <li>🥤 飲み物</li>
-      <li>💰 交通費や小銭</li>
+      <li class="essential">✅ サンダル（中用）とサンダル袋</li>
+      <li class="essential">✅ 外靴袋・靴下袋</li>
+      <li class="essential">📝 筆記用具</li>
+      <li class="essential">💧 水着・キャップ・ゴーグル・タオル</li>
+      <li class="essential">👕 濡れてもよいTシャツや短パン（体操着でも可）</li>
+      <li class="essential">🥤 飲み物</li>
+      <li class="essential">💰 交通費や小銭</li>
     </ul>
 
     <h3>あった方がよいもの</h3>
     <ul class="checklist">
-      <li>👜 大きなバッグを入れられるゴミ袋</li>
-      <li>🗑 小さなゴミ袋</li>
-      <li>🍙 入場前・退場後の補食</li>
-      <li>🧊 凍らせた飲み物やゼリー</li>
-      <li>💧 予備の水着・キャップ・ゴーグル</li>
-      <li>🧴 セーム（吸水タオル）</li>
+      <li class="optional">👜 大きなバッグを入れられるゴミ袋</li>
+      <li class="optional">🗑 小さなゴミ袋</li>
+      <li class="optional">🍙 入場前・退場後の補食</li>
+      <li class="optional">🧊 凍らせた飲み物やゼリー</li>
+      <li class="optional">💧 予備の水着・キャップ・ゴーグル</li>
+      <li class="optional">🧴 セーム（吸水タオル）</li>
     </ul>
 
     <h3>注意事項</h3>
@@ -224,6 +239,7 @@
     </ul>
   </section>
 
+  <!-- 備考 -->
   <section class="section-card">
     <h2>備考</h2>
     <p>現在表示する内容はありません</p>
