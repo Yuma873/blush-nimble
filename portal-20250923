@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>9/23 選手権大会 特設ページ</title>
+  <link rel="stylesheet" href="portal-style.css">
+</head>
+<body>
+  <header class="header">
+    <h1>9/23 選手権大会 特設ページ</h1>
+  </header>
+
+  <main>
+    <section class="section-card">
+      <h2>大会情報</h2>
+      <p><strong>大会名：</strong>第30回伊勢原市水泳選手権大会</p>
+      <p><strong>日付：</strong>2025年9月23日（火）</p>
+      <p><strong>場所：</strong>NITTANパークおおね（秦野市立おおね公園）</p>
+      <p><strong>集合時間・場所：</strong>未定</p>
+      <p><strong>対象：</strong>前期生（大会は全年齢対象）</p>
+      <p><strong>主催：</strong>伊勢原市スポーツ協会　伊勢原市水泳協会</p>
+      <p><strong>要項URL：</strong> <a href="https://www.dropbox.com/scl/fi/y4ipmttxg5ix793ykwoe7/0923.pdf?rlkey=c9e45pm0vz32lncft5k7pihg0&st=dpljjmlg&dl=0" target="_blank">大会要項</a></p>
+    </section>
+
+    <section class="section-card">
+      <h2>種目一覧</h2>
+      <ul>
+        <li>50m バタフライ</li>
+        <li>50m 背泳ぎ</li>
+        <li>50m 平泳ぎ</li>
+        <li>50m 自由形</li>
+        <li>100m 個人メドレー</li>
+        <li>4×25m フリーリレー</li>
+      </ul>
+    </section>
+
+    <section class="section-card">
+      <h2>タイムスケジュール</h2>
+      <ul>
+        <li>9:30 開場</li>
+        <li>9:30 ウォーミングアップ開始（~10:10）</li>
+        <li>10:20 競技開始</li>
+        <li>12:30 休憩</li>
+        <li>13:30 終了・解散予定</li>
+      </ul>
+    </section>
+
+    <section class="section-card">
+      <h2>結果URL</h2>
+      <p><a href="about:blank" target="_blank">終了次第、結果がご覧いただけます。</a></p>
+    </section>
+
+    <section class="section-card">
+      <h2>アクセス</h2>
+      <p>NITTANパークおおね<br>
+      住所：〒257-0007神奈川県秦野市鶴巻940番地<br>
+      電車：小田急小田原線『東海大学前駅』下車徒歩15分<br>
+      バス：神奈川中央バス：鶴巻温泉駅発東海大学行『下落幡』下車徒歩1分</p>
+    </section>
+
+    <section class="section-card">
+      <h2>持ち物・注意事項</h2>
+
+      <h3>必須なもの</h3>
+      <ol>
+        <li>サンダル（中用）とサンダルを入れる袋</li>
+        <li>外靴を入れる靴袋と靴下を入れる袋</li>
+        <li>筆記用具</li>
+        <li>レースに必要なもの（水着・キャップ・ゴーグル・タオル）</li>
+        <li>レース前や待ち時間に水着の上から着る濡れてもよいTシャツや短パン（体操着でも可）</li>
+        <li>飲み物</li>
+        <li>交通費や飲み物代などの小銭</li>
+      </ol>
+
+      <h3>あった方がよいもの</h3>
+      <ol>
+        <li>大きなバッグを入れられるゴミ袋</li>
+        <li>小さなゴミ袋</li>
+        <li>入場前や退場後の補食</li>
+        <li>凍らせた飲み物やゼリー</li>
+        <li>予備の水着・キャップ・ゴーグル</li>
+        <li>セーム（吸水タオル）</li>
+      </ol>
+
+      <h3>注意事項</h3>
+      <ul>
+        <li>1名2種目以内(リレー種目を除く)</li>
+        <li>男女別、種目別のタイム決勝とする。</li>
+        <li>各区分の1位~3位に賞状を授与する。</li>
+        <li>個人種目1種目600円(参加賞を含む)</li>
+        <li>9月6日(土)以降に二次要項をホームページにてお知らせします。</li>
+      </ul>
+    </section>
+
+    <section class="section-card">
+      <h2>備考</h2>
+      <p>全員で1個メに出場します。今年の集大成を見せられるよう、各自頑張りましょう。</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2025 水泳部大会情報</p>
+  </footer>
+</body>
+</html>
