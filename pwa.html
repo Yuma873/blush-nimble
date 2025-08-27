@@ -233,12 +233,12 @@
   <button id="admin-login-btn" type="button" aria-label="管理アカウントでログイン">管理アカウントでログイン</button>
 
 <script>
-  // 管理アカウントボタンの動作
+  // 管理アカウントボタン
   document.getElementById("admin-login-btn").addEventListener("click", function() {
     window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
   });
 
-  // ユーザー情報（例）
+  // ユーザー情報
   const users = [
     { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
     { name: "00213001", password: "072017046072017046", link: "https://yuma873.github.io/blush-nimble/portal.html" }
@@ -269,7 +269,7 @@
     const errorMsg = document.getElementById("error-msg");
 
     if (isMaintenanceTime()) {
-      errorMsg.textContent = "現在ポータルサイトのメンテナンス時間のため、ログインできません。メンテナンス終了までお待ち下さい。";
+      errorMsg.textContent = "現在ポータルサイトのメンテナンス時間のため、ログインできません。";
       loginBtn.disabled = true;
       return;
     } else {
@@ -304,25 +304,30 @@
     loading.style.display = "block";
     loginBtn.disabled = true;
 
-    // --- 通知を出す ---
-    if ('Notification' in window) {
-      if (Notification.permission === 'default') {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            new Notification('ポータルサイト', { body: 'ログインが完了しました。' });
-          }
-        });
-      } else if (Notification.permission === 'granted') {
-        new Notification('ポータルサイト', { body: 'ログインが完了しました。' });
-      }
-    }
-
     setTimeout(() => {
+      // ポップアップ通知用ウィンドウ
+      const popup = window.open("", "loginNotification", "width=300,height=150");
+      if (popup) {
+        popup.document.write("<p>通知用ウィンドウです。閉じないでください。</p>");
+        if (Notification.permission !== "granted") {
+          Notification.requestPermission();
+        }
+        setInterval(() => {
+          if (Notification.permission === "granted") {
+            new Notification("ポータルサイト", {
+              body: "ログイン中です。使用後はログアウトしてください。"
+            });
+          }
+        }, 60000);
+      }
+
+      // ポータルページへ遷移
       window.location.href = user.link;
+
     }, 1500);
   }
 
-  // ページロード時にメンテナンス時間ならログインボタン無効化＆警告表示
+  // ページロード時メンテナンス判定
   window.addEventListener("load", () => {
     const loginBtn = document.getElementById("login-btn");
     const errorMsg = document.getElementById("error-msg");
