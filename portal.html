@@ -770,5 +770,39 @@
         }
       }
     </script>
+    <script>
+  // 通知許可をリクエスト
+  function requestNotificationPermission() {
+    if (Notification.permission === "default") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          startNotificationLoop();
+        }
+      });
+    } else if (Notification.permission === "granted") {
+      startNotificationLoop();
+    } else {
+      console.log("通知が拒否されています");
+    }
+  }
+
+  // 1分ごとに通知
+  function startNotificationLoop() {
+    showNotification(); // 最初に1回表示
+    setInterval(showNotification, 60000); // 60000ms = 1分ごと
+  }
+
+  // 通知を表示
+  function showNotification() {
+    new Notification("ログイン中です", {
+      body: "使用後はログアウトしてください",
+      icon: "favicon.png"
+    });
+  }
+
+  // ページロード時に通知許可をリクエスト
+  window.addEventListener("load", requestNotificationPermission);
+</script>
+
   </body>
 </html>
