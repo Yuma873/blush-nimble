@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ログイン</title>
+  <link rel="shortcut icon" href="favicon.png" type="image/png">
+
+  <!-- Android PWA用マニフェスト -->
+  <link rel="manifest" href="login-manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #005bac, #0081cc);
+      font-family: "Segoe UI", sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .login-container {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      max-width: 380px;
+      width: 100%;
+      animation: fadeIn 0.6s ease-in-out;
+      position: relative;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 { margin-bottom: 20px; text-align: center; color: #005bac; font-size: 24px; }
+    label { display: block; margin: 12px 0 6px; color: #333; font-size: 14px; }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    input:focus { border-color: #005bac; outline: none; }
+    .toggle { margin: 10px 0; font-size: 13px; }
+    .toggle input { margin-right: 5px; }
+    .warn { font-size: 12px; color: #888; }
+    .error-message { color: red; margin-top: 10px; text-align: center; font-size: 13px; }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      background-color: #005bac;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover:enabled { background-color: #00488c; }
+    button:disabled { background-color: #999 !important; cursor: not-allowed; }
+    .loading { display: none; margin-top: 20px; text-align: center; color: #005bac; font-size: 14px; }
+    .spinner {
+      margin: 10px auto;
+      width: 30px;
+      height: 30px;
+      border: 4px solid #ccc;
+      border-top: 4px solid #005bac;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+    #admin-login-btn {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      padding: 6px 12px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      background-color: #d93025;
+      color: white;
+      cursor: pointer;
+      opacity: 0.9;
+      transition: background-color 0.3s, opacity 0.3s;
+      z-index: 10000;
+    }
+    #admin-login-btn:hover { background-color: #a52714; opacity: 1; }
+    .ticker-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #ffeb3b;
+      color: #222;
+      font-size: 18px;
+      padding: 6px 0;
+      overflow: hidden;
+      z-index: 9999;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .ticker { display: inline-block; white-space: nowrap; animation: scroll-left 30s linear infinite; padding-left: 100%; }
+    @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    .blinking { animation: blink 1.2s step-start infinite; color: red; font-weight: bold; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .blinking-bg { animation: blink-bg 1.2s step-start infinite; color: red; font-weight: bold; }
+    @keyframes blink-bg { 50% { background-color: yellow; } 0%, 100% { background-color: transparent; } }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <h2>ログイン</h2>
+  <label for="username">ユーザーID</label>
+  <input type="text" id="username" placeholder="userID" />
+
+  <label for="password">パスワード</label>
+  <input type="password" id="password" placeholder="password" />
+
+  <div class="toggle">
+    <input type="checkbox" id="showpass" onclick="togglePassword()" />
+    <label for="showpass">パスワードを表示</label>
+    <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
+  </div>
+
+  <button id="login-btn" onclick="handleLogin()">ログイン</button>
+  <div style="text-align: right; margin-top: 10px;">
+    <a href="system.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
+      サーバー稼働状況 ▶
+    </a>
+
+  <div class="error-message" id="error-msg"></div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    ログインしています...*この読み込みは時間がかかる場合があります
+  </div>
+</div>
+
+<button id="admin-login-btn" type="button" aria-label="管理アカウントでログイン">管理アカウントでログイン</button>
+
+<script>
+  // 管理アカウントボタン
+  document.getElementById("admin-login-btn").addEventListener("click", function() {
+    window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
+  });
+
+  const users = [
+    { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
+    { name: "00213001", password: "072017046072017046", link: "https://yuma873.github.io/blush-nimble/portal.html" }
+  ];
+  let attempts = 3;
+
+  document.getElementById("username").focus();
+
+  function togglePassword() {
+    const pass = document.getElementById("password");
+    pass.type = document.getElementById("showpass").checked ? "text" : "password";
+  }
+
+  function isMaintenanceTime() {
+    const now = new Date();
+    return now.getDay() === 2 && now.getHours() >= 8 && now.getHours() < 15;
+  }
+
+  function handleLogin() {
+    const loginBtn = document.getElementById("login-btn");
+    const errorMsg = document.getElementById("error-msg");
+    if (isMaintenanceTime()) {
+      errorMsg.textContent = "現在メンテナンス時間のため、ログインできません。";
+      loginBtn.disabled = true;
+      return;
+    } else {
+      loginBtn.disabled = false;
+      errorMsg.textContent = "";
+    }
+
+    const name = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    if (!name || !pass) {
+      errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
+      return;
+    }
+
+    const user = users.find(u => u.name === name && u.password === pass);
+    if (!user) {
+      attempts--;
+      errorMsg.textContent = `ユーザーIDまたはパスワードが異なります。（残り${attempts}回）`;
+      if (attempts <= 0) {
+        errorMsg.textContent = "操作をロックしました。";
+        loginBtn.disabled = true;
+      }
+      return;
+    }
+
+    document.getElementById("loading").style.display = "block";
+    loginBtn.disabled = true;
+    setTimeout(() => { window.location.href = user.link; }, 1500);
+  }
+
+  window.addEventListener("load", () => {
+    if (isMaintenanceTime()) {
+      document.getElementById("login-btn").disabled = true;
+      document.getElementById("error-msg").textContent = "現在メンテナンス時間のため、ログインできません。";
+    }
+  });
+
+  document.addEventListener("keydown", e => { if (e.key === "Enter") handleLogin(); });
+
+  // --- PWA Service Worker登録 ---
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker registered.', reg))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    });
+  }
+</script>
+
+</body>
+</html>
