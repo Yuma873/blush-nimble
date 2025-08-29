@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>情報パネル - デジタルサイネージ</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+  }
+  header {
+    background: #2c3e50;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    font-size: 2em;
+  }
+  .panel-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+    padding: 20px;
+  }
+  .panel {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    height: 400px;
+    overflow-y: auto;
+  }
+  .panel h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+    border-bottom: 2px solid #1abc9c;
+    padding-bottom: 5px;
+  }
+  ul {
+    padding-left: 20px;
+  }
+</style>
+</head>
+<body>
+<header>🏊‍♂️ 部活情報パネル</header>
+<div class="panel-container">
+  <div class="panel" id="weatherPanel">
+    <h2>天気</h2>
+    <div id="weatherContent">読み込み中...</div>
+  </div>
+
+  <div class="panel" id="newsPanel">
+    <h2>ニュース</h2>
+    <ul id="newsContent">
+      <li>読み込み中...</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="calendarPanel">
+    <h2>部活予定</h2>
+    <ul id="calendarContent">
+      <li>読み込み中...</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="announcementPanel">
+    <h2>連絡</h2>
+    <ul id="announcementContent">
+      <li>読み込み中...</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="tournamentPanel">
+    <h2>大会情報</h2>
+    <ul id="tournamentContent">
+      <li>読み込み中...</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+// --- 天気取得 (OpenWeatherMap API) ---
+const weatherApiKey = '1c9ab4ae3ab780ce08bee6c67d6f4571';
+const cityId = '1850147'; // 東京
+async function fetchWeather() {
+  try {
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?id=${cityId}&units=metric&lang=ja&appid=${weatherApiKey}`);
+    const data = await res.json();
+    document.getElementById('weatherContent').innerHTML = `
+      ${data.name}：${data.weather[0].description}<br>
+      気温：${data.main.temp}℃<br>
+      湿度：${data.main.humidity}％<br>
+      風速：${data.wind.speed}m/s
+    `;
+  } catch(err) {
+    document.getElementById('weatherContent').innerText = '天気情報取得失敗';
+  }
+}
+
+// --- ニュース取得 (RSS) ---
+async function fetchNews() {
+  try {
+    const proxy = 'https://api.rss2json.com/v1/api.json?rss_url=';
+    const rssUrl = encodeURIComponent('https://www3.nhk.or.jp/rss/news/cat0.xml');
+    const res = await fetch(proxy + rssUrl);
+    const data = await res.json();
+    const list = data.items.slice(0,5).map(item => `<li><a href="${item.link}" target="_blank">${item.title}</a></li>`).join('');
+    document.getElementById('newsContent').innerHTML = list;
+  } catch(err) {
+    document.getElementById('newsContent').innerHTML = '<li>ニュース取得失敗</li>';
+  }
+}
+
+// --- 部活予定 ---
+const clubSchedule = [
+  { date: '2025-08-25', event: '練習試合（横浜国際プール）' },
+  { date: '2025-08-28', event: '定例練習 16:00〜18:00' },
+];
+function showSchedule() {
+  const list = clubSchedule.map(c => `<li>${c.date}：${c.event}</li>`).join('');
+  document.getElementById('calendarContent').innerHTML = list;
+}
+
+// --- 連絡 ---
+const announcements = [
+  { date: '2025-08-24', msg: '練習後にミーティングがあります' },
+  { date: '2025-08-27', msg: 'プール清掃当番あり' },
+];
+function showAnnouncements() {
+  const list = announcements.map(a => `<li>${a.date}：${a.msg}</li>`).join('');
+  document.getElementById('announcementContent').innerHTML = list;
+}
+
+// --- 大会情報 ---
+const tournaments = [
+  { date: '2025-09-01', name: '市内大会 50m自由形予選' },
+  { date: '2025-09-15', name: '県大会 100mバタフライ決勝' },
+];
+function showTournaments() {
+  const list = tournaments.map(t => `<li>${t.date}：${t.name}</li>`).join('');
+  document.getElementById('tournamentContent').innerHTML = list;
+}
+
+// --- 初回表示 ---
+fetchWeather();
+fetchNews();
+showSchedule();
+showAnnouncements();
+showTournaments();
+
+// --- 自動更新（60秒ごと） ---
+setInterval(() => {
+  fetchWeather();
+  fetchNews();
+}, 60000);
+</script>
+</body>
+</html>
