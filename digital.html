@@ -3,116 +3,102 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>情報パネル - 水泳部</title>
+<title>情報パネル - サイネージ用</title>
 <style>
-  body {
-    margin: 0;
+  body, html {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
     font-family: 'Arial', sans-serif;
-    background-color: #f0f8ff;
-    color: #000;
+    background-color: #f0f4f8;
     overflow: hidden;
   }
   .panel {
-    width: 100vw;
-    height: 100vh;
+    width: 100%; height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
-    padding: 20px;
-    box-sizing: border-box;
     text-align: center;
     transition: opacity 1s;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
   }
-  h1 { font-size: 48px; margin: 10px 0; }
-  h2 { font-size: 36px; margin: 5px 0; }
-  .section { margin: 15px 0; }
-  .item { font-size: 28px; margin: 5px 0; }
+  .panel.hidden { opacity: 0; z-index: 0; pointer-events: none; }
+  .panel.visible { opacity: 1; z-index: 1; pointer-events: all; }
+  h1 { font-size: 4vw; margin-bottom: 1vh; }
+  h2 { font-size: 3vw; margin-bottom: 2vh; }
+  ul { list-style: none; padding: 0; font-size: 2.5vw; }
+  li { margin: 1vh 0; }
+  .important { color: #e74c3c; font-weight: bold; }
+  .weather-icon { width: 80px; height: 80px; vertical-align: middle; }
 </style>
 </head>
 <body>
 
-<!-- パネル1: 部活予定 -->
-<div class="panel" style="background-color:#a0e7e5;">
-  <h1>🏊 部活予定</h1>
-  <div id="practice" class="section"></div>
+<!-- 部活予定 -->
+<div class="panel visible" id="panel-club">
+  <h1>🏊‍♂️ 部活予定</h1>
+  <ul id="club-schedule">
+    <li>8/25(月) 16:00〜18:00 メインプール</li>
+    <li>8/26(火) 17:00〜19:00 サブプール</li>
+    <li>8/27(水) 16:00〜18:00 メインプール</li>
+    <li>8/28(木) 17:00〜19:00 メインプール</li>
+    <li>8/29(金) 16:00〜18:00 サブプール</li>
+  </ul>
 </div>
 
-<!-- パネル2: 大会情報 -->
-<div class="panel" style="background-color:#ffb6b9; opacity:0;">
+<!-- 大会情報 -->
+<div class="panel hidden" id="panel-tournament">
   <h1>🏆 大会情報</h1>
-  <div id="tournament" class="section"></div>
+  <ul id="tournament-info">
+    <li>9/1(日) 横浜水泳大会 9:00〜12:00</li>
+    <li>9/7(土) 川崎記録会 10:00〜13:00</li>
+  </ul>
 </div>
 
-<!-- パネル3: 連絡 -->
-<div class="panel" style="background-color:#ffd6a5; opacity:0;">
-  <h1>📢 連絡</h1>
-  <div id="notice" class="section"></div>
+<!-- 連絡事項 -->
+<div class="panel hidden" id="panel-news">
+  <h1>📢 連絡事項</h1>
+  <ul id="news-info">
+    <li class="important">プール清掃のため8/30は休み</li>
+    <li>次回ミーティング 9/2 16:30</li>
+  </ul>
 </div>
 
-<!-- パネル4: 天気 -->
-<div class="panel" style="background-color:#caffbf; opacity:0;">
-  <h1>🌤 天気</h1>
-  <div id="weather" class="section">読み込み中…</div>
+<!-- 天気 -->
+<div class="panel hidden" id="panel-weather">
+  <h1>☀️ 天気情報</h1>
+  <h2 id="weather-city">横浜市</h2>
+  <img id="weather-icon" class="weather-icon" src="" alt="天気">
+  <div id="weather-temp" style="font-size:3vw; margin-top:1vh;">--°C</div>
 </div>
 
 <script>
-// データ例（サイネージ用に自動更新想定）
-const practiceData = [
-  "1年生: 16:00〜18:00 メインプール",
-  "2年生: 17:00〜19:00 サブプール",
-  "3年生: 18:00〜20:00 メインプール"
-];
-const tournamentData = [
-  "9/23 横浜市大会 - メインプール",
-  "10/5 神奈川県大会 - 国際プール",
-  "10/20 学内記録会 - サブプール"
-];
-const noticeData = [
-  "明日: プール清掃 16:00集合",
-  "忘れ物: ゴーグル・キャップ確認",
-  "提出物: 健康チェックシート"
-];
+const panels = document.querySelectorAll('.panel');
+let current = 0;
+const displayTime = 10000; // 10秒ごとに切替
 
-// 各パネルに表示
-function populateSection(id, data) {
-  const container = document.getElementById(id);
-  container.innerHTML = data.map(item => `<div class="item">${item}</div>`).join('');
-}
-populateSection('practice', practiceData);
-populateSection('tournament', tournamentData);
-populateSection('notice', noticeData);
+// 自動切替
+setInterval(() => {
+  panels[current].classList.remove('visible');
+  panels[current].classList.add('hidden');
+  current = (current + 1) % panels.length;
+  panels[current].classList.remove('hidden');
+  panels[current].classList.add('visible');
+}, displayTime);
 
-// 天気取得（OpenWeatherMap API）
-const apiKey = "1c9ab4ae3ab780ce08bee6c67d6f4571"; // ユーザー提供
-const city = "Yokohama,jp";
+// 天気API取得
+const apiKey = '1c9ab4ae3ab780ce08bee6c67d6f4571';
+const city = 'Yokohama,jp';
 fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=ja`)
   .then(res => res.json())
   .then(data => {
-    const weatherDiv = document.getElementById('weather');
-    const icon = `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
-    weatherDiv.innerHTML = `
-      <div class="item"><img src="${icon}" style="vertical-align:middle;"> ${data.weather[0].description}</div>
-      <div class="item">気温: ${data.main.temp}℃</div>
-      <div class="item">湿度: ${data.main.humidity}%</div>
-    `;
+    document.getElementById('weather-city').textContent = data.name;
+    document.getElementById('weather-temp').textContent = `${Math.round(data.main.temp)}°C`;
+    document.getElementById('weather-icon').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
   })
-  .catch(() => {
-    document.getElementById('weather').innerHTML = "天気情報取得失敗";
-  });
+  .catch(err => console.log(err));
 
-// パネル自動切替
-const panels = document.querySelectorAll('.panel');
-let current = 0;
-function showNextPanel() {
-  panels[current].style.opacity = 0;
-  current = (current + 1) % panels.length;
-  panels[current].style.opacity = 1;
-}
-setInterval(showNextPanel, 10000);
 </script>
 
 </body>
