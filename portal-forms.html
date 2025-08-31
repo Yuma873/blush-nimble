@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大会アンケート</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      background-color: #f5f5f5;
+      min-height: 100vh;
+    }
+    nav {
+      width: 220px;
+      background-color: #2c3e50;
+      color: white;
+      padding: 10px;
+      min-height: 100vh;
+    }
+    nav a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 12px;
+      margin: 8px 0;
+      background-color: #34495e;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+    }
+    nav a:hover {
+      background-color: #1abc9c;
+    }
+    main {
+      flex: 1;
+      padding: 20px;
+    }
+    header {
+      font-size: 1.4em;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    iframe {
+      width: 100%;
+      height: 70vh;
+      border: none;
+      display: none;
+    }
+    select {
+      padding: 8px;
+      font-size: 1em;
+      margin-bottom: 15px;
+    }
+    .event-info {
+      display: none;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .event-info h2 {
+      margin: 0 0 10px;
+      color: #1abc9c;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="portal.html">🏠 トップ</a>
+    <a href="portal-news.html">📰 お知らせ</a>
+    <a href="portal-tool.html">🛠 ツール</a>
+    <a href="portal-renraku.html">📢 連絡</a>
+    <a href="portal-umekomi.html">🧰 水泳関連ツール</a>
+    <a href="portal-tenki.html">⛅️ 今後の天気</a>
+    <a href="portal-pdf.html">📁 ファイル一覧</a>
+    <a href="portal-form.html">📝 アンケート</a>
+  </nav>
+
+  <main>
+    <header>
+      <h1>大会アンケート</h1>
+    </header>
+
+    <label for="eventSelect">大会を選んでください：</label>
+    <select id="eventSelect">
+      <option value="">-- 大会を選択 --</option>
+      <option value="0923">0923 選手権大会</option>
+      <option value="1201">1201 冬季大会</option>
+      <option value="0305">0305 春季大会</option>
+    </select>
+
+    <!-- 大会ごとの説明 -->
+    <div id="info-0923" class="event-info">
+      <h2>0923 選手権大会</h2>
+      <p>日付：2025年9月23日（火・祝）<br>
+      場所：NITTANパークおおね（秦野市立おおね公園）<br>
+      集合時間：未定</p>
+        <p><a href="tokusetsu-0923.html" target="_blank" class="special-link">👉 大会特設ページへ</a></p>
+
+    </div>
+
+    <div id="info-1201" class="event-info">
+      <h2>1201 冬季大会</h2>
+      <p>日付：2025年12月1日（日）<br>
+      場所：伊勢原市民プール<br>
+      集合時間：8:30</p>
+    </div>
+
+    <div id="info-0305" class="event-info">
+      <h2>0305 春季大会</h2>
+      <p>日付：2026年3月5日（水）<br>
+      場所：厚木市立プール<br>
+      集合時間：9:00</p>
+    </div>
+
+    <!-- Forms埋め込み -->
+    <iframe id="form-0923" src="https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAANAAW2ouE5UOU05OFZLSUkyU0xOWjFUWk5ETzNER0RGNi4u&embed=true"></iframe>
+    <iframe id="form-1201" src="https://forms.office.com/Pages/ResponsePage.aspx?xxxxx"></iframe>
+    <iframe id="form-0305" src="https://forms.office.com/Pages/ResponsePage.aspx?yyyyy"></iframe>
+
+  </main>
+
+  <script>
+    const select = document.getElementById("eventSelect");
+    const forms = document.querySelectorAll("iframe");
+    const infos = document.querySelectorAll(".event-info");
+
+    select.addEventListener("change", () => {
+      // 全部非表示
+      forms.forEach(f => f.style.display = "none");
+      infos.forEach(i => i.style.display = "none");
+
+      // 選ばれた大会だけ表示
+      const form = document.getElementById("form-" + select.value);
+      const info = document.getElementById("info-" + select.value);
+      if (form) form.style.display = "block";
+      if (info) info.style.display = "block";
+    });
+  </script>
+</body>
+</html>
