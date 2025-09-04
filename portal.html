@@ -299,112 +299,101 @@
         ></iframe>
       </section>
 
+    <section>
+  <header
+    style="
+      cursor: pointer;
+      background-color: #2c3e50;
+      color: white;
+      padding: 8px;
+    "
+    onclick="toggleSection()"
+  >
+    🌤 今後の天気[練習の参考に]▼
+  </header>
+
+  <div
+    id="toggleContent"
+    style="display: none; border: 1px solid #ccc; padding: 10px"
+  >
+    <iframe
+      src="https://ritska.com/clock/clock-5x4c.html?AREA_CODE=46106&COLORSET=0&CLOCK24H=1&COLON_BLINK=1&ZEROPAD=1&DEBUG=0"
+      width="100%"
+      height="180"
+      style="border: none"
+      title="天気と時計"
+      loading="lazy"
+    ></iframe>
+    <section>
+      <header>🌤</header>
       <section>
-        <header
-          style="
-            cursor: pointer;
-            background-color: #2c3e50;
-            color: white;
-            padding: 8px;
-          "
-          onclick="toggleSection()"
-        >
-          🌤 今後の天気[練習の参考に]▼
-        </header>
-
-        <div
-          id="toggleContent"
-          style="display: none; border: 1px solid #ccc; padding: 10px"
-        >
-          <iframe
-            src="https://ritska.com/clock/clock-5x4c.html?AREA_CODE=46106&COLORSET=0&CLOCK24H=1&COLON_BLINK=1&ZEROPAD=1&DEBUG=0"
-            width="100%"
-            height="180"
-            style="border: none"
-            title="天気と時計"
-            loading="lazy"
-          ></iframe>
-          <section>
-            <header>🌤</header>
-            <section>
-              <header>🌡 暑さ指数（WBGT）</header>
-              <iframe
-                src="https://atsusa.jp/wbgt/46091.html"
-                width="100%"
-                height="600"
-                style="border: 1px solid #ccc"
-                title="暑さ指数（WBGT）"
-                loading="lazy"
-              ></iframe>
-            </section>
-
-            <!-- 伊勢原市 -->
-            <div id="booked-widget-h13bs0hdj6q" style="margin-bottom: 20px">
-              <a href="https://booked.jp/weather/isehara-270586">伊勢原市</a>
-            </div>
-            <script type="text/javascript">
-              (function () {
-                const widgetUrl = encodeURIComponent(location.href);
-                async function fetchWidgetData() {
-                  let WUrl =
-                    "https://weather-widget.booked.net/api/template?&cityId=270586&id=sidebar1&langId=16&iconPack=grd_fill&rand_id=h13bs0hdj6q";
-                  WUrl += "&ref=" + widgetUrl;
-                  let response = await fetch(WUrl);
-                  if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                  }
-                  const data = await response.json();
-                  if (data.patternHTML) {
-                    document.getElementById(
-                      "booked-widget-h13bs0hdj6q"
-                    ).innerHTML = data.patternHTML;
-                  }
-                }
-                fetchWidgetData();
-              })();
-            </script>
-            <iframe
-              src="https://www.wbgt.env.go.jp/wbgt_data.php"
-              width="100%"
-              height="600"
-              style="border: 1px solid #ccc"
-            ></iframe>
-            <iframe
-              src="https://embed.windy.com/embed2.html?lat=35.38&lon=139.25&detailLat=35.38&detailLon=139.25&width=650&height=450&zoom=10&level=surface&overlay=rain&product=radar&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
-              width="100%"
-              height="400"
-              style="border: none"
-              title="Windyレーダー"
-              loading="lazy"
-            ></iframe>
-          </section>
-           <section>
-            <header></header>
-            <section>
-              <header> 災害情報</header>
-              <iframe
-                src="https://www.bousai.pref.kanagawa.jp/"
-                width="100%"
-                height="600"
-                style="border: 1px solid #ccc"
-                title="災害ポータル"
-                loading="lazy"
-              ></iframe>
-            </section>
-
-        </div>
+        <header>🌡 暑さ指数（WBGT）</header>
+        <iframe
+          src="https://atsusa.jp/wbgt/46091.html"
+          width="100%"
+          height="600"
+          style="border: 1px solid #ccc"
+          title="暑さ指数（WBGT）"
+          loading="lazy"
+        ></iframe>
       </section>
 
-      <script>
-        function toggleSection() {
-          const content = document.getElementById("toggleContent");
-          if (content.style.display === "none") {
-            content.style.display = "block";
-          } else {
-            content.style.display = "none";
+      <!-- 伊勢原市 -->
+      <div id="booked-widget-h13bs0hdj6q" style="margin-bottom: 20px">
+        <a href="https://booked.jp/weather/isehara-270586">伊勢原市</a>
+      </div>
+      <script type="text/javascript">
+        (function () {
+          const widgetUrl = encodeURIComponent(location.href);
+          async function fetchWidgetData() {
+            let WUrl =
+              "https://weather-widget.booked.net/api/template?&cityId=270586&id=sidebar1&langId=16&iconPack=grd_fill&rand_id=h13bs0hdj6q";
+            WUrl += "&ref=" + widgetUrl;
+            let response = await fetch(WUrl);
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (data.patternHTML) {
+              document.getElementById(
+                "booked-widget-h13bs0hdj6q"
+              ).innerHTML = data.patternHTML;
+            }
           }
-        }
+          fetchWidgetData();
+        })();
       </script>
+      <iframe
+        src="https://www.wbgt.env.go.jp/wbgt_data.php"
+        width="100%"
+        height="600"
+        style="border: 1px solid #ccc"
+      ></iframe>
+      <iframe
+        src="https://embed.windy.com/embed2.html?lat=35.38&lon=139.25&detailLat=35.38&detailLon=139.25&width=650&height=450&zoom=10&level=surface&overlay=rain&product=radar&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
+        width="100%"
+        height="400"
+        style="border: none"
+        title="Windyレーダー"
+        loading="lazy"
+      ></iframe>
+    </section>
+    <section>
+      <header></header>
+      <section>
+        <header>☔ 雨雲レーダー（神奈川県）</header>
+        <iframe
+          src="https://tenki.jp/radar/3/17/"
+          width="100%"
+          height="800"
+          style="border: 1px solid #ccc"
+          title="雨雲レーダー（神奈川県）"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </section>
+  </div>
+</section>
 
       <section>
         <header>📊 稼働状況</header>
