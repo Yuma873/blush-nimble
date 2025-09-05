@@ -299,23 +299,15 @@
         ></iframe>
       </section>
 
-    <section>
+<section>
   <header
-    style="
-      cursor: pointer;
-      background-color: #2c3e50;
-      color: white;
-      padding: 8px;
-    "
+    style="cursor: pointer; background-color: #2c3e50; color: white; padding: 8px;"
     onclick="toggleSection()"
   >
     🌤 今後の天気[練習の参考に]▼
   </header>
 
-  <div
-    id="toggleContent"
-    style="display: none; border: 1px solid #ccc; padding: 10px"
-  >
+  <div id="toggleContent" style="display: none; border: 1px solid #ccc; padding: 10px">
     <iframe
       src="https://ritska.com/clock/clock-5x4c.html?AREA_CODE=46106&COLORSET=0&CLOCK24H=1&COLON_BLINK=1&ZEROPAD=1&DEBUG=0"
       width="100%"
@@ -324,6 +316,7 @@
       title="天気と時計"
       loading="lazy"
     ></iframe>
+
     <section>
       <header>🌤</header>
       <section>
@@ -355,22 +348,23 @@
             }
             const data = await response.json();
             if (data.patternHTML) {
-              document.getElementById(
-                "booked-widget-h13bs0hdj6q"
-              ).innerHTML = data.patternHTML;
+              document.getElementById("booked-widget-h13bs0hdj6q").innerHTML = data.patternHTML;
             }
           }
           fetchWidgetData();
         })();
       </script>
+
       <iframe
         src="https://www.wbgt.env.go.jp/wbgt_data.php"
         width="100%"
         height="600"
         style="border: 1px solid #ccc"
+        title="環境省 WBGTデータ"
       ></iframe>
+
       <iframe
-        src="https://embed.windy.com/embed2.html?lat=35.38&lon=139.25&detailLat=35.38&detailLon=139.25&width=650&height=450&zoom=10&level=surface&overlay=rain&product=radar&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
+        src="https://embed.windy.com/embed2.html?lat=35.38&lon=139.25&detailLat=35.38&detailLon=139.25&width=650&height=450&zoom=10&level=surface&overlay=rain&product=radar"
         width="100%"
         height="400"
         style="border: none"
@@ -378,19 +372,17 @@
         loading="lazy"
       ></iframe>
     </section>
+
     <section>
-      <header></header>
-    <section>
-  <header>🚨 神奈川県 防災・緊急情報 (RSS)</header>
-  <iframe
-    src="https://feed2js.org/feed2js.php?src=https%3A%2F%2Fwww.pref.kanagawa.jp%2Femergency%2Findex.html&num=5&desc=1&utf=y"
-    width="100%"
-    height="400"
-    style="border: 1px solid #ccc;"
-    title="神奈川県 防災・緊急情報 RSS"
-    loading="lazy"
-  ></iframe>
-</section>
+      <header>🚨 神奈川県 防災・緊急情報 (RSS)</header>
+      <iframe
+        src="https://feed2js.org/feed2js.php?src=https%3A%2F%2Fwww.pref.kanagawa.jp%2Femergency%2Findex.html&num=5&desc=1&utf=y"
+        width="100%"
+        height="400"
+        style="border: 1px solid #ccc;"
+        title="神奈川県 防災・緊急情報 RSS"
+        loading="lazy"
+      ></iframe>
     </section>
   </div>
 </section>
