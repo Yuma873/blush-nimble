@@ -373,17 +373,44 @@
       ></iframe>
     </section>
 
-    <section>
-      <header>🚨 神奈川県 防災・緊急情報 (RSS)</header>
-      <iframe
-        src="https://feed2js.org/feed2js.php?src=https%3A%2F%2Fwww.pref.kanagawa.jp%2Femergency%2Findex.html&num=5&desc=1&utf=y"
-        width="100%"
-        height="400"
-        style="border: 1px solid #ccc;"
-        title="神奈川県 防災・緊急情報 RSS"
-        loading="lazy"
-      ></iframe>
-    </section>
+  <section>
+  <h2>🚨 神奈川県 緊急情報</h2>
+  <ul id="kanagawa-rss"></ul>
+</section>
+
+<script>
+async function loadKanagawaRSS() {
+  const url = "https://www.pref.kanagawa.jp/emergency/index.rdf";
+  try {
+    // AllOrigins経由でCORS回避
+    const response = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(url));
+    const data = await response.json();
+
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(data.contents, "application/xml");
+
+    const items = xml.querySelectorAll("item");
+    const list = document.getElementById("kanagawa-rss");
+    list.innerHTML = "";
+
+    items.forEach((item, i) => {
+      if (i >= 5) return; // 最新5件だけ
+      const title = item.querySelector("title")?.textContent;
+      const link = item.querySelector("link")?.textContent;
+
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="${link}" target="_blank">${title}</a>`;
+      list.appendChild(li);
+    });
+  } catch (e) {
+    console.error(e);
+    document.getElementById("kanagawa-rss").innerHTML = "<li>情報を取得できませんでした</li>";
+  }
+}
+
+loadKanagawaRSS();
+</script>
+  
   </div>
 </section>
 
