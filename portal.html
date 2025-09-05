@@ -786,6 +786,15 @@
   // ページロード時に通知許可をリクエスト
   window.addEventListener("load", requestNotificationPermission);
 </script>
-
+<script>
+  function toggleSection() {
+    const content = document.getElementById("toggleContent");
+    if (content.style.display === "none") {
+      content.style.display = "block";   // ← 開く
+    } else {
+      content.style.display = "none";    // ← 閉じる
+    }
+  }
+</script>
   </body>
 </html>
