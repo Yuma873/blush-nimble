@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>メニュー</title>
+  <style>
+    body { font-family: sans-serif; }
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #333;
+    }
+    .tab {
+      padding: 8px 16px;
+      cursor: pointer;
+      border: 1px solid #333;
+      border-bottom: none;
+      background: #eee;
+      margin-right: 4px;
+    }
+    .tab.active {
+      background: white;
+      font-weight: bold;
+    }
+    .content {
+      border: 1px solid #333;
+      padding: 12px;
+      display: none;
+    }
+    .content.active { display: block; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #666; padding: 4px; text-align: center; }
+    th { background: #ddd; }
+  </style>
+</head>
+<body>
+
+<h1>2008年 神奈川県高体連水泳専門部 強化合宿</h1>
+
+<div class="tabs">
+  <div class="tab active" data-target="sheet1">A-short</div>
+  <div class="tab" data-target="sheet2">A-Fly</div>
+  <div class="tab" data-target="sheet3">B-Free</div>
+</div>
+
+<div id="sheet1" class="content active">
+  <h2>A-short</h2>
+  <table>
+    <tr><th>種目</th><th>距離</th><th>回数</th><th>サイクル</th><th>内容</th><th>合計</th></tr>
+    <tr><td>W-up</td><td>600</td><td>1</td><td>10:00</td><td>SKPS</td><td>600</td></tr>
+    <tr><td>Swim</td><td>100</td><td>6</td><td>1:30</td><td>IM Keep</td><td>600</td></tr>
+    <tr><td>Loosen</td><td>100</td><td>1</td><td>05:00</td><td>Easy</td><td>100</td></tr>
+  </table>
+</div>
+
+<div id="sheet2" class="content">
+  <h2>A-Fly</h2>
+  <table>
+    <tr><th>種目</th><th>距離</th><th>回数</th><th>サイクル</th><th>内容</th><th>合計</th></tr>
+    <tr><td>W-up</td><td>400</td><td>1</td><td>08:00</td><td>SKPS</td><td>400</td></tr>
+    <tr><td>Kick</td><td>50</td><td>8</td><td>01:10</td><td>Fly Kick</td><td>400</td></tr>
+    <tr><td>Swim</td><td>100</td><td>4</td><td>01:40</td><td>Fly Drill</td><td>400</td></tr>
+  </table>
+</div>
+
+<div id="sheet3" class="content">
+  <h2>B-Free</h2>
+  <table>
+    <tr><th>種目</th><th>距離</th><th>回数</th><th>サイクル</th><th>内容</th><th>合計</th></tr>
+    <tr><td>W-up</td><td>500</td><td>1</td><td>09:00</td><td>SKPS</td><td>500</td></tr>
+    <tr
