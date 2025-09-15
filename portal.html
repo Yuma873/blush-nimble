@@ -137,16 +137,24 @@
 }
 
     </style>
-    <!-- PushAlert -->
-<script type="text/javascript">
-        (function(d, t) {
-                var g = d.createElement(t),
-                s = d.getElementsByTagName(t)[0];
-                g.src = "https://cdn.pushalert.co/integrate_359cbaad3b0c5e1e45cb99054d9b6a6d.js";
-                s.parentNode.insertBefore(g, s);
-        }(document, "script"));
+   <script defer src="https://www.pushcode.jp/dist/js/pushcode.js"></script>
+<script>
+window.PushCodeInit = function() {
+  try {
+    if (PushCode && PushCode.isSupport()) {
+      PushCode.init({ domainToken: '6d20f79ae2615a8ced22db9f79bb01abfbbbe2fb5a2f558f1269ee6b21b3ce15', userid: '', serviceWorkerPath: '/blush-nimble/pushcode_sw.js', scopePath: '/blush-nimble/' });
+      PushCode.components.openSubscribeDialog();
+    }
+  }
+  catch (err) {
+    console.error(err);
+    if (PushCode) {
+      PushCode.sendError(err);
+    }
+  }
+};
 </script>
-<!-- End PushAlert -->
+
   </head>
   <body>
     <nav>
