@@ -1,57 +1,37 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>プッシュ通知登録</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PushCode 通知テスト</title>
+
+<!-- PushCode 本体 -->
 <script defer src="https://www.pushcode.jp/dist/js/pushcode.js"></script>
-<style>
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-family: "Segoe UI", sans-serif;
-    background: #0081cc;
-    color: white;
-    flex-direction: column;
-    text-align: center;
+<script>
+window.PushCodeInit = function() {
+  try {
+    if (PushCode && PushCode.isSupport()) {
+      PushCode.init({
+        domainToken: '6d20f79ae2615a8ced22db9f79bb01abfbbbe2fb5a2f558f1269ee6b21b3ce15',
+        userid: '',
+        serviceWorkerPath: '/blush-nimble/pushcode_sw.js', // GitHub Pages上のSW
+        scopePath: '/blush-nimble/'
+      });
+      
+      // DOMが完全にロードされてから許可枠を開く
+      window.addEventListener('load', function() {
+        PushCode.components.openSubscribeDialog();
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    if (PushCode) PushCode.sendError(err);
   }
-  button {
-    padding: 15px 30px;
-    font-size: 18px;
-    border: none;
-    border-radius: 8px;
-    background-color: #005bac;
-    color: white;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: #00488c;
-  }
-</style>
+};
+</script>
 </head>
 <body>
-
-<h1>プッシュ通知を受け取る</h1>
-<p>下のボタンを押すと通知登録ダイアログが表示されます。</p>
-<button id="subscribe-btn">通知を許可する</button>
-
-<script>
-document.getElementById("subscribe-btn").addEventListener("click", () => {
-  if (PushCode && PushCode.isSupport()) {
-    PushCode.init({
-      domainToken: '6d20f79ae2615a8ced22db9f79bb01abfbbbe2fb5a2f558f1269ee6b21b3ce15',
-      userid: '',
-      serviceWorkerPath: '/blush-nimble/pushcode_sw.js',
-      scopePath: '/blush-nimble/'
-    });
-    PushCode.components.openSubscribeDialog();
-  } else {
-    alert("このブラウザではPushCodeがサポートされていません。");
-  }
-});
-</script>
-
+<h1>PushCode 通知テスト</h1>
+<p>このページにアクセスすると、通知許可枠が表示されます。</p>
 </body>
 </html>
