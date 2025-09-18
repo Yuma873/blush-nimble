@@ -4,11 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>次回大会情報</title>
-    <link
-      rel="icon"
-      href="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
-      type="image/jpeg"
-    />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -233,14 +228,14 @@
           for (let i = 1; i <= numEvents; i++) {
             const eventDiv = document.createElement("div");
             eventDiv.innerHTML = `
-                    <h4>種目${i}</h4>
-                    <label for="distance-${i}">距離:</label>
-                    <input type="text" id="distance-${i}" name="distance-${i}">
-                    <label for="type-${i}">種別:</label>
-                    <input type="text" id="type-${i}" name="type-${i}">
-                    <label for="time-${i}">エントリータイム:</label>
-                    <input type="text" id="time-${i}" name="time-${i}">
-                `;
+              <h4>種目${i}</h4>
+              <label for="distance-${i}">距離:</label>
+              <input type="text" id="distance-${i}" name="distance-${i}">
+              <label for="type-${i}">種別:</label>
+              <input type="text" id="type-${i}" name="type-${i}">
+              <label for="time-${i}">エントリータイム:</label>
+              <input type="text" id="time-${i}" name="time-${i}">
+            `;
             eventDetailsDiv.appendChild(eventDiv);
           }
         });
