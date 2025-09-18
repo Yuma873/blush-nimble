@@ -1,14 +1,9 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>大会一覧</title>
-    <link
-      rel="icon"
-      href="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
-      type="image/jpeg"
-    />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -34,6 +29,7 @@
       th {
         background-color: #f2f2f2;
         cursor: pointer;
+        user-select: none;
       }
       tr:nth-child(even) {
         background-color: #f9f9f9;
@@ -43,6 +39,11 @@
       }
       .sorted-desc::after {
         content: " ↓";
+      }
+      /* 赤文字の資格表示（以前の <font color="red"> の代替） */
+      .qual {
+        color: #d32f2f;
+        font-weight: bold;
       }
     </style>
   </head>
@@ -78,7 +79,7 @@
           <td>中ブロック大会</td>
           <td>8月2日（土）</td>
           <td>平塚総合体育館</td>
-          <td><font color="red">前期生/記録突破者</font></td>
+          <td><span class="qual">前期生/記録突破者</span></td>
           <td>記録突破した者は県総体出場可</td>
         </tr>
         <tr>
@@ -92,7 +93,7 @@
           <td>県総体</td>
           <td>8月13日付近</td>
           <td>横浜国際プール/さがみはらグリーンプール</td>
-          <td><font color="red">前期生/記録突破者</font></td>
+          <td><span class="qual">前期生/記録突破者</span></td>
           <td>なし</td>
         </tr>
         <tr>
@@ -127,39 +128,74 @@
     </table>
 
     <script>
+      // 日付テキスト（例: "7月5日（土）", "8月13日付近", "未定"）をパースして
+      // 比較可能な数値（タイムスタンプ）を返す。解析不能なら null を返す。
+      function parseJapaneseDate(text) {
+        if (!text) return null;
+        text = text.trim();
+        // 正規表現で「N月M日」を探す
+        const m = text.match(/(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+        if (m) {
+          const month = parseInt(m[1], 10) - 1; // JS 月は 0-11
+          const day = parseInt(m[2], 10);
+          const now = new Date();
+          let year = now.getFullYear();
+          // ※年をまたぐ可能性がある場合は別ロジックが必要（今は当年扱い）
+          const d = new Date(year, month, day);
+          return d.getTime();
+        }
+        // YYYY/MM/DD 形式なども扱いたければここに追加
+        return null;
+      }
+
       function sortTable(columnIndex) {
         const table = document.getElementById("eventTable");
-        const rows = Array.from(table.rows).slice(1);
-        let ascending = true;
+        const tbody = table.tBodies[0];
+        const ths = table.querySelectorAll("th");
+        const th = ths[columnIndex];
 
-        const th = table.querySelectorAll("th")[columnIndex];
-        if (th.classList.contains("sorted-asc")) {
-          ascending = false;
-          th.classList.remove("sorted-asc");
-          th.classList.add("sorted-desc");
-        } else {
-          th.classList.remove("sorted-desc");
-          th.classList.add("sorted-asc");
-        }
+        // 今回クリックした th が昇順中かどうかで切り替え
+        const currentlyAsc = th.classList.contains("sorted-asc");
+        const ascending = !currentlyAsc;
+
+        // すべての th のソートクラスをクリアして、クリックされた列にだけクラスを付与
+        ths.forEach((t) => {
+          t.classList.remove("sorted-asc", "sorted-desc");
+        });
+        th.classList.add(ascending ? "sorted-asc" : "sorted-desc");
+
+        // tbody の行のみ取得（ヘッダは除外）
+        const rows = Array.from(tbody.querySelectorAll("tr"));
 
         rows.sort((rowA, rowB) => {
-          const cellA = rowA.cells[columnIndex].innerText;
-          const cellB = rowB.cells[columnIndex].innerText;
+          const cellA = rowA.cells[columnIndex].innerText.trim();
+          const cellB = rowB.cells[columnIndex].innerText.trim();
 
+          // 日付列は数値（日付）として比較できるようにする
           if (columnIndex === 1) {
-            // 日付の列（未定の場合も文字列として扱う）
-            return ascending
-              ? cellA.localeCompare(cellB)
-              : cellB.localeCompare(cellA);
-          } else {
-            // その他の列（テキスト）
-            return ascending
-              ? cellA.localeCompare(cellB)
-              : cellB.localeCompare(cellA);
+            const aTime = parseJapaneseDate(cellA);
+            const bTime = parseJapaneseDate(cellB);
+
+            if (aTime !== null && bTime !== null) {
+              return ascending ? aTime - bTime : bTime - aTime;
+            }
+            // 片方だけパースできる場合は、パースできる方を先に（昇順）／後に（降順）
+            if (aTime !== null && bTime === null) {
+              return ascending ? -1 : 1;
+            }
+            if (aTime === null && bTime !== null) {
+              return ascending ? 1 : -1;
+            }
+            // 両方パースできない（例: 両方 "未定"）なら文字列比較
+            return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
           }
+
+          // それ以外の列は通常の文字列比較
+          return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
         });
 
-        rows.forEach((row) => table.appendChild(row));
+        // ソートされた順で tbody に戻す（appendChild で移動）
+        rows.forEach((r) => tbody.appendChild(r));
       }
     </script>
   </body>
