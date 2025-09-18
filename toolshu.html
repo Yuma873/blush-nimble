@@ -1,37 +1,33 @@
 <!DOCTYPE html>
 <html lang="ja">
-
   <head>
-  <script defer src="https://www.pushcode.jp/dist/js/pushcode.js"></script>
-  <script>
-    window.PushCodeInit = function () {
-      try {
-        if (PushCode && PushCode.isSupport()) {
-          PushCode.init({
-            domainToken:
-              "8c5ec3cd4b16e15103a9755f5a9850b3b66ad74a168d8050b3e5458c86aa6804",
-            userid: "",
-          });
-          PushCode.components.openSubscribeDialog();
-        }
-      } catch (err) {
-        console.error(err);
-        if (PushCode) {
-          PushCode.sendError(err);
-        }
-      }
-    };
-  </script>
-
-  </head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ツール ポータルページ</title>
-    <link
-      rel="icon"
-      href="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
-      type="image/jpeg"
-    />
+
+    <!-- PushCode（遅延読み込み） -->
+    <script defer src="https://www.pushcode.jp/dist/js/pushcode.js"></script>
+    <script>
+      // PushCode に渡す初期化関数（pushcode.js 側が遅延で呼ぶ想定）
+      window.PushCodeInit = function () {
+        try {
+          if (PushCode && PushCode.isSupport()) {
+            PushCode.init({
+              domainToken:
+                "8c5ec3cd4b16e15103a9755f5a9850b3b66ad74a168d8050b3e5458c86aa6804",
+              userid: "",
+            });
+            PushCode.components.openSubscribeDialog();
+          }
+        } catch (err) {
+          console.error(err);
+          if (PushCode) {
+            PushCode.sendError(err);
+          }
+        }
+      };
+    </script>
+
     <style>
       body {
         font-family: "Arial", sans-serif;
@@ -67,6 +63,11 @@
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         display: flex;
         align-items: center;
+      }
+
+      .section .emoji {
+        font-size: 60px;
+        margin-right: 20px;
       }
 
       .section img {
@@ -107,35 +108,35 @@
         background-color: #005a9e;
       }
     </style>
+
     <script>
-      // ログイン情報
+      // 簡易ログイン（prompt） — いつものまま残しました
       const correctID = "oshiki";
       const correctPassword = "Oshiki";
 
       function verifyLogin(link) {
-        // ログインIDとパスワードを入力させる
         const userID = prompt("ログインIDを入力してください:");
         const userPassword = prompt("パスワードを入力してください:");
-
-        // 入力内容をチェック
         if (userID === correctID && userPassword === correctPassword) {
-          // ログイン成功の場合
+          // GitHub Pages の公開ページへ遷移
           window.location.href = link;
         } else {
-          // ログイン失敗の場合
           alert("ログインIDまたはパスワードが間違っています。");
         }
       }
     </script>
   </head>
+
   <body>
     <header>
       <h1>水泳関連 ポータルページ</h1>
       <p>活動情報や大会予定をこちらからご確認ください</p>
     </header>
+
     <main>
       <!-- Section 1 -->
       <div class="section">
+        <!-- 画像のまま残すか絵文字にしたいか好みで変更できます -->
         <img
           src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
           alt="2024年度水泳部合宿"
@@ -144,8 +145,9 @@
           <h2>この情報の掲載は終了しました。</h2>
           <p>2024年度の冬季合宿に関する詳細情報はこちらをご覧ください。</p>
           <p>掲載期間:2025/1/1まで</p>
+          <!-- GitHub → GitHub Pages 形式に変更 -->
           <a
-            href="https://github.com/Yuma873/blush-nimble/2024%E5%B9%B4%E5%BA%A6%E6%B0%B4%E6%B3%B3%E9%83%A8%E5%86%AC%E5%90%88%E5%AE%BF.html"
+            href="https://yuma873.github.io/blush-nimble/2024%E5%B9%B4%E5%BA%A6%E6%B0%B4%E6%B3%B3%E9%83%A8%E5%86%AC%E5%90%88%E5%AE%BF.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
             >詳細を見る</a
           >
@@ -163,7 +165,7 @@
           <p>今後の大会スケジュールを確認できます。</p>
           <p>掲載期間:当面の間　　最終更新:1/14</p>
           <a
-            href="https://github.com/Yuma873/blush-nimble/taikaiichiran.html"
+            href="https://yuma873.github.io/blush-nimble/taikaiichiran.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
             >詳細を見る</a
           >
@@ -181,7 +183,7 @@
           <p>次回開催される大会の日時、場所、詳細情報はこちらです。</p>
           <p>掲載期間:当面の間　　最終更新:1/14</p>
           <a
-            href="https://github.com/Yuma873/blush-nimble/jikaitaikai.html"
+            href="https://yuma873.github.io/blush-nimble/jikaitaikai.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
             >詳細を見る</a
           >
@@ -199,7 +201,7 @@
           <p>主に交通費など、残高の管理情報が確認できます。</p>
           <p>掲載期間:当面の間　　最終更新:1/14</p>
           <a
-            href="https://github.com/Yuma873/blush-nimble/zandakakanri.html"
+            href="https://yuma873.github.io/blush-nimble/zandakakanri.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
             >詳細を見る</a
           >
@@ -217,7 +219,7 @@
           <p>個人の記録管理はこちらから行えます。</p>
           <p>掲載期間:当面の間　　最終更新:1/14</p>
           <a
-            href="https://github.com/Yuma873/blush-nimble/kiroku.html"
+            href="https://yuma873.github.io/blush-nimble/kiroku.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
             >詳細を見る</a
           >
@@ -235,7 +237,7 @@
           <p>部内ミーティングの議事録や内容はこちらにまとめています。</p>
           <p>掲載期間:当面の間　　最終更新:1/14</p>
           <a
-            href="bukatuMTG.html"
+            href="https://yuma873.github.io/blush-nimble/bukatuMTG.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
             >詳細を見る</a
           >
@@ -253,7 +255,7 @@
           <p>練習の最新日程をご確認ください。</p>
           <p>掲載期間:当面の間　　最終更新:1/14</p>
           <a
-            href="https://github.com/Yuma873/blush-nimble/bukatunittei.html"
+            href="https://yuma873.github.io/blush-nimble/bukatunittei.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
             >詳細を見る</a
           >
@@ -262,3 +264,4 @@
     </main>
   </body>
 </html>
+
