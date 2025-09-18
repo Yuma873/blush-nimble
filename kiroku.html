@@ -4,11 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>水泳記録管理</title>
-    <link
-      rel="icon"
-      href="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
-      type="image/jpeg"
-    />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -16,12 +11,10 @@
         padding: 0;
         background-color: #f9f9f9;
       }
-
       h1 {
         text-align: center;
         margin-bottom: 20px;
       }
-
       form,
       table {
         width: 100%;
@@ -31,23 +24,19 @@
         padding: 20px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
-
       table {
         border-collapse: collapse;
       }
-
       th,
       td {
         padding: 12px;
         text-align: left;
         border-bottom: 1px solid #ddd;
       }
-
       th {
         background-color: #4caf50;
         color: white;
       }
-
       td button {
         margin: 5px;
         padding: 5px 10px;
@@ -57,17 +46,14 @@
         border: none;
         border-radius: 5px;
       }
-
       td button.edit-btn {
         background-color: #4caf50;
       }
-
       .best-label {
-        font-weight: RED;
+        font-weight: bold;
         color: #ff9800;
         margin-left: 5px;
       }
-
       input[type="text"],
       input[type="date"],
       select {
@@ -77,23 +63,19 @@
         border-radius: 5px;
         border: 1px solid #ddd;
       }
-
       #searchInput {
         width: 30%;
         display: inline-block;
         margin-right: 10px;
       }
-
       #filterType {
         width: 30%;
         display: inline-block;
       }
-
       .pagination {
         text-align: center;
         margin-top: 20px;
       }
-
       .pagination button {
         padding: 10px;
         cursor: pointer;
@@ -102,11 +84,9 @@
         margin: 0 5px;
         border-radius: 5px;
       }
-
       .pagination button:hover {
         background-color: #888;
       }
-
       @media screen and (max-width: 600px) {
         table,
         form {
@@ -235,7 +215,7 @@
         // 種目と距離ごとの最速タイムを計算
         const bestTimes = {};
         filteredRecords.forEach((record) => {
-          const key = ${record.eventName}-${record.distance};
+          const key = `${record.eventType}-${record.distance}`;
           if (
             !bestTimes[key] ||
             compareTimes(record.time, bestTimes[key]) < 0
@@ -251,26 +231,26 @@
 
         tableBody.innerHTML = "";
         paginatedRecords.forEach((record, index) => {
-          const key = ${record.eventName}-${record.distance};
+          const key = `${record.eventType}-${record.distance}`;
           const isBest = record.time === bestTimes[key];
 
           const row = document.createElement("tr");
-          row.innerHTML =
-          <td>${record.entryType}</td>
-          <td>${record.eventName}</td>
-          <td>${record.eventDate}</td>
-          <td>${record.eventType}</td>
-          <td>${record.distance}m</td>
-          <td>${record.time} ${
+          row.innerHTML = `
+            <td>${record.entryType}</td>
+            <td>${record.eventName}</td>
+            <td>${record.eventDate}</td>
+            <td>${record.eventType}</td>
+            <td>${record.distance}m</td>
+            <td>${record.time} ${
             isBest ? '<span class="best-label">BEST</span>' : ""
           }</td>
-          <td>${record.location}</td>
-          <td>${record.timestamp}</td>
-          <td>
-            <button class="edit-btn" onclick="editRecord(${index})">編集する</button>
-            <button class="delete-btn" onclick="deleteRecord(${index})">削除する</button>
-          </td>
-        ;
+            <td>${record.location}</td>
+            <td>${record.timestamp}</td>
+            <td>
+              <button class="edit-btn" onclick="editRecord(${index})">編集する</button>
+              <button class="delete-btn" onclick="deleteRecord(${index})">削除する</button>
+            </td>
+          `;
           tableBody.appendChild(row);
         });
 
