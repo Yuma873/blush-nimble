@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>遠隔監視システム for pool</title>
 <style>
+  .notice {
+  background: #fff9e6;
+  color: #856404;
+  border-radius: 6px;
+  padding: 6px 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  text-align: center;
+}
+
 body {
   font-family: "Helvetica Neue", Arial, sans-serif;
   background: #f5f5f5;
@@ -100,6 +110,10 @@ h1 {
 </style>
 </head>
 <body>
+  <div class="notice">
+  📢 お知らせ: プールは明日休館です。
+</div>
+
 <h1>気温監視システム（35.406482,139.340873）</h1>
 
 <div class="card">
@@ -130,7 +144,7 @@ h1 {
 
 <script>
 // ===== データ入力（コード更新時に変更） =====
-const airTemperature = 26.4;
+const airTemperature = 28.4;
 const waterTemperature = 22.5;
 const wbgtValue = 31.2;
 
@@ -237,7 +251,7 @@ function showResult() {
 // ===== サイクル処理 =====
 showPending();
 loadHistory(); // リロード時に履歴復元
-setTimeout(showResult, 10000); // 10秒後に判定
+setTimeout(showResult, 2000); // 10秒後に判定
 setInterval(()=>{
   showResult();
 },30000);
