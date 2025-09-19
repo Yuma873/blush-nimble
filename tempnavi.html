@@ -27,8 +27,6 @@
       font-weight: bold;
       font-size: 18px;
       margin-bottom: 8px;
-      display: flex;
-      align-items: center;
     }
     .value {
       font-size: 24px;
@@ -57,10 +55,27 @@
       color: #a60000;
       border: 2px solid #a60000;
     }
+    .detail {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #fafafa;
+      font-size: 15px;
+      line-height: 1.5;
+      border-left: 4px solid #ccc;
+    }
+    .blinking {
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
   </style>
 </head>
 <body>
-  <h1>🏊 水温チェック</h1>
+  <h1>🏊 水温チェック（海老名市）</h1>
 
   <div class="card">
     <div class="title">🌡 気温</div>
@@ -80,7 +95,8 @@
     <div class="update" id="wbgtUpdate">最終更新: --</div>
   </div>
 
-  <div id="judge" class="result">判定中...</div>
+  <div id="judge" class="result blinking">判定中...</div>
+  <div id="detail" class="detail">詳細はここに表示されます。</div>
 
   <script>
     // ===== データをここで入力 =====
@@ -90,14 +106,53 @@
 
     // ===== 判定関数 =====
     function judgeSwimming(air, water, wbgt) {
-      if (water <= 20) return { text: "🚫 危険（低水温）", safe: false };
-      if (air + water <= 50) return { text: "🚫 危険（気温＋水温が低い）", safe: false };
-      if (wbgt >= 35) return { text: "🚫 危険（暑さ指数が高すぎ）", safe: false };
-      return { text: "✅ 安全に泳げます", safe: true };
+      if (water <= 20) {
+        return {
+          text: "🚫 危険（低水温）",
+          safe: false,
+          detail: "水温が20℃以下では低体温症のリスクがあります。長時間の遊泳は避け、注意してください。"
+        };
+      }
+      if (air + water <= 50) {
+        return {
+          text: "🚫 危険（気温＋水温が低い）",
+          safe: false,
+          detail: "気温と水温の合計が50℃以下だと体温低下の恐れがあります。無理に泳ぐのは避けましょう。"
+        };
+      }
+      if (wbgt >= 35) {
+        return {
+          text: "🚫 危険（暑さ指数が高すぎ）",
+          safe: false,
+          detail: "WBGTが35以上は熱中症の危険度が極めて高い状態です。屋外での活動は原則中止してください。"
+        };
+      }
+      return {
+        text: "✅ 安全に泳げます",
+        safe: true,
+        detail: "気温・水温・暑さ指数の条件は問題ありません。適度に休憩しながら泳ぎましょう。"
+      };
     }
 
-    // ===== UI更新 =====
-    function updateUI() {
+    // ===== 判定中表示 =====
+    function showPending() {
+      document.getElementById("airTemp").textContent = "-- ℃";
+      document.getElementById("airUpdate").textContent = "最終更新: --";
+
+      document.getElementById("waterTemp").textContent = "-- ℃";
+      document.getElementById("waterUpdate").textContent = "最終更新: --";
+
+      document.getElementById("wbgt").textContent = "-- ℃";
+      document.getElementById("wbgtUpdate").textContent = "最終更新: --";
+
+      const judgeElem = document.getElementById("judge");
+      judgeElem.textContent = "判定中...";
+      judgeElem.className = "result blinking";
+      document.getElementById("detail").textContent = "データ取得中です...";
+    }
+
+    // ===== データ表示 =====
+    function showResult() {
       const now = new Date().toLocaleString("ja-JP");
 
       document.getElementById("airTemp").textContent = airTemperature + " ℃";
@@ -113,9 +168,17 @@
       const judgeElem = document.getElementById("judge");
       judgeElem.textContent = result.text;
       judgeElem.className = "result " + (result.safe ? "safe" : "danger");
+      document.getElementById("detail").textContent = result.detail;
     }
 
-    updateUI();
+    // ===== サイクル処理 =====
+    function cycle() {
+      showPending();
+      setTimeout(showResult, 10000); // 10秒後に判定
+    }
+
+    cycle(); // 初回実行
+    setInterval(cycle, 30000); // 30秒ごとに繰り返し
   </script>
 </body>
 </html>
