@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>遠隔水温監視システム</title>
+  <style>
+    body { font-family: sans-serif; background: #f5f5f5; padding: 20px; }
+    .card { background: white; padding: 16px; margin-bottom: 16px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .title { font-weight: bold; font-size: 18px; margin-bottom: 8px; }
+    .value { font-size: 24px; margin-bottom: 8px; }
+    .update { color: gray; font-size: 14px; }
+    .result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>🏊 水温チェック</h1>
+
+  <div class="card">
+    <div class="title">🌡 気温</div>
+    <div class="value" id="airTemp">-- ℃</div>
+    <div class="update" id="airUpdate">最終更新: --</div>
+  </div>
+
+  <div class="card">
+    <div class="title">💧 水温</div>
+    <div class="value" id="waterTemp">-- ℃</div>
+    <div class="update" id="waterUpdate">最終更新: --</div>
+  </div>
+
+  <div class="card">
+    <div class="title">☀ WBGT</div>
+    <div class="value" id="wbgt">-- ℃</div>
+    <div class="update" id="wbgtUpdate">最終更新: --</div>
+  </div>
+
+  <div class="result" id="judge">判定中...</div>
+
+  <script>
+    // ===== データをここで入力 =====
+    const airTemperature = 26.4;  // 気温
+    const waterTemperature = 22.5; // 水温
+    const wbgtValue = 31.2; // WBGT
+
+    // ===== 判定条件 =====
+    // 水温が20℃以下、気温+水温が50℃以下、WBGTが35以上 → 危険
+    function judgeSwimming(air, water, wbgt) {
+      if (water <= 20) return "🚫 危険（低水温）";
+      if (air + water <= 50) return "🚫 危険（気温＋水温が低い）";
+      if (wbgt >= 35) return "🚫 危険（暑さ指数が高すぎ）";
+      return "✅ 安全に泳げます";
+    }
+
+    // ===== 各項目を画面に反映 =====
+    function updateUI() {
+      const now = new Date().toLocaleString("ja-JP");
+
+      document.getElementById("airTemp").textContent = airTemperature + " ℃";
+      document.getElementById("airUpdate").textContent = "最終更新: " + now;
+
+      document.getElementById("waterTemp").textContent = waterTemperature + " ℃";
+      document.getElementById("waterUpdate").textContent = "最終更新: " + now;
+
+      document.getElementById("wbgt").textContent = wbgtValue + " ℃";
+      document.getElementById("wbgtUpdate").textContent = "最終更新: " + now;
+
+      document.getElementById("judge").textContent = judgeSwimming(airTemperature, waterTemperature, wbgtValue);
+    }
+
+    updateUI();
+  </script>
+</body>
+</html>
