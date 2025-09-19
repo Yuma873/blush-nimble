@@ -3,14 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>遠隔水温監視システム</title>
+  <title>水温チェック</title>
   <style>
-    body { font-family: sans-serif; background: #f5f5f5; padding: 20px; }
-    .card { background: white; padding: 16px; margin-bottom: 16px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    .title { font-weight: bold; font-size: 18px; margin-bottom: 8px; }
-    .value { font-size: 24px; margin-bottom: 8px; }
-    .update { color: gray; font-size: 14px; }
-    .result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+    body {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 26px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .title {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+    .value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .update {
+      color: #666;
+      font-size: 13px;
+    }
+    .result {
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      padding: 16px;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+    .safe {
+      background: #e6f9ec;
+      color: #0b7a33;
+      border: 2px solid #0b7a33;
+    }
+    .danger {
+      background: #ffeaea;
+      color: #a60000;
+      border: 2px solid #a60000;
+    }
   </style>
 </head>
 <body>
@@ -34,24 +80,23 @@
     <div class="update" id="wbgtUpdate">最終更新: --</div>
   </div>
 
-  <div class="result" id="judge">判定中...</div>
+  <div id="judge" class="result">判定中...</div>
 
   <script>
     // ===== データをここで入力 =====
-    const airTemperature = 26.4;  // 気温
+    const airTemperature = 26.4;   // 気温
     const waterTemperature = 22.5; // 水温
-    const wbgtValue = 31.2; // WBGT
+    const wbgtValue = 31.2;        // WBGT
 
-    // ===== 判定条件 =====
-    // 水温が20℃以下、気温+水温が50℃以下、WBGTが35以上 → 危険
+    // ===== 判定関数 =====
     function judgeSwimming(air, water, wbgt) {
-      if (water <= 20) return "🚫 危険（低水温）";
-      if (air + water <= 50) return "🚫 危険（気温＋水温が低い）";
-      if (wbgt >= 35) return "🚫 危険（暑さ指数が高すぎ）";
-      return "✅ 安全に泳げます";
+      if (water <= 20) return { text: "🚫 危険（低水温）", safe: false };
+      if (air + water <= 50) return { text: "🚫 危険（気温＋水温が低い）", safe: false };
+      if (wbgt >= 35) return { text: "🚫 危険（暑さ指数が高すぎ）", safe: false };
+      return { text: "✅ 安全に泳げます", safe: true };
     }
 
-    // ===== 各項目を画面に反映 =====
+    // ===== UI更新 =====
     function updateUI() {
       const now = new Date().toLocaleString("ja-JP");
 
@@ -64,7 +109,10 @@
       document.getElementById("wbgt").textContent = wbgtValue + " ℃";
       document.getElementById("wbgtUpdate").textContent = "最終更新: " + now;
 
-      document.getElementById("judge").textContent = judgeSwimming(airTemperature, waterTemperature, wbgtValue);
+      const result = judgeSwimming(airTemperature, waterTemperature, wbgtValue);
+      const judgeElem = document.getElementById("judge");
+      judgeElem.textContent = result.text;
+      judgeElem.className = "result " + (result.safe ? "safe" : "danger");
     }
 
     updateUI();
