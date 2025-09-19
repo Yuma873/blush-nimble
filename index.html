@@ -16,7 +16,6 @@ body {
   justify-content: center;
   flex-direction: column;
 }
-
 .login-container {
   background: white;
   padding: 40px 30px;
@@ -27,166 +26,40 @@ body {
   animation: fadeIn 0.6s ease-in-out;
   position: relative;
 }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes fadeIn { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+h2 { margin-bottom: 20px; text-align: center; color: #005bac; font-size: 24px; }
+label { display: block; margin: 12px 0 6px; color: #333; font-size: 14px; }
+input[type="text"], input[type="password"] {
+  width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;
+  box-sizing:border-box; font-size:14px; transition:border-color 0.3s;
 }
-
-h2 {
-  margin-bottom: 20px;
-  text-align: center;
-  color: #005bac;
-  font-size: 24px;
-}
-
-label {
-  display: block;
-  margin: 12px 0 6px;
-  color: #333;
-  font-size: 14px;
-}
-
-input[type="text"],
-input[type="password"] {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-  font-size: 14px;
-  transition: border-color 0.3s;
-}
-
-input:focus {
-  border-color: #005bac;
-  outline: none;
-}
-
-.toggle {
-  margin: 10px 0;
-  font-size: 13px;
-}
-
-.toggle input {
-  margin-right: 5px;
-}
-
-.warn {
-  font-size: 12px;
-  color: #888;
-}
-
-.error-message {
-  color: red;
-  margin-top: 10px;
-  text-align: center;
-  font-size: 13px;
-}
-
+input:focus { border-color:#005bac; outline:none; }
+.toggle { margin:10px 0; font-size:13px; }
+.toggle input { margin-right:5px; }
+.warn { font-size:12px; color:#888; }
+.error-message { color:red; margin-top:10px; text-align:center; font-size:13px; }
 button {
-  margin-top: 20px;
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border: none;
-  background-color: #005bac;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
+  margin-top:20px; width:100%; padding:12px; font-size:16px;
+  border:none; background-color:#005bac; color:white; border-radius:6px; cursor:pointer;
   transition: background-color 0.3s;
 }
-
-button:hover:enabled {
-  background-color: #00488c;
-}
-
-button:disabled {
-  background-color: #999 !important;
-  cursor: not-allowed;
-}
-
-.loading {
-  display: none;
-  margin-top: 20px;
-  text-align: center;
-  color: #005bac;
-  font-size: 14px;
-}
-
-.spinner {
-  margin: 10px auto;
-  width: 30px;
-  height: 30px;
-  border: 4px solid #ccc;
-  border-top: 4px solid #005bac;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg);}
-  100% { transform: rotate(360deg);}
-}
-
-#admin-login-btn {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  padding: 6px 12px;
-  font-size: 12px;
-  border: none;
-  border-radius: 6px;
-  background-color: #d93025;
-  color: white;
-  cursor: pointer;
-  opacity: 0.9;
-  transition: background-color 0.3s, opacity 0.3s;
-  z-index: 10000;
-}
-
-#admin-login-btn:hover {
-  background-color: #a52714;
-  opacity: 1;
-}
-
+button:hover:enabled { background-color:#00488c; }
+button:disabled { background-color:#999 !important; cursor:not-allowed; }
+.loading { display:none; margin-top:20px; text-align:center; color:#005bac; font-size:14px; }
+.spinner { margin:10px auto; width:30px; height:30px; border:4px solid #ccc; border-top:4px solid #005bac; border-radius:50%; animation:spin 1s linear infinite; }
+@keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+#admin-login-btn { position:fixed; top:12px; right:12px; padding:6px 12px; font-size:12px; border:none; border-radius:6px; background-color:#d93025; color:white; cursor:pointer; opacity:0.9; transition:background-color 0.3s, opacity 0.3s; z-index:10000; }
+#admin-login-btn:hover { background-color:#a52714; opacity:1; }
 /* OTPモーダル */
-@keyframes modalPop {
-  0% { transform: scale(0.8); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-#otp-modal {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  animation: fadeIn 0.5s ease-out;
-}
-
+@keyframes modalPop { 0%{transform:scale(0.8);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+#otp-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:10000; animation: fadeIn 0.5s ease-out; }
 #otp-content {
   background: linear-gradient(135deg, #005bac, #0081cc);
-  color: white;
-  padding: 30px 25px;
-  border-radius: 12px;
-  max-width: 320px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  animation: modalPop 0.4s ease-out;
-  user-select: none; /* コピー防止 */
+  color:white; padding:30px 25px; border-radius:12px; max-width:320px; width:90%;
+  text-align:center; box-shadow:0 8px 24px rgba(0,0,0,0.3); animation: modalPop 0.4s ease-out;
+  user-select:none; /* コピー防止 */
 }
-
-#otp-number {
-  font-size: 24px;
-  margin: 15px 0;
-  letter-spacing: 2px;
-  font-weight: bold;
-}
+#otp-number { font-size:24px; margin:15px 0; letter-spacing:2px; font-weight:bold; }
 </style>
 </head>
 <body>
@@ -195,23 +68,17 @@ button:disabled {
   <h2>ログイン</h2>
   <label for="username">ユーザーID</label>
   <input type="text" id="username" placeholder="userID" />
-
   <label for="password">パスワード</label>
   <input type="password" id="password" placeholder="password" />
-
   <div class="toggle">
     <input type="checkbox" id="showpass" onclick="togglePassword()" />
     <label for="showpass">パスワードを表示</label>
     <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
   </div>
-
   <button id="login-btn" onclick="handleLogin()">ログイン</button>
-  <div style="text-align: right; margin-top: 10px;">
-    <a href="system.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
-      サーバー稼働状況 ▶
-    </a>
+  <div style="text-align:right; margin-top:10px;">
+    <a href="system.html" style="color:#005bac; font-weight:bold; text-decoration:none;">サーバー稼働状況 ▶</a>
   </div>
-
   <div class="error-message" id="error-msg"></div>
   <div class="loading" id="loading">
     <div class="spinner"></div>
@@ -227,22 +94,14 @@ button:disabled {
     <h3>追加認証</h3>
     <p>画面に表示された10桁の番号を入力してください</p>
     <div id="otp-number"></div>
-    <input type="text" id="otp-input" placeholder="1234567890" style="
-      width:100%; padding:10px; border-radius:6px; border:none; font-size:16px;
-      text-align:center; margin-bottom:10px;
-    "/>
+    <input type="text" id="otp-input" placeholder="1234567890" style="width:100%; padding:10px; border-radius:6px; border:none; font-size:16px; text-align:center; margin-bottom:10px;" />
     <div id="otp-error" style="color:#ff8080; font-size:13px; margin-bottom:10px; min-height:18px;"></div>
-    <button onclick="verifyOtp()" style="
-      padding:10px 20px; width:100%; border:none; border-radius:6px;
-      background-color:#00488c; color:white; font-size:16px; cursor:pointer;
-    " onmouseover="this.style.backgroundColor='#003366'" onmouseout="this.style.backgroundColor='#00488c'">
-      認証
-    </button>
+    <button onclick="verifyOtp()" style="padding:10px 20px; width:100%; border:none; border-radius:6px; background-color:#00488c; color:white; font-size:16px; cursor:pointer;" onmouseover="this.style.backgroundColor='#003366'" onmouseout="this.style.backgroundColor='#00488c'">認証</button>
   </div>
 </div>
 
 <script>
-// 管理アカウントボタン
+// 管理アカウント
 document.getElementById("admin-login-btn").addEventListener("click", function() {
   window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
 });
@@ -252,10 +111,8 @@ const users = [
   { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
   { name: "00213001", password: "072017046072017046", link: "https://yuma873.github.io/blush-nimble/portal.html" }
 ];
-
 const loginLimit = 3;
 let attempts = loginLimit;
-
 document.getElementById("username").focus();
 
 // パスワード表示切替
@@ -286,12 +143,9 @@ function handleLogin() {
     errorMsg.textContent = "";
   }
 
-  const userField = document.getElementById("username");
-  const passField = document.getElementById("password");
+  const name = document.getElementById("username").value.trim();
+  const pass = document.getElementById("password").value.trim();
   const loading = document.getElementById("loading");
-
-  const name = userField.value.trim();
-  const pass = passField.value.trim();
 
   if (!name || !pass) {
     errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
@@ -314,29 +168,23 @@ function handleLogin() {
   loginBtn.disabled = true;
 
   setTimeout(() => {
+    loading.style.display = "none";
     showOtpModal();
   }, 1500);
 }
 
-// ページロード時メンテナンス判定
+// ページロード時メンテ判定
 window.addEventListener("load", () => {
   const loginBtn = document.getElementById("login-btn");
   const errorMsg = document.getElementById("error-msg");
-
-  if (isMaintenanceTime()) {
-    loginBtn.disabled = true;
-    errorMsg.textContent = "現在メンテナンス時間のため、ログインできません。";
-  }
+  if (isMaintenanceTime()) { loginBtn.disabled = true; errorMsg.textContent="現在メンテナンス時間のため、ログインできません。"; }
 });
 
-// Enterキーでログイン
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") handleLogin();
-});
+// Enterでログイン
+document.addEventListener("keydown", (e) => { if (e.key==="Enter") handleLogin(); });
 
 // OTP処理
 let currentOtp = null;
-
 function showOtpModal() {
   currentOtp = Math.floor(1000000000 + Math.random() * 9000000000); // 10桁
   document.getElementById("otp-number").textContent = currentOtp;
@@ -346,26 +194,29 @@ function showOtpModal() {
   document.getElementById("otp-input").focus();
 }
 
+// OTP Enterキー認証（1回だけ設定）
+document.getElementById("otp-input").addEventListener("keydown", function(e){
+  if(e.key==="Enter") verifyOtp();
+});
+
 function verifyOtp() {
   const input = document.getElementById("otp-input").value.trim();
   const error = document.getElementById("otp-error");
   const username = document.getElementById("username").value;
   const user = users.find(u => u.name === username);
 
-  if (input === currentOtp.toString()) {
+  if(input === currentOtp.toString()) {
     error.textContent = "";
-    if (user) window.location.href = user.link;
+    if(user) window.location.href = user.link;
   } else {
     error.textContent = "番号が間違っています";
   }
 }
 
-// コピー・右クリック防止
+// コピー・右クリック・選択防止
 const otpNumberDiv = document.getElementById("otp-number");
-otpNumberDiv.addEventListener("contextmenu", e => e.preventDefault());
-otpNumberDiv.addEventListener("copy", e => e.preventDefault());
-otpNumberDiv.addEventListener("mousedown", e => e.preventDefault());
-otpNumberDiv.addEventListener("selectstart", e => e.preventDefault());
+["contextmenu","copy","mousedown","selectstart","keydown"].forEach(ev => otpNumberDiv.addEventListener(ev,e=>e.preventDefault()));
+
 </script>
 </body>
 </html>
