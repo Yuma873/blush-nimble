@@ -127,79 +127,96 @@ h1 {
   <h2>判定履歴</h2>
   <ul id="historyList"></ul>
 </div>
-
 <script>
+// ===== データ入力 =====
 const airTemperature = 26.4;
 const waterTemperature = 22.5;
 const wbgtValue = 31.2;
 
+// 前回の値保持
 let lastValues = {air:null, water:null, wbgt:null};
 
+// 判定関数
 function judgeSwimming(air, water, wbgt) {
-  if (water <= 20) return {text:"🚫 危険", safe:false, detail:"水温が規定に満ちていません。利用不可です。"};
-  if (air+water <= 50) return {text:"🚫 危険", safe:false, detail:"気温・水温が規定に満ちていません。利用を避けてください。"};
-  if (wbgt >= 35) return {text:"⚠ 厳重注意", safe:false, detail:"熱中症リスクが極めて高いです。"};
-  return {text:"✅ 安全", safe:true, detail:"条件は問題ありません。"};
+  if (water <= 20) return {text:"🚫 危険", safe:false, detail:"水温が規定に満ちていません。利用不可です。", dangerItems:["water"]};
+  if (air+water <= 50) return {text:"🚫 危険", safe:false, detail:"気温・水温が規定に満ちていません。利用を避けてください。", dangerItems:["air","water"]};
+  if (wbgt >= 35) return {text:"⚠ 厳重注意", safe:false, detail:"熱中症リスクが極めて高いです。", dangerItems:["wbgt"]};
+  return {text:"✅ 安全", safe:true, detail:"条件は問題ありません。", dangerItems:[]};
 }
 
+// 判定中表示
 function showPending() {
   ["airTemp","waterTemp","wbgt"].forEach(id=>{
-    document.getElementById(id).textContent="-- ℃";
-    document.getElementById(id).className="value blinking";
+    const elem = document.getElementById(id);
+    elem.textContent="-- ℃";
+    elem.className="value blinking"; // 判定中用点滅
   });
-  document.getElementById("judge").textContent="判定中...";
-  document.getElementById("judge").className="result blinking";
+  const judgeElem = document.getElementById("judge");
+  judgeElem.textContent="判定中...";
+  judgeElem.className="result blinking";
   document.getElementById("detail").textContent="データ取得中です...";
   ["airUpdate","waterUpdate","wbgtUpdate"].forEach(id=>document.getElementById(id).textContent="最終更新: --");
 }
 
-function addHistory(name,value) {
+// 履歴追加
+function addHistory(name,value,dangerItems){
   const last = lastValues[name];
-  if(last !== value) {
+  if(last !== value){
     const li = document.createElement("li");
     li.textContent = `${new Date().toLocaleTimeString()} ${name}: ${value} ℃`;
+    if(dangerItems.includes(name.toLowerCase())){
+      li.classList.add("danger-value","blinking");
+    }
     document.getElementById("historyList").prepend(li);
+    lastValues[name]=value;
   }
-  lastValues[name]=value;
 }
 
+// 判定結果表示
 function showResult() {
   const now = new Date().toLocaleString("ja-JP");
 
-  document.getElementById("airTemp").textContent = airTemperature + " ℃";
+  const elems = {
+    air: document.getElementById("airTemp"),
+    water: document.getElementById("waterTemp"),
+    wbgt: document.getElementById("wbgt")
+  };
+
+  // 表示更新
+  elems.air.textContent = airTemperature + " ℃";
   document.getElementById("airUpdate").textContent = "最終更新: " + now;
 
-  document.getElementById("waterTemp").textContent = waterTemperature + " ℃";
+  elems.water.textContent = waterTemperature + " ℃";
   document.getElementById("waterUpdate").textContent = "最終更新: " + now;
 
-  document.getElementById("wbgt").textContent = wbgtValue + " ℃";
+  elems.wbgt.textContent = wbgtValue + " ℃";
   document.getElementById("wbgtUpdate").textContent = "最終更新: " + now;
 
   const result = judgeSwimming(airTemperature, waterTemperature, wbgtValue);
 
+  // 判定表示
   const judgeElem = document.getElementById("judge");
-  judgeElem.textContent=result.text;
-  judgeElem.className="result "+(result.safe?"safe":"danger");
+  judgeElem.textContent = result.text;
+  judgeElem.className = "result " + (result.safe ? "safe" : "danger");
 
-  const detailElem=document.getElementById("detail");
-  detailElem.textContent=result.detail;
+  document.getElementById("detail").textContent = result.detail;
 
-  // 危険値赤点滅
-  if(!result.safe){
-    if(waterTemperature<=20) document.getElementById("waterTemp").classList.add("danger-value","blinking");
-    if(airTemperature+waterTemperature<=50) {
-      document.getElementById("airTemp").classList.add("danger-value","blinking");
-      document.getElementById("waterTemp").classList.add("danger-value","blinking");
+  // 危険項目だけ赤点滅
+  ["air","water","wbgt"].forEach(key=>{
+    const elem = elems[key];
+    elem.classList.remove("danger-value","blinking");
+    if(result.dangerItems.includes(key)){
+      elem.classList.add("danger-value","blinking");
     }
-    if(wbgtValue>=35) document.getElementById("wbgt").classList.add("danger-value","blinking");
-  }
+  });
 
   // 履歴追加
-  addHistory("気温",airTemperature);
-  addHistory("水温",waterTemperature);
-  addHistory("WBGT",wbgtValue);
+  addHistory("気温",airTemperature,result.dangerItems);
+  addHistory("水温",waterTemperature,result.dangerItems);
+  addHistory("WBGT",wbgtValue,result.dangerItems);
 }
 
+// サイクル処理
 function cycle(){
   showPending();
   setTimeout(showResult,10000);
@@ -208,5 +225,6 @@ function cycle(){
 cycle();
 setInterval(cycle,30000);
 </script>
+
 </body>
 </html>
