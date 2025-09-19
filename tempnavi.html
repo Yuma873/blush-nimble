@@ -106,20 +106,19 @@ function showPending() {
   setTimeout(showResult,1000); // 1秒後に判定結果表示
 }
 
-// 履歴追加（いずれかの値が変わった場合のみ、1行で、最大10件）
+<!-- 履歴追加（いずれかの値が変わった場合のみ、1行で、最大10件） -->
 function addHistory(air, water, wbgt, dangerItems){
   if(air===lastValues.air && water===lastValues.water && wbgt===lastValues.wbgt) return;
 
   const nowStr = new Date().toLocaleString("ja-JP");
   const li = document.createElement("li");
   li.textContent = `${nowStr} 気温:${air}℃ 水温:${water}℃ WBGT:${wbgt}℃ 判定:${dangerItems.length>0?"⚠":"✅"}`;
-  if(dangerItems.length>0) li.classList.add("danger-value","blinking");
 
   const ul = document.getElementById("historyList");
   ul.prepend(li);
 
   let hist = JSON.parse(localStorage.getItem("poolHistory")||"[]");
-  hist.unshift({text:li.textContent, danger:dangerItems.length>0, values:{air, water, wbgt}});
+  hist.unshift({text:li.textContent, values:{air, water, wbgt}});
   hist = hist.slice(0,10); // 最新10件まで
   while(ul.children.length>10) ul.removeChild(ul.lastChild);
 
@@ -137,7 +136,6 @@ function loadHistory(){
   hist.forEach(item=>{
     const li = document.createElement("li");
     li.textContent = item.text;
-    if(item.danger) li.classList.add("danger-value","blinking");
     ul.appendChild(li);
 
     lastValues.air = item.values.air;
@@ -145,6 +143,7 @@ function loadHistory(){
     lastValues.wbgt = item.values.wbgt;
   });
 }
+
 
 // 判定結果表示
 function showResult() {
