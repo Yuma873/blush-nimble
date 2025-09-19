@@ -1,370 +1,194 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ログイン</title>
-  <link rel="shortcut icon" href="favicon.png" type="image/png">
-  <style>
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #005bac, #0081cc);
-      font-family: "Segoe UI", sans-serif;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ログイン</title>
+<link rel="shortcut icon" href="favicon.png" type="image/png">
+<style>
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #005bac, #0081cc);
+  font-family: "Segoe UI", sans-serif;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
 
-    .login-container {
-      background: white;
-      padding: 40px 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      max-width: 380px;
-      width: 100%;
-      animation: fadeIn 0.6s ease-in-out;
-      position: relative;
-    }
+@keyframes fadeIn { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+.login-container {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  max-width: 380px;
+  width: 100%;
+  animation: fadeIn 0.6s ease-in-out;
+  position: relative;
+}
 
-    h2 {
-      margin-bottom: 20px;
-      text-align: center;
-      color: #005bac;
-      font-size: 24px;
-    }
+h2 { margin-bottom: 20px; text-align:center; color:#005bac; font-size:24px; }
+label { display:block; margin:12px 0 6px; color:#333; font-size:14px; }
+input[type="text"], input[type="password"] {
+  width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:14px;
+  transition:border-color 0.3s;
+}
+input:focus { border-color:#005bac; outline:none; }
 
-    label {
-      display: block;
-      margin: 12px 0 6px;
-      color: #333;
-      font-size: 14px;
-    }
+.toggle { margin:10px 0; font-size:13px; }
+.toggle input { margin-right:5px; }
+.warn { font-size:12px; color:#888; }
 
-    input[type="text"],
-    input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-size: 14px;
-      transition: border-color 0.3s;
-    }
+.error-message { color:red; margin-top:10px; text-align:center; font-size:13px; }
 
-    input:focus {
-      border-color: #005bac;
-      outline: none;
-    }
+button {
+  margin-top:20px; width:100%; padding:12px; font-size:16px;
+  border:none; background-color:#005bac; color:white; border-radius:6px; cursor:pointer;
+  transition: background-color 0.3s;
+}
+button:hover:enabled { background-color:#00488c; }
+button:disabled { background-color:#999 !important; cursor:not-allowed; }
 
-    .toggle {
-      margin: 10px 0;
-      font-size: 13px;
-    }
+.loading { display:none; margin-top:20px; text-align:center; color:#005bac; font-size:14px; }
+.spinner { margin:10px auto; width:30px; height:30px; border:4px solid #ccc; border-top:4px solid #005bac; border-radius:50%; animation:spin 1s linear infinite; }
 
-    .toggle input {
-      margin-right: 5px;
-    }
+#admin-login-btn {
+  position: fixed; top:12px; right:12px; padding:6px 12px; font-size:12px; border:none; border-radius:6px;
+  background-color:#d93025; color:white; cursor:pointer; opacity:0.9; transition:background-color 0.3s, opacity 0.3s; z-index:10000;
+}
+#admin-login-btn:hover { background-color:#a52714; opacity:1; }
 
-    .warn {
-      font-size: 12px;
-      color: #888;
-    }
+/* OTPモーダル */
+#otp-modal {
+  display:none;
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.6);
+  align-items:center; justify-content:center; z-index:10000;
+  animation: fadeIn 0.5s ease-out;
+}
+#otp-modal .modal-content {
+  background: linear-gradient(135deg,#005bac,#0081cc);
+  color:white; padding:30px 25px; border-radius:12px; max-width:320px; width:90%;
+  text-align:center; box-shadow:0 8px 24px rgba(0,0,0,0.3);
+  animation: modalPop 0.4s ease-out;
+}
+#otp-modal input { width:100%; padding:10px; border-radius:6px; border:none; font-size:16px; text-align:center; margin-bottom:10px; }
+#otp-error { color:#ff8080; font-size:13px; margin-bottom:10px; min-height:18px; }
 
-    .error-message {
-      color: red;
-      margin-top: 10px;
-      text-align: center;
-      font-size: 13px;
-    }
-
-    button {
-      margin-top: 20px;
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      border: none;
-      background-color: #005bac;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:hover:enabled {
-      background-color: #00488c;
-    }
-
-    button:disabled {
-      background-color: #999 !important;
-      cursor: not-allowed;
-    }
-
-    .loading {
-      display: none;
-      margin-top: 20px;
-      text-align: center;
-      color: #005bac;
-      font-size: 14px;
-    }
-
-    .spinner {
-      margin: 10px auto;
-      width: 30px;
-      height: 30px;
-      border: 4px solid #ccc;
-      border-top: 4px solid #005bac;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
-    }
-
-    #admin-login-btn {
-      position: fixed;
-      top: 12px;
-      right: 12px;
-      padding: 6px 12px;
-      font-size: 12px;
-      border: none;
-      border-radius: 6px;
-      background-color: #d93025;
-      color: white;
-      cursor: pointer;
-      opacity: 0.9;
-      transition: background-color 0.3s, opacity 0.3s;
-      z-index: 10000;
-    }
-
-    #admin-login-btn:hover {
-      background-color: #a52714;
-      opacity: 1;
-    }
-
-    .ticker-wrapper {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: #ffeb3b;
-      color: #222;
-      font-size: 18px;
-      padding: 6px 0;
-      overflow: hidden;
-      z-index: 9999;
-      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-
-    .ticker {
-      display: inline-block;
-      white-space: nowrap;
-      animation: scroll-left 30s linear infinite;
-      padding-left: 100%;
-    }
-
-    @keyframes scroll-left {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
-    }
-
-    .blinking {
-      animation: blink 1.2s step-start infinite;
-      color: red;
-      font-weight: bold;
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
-
-    .blinking-bg {
-      animation: blink-bg 1.2s step-start infinite;
-      color: red;
-      font-weight: bold;
-    }
-
-    @keyframes blink-bg {
-      50% { background-color: yellow; }
-      0%, 100% { background-color: transparent; }
-    }
-   
-</script>
-
-  </style>
-<script defer src="https://www.pushcode.jp/dist/js/pushcode.js"></script>
-<script>
-window.PushCodeInit = function() {
-  try {
-    if (PushCode && PushCode.isSupport()) {
-      PushCode.init({ domainToken: '6d20f79ae2615a8ced22db9f79bb01abfbbbe2fb5a2f558f1269ee6b21b3ce15', userid: '', serviceWorkerPath: '/blush-nimble/pushcode_sw.js', scopePath: '/blush-nimble/' });
-      PushCode.components.openSubscribeDialog();
-    }
-  }
-  catch (err) {
-    console.error(err);
-    if (PushCode) {
-      PushCode.sendError(err);
-    }
-  }
-};
-</script>
- 
+</style>
 </head>
 <body>
 
-  <div class="login-container">
-    <h2>ログイン</h2>
-    <label for="username">ユーザーID</label>
-    <input type="text" id="username" placeholder="userID" />
+<div class="login-container">
+  <h2>ログイン</h2>
+  <label for="username">ユーザーID</label>
+  <input type="text" id="username" placeholder="userID" />
 
-    <label for="password">パスワード</label>
-    <input type="password" id="password" placeholder="password" />
+  <label for="password">パスワード</label>
+  <input type="password" id="password" placeholder="password" />
 
-    <div class="toggle">
-      <input type="checkbox" id="showpass" onclick="togglePassword()" />
-      <label for="showpass">パスワードを表示</label>
-      <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
-    </div>
-
-    <button id="login-btn" onclick="handleLogin()">ログイン</button>
-    <div style="text-align: right; margin-top: 10px;">
-      <a href="system.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
-        サーバー稼働状況 ▶
-      </a>
-    </div>
-
-    <div class="error-message" id="error-msg"></div>
-
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-      ログインしています...*この読み込みは時間がかかる場合があります
-    </div>
+  <div class="toggle">
+    <input type="checkbox" id="showpass" onclick="togglePassword()" />
+    <label for="showpass">パスワードを表示</label>
+    <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
   </div>
 
-  <button id="admin-login-btn" type="button" aria-label="管理アカウントでログイン">管理アカウントでログイン</button>
+  <button id="login-btn" onclick="handleLogin()">ログイン</button>
+  <div style="text-align:right; margin-top:10px;">
+    <a href="system.html" style="color:#005bac; font-weight:bold; text-decoration:none;">サーバー稼働状況 ▶</a>
+  </div>
+
+  <div class="error-message" id="error-msg"></div>
+  <div class="loading" id="loading"><div class="spinner"></div>ログインしています...*この読み込みは時間がかかる場合があります</div>
+</div>
+
+<button id="admin-login-btn" type="button" aria-label="管理アカウントでログイン">管理アカウントでログイン</button>
+
+<!-- OTPモーダル -->
+<div id="otp-modal">
+  <div class="modal-content">
+    <h3>追加認証</h3>
+    <p>スマホに送信されたコードを入力してください</p>
+    <input type="text" id="otp-input" placeholder="123456" />
+    <div id="otp-error"></div>
+    <button onclick="verifyOtp()">認証</button>
+  </div>
+</div>
 
 <script>
-  // 管理アカウントボタン
-  document.getElementById("admin-login-btn").addEventListener("click", function() {
-    window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
-  });
+const users = [
+  { name:"oshiki", password:"Oshiki", link:"https://yuma873.github.io/blush-nimble/portal.html" },
+  { name:"00213001", password:"072017046072017046", link:"https://yuma873.github.io/blush-nimble/portal.html" }
+];
+const loginLimit = 3;
+let attempts = loginLimit;
+let currentOtp = null;
 
-  // ユーザー情報
-  const users = [
-    { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
-    { name: "00213001", password: "072017046072017046", link: "https://yuma873.github.io/blush-nimble/portal.html" }
-  ];
+document.getElementById("username").focus();
+document.getElementById("admin-login-btn").addEventListener("click",()=>{ window.location.href="https://yuma873.github.io/blush-nimble/kanri.html"; });
+function togglePassword() { const pass=document.getElementById("password"); pass.type=document.getElementById("showpass").checked?"text":"password"; }
+function isMaintenanceTime() { const now=new Date(); const day=now.getDay(); const hour=now.getHours(); return day===2 && hour>=8 && hour<15; }
 
-  const loginLimit = 3;
-  let attempts = loginLimit;
+// OTPモーダル表示
+function showOtpModal() {
+  currentOtp = Math.floor(100000 + Math.random() * 900000);
+  console.log("送信されたOTP:", currentOtp); // 実運用ではSMS/メール
+  const modal = document.getElementById("otp-modal");
+  modal.style.display="flex";
+  document.getElementById("otp-input").value="";
+  document.getElementById("otp-error").textContent="";
+  document.getElementById("otp-input").focus();
+}
 
-  document.getElementById("username").focus();
+// OTP確認
+function verifyOtp() {
+  const input = document.getElementById("otp-input").value.trim();
+  const error = document.getElementById("otp-error");
+  const username = document.getElementById("username").value;
+  const user = users.find(u => u.name === username);
 
-  // パスワード表示切替
-  function togglePassword() {
-    const pass = document.getElementById("password");
-    pass.type = document.getElementById("showpass").checked ? "text" : "password";
+  if(input === currentOtp.toString()) {
+    error.textContent="";
+    if(user) window.location.href=user.link;
+  } else {
+    error.textContent="コードが間違っています";
+  }
+}
+
+// ログイン処理
+function handleLogin() {
+  const loginBtn=document.getElementById("login-btn");
+  const errorMsg=document.getElementById("error-msg");
+  const loading=document.getElementById("loading");
+
+  if(isMaintenanceTime()){ errorMsg.textContent="現在ポータルサイトのメンテナンス時間のため、ログインできません。"; loginBtn.disabled=true; return; }
+  else { loginBtn.disabled=false; errorMsg.textContent=""; }
+
+  const name=document.getElementById("username").value.trim();
+  const pass=document.getElementById("password").value.trim();
+  if(!name||!pass){ errorMsg.textContent="ユーザー名とパスワードを入力してください。"; return; }
+
+  const user=users.find(u=>u.name===name && u.password===pass);
+  if(!user){ attempts--; errorMsg.textContent=`ユーザーIDまたはパスワードが異なります。　ロックまで（残り${attempts}回）`;
+    if(attempts<=0){ errorMsg.textContent="ログイン失敗が続いたため、操作をロックしました。 loginBtn.disabled=true;"; } return;
   }
 
-  // メンテナンス時間判定
-  function isMaintenanceTime() {
-    const now = new Date();
-    const day = now.getDay();
-    const hour = now.getHours();
-    return day === 2 && hour >= 8 && hour < 15;
-  }
+  loading.style.display="block";
+  loginBtn.disabled=true;
+  setTimeout(()=>{ showOtpModal(); },1500);
+}
 
-  // ログイン処理
-  function handleLogin() {
-    const loginBtn = document.getElementById("login-btn");
-    const errorMsg = document.getElementById("error-msg");
-
-    if (isMaintenanceTime()) {
-      errorMsg.textContent = "現在ポータルサイトのメンテナンス時間のため、ログインできません。";
-      loginBtn.disabled = true;
-      return;
-    } else {
-      loginBtn.disabled = false;
-      errorMsg.textContent = "";
-    }
-
-    const userField = document.getElementById("username");
-    const passField = document.getElementById("password");
-    const loading = document.getElementById("loading");
-
-    const name = userField.value.trim();
-    const pass = passField.value.trim();
-
-    if (!name || !pass) {
-      errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
-      return;
-    }
-
-    const user = users.find(u => u.name === name && u.password === pass);
-    if (!user) {
-      attempts--;
-      errorMsg.textContent = `ユーザーIDまたはパスワードが異なります。　ロックまで（残り${attempts}回）`;
-      if (attempts <= 0) {
-        errorMsg.textContent = "ログイン失敗が続いたため、操作をロックしました。";
-        loginBtn.disabled = true;
-      }
-      return;
-    }
-
-    // 成功
-    loading.style.display = "block";
-    loginBtn.disabled = true;
-
-    setTimeout(() => {
-      /*
-      // ポップアップ通知用ウィンドウ
-      const popup = window.open("", "loginNotification", "width=300,height=150");
-      if (popup) {
-        popup.document.write("<p>通知用ウィンドウです。閉じないでください。</p>");
-        if (Notification.permission !== "granted") {
-          Notification.requestPermission();
-        }
-        setInterval(() => {
-          if (Notification.permission === "granted") {
-            new Notification("ポータルサイト", {
-              body: "ログイン中です。使用後はログアウトしてください。"
-            });
-          }
-        }, 30000);
-      }
-
-      // ポータルページへ遷移
-      */
-      window.location.href = user.link;
-
-    }, 1500);
-  }
-
-  // ページロード時メンテナンス判定
-  window.addEventListener("load", () => {
-    const loginBtn = document.getElementById("login-btn");
-    const errorMsg = document.getElementById("error-msg");
-
-    if (isMaintenanceTime()) {
-      loginBtn.disabled = true;
-      errorMsg.textContent = "現在メンテナンス時間のため、ログインできません。";
-    }
-  });
-
-  // Enterキーでログイン
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") handleLogin();
-  });
+window.addEventListener("load",()=>{
+  const loginBtn=document.getElementById("login-btn");
+  const errorMsg=document.getElementById("error-msg");
+  if(isMaintenanceTime()){ loginBtn.disabled=true; errorMsg.textContent="現在メンテナンス時間のため、ログインできません。"; }
+});
+document.addEventListener("keydown",(e)=>{ if(e.key==="Enter") handleLogin(); });
 </script>
 
 </body>
