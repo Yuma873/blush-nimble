@@ -127,6 +127,7 @@ h1 {
   <h2>判定履歴</h2>
   <ul id="historyList"></ul>
 </div>
+
 <script>
 // ===== データ入力 =====
 const airTemperature = 26.4;
@@ -144,12 +145,12 @@ function judgeSwimming(air, water, wbgt) {
   return {text:"✅ 安全", safe:true, detail:"条件は問題ありません。", dangerItems:[]};
 }
 
-// 判定中表示
+// 判定中表示（読み込み時のみ）
 function showPending() {
   ["airTemp","waterTemp","wbgt"].forEach(id=>{
     const elem = document.getElementById(id);
     elem.textContent="-- ℃";
-    elem.className="value blinking"; // 判定中用点滅
+    elem.className="value blinking"; // 点滅
   });
   const judgeElem = document.getElementById("judge");
   judgeElem.textContent="判定中...";
@@ -216,14 +217,13 @@ function showResult() {
   addHistory("WBGT",wbgtValue,result.dangerItems);
 }
 
-// サイクル処理
-function cycle(){
-  showPending();
-  setTimeout(showResult,10000);
-}
+// ===== 初回読み込み時 =====
+showPending();
+setTimeout(showResult,10000); // 判定表示は10秒後
 
-cycle();
-setInterval(cycle,30000);
+// 以降30秒ごとに判定結果更新（履歴維持）
+setInterval(showResult,30000);
+
 </script>
 
 </body>
