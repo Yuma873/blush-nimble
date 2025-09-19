@@ -5,40 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>遠隔監視システム for pool</title>
 <style>
-  .notice {
-    background: #fff9e6;
-    color: #856404;
-    border-radius: 6px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    font-size: 14px;
-    text-align: center;
-  }
-  body { font-family: "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; margin:0; padding:20px; }
-  h1 { text-align:center; margin-bottom:20px; font-size:26px; }
-  .card { background:#fff; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.15); padding:16px; margin-bottom:16px; }
-  .title { font-weight:bold; font-size:18px; margin-bottom:8px; }
-  .value { font-size:24px; font-weight:bold; margin-bottom:6px; }
+  .notice { background: #fff9e6; color: #856404; border-radius: 6px; padding: 6px 12px; margin-bottom: 12px; font-size: 14px; text-align: center; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+  h1 { text-align: center; margin-bottom: 20px; font-size: 26px; }
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); padding:16px; margin-bottom:16px; }
+  .title { font-weight: bold; font-size: 18px; margin-bottom: 8px; }
+  .value { font-size: 24px; font-weight: bold; margin-bottom:6px; }
   .update { color:#666; font-size:13px; }
   .result { text-align:center; font-size:22px; font-weight:bold; padding:16px; border-radius:12px; margin-top:20px; }
   .safe { background:#e6f9ec; color:#0b7a33; border:2px solid #0b7a33; }
   .danger { background:#ffeaea; color:#a60000; border:2px solid #a60000; }
   .detail { margin-top:12px; padding:12px; border-radius:8px; background:#fafafa; font-size:15px; line-height:1.5; border-left:4px solid #ccc; }
   .blinking { animation: blink 1s infinite; }
-  @keyframes blink { 0% {opacity:1;} 50% {opacity:0;} 100% {opacity:1;} }
+  @keyframes blink { 0%{opacity:1;}50%{opacity:0;}100%{opacity:1;} }
   .history { background:#fff; border-radius:12px; padding:16px; max-height:200px; overflow-y:auto; margin-top:20px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
   .history h2 { margin-top:0; font-size:18px; }
   .history ul { list-style:none; padding-left:0; margin:0; }
   .history li { padding:4px 0; border-bottom:1px solid #eee; }
-  .danger-value.blinking { color:#a60000; }
+  .danger-value { color:#a60000; }
 </style>
 </head>
 <body>
-
-<div class="notice">
-  📢 お知らせ: 温度が低くなっています。こまめに情報を確認してください。<br>
-  稼働時間: 8:00~20:00、不定期更新(1時間おき)
-</div>
+<div class="notice">📢 お知らせ: 温度が低くなっています。こまめに確認してください。<br>稼働時間: 8:00~20:00、不定期更新(1時間おき)</div>
 
 <h1>気温監視システム（35.406482,139.340873）</h1>
 
@@ -56,7 +44,7 @@
 
 <div class="card">
   <div class="title">☀ WBGT</div>
-  <div class="value" id="wbgt">-- </div>
+  <div class="value" id="wbgt">--</div>
   <div class="update" id="wbgtUpdate">最終更新: --</div>
 </div>
 
@@ -69,117 +57,97 @@
 </div>
 
 <script>
-// データ入力（コード更新時に変更）
+// ===== データ（コード更新時に変更） =====
 const airTemperature = 22.4;
 const waterTemperature = 25.5;
 const wbgtValue = 20.2;
-const codeUpdatedTime = "2025/09/19 19:27:00";
+const codeUpdatedTime = "2025/09/19 19:50:00";
 
-// 前回値
-let lastValues = {air:null, water:null, wbgt:null};
+// 前回値保持
+let lastValues = {air: null, water: null, wbgt: null};
 
 // 判定関数
-function judgeSwimming(air, water, wbgt) {
-  if (water <= 20) return {text:"🚫 危険", safe:false, detail:"水温が規定に満ちていません。利用不可です。", dangerItems:["water"]};
-  if (air+water <= 50) return {text:"🚫 危険", safe:false, detail:"気温・水温が規定に満ちていません。利用を避けてください。", dangerItems:["air","water"]};
-  if (wbgt >= 35) return {text:"⚠ 厳重注意", safe:false, detail:"熱中症リスクが極めて高いです。", dangerItems:["wbgt"]};
-  return {text:"✅ 安全", safe:true, detail:"条件は問題ありません。", dangerItems:[]};
+function judgeSwimming(air, water, wbgt){
+  let dangerItems = [];
+  if(water<=20) dangerItems.push("water");
+  if(air+water<=50) dangerItems.push("air","water");
+  if(wbgt>=35) dangerItems.push("wbgt");
+  let text = (dangerItems.length>0) ? "🚫 危険" : "✅ 安全";
+  let detail = (dangerItems.length>0) ? "条件が安全基準を満たしていません。" : "条件は問題ありません。";
+  return {text, safe:dangerItems.length===0, detail, dangerItems};
 }
 
-// 判定中表示（読み込み時のみ）
-function showPending() {
-  ["airTemp","waterTemp","wbgt"].forEach(id=>{
-    const elem = document.getElementById(id);
-    elem.textContent="-- ℃";
-    elem.className="value blinking";
-  });
-  const judgeElem = document.getElementById("judge");
-  judgeElem.textContent="判定中...";
-  judgeElem.className="result blinking";
-  document.getElementById("detail").textContent="データ取得中です...";
-  ["airUpdate","waterUpdate","wbgtUpdate"].forEach(id=>{
-    document.getElementById(id).textContent="最終更新: --";
-  });
-}
+// 履歴追加（いずれかの値が変わったときだけ）
+function addHistory(air, water, wbgt, dangerItems){
+  if(air!==lastValues.air || water!==lastValues.water || wbgt!==lastValues.wbgt){
+    const nowStr = new Date().toLocaleString("ja-JP");
+    const li = document.createElement("li");
+    li.textContent = `${nowStr} 気温:${air}℃ 水温:${water}℃ WBGT:${wbgt}`;
+    if(dangerItems.length>0) li.classList.add("danger-value");
+    document.getElementById("historyList").prepend(li);
 
-// 履歴追加（値が変わったときだけ）
-function addHistory(name,value,dangerItems){
-  const last = lastValues[name];
-  if(last === value) return; // 変化がなければ追加しない
-  const nowStr = new Date().toLocaleString("ja-JP");
-  const li = document.createElement("li");
-  li.textContent = `${nowStr} ${name}: ${value} ℃`;
-  if(dangerItems.includes(name.toLowerCase())) li.classList.add("danger-value","blinking");
-  document.getElementById("historyList").prepend(li);
+    // localStorage保存
+    const hist = JSON.parse(localStorage.getItem("poolHistory") || "[]");
+    hist.unshift({time: nowStr, air, water, wbgt, danger: dangerItems.length>0});
+    localStorage.setItem("poolHistory", JSON.stringify(hist));
 
-  // localStorageに保存
-  let hist = JSON.parse(localStorage.getItem("poolHistory") || "[]");
-  hist.unshift({time: nowStr, name:name, value:value, danger:dangerItems.includes(name.toLowerCase())});
-  localStorage.setItem("poolHistory", JSON.stringify(hist));
-
-  lastValues[name] = value;
+    lastValues.air = air;
+    lastValues.water = water;
+    lastValues.wbgt = wbgt;
+  }
 }
 
 // 履歴復元
-function loadHistory() {
+function loadHistory(){
   const hist = JSON.parse(localStorage.getItem("poolHistory") || "[]");
   const ul = document.getElementById("historyList");
   ul.innerHTML = "";
   hist.forEach(item=>{
     const li = document.createElement("li");
-    li.textContent = `${item.time} ${item.name}: ${item.value} ℃`;
-    if(item.danger) li.classList.add("danger-value","blinking");
+    li.textContent = `${item.time} 気温:${item.air}℃ 水温:${item.water}℃ WBGT:${item.wbgt}`;
+    if(item.danger) li.classList.add("danger-value");
     ul.appendChild(li);
 
-    // 前回値を保持
-    if(item.name === "気温") lastValues.air = item.value;
-    if(item.name === "水温") lastValues.water = item.value;
-    if(item.name === "WBGT") lastValues.wbgt = item.value;
+    lastValues.air = item.air;
+    lastValues.water = item.water;
+    lastValues.wbgt = item.wbgt;
   });
 }
 
-// 判定表示
-function showResult() {
+// 判定結果表示
+function showResult(){
   const elems = {
     air: document.getElementById("airTemp"),
     water: document.getElementById("waterTemp"),
     wbgt: document.getElementById("wbgt")
   };
-
-  // 表示更新（コード書き込み時刻を最終更新として表示）
-  elems.air.textContent = airTemperature + " ℃";
-  document.getElementById("airUpdate").textContent = "最終更新: " + codeUpdatedTime;
-  elems.water.textContent = waterTemperature + " ℃";
-  document.getElementById("waterUpdate").textContent = "最終更新: " + codeUpdatedTime;
-  elems.wbgt.textContent = wbgtValue + " ℃";
-  document.getElementById("wbgtUpdate").textContent = "最終更新: " + codeUpdatedTime;
+  elems.air.textContent = airTemperature+" ℃";
+  elems.water.textContent = waterTemperature+" ℃";
+  elems.wbgt.textContent = wbgtValue+" ℃";
+  document.getElementById("airUpdate").textContent = "最終更新: "+codeUpdatedTime;
+  document.getElementById("waterUpdate").textContent = "最終更新: "+codeUpdatedTime;
+  document.getElementById("wbgtUpdate").textContent = "最終更新: "+codeUpdatedTime;
 
   const result = judgeSwimming(airTemperature, waterTemperature, wbgtValue);
-
   const judgeElem = document.getElementById("judge");
   judgeElem.textContent = result.text;
   judgeElem.className = "result " + (result.safe ? "safe" : "danger");
-
   document.getElementById("detail").textContent = result.detail;
 
-  // 危険項目だけ赤点滅
-  ["air","water","wbgt"].forEach(key=>{
-    const elem = elems[key];
+  // 個別赤点滅
+  ["air","water","wbgt"].forEach(k=>{
+    const elem = elems[k];
     elem.classList.remove("danger-value","blinking");
-    if(result.dangerItems.includes(key)) elem.classList.add("danger-value","blinking");
+    if(result.dangerItems.includes(k)) elem.classList.add("danger-value","blinking");
   });
 
-  // 履歴追加
-  addHistory("気温",airTemperature,result.dangerItems);
-  addHistory("水温",waterTemperature,result.dangerItems);
-  addHistory("WBGT",wbgtValue,result.dangerItems);
+  addHistory(airTemperature, waterTemperature, wbgtValue, result.dangerItems);
 }
 
 // ===== サイクル処理 =====
-showPending();
 loadHistory();
-setTimeout(showResult,2000);
-setInterval(showResult,30000);
+showResult();
+setInterval(showResult, 30000);
 </script>
 </body>
 </html>
