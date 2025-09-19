@@ -77,8 +77,6 @@
 const airTemperature = 22.4;
 const waterTemperature = 25.5;
 const wbgtValue = 20.2;
-
-// 最終更新時刻（コード書き込み時間）
 const codeUpdatedTime = "2025/09/19 19:27:00";
 
 // 前回の値保持
@@ -92,7 +90,7 @@ function judgeSwimming(air, water, wbgt) {
   return {text:"✅ 安全", safe:true, detail:"条件は問題ありません。", dangerItems:[]};
 }
 
-// 判定中表示（読み込み時のみ）
+// 判定中表示（読み込み時のみ、1秒点滅）
 function showPending() {
   ["airTemp","waterTemp","wbgt"].forEach(id=>{
     const elem = document.getElementById(id);
@@ -104,6 +102,8 @@ function showPending() {
   judgeElem.className="result blinking";
   document.getElementById("detail").textContent="データ取得中です...";
   ["airUpdate","waterUpdate","wbgtUpdate"].forEach(id=>document.getElementById(id).textContent="最終更新: --");
+
+  setTimeout(showResult,1000); // 1秒後に判定結果表示
 }
 
 // 履歴追加（いずれかの値が変わった場合のみ、1行で、最大10件）
@@ -120,13 +120,10 @@ function addHistory(air, water, wbgt, dangerItems){
 
   let hist = JSON.parse(localStorage.getItem("poolHistory")||"[]");
   hist.unshift({text:li.textContent, danger:dangerItems.length>0, values:{air, water, wbgt}});
-
-  // 最新10件までに制限
-  hist = hist.slice(0,10);
-  while(ul.children.length > 10) ul.removeChild(ul.lastChild);
+  hist = hist.slice(0,10); // 最新10件まで
+  while(ul.children.length>10) ul.removeChild(ul.lastChild);
 
   localStorage.setItem("poolHistory", JSON.stringify(hist));
-
   lastValues.air = air;
   lastValues.water = water;
   lastValues.wbgt = wbgt;
@@ -182,10 +179,9 @@ function showResult() {
 }
 
 // ===== サイクル処理 =====
-showPending();
-loadHistory();
-setTimeout(showResult,2000);
-setInterval(showResult,2000);
+showPending();  // ページ読み込み時に判定中表示
+loadHistory();  // 履歴復元
+setInterval(showResult,30000); // 30秒ごとに自動更新
 </script>
 </body>
 </html>
