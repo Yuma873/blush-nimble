@@ -77,8 +77,8 @@
 </head>
 <body>
   <div class="notice">
-    📢 お知らせ: 温度が低くなっています。こまめに情報を確認してください。<br>
-    稼働時間: 8:00~20:00、不定期更新(約1時間おき)、日曜欠測
+    📢 お知らせ:ただいまの時間、欠測データがあります。 <br>
+    <b>稼働時間:</b> 平日,土曜 8:00~20:00不定期更新、欠測あり
   </div>
 
   <h1>気温監視システム（35.406482,139.340873）</h1>
@@ -111,10 +111,10 @@
 
   <script>
     // ===== データ入力（変更可） =====
-    const airTemperature = "欠測";         // 例: 23.4 または "欠測"
+    const airTemperature = "23.0";         // 例: 23.4 または "欠測"
     const waterTemperature = "欠測";       // 例: 25.0 または "欠測"
-    const wbgtValue = 23.0;                // 例: NaN または "欠測"
-    const codeUpdatedTime = "2025/09/20 15:00:00";
+    const wbgtValue = "欠測";                // 例: NaN または "欠測"
+    const codeUpdatedTime = "-";
 
     // 前回の値保持
     let lastValues = {air: null, water: null, wbgt: null};
