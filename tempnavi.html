@@ -75,7 +75,7 @@
 <script>
 // ===== データ入力（コード更新時に変更） =====
 const airTemperature = 23.4;
-const waterTemperature = 欠測;
+const waterTemperature = "欠測";  // 修正: 欠測を文字列に
 const wbgtValue = 23.0;
 const codeUpdatedTime = "2025/09/20 15:00:00";
 
@@ -84,11 +84,48 @@ let lastValues = {air:null, water:null, wbgt:null};
 
 // 判定関数
 function judgeSwimming(air, water, wbgt) {
-  if (water <= 20) return {text:"🚫 危険", safe:false, detail:"水温が規定に満ちていません。利用不可です。", dangerItems:["water"]};
-    if (water = 欠測) return {text:"❓️ 不明", safe:false, detail:"測定不能時間です。", dangerItems:["water"]};
-  if (air+water <= 50) return {text:"🚫 危険", safe:false, detail:"気温・水温が規定に満ちていません。利用を避けてください。", dangerItems:["air","water"]};
-  if (wbgt >= 35) return {text:"⚠ 厳重注意", safe:false, detail:"熱中症リスクが極めて高いです。", dangerItems:["wbgt"]};
-  return {text:"✅ 安全", safe:true, detail:"条件は問題ありません。", dangerItems:[]};
+  if (water === "欠測" || isNaN(water)) {
+    return {
+      text: "❓️ 不明",
+      safe: false,
+      detail: "水温データが取得できませんでした。",
+      dangerItems: ["water"]
+    };
+  }
+
+  if (water <= 20) {
+    return {
+      text: "🚫 危険",
+      safe: false,
+      detail: "水温が規定に満ちていません。利用不可です。",
+      dangerItems: ["water"]
+    };
+  }
+
+  if (air + water <= 50) {
+    return {
+      text: "🚫 危険",
+      safe: false,
+      detail: "気温・水温が規定に満ちていません。利用を避けてください。",
+      dangerItems: ["air", "water"]
+    };
+  }
+
+  if (wbgt >= 35) {
+    return {
+      text: "⚠ 厳重注意",
+      safe: false,
+      detail: "熱中症リスクが極めて高いです。",
+      dangerItems: ["wbgt"]
+    };
+  }
+
+  return {
+    text: "✅ 安全",
+    safe: true,
+    detail: "条件は問題ありません。",
+    dangerItems: []
+  };
 }
 
 // 判定中表示（読み込み時のみ、1秒点滅）
@@ -107,7 +144,7 @@ function showPending() {
   setTimeout(showResult,1000); // 1秒後に判定結果表示
 }
 
-<!-- 履歴追加（いずれかの値が変わった場合のみ、1行で、最大10件） -->
+// 履歴追加（いずれかの値が変わった場合のみ、1行で、最大10件）
 function addHistory(air, water, wbgt, dangerItems){
   if(air===lastValues.air && water===lastValues.water && wbgt===lastValues.wbgt) return;
 
@@ -145,7 +182,6 @@ function loadHistory(){
   });
 }
 
-
 // 判定結果表示
 function showResult() {
   const elems = {
@@ -156,8 +192,10 @@ function showResult() {
 
   elems.air.textContent = airTemperature + " ℃";
   document.getElementById("airUpdate").textContent = "最終更新: " + codeUpdatedTime;
-  elems.water.textContent = waterTemperature + " ℃";
+
+  elems.water.textContent = (waterTemperature === "欠測" ? "欠測" : waterTemperature + " ℃");
   document.getElementById("waterUpdate").textContent = "最終更新: " + codeUpdatedTime;
+
   elems.wbgt.textContent = wbgtValue + " ℃";
   document.getElementById("wbgtUpdate").textContent = "最終更新: " + codeUpdatedTime;
 
