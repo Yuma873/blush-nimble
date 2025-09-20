@@ -74,9 +74,9 @@
 
 <script>
 // ===== データ入力（コード更新時に変更） =====
-const airTemperature = 24.2;
-const waterTemperature = 27.0;
-const wbgtValue = 23.5;
+const airTemperature = 23.4;
+const waterTemperature = 欠測;
+const wbgtValue = 23.0;
 const codeUpdatedTime = "2025/09/20 15:00:00";
 
 // 前回の値保持
@@ -85,6 +85,7 @@ let lastValues = {air:null, water:null, wbgt:null};
 // 判定関数
 function judgeSwimming(air, water, wbgt) {
   if (water <= 20) return {text:"🚫 危険", safe:false, detail:"水温が規定に満ちていません。利用不可です。", dangerItems:["water"]};
+    if (water = 欠測) return {text:"❓️ 不明", safe:false, detail:"測定不能時間です。", dangerItems:["water"]};
   if (air+water <= 50) return {text:"🚫 危険", safe:false, detail:"気温・水温が規定に満ちていません。利用を避けてください。", dangerItems:["air","water"]};
   if (wbgt >= 35) return {text:"⚠ 厳重注意", safe:false, detail:"熱中症リスクが極めて高いです。", dangerItems:["wbgt"]};
   return {text:"✅ 安全", safe:true, detail:"条件は問題ありません。", dangerItems:[]};
