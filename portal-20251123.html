@@ -13,22 +13,22 @@
       background-color: #f5f5f5;
       display: flex;
       min-height: 100vh;
-      overflow: hidden;
+      /* overflow: hidden; ← これがスクロール妨げてたので削除 */
     }
 
-    /* ===== 左ナビ（ポータル共通） ===== */
+    /* ===== 左ナビ（統一・調整） ===== */
     nav {
-      width: 220px;
+      width: 200px; /* 少し細く */
       background-color: #2c3e50;
       color: white;
-      padding: 10px;
+      padding: 8px;
       box-sizing: border-box;
       position: fixed;
       top: 0;
       left: 0;
       height: 100vh;
       overflow-y: auto;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      box-shadow: 2px 0 6px rgba(0,0,0,0.25);
       z-index: 1000;
       display: flex;
       flex-direction: column;
@@ -38,7 +38,7 @@
     nav video {
       width: 100%;
       border-radius: 5px;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
 
     nav a {
@@ -47,11 +47,12 @@
       text-align: center;
       color: white;
       text-decoration: none;
-      padding: 12px;
-      margin: 8px 0;
+      padding: 9px;
+      margin: 5px 0; /* 間隔を少し狭く */
       background-color: #34495e;
-      border-radius: 6px;
-      transition: background-color 0.3s;
+      border-radius: 5px;
+      font-size: 0.9em;
+      transition: background-color 0.25s;
     }
 
     nav a:hover {
@@ -60,32 +61,34 @@
 
     nav img {
       display: block;
-      margin: 8px auto;
+      margin: 6px auto;
       border-radius: 6px;
+      max-width: 120px;
     }
 
     /* ===== メイン ===== */
     main {
       flex: 1;
-      padding: 30px;
-      margin-left: 240px;
-      overflow-y: auto;
+      padding: 25px;
+      margin-left: 210px; /* nav幅と揃える */
+      overflow-y: auto; /* ✅ 右側だけスクロールできる */
       box-sizing: border-box;
+      height: 100vh;
     }
 
     header h1 {
-      font-size: 1.4em;
+      font-size: 1.3em;
       color: #2c3e50;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       text-align: center;
     }
 
     .section-card {
       background: white;
-      padding: 20px;
-      margin-bottom: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 18px;
+      margin-bottom: 22px;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     }
 
     .section-card h2 {
@@ -93,21 +96,23 @@
       color: #1abc9c;
       border-bottom: 2px solid #1abc9c;
       padding-bottom: 5px;
+      font-size: 1.1em;
     }
 
-    .checklist li { margin: 5px 0; line-height: 1.5; }
+    .checklist li { margin: 4px 0; line-height: 1.4; font-size: 0.95em; }
     .checklist li.essential { color: #e74c3c; font-weight: bold; }
     .checklist li.optional { color: #f39c12; }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 8px;
+      font-size: 0.95em;
     }
 
     table th, table td {
       border: 1px solid #ddd;
-      padding: 8px;
+      padding: 6px;
       text-align: center;
     }
 
@@ -124,10 +129,11 @@
       display: inline-block;
       background-color: #1abc9c;
       color: white;
-      padding: 10px 20px;
-      border-radius: 6px;
+      padding: 8px 16px;
+      border-radius: 5px;
       text-decoration: none;
-      margin: 10px 0;
+      margin-top: 6px;
+      font-size: 0.95em;
     }
 
     .button-link:hover {
@@ -136,33 +142,34 @@
 
     footer {
       text-align: center;
-      padding: 15px;
+      padding: 12px;
       background-color: #2c3e50;
       color: white;
       margin-top: 20px;
+      font-size: 0.9em;
     }
 
-    /* ===== スマホ対応（トップ共通） ===== */
+    /* ===== スマホ対応 ===== */
     @media(max-width: 768px) {
-      body { flex-direction: column; overflow: auto; }
+      body { flex-direction: column; }
       nav {
         position: relative;
         width: 100%;
         height: auto;
         box-shadow: none;
-        display: flex;
         flex-wrap: wrap;
         justify-content: space-around;
       }
       nav a {
-        flex: 1 1 40%;
-        margin: 5px;
-        font-size: 0.9em;
+        flex: 1 1 45%;
+        margin: 4px;
+        font-size: 0.85em;
       }
       nav video { display: none; }
       main {
         margin-left: 0;
         padding: 15px;
+        height: auto;
       }
     }
   </style>
@@ -170,7 +177,7 @@
 
 <body>
 
-<!-- ===== 左ナビ（完全統一） ===== -->
+<!-- ===== 左ナビ ===== -->
 <nav>
   <video id="randomVideo" autoplay muted loop playsinline></video>
 
@@ -182,28 +189,29 @@
   <a href="portal-20251123.html">🏆 次回大会 特設ページ(11/23)</a>
 
   <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
-    <img src="botan.png" alt="プール開館情報" width="120">
+    <img src="botan.png" alt="プール開館情報">
   </a>
 
   <a href="https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001" target="_blank">
-    <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
+    <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約">
   </a>
 
   <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
 
   <a href="https://yuma873.github.io/blush-nimble/index.html"
-     style="display: inline-block; padding: 10px 20px; background-color: #f44336;
-            color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 8px;">
+     style="display:inline-block;padding:8px 16px;background-color:#f44336;
+            color:white;text-decoration:none;border-radius:5px;font-weight:bold;margin-top:5px;">
      🚪ログアウト
   </a>
 </nav>
 
-<!-- ===== メイン ===== -->
+<!-- ===== メインコンテンツ ===== -->
 <main>
   <header>
     <h1>11/23 湘南スイムミート 特設ページ</h1>
   </header>
 
+  <!-- 以下はそのまま（省略せず完全動作） -->
   <section class="section-card">
     <h2>大会情報</h2>
     <p>📅 <strong>日付：</strong>2025年11月23日（日）</p>
@@ -235,7 +243,7 @@
       </thead>
       <tbody>
         <tr><td>-</td><td>集合（略市内で）</td></tr>
-        <tr><td></td><td>引率: <span style="border: 1px solid black; border-radius: 50%; padding: 5px;">未</span></td></tr>
+        <tr><td></td><td>引率: <span style="border:1px solid black;border-radius:50%;padding:5px;">未</span></td></tr>
         <tr><td>8:45</td><td>開場</td></tr>
         <tr><td>10:30</td><td>競技開始</td></tr>
         <tr><td>17:00</td><td>終了予定</td></tr>
@@ -295,15 +303,14 @@
   </section>
 </main>
 
-<!-- ===== ランダム動画 ===== -->
 <script>
   const videos = [
-    "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
-    "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
-    "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
+    "video1.mp4","video2.mp4","video3.mp4","video5.mp4",
+    "V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4",
+    "V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"
   ];
-  const randomVideo = videos[Math.floor(Math.random() * videos.length)];
-  document.getElementById("randomVideo").src = randomVideo;
+  document.getElementById("randomVideo").src =
+    videos[Math.floor(Math.random() * videos.length)];
 </script>
 
 </body>
