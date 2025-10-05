@@ -13,12 +13,12 @@
       background-color: #f5f5f5;
       display: flex;
       min-height: 100vh;
-      /* overflow: hidden; ← これがスクロール妨げてたので削除 */
+      overflow: hidden;
     }
 
-    /* ===== 左ナビ（統一・調整） ===== */
+    /* ===== 左ナビ（トップと完全一致） ===== */
     nav {
-      width: 200px; /* 少し細く */
+      width: 220px;
       background-color: #2c3e50;
       color: white;
       padding: 8px;
@@ -28,7 +28,7 @@
       left: 0;
       height: 100vh;
       overflow-y: auto;
-      box-shadow: 2px 0 6px rgba(0,0,0,0.25);
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
       z-index: 1000;
       display: flex;
       flex-direction: column;
@@ -38,7 +38,7 @@
     nav video {
       width: 100%;
       border-radius: 5px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     nav a {
@@ -47,48 +47,45 @@
       text-align: center;
       color: white;
       text-decoration: none;
-      padding: 9px;
-      margin: 5px 0; /* 間隔を少し狭く */
+      padding: 10px;
+      margin: 5px 0;
       background-color: #34495e;
-      border-radius: 5px;
-      font-size: 0.9em;
-      transition: background-color 0.25s;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+      font-size: 0.95em;
     }
 
-    nav a:hover {
-      background-color: #1abc9c;
-    }
+    nav a:hover { background-color: #1abc9c; }
 
     nav img {
       display: block;
-      margin: 6px auto;
+      margin: 5px auto;
       border-radius: 6px;
-      max-width: 120px;
     }
 
-    /* ===== メイン ===== */
+    /* ===== main ===== */
     main {
       flex: 1;
-      padding: 25px;
-      margin-left: 210px; /* nav幅と揃える */
-      overflow-y: auto; /* ✅ 右側だけスクロールできる */
+      padding: 30px;
+      margin-left: 240px;
+      overflow-y: auto;      /* ← スクロールを有効化 */
+      height: 100vh;         /* ← 高さ固定でスクロール */
       box-sizing: border-box;
-      height: 100vh;
     }
 
     header h1 {
-      font-size: 1.3em;
+      font-size: 1.4em;
       color: #2c3e50;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       text-align: center;
     }
 
     .section-card {
       background: white;
-      padding: 18px;
-      margin-bottom: 22px;
-      border-radius: 10px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
     .section-card h2 {
@@ -96,23 +93,21 @@
       color: #1abc9c;
       border-bottom: 2px solid #1abc9c;
       padding-bottom: 5px;
-      font-size: 1.1em;
     }
 
-    .checklist li { margin: 4px 0; line-height: 1.4; font-size: 0.95em; }
+    .checklist li { margin: 5px 0; line-height: 1.5; }
     .checklist li.essential { color: #e74c3c; font-weight: bold; }
     .checklist li.optional { color: #f39c12; }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 8px;
-      font-size: 0.95em;
+      margin-top: 10px;
     }
 
     table th, table td {
       border: 1px solid #ddd;
-      padding: 6px;
+      padding: 8px;
       text-align: center;
     }
 
@@ -129,47 +124,45 @@
       display: inline-block;
       background-color: #1abc9c;
       color: white;
-      padding: 8px 16px;
-      border-radius: 5px;
+      padding: 10px 20px;
+      border-radius: 6px;
       text-decoration: none;
-      margin-top: 6px;
-      font-size: 0.95em;
+      margin: 10px 0;
     }
 
-    .button-link:hover {
-      background-color: #16a085;
-    }
+    .button-link:hover { background-color: #16a085; }
 
     footer {
       text-align: center;
-      padding: 12px;
+      padding: 15px;
       background-color: #2c3e50;
       color: white;
       margin-top: 20px;
-      font-size: 0.9em;
     }
 
-    /* ===== スマホ対応 ===== */
+    /* ===== スマホ対応（トップ共通） ===== */
     @media(max-width: 768px) {
-      body { flex-direction: column; }
+      body { flex-direction: column; overflow: auto; }
       nav {
         position: relative;
         width: 100%;
         height: auto;
         box-shadow: none;
+        display: flex;
         flex-wrap: wrap;
         justify-content: space-around;
       }
       nav a {
-        flex: 1 1 45%;
-        margin: 4px;
-        font-size: 0.85em;
+        flex: 1 1 40%;
+        margin: 5px;
+        font-size: 0.9em;
       }
       nav video { display: none; }
       main {
         margin-left: 0;
         padding: 15px;
         height: auto;
+        overflow-y: visible;
       }
     }
   </style>
@@ -189,29 +182,26 @@
   <a href="portal-20251123.html">🏆 次回大会 特設ページ(11/23)</a>
 
   <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
-    <img src="botan.png" alt="プール開館情報">
+    <img src="botan.png" alt="プール開館情報" width="120">
   </a>
 
   <a href="https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001" target="_blank">
-    <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約">
+    <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
   </a>
 
   <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
 
   <a href="https://yuma873.github.io/blush-nimble/index.html"
-     style="display:inline-block;padding:8px 16px;background-color:#f44336;
-            color:white;text-decoration:none;border-radius:5px;font-weight:bold;margin-top:5px;">
+     style="display:inline-block;padding:10px 20px;background-color:#f44336;
+            color:white;text-decoration:none;border-radius:5px;font-weight:bold;margin-top:8px;">
      🚪ログアウト
   </a>
 </nav>
 
-<!-- ===== メインコンテンツ ===== -->
+<!-- ===== メイン ===== -->
 <main>
-  <header>
-    <h1>11/23 湘南スイムミート 特設ページ</h1>
-  </header>
+  <header><h1>11/23 湘南スイムミート 特設ページ</h1></header>
 
-  <!-- 以下はそのまま（省略せず完全動作） -->
   <section class="section-card">
     <h2>大会情報</h2>
     <p>📅 <strong>日付：</strong>2025年11月23日（日）</p>
@@ -303,6 +293,7 @@
   </section>
 </main>
 
+<!-- 🎥 ランダム動画 -->
 <script>
   const videos = [
     "video1.mp4","video2.mp4","video3.mp4","video5.mp4",
@@ -312,6 +303,5 @@
   document.getElementById("randomVideo").src =
     videos[Math.floor(Math.random() * videos.length)];
 </script>
-
 </body>
 </html>
