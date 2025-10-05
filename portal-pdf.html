@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ポータルサイト - PDFプレビュー</title>
-      <link rel="shortcut icon" href="favicon4.png" type="image/png">
+  <link rel="shortcut icon" href="favicon4.png" type="image/png">
 
   <style>
     body {
@@ -16,23 +16,43 @@
       overflow: hidden;
     }
 
+    /* ===== 左ナビ固定・動画付き ===== */
     nav {
-      width: 220px;
+      width: 230px;
       background-color: #2c3e50;
       color: white;
       padding: 10px;
       box-sizing: border-box;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    nav video {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 10px;
     }
 
     nav a {
       display: block;
+      width: 100%;
       color: white;
       text-decoration: none;
+      text-align: center;
       padding: 12px;
-      margin: 8px 0;
+      margin: 6px 0;
       background-color: #34495e;
       border-radius: 6px;
       transition: background-color 0.3s;
+      box-sizing: border-box;
     }
 
     nav a:hover {
@@ -40,26 +60,27 @@
     }
 
     nav img {
-      width: 100%;
-      border-radius: 5px;
-      margin-bottom: 10px;
+      display: block;
+      width: 120px;
+      border-radius: 6px;
+      margin: 8px auto;
     }
 
     main {
       flex: 1;
-      padding: 20px 30px 70px;
+      padding: 25px 40px 80px;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
       overflow-y: auto;
+      margin-left: 250px;
     }
 
     .pdf-viewer-section {
       background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-      max-width: 1000px;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
       width: 100%;
       margin: 0 auto;
       flex-grow: 1;
@@ -68,11 +89,11 @@
     }
 
     .pdf-viewer-section header {
-      font-size: 1.5em;
-      margin-bottom: 20px;
+      font-size: 1.6em;
+      margin-bottom: 25px;
       color: #34495e;
       border-bottom: 2px solid #1abc9c;
-      padding-bottom: 8px;
+      padding-bottom: 10px;
     }
 
     select {
@@ -89,7 +110,6 @@
       border: 1px solid #ddd;
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
       height: 80vh;
       margin-bottom: 10px;
     }
@@ -136,31 +156,65 @@
     }
 
     @keyframes tickerScroll {
-      from {
-        transform: translateX(0%);
+      from { transform: translateX(0%); }
+      to { transform: translateX(-100%); }
+    }
+
+    /* ===== スマホ対応 ===== */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+        overflow: visible;
       }
-      to {
-        transform: translateX(-100%);
+
+      nav {
+        position: relative;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      nav video {
+        width: 100%;
+        max-width: 400px;
+        margin: 5px auto;
+      }
+
+      main {
+        margin-left: 0;
+        padding: 15px;
       }
     }
   </style>
 </head>
 <body>
   <nav>
-    <img
-      src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
-      alt="メニュー画像"
-    />
+    <video id="randomVideo" autoplay muted loop playsinline></video>
+
     <a href="portal.html">🏠 トップ</a>
     <a href="portal-news.html">📰 お知らせ</a>
     <a href="portal-tool.html">🛠 ツール</a>
-    <a href="portal-renraku.html">📢 連絡</a>
-    <a href="portal-umekomi.html">🧰水泳関連 ツールポータル</a>
-    <a href="portal-tenki.html">⛅️今後の天気【プール練の参考に】</a>
+    <a href="portal-renraku.html">📢 掲示板連絡</a>
     <a href="portal-pdf.html">📁ファイル一覧</a>
-        <a href="portal-form.html">📝 アンケート</a>
+    <a href="portal-form.html">📝 アンケート</a>
+    <a href="portal-20251123.html">🏆次回大会 特設ページ(11/23)</a>
 
-    <a href="https://yuma873.github.io/blush-nimble/index.html" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">🚪ログアウト</a>
+    <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
+      <img src="botan.png" alt="プール開館情報" width="120">
+    </a>
+
+    <a href="https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001" target="_blank">
+      <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
+    </a>
+
+    <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
+
+    <a href="https://yuma873.github.io/blush-nimble/index.html"
+      style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">
+      🚪ログアウト
+    </a>
   </nav>
 
   <main>
@@ -168,43 +222,51 @@
       <header>📄 資料プレビュー</header>
       <label for="pdfSelector">表示するPDFを選択:</label>
       <select id="pdfSelector">
-
-      <option value="https://www.dropbox.com/scl/fi/bhuwts84oxd5du665vklq/25.pdf?rlkey=3cr9ayurxtaw7t8lfixbsef4j&st=o7goa4ul&raw=1">【後期】県新人</option>
-<option value="https://www.dropbox.com/scl/fi/9aas17qnc47q27i9lee02/25.pdf?rlkey=m2t5x8qxtnidu74u58se1rc8u&st=mo2eqcxu&raw=1">【後期】北相新人</option>
-<option value="https://www.dropbox.com/scl/fi/shf20aexsc86hm6vppug1/25.pdf?rlkey=japddjdetqcs1qdc17ziysr40&st=lquqmhic&raw=1">【後期】北相地区大会</option>
-<option value="https://www.dropbox.com/scl/fi/75pj97jyi13dkddtbcuyj/25.pdf?rlkey=9my8wdltnjpogtezgn89b86dr&st=7lmhf559&raw=1">【後期】県総体</option>
-<option value="https://www.dropbox.com/scl/fi/8isg5hhbrf558rtnaoj81/25.pdf?rlkey=0tqfh9j7bdb17rh08sdzbqjl8&st=46xzijaw&raw=1">【後期】夏季記録会</option>
-<option value="https://www.dropbox.com/scl/fi/096dvcuvs8onp4048av8f/25.pdf?rlkey=9bqz7sairnhnfr3ur2qoveodl&st=d5z3ww52&raw=1">【後期】春季記録会</option>
-<option value="https://www.dropbox.com/scl/fi/y4ipmttxg5ix793ykwoe7/0923.pdf?rlkey=c9e45pm0vz32lncft5k7pihg0&st=4klpdrnr&raw=1">0923要項</option>
-<option value="https://www.dropbox.com/scl/fi/t1akzrkjk008b89bgvwlm/21-2025.pdf?rlkey=xf85b9o66ufgivj6is4qduddz&st=ztn77fzl&raw=1">0923結果</option>
-<option value="https://www.dropbox.com/scl/fi/b9qhflvmeavtpozo8s0j2/11-2025.pdf?rlkey=qm3kyxbztmy6g51360s5opsa6&st=pp2wuqsw&raw=1">09232次要項</option>
-<option value="https://www.dropbox.com/scl/fi/g6epj1d4uer1jr7xhk145/0802.pdf?rlkey=wrhb85cojynnern7mh3vxtay5&st=hgxre7za&raw=1">0802中ブロック要項</option>
-<option value="https://www.dropbox.com/scl/fi/zix8sp45rgkeexjyge5km/20250805100036.pdf?rlkey=4cdail7druhxyhay4y99ni2v6&st=2gcpmi9r&raw=1">0802結果</option>
-<option value="https://www.dropbox.com/scl/fi/ik09wzysaiu0bcujsronx/0727-scan.pdf?rlkey=68kdo8muc2k27b5kvk0xn82pt&st=0dr89pf8&raw=1">0727結果</option>
-<option value="https://www.dropbox.com/scl/fi/jvl91qoqtvunf8gwbewzz/0712.pdf?rlkey=e5g4qrbulvt0ty91a7mp4nt1g&st=fczrt2as&raw=1">0712結果</option>
-
+        <option value="https://www.dropbox.com/scl/fi/bhuwts84oxd5du665vklq/25.pdf?raw=1">【後期】県新人</option>
+        <option value="https://www.dropbox.com/scl/fi/9aas17qnc47q27i9lee02/25.pdf?raw=1">【後期】北相新人</option>
+        <option value="https://www.dropbox.com/scl/fi/shf20aexsc86hm6vppug1/25.pdf?raw=1">【後期】北相地区大会</option>
+        <option value="https://www.dropbox.com/scl/fi/75pj97jyi13dkddtbcuyj/25.pdf?raw=1">【後期】県総体</option>
+        <option value="https://www.dropbox.com/scl/fi/8isg5hhbrf558rtnaoj81/25.pdf?raw=1">【後期】夏季記録会</option>
+        <option value="https://www.dropbox.com/scl/fi/096dvcuvs8onp4048av8f/25.pdf?raw=1">【後期】春季記録会</option>
       </select>
 
       <div class="iframe-container">
-        <iframe id="pdfViewer" src="https://www.dropbox.com/scl/fi/4w6qhzk6kjaiaforh2tty/.pdf?rlkey=6zxelc2fxye1uof2p8t35h3u5&st=9yzfd4jt&raw=1"></iframe>
+        <iframe id="pdfViewer" src="https://www.dropbox.com/scl/fi/bhuwts84oxd5du665vklq/25.pdf?raw=1"></iframe>
       </div>
 
       <p class="fallback-link">
-        表示されない場合は <a id="openInNewTab" href="https://www.dropbox.com/scl/fi/4w6qhzk6kjaiaforh2tty/.pdf?rlkey=6zxelc2fxye1uof2p8t35h3u5&st=9yzfd4jt&raw=1" target="_blank" rel="noopener">こちら</a> をクリックして開いてください。
+        表示されない場合は
+        <a id="openInNewTab" href="https://www.dropbox.com/scl/fi/bhuwts84oxd5du665vklq/25.pdf?raw=1" target="_blank" rel="noopener">
+          こちら
+        </a> をクリックして開いてください。
       </p>
-          <div style="text-align: right; margin-top: 10px;">
-  <a href="portal-pdf-chrome.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
-    Chrome等を利用の場合で、ファイル内部が表示されない方 ▶
-  </a>
 
+      <div style="text-align: right; margin-top: 10px;">
+        <a href="portal-pdf-chrome.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
+          Chrome等を利用の場合で、ファイル内部が表示されない方 ▶
+        </a>
+      </div>
     </section>
   </main>
 
   <div class="ticker-wrap">
-    <div class="ticker">PDF VIEWER等の拡張機能を利用している場合は、<b><u>開くことができない場合があります。</u></b>拡張機能を利用していない状態で閲覧するか、選択したうえで新しいタブで開いてください。</div>
+    <div class="ticker">
+      PDF VIEWER等の拡張機能を利用している場合は、<b><u>開くことができない場合があります。</u></b>
+      拡張機能を利用していない状態で閲覧するか、新しいタブで開いてください。
+    </div>
   </div>
 
   <script>
+    // ===== ランダム動画 =====
+    const videos = [
+      "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
+      "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
+      "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
+    ];
+    const randomIndex = Math.floor(Math.random() * videos.length);
+    document.getElementById("randomVideo").src = videos[randomIndex];
+
+    // ===== PDF切り替え =====
     const pdfSelector = document.getElementById('pdfSelector');
     const pdfViewer = document.getElementById('pdfViewer');
     const openInNewTab = document.getElementById('openInNewTab');
