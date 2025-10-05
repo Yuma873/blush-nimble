@@ -1,188 +1,284 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ポータルサイト - お知らせ</title>
-        <link rel="shortcut icon" href="favicon2.png" type="image/png">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ポータルサイト - お知らせ</title>
+  <link rel="shortcut icon" href="favicon2.png" type="image/png" />
 
-    <style>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===== 左ナビ ===== */
+    nav {
+      width: 240px;
+      background-color: #2c3e50;
+      color: white;
+      padding: 15px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+      box-sizing: border-box;
+    }
+
+    nav video {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+
+    nav a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 12px;
+      margin: 6px 0;
+      background-color: #34495e;
+      border-radius: 6px;
+      text-align: center;
+      transition: 0.3s;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      background-color: #1abc9c;
+    }
+
+    nav img {
+      display: block;
+      margin: 8px auto;
+      border-radius: 6px;
+    }
+
+    /* ===== メイン部分 ===== */
+    main {
+      flex: 1;
+      padding: 30px;
+      margin-left: 260px;
+      box-sizing: border-box;
+    }
+
+    header {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      color: #2c3e50;
+      font-weight: bold;
+    }
+
+    section {
+      margin-bottom: 40px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    ul {
+      list-style: disc;
+      padding-left: 25px;
+      line-height: 1.7;
+      font-size: 1.05em;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .update-time {
+      font-size: 0.9em;
+      color: #777;
+      text-align: right;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #1abc9c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #16a085;
+    }
+
+    /* ===== カウントダウン ===== */
+    #countdown-list li strong {
+      font-weight: bold;
+    }
+
+    /* ===== スクロールテロップ ===== */
+    .ticker-wrap {
+      width: 100%;
+      overflow: hidden;
+      background-color: #2c3e50;
+      color: white;
+      padding: 8px 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      z-index: 9999;
+    }
+
+    .ticker {
+      display: inline-block;
+      white-space: nowrap;
+      animation: tickerScroll 25s linear infinite;
+      padding-left: 100%;
+    }
+
+    @keyframes tickerScroll {
+      from { transform: translateX(0%); }
+      to { transform: translateX(-100%); }
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    /* ===== スマホ対応 ===== */
+    @media(max-width: 768px) {
       body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        display: flex;
-        background-color: #f5f5f5;
+        flex-direction: column;
       }
+
       nav {
-        width: 220px;
-        background-color: #2c3e50;
-        color: white;
-        padding: 10px;
-        min-height: 100vh;
-      }
-      nav a {
-        display: block;
-        color: white;
-        text-decoration: none;
-        padding: 12px;
-        margin: 8px 0;
-        background-color: #34495e;
-        border-radius: 6px;
-        transition: background-color 0.3s;
-      }
-      nav a:hover {
-        background-color: #1abc9c;
-      }
-      main {
-        flex: 1;
-        padding: 30px;
-      }
-      header {
-        font-size: 1.8em;
-        margin-bottom: 15px;
-        color: #2c3e50;
-      }
-      section {
-        margin-bottom: 40px;
-      }
-      ul {
-        list-style: disc;
-        padding-left: 20px;
-      }
-      .update-time {
-        font-size: 0.9em;
-        color: #888;
-      }
-    </style>
-  </head>
-  <body>
-    <nav>
-      <img
-        src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
-        alt="メニュー画像"
-        style="width: 100%; border-radius: 5px; margin-bottom: 10px"
-      />
-      <a href="portal.html">🏠 トップ</a>
-      <a href="portal-news.html">📰 お知らせ</a>
-      <a href="portal-tool.html">🛠 ツール</a>
-      <a href="portal-renraku.html">📢 連絡</a>
-      <a href="portal-umekomi.html">🧰水泳関連 ツールポータル</a>
-      <a href="portal-tenki.html">⛅️今後の天気【プール練の参考に】</a>
-      <a href="portal-pdf.html">📁ファイル一覧</a>
-          <a href="portal-form.html">📝 アンケート</a>
-
-      <a href="https://yuma873.github.io/blush-nimble/index.html" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">🚪ログアウト</a>
-
-    </nav>
-    <main>
-      <section>
-        <header>📰 最新のお知らせ</header>
-        <ul>
-          <li>2025/9/21 - 【重要】プール予約システムの導入を行います。明日以降、プール利用の際には電話等ではなくトップページメニューにある予約ボタンからお願い致します。
-          <li>2025/8/17 - 夏休み明け1回目or2回目でAVGやります</li>
-          <li>2025/7/23 - 夏休み中の学校練習のスクールバスは、平塚[7:50]愛甲[8:10]。帰りのバスは[11:30]。</li>
-          <li>2025/04/15 - 新年度のスケジュールを公開しました　。</li>
-        </ul>
-      </section>
-
-      <section>
-        <header>📢 大会関連情報</header>
-        <ul>
-           <li>
-            2025/08/24 -
-            <strong>選手権大会</strong>の申込みは、9/1までです。600円を添えて、提出をお願いします。出場種目などに関しては<p><a href="portal-20250923.html" target="_blank">こちら</a></p>をご確認ください。
-          </li>
-        </ul>
-      </section>
-
-      <!-- カウントダウン追加部分 -->
-      <section>
-        <header>⏳ 大会カウントダウン(2025年の日程で2026年度版を登録済み)</header>
-        <ul id="countdown-list"></ul>
-      </section>
-
-      <section class="update-time">最終更新: 2025/8/15 8:17.22</section>
-      <button
-        onclick="location.href='portal.html'"
-        style="
-          padding: 10px 20px;
-          font-size: 1em;
-          background-color: #1abc9c;
-          color: white;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-        "
-      >
-        ポータルトップへ戻る
-      </button>
-    </main>
-
-    <!-- JavaScriptを追加 -->
-    <script>
-      const events = [
-        { name: "春季記録会(24-25)", date: "2026-05-24" },
-        { name: "夏季記録会", date: "2026-06-15" },
-        { name: "県高校総体(20-22)", date: "2026-06-20" },
-        { name: "北相地区大会", date: "2026-07-28" },
-        { name: "北相地区新人", date: "2026-09-13" },
-        { name: "県新人(27-28)", date: "2026-09-27" },
-        
-      ];
-
-      const today = new Date();
-      const list = document.getElementById("countdown-list");
-
-      events.forEach((e) => {
-        const d = Math.ceil((new Date(e.date) - today) / (1000 * 60 * 60 * 24));
-        let c = "#666";
-        if (d <= 7) c = "red";
-        else if (d <= 30) c = "orange";
-        else if (d <= 50) c = "goldenrod";
-
-        const li = document.createElement("li");
-        if (d > 60) {
-          li.innerHTML = `<span style="color:#aaa; font-size:0.9em;">${e.name}：あと ${d}日</span>`;
-        } else {
-          li.innerHTML = `${e.name}：あと <strong style="color:${c}">${d}日</strong>`;
-        }
-        list.appendChild(li);
-      });
-    </script>
-    <div class="ticker-wrap">
-      <div class="ticker">
-        <span>🚨 大会に向けて調整を進めましょう ／ 📢 目指せ高校総体進出 </span>
-      </div>
-    </div>
-
-    <style>
-      .ticker-wrap {
         width: 100%;
-        overflow: hidden;
-        background-color: #2c3e50;
-        color: white;
-        padding: 8px 0;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        z-index: 9999;
+        height: auto;
+        position: relative;
       }
 
-      .ticker {
-        display: inline-block;
-        white-space: nowrap;
-        animation: tickerScroll 25s linear infinite;
-        padding-left: 100%;
+      main {
+        margin-left: 0;
+        padding: 15px;
       }
+    }
+  </style>
+</head>
 
-      @keyframes tickerScroll {
-        from {
-          transform: translateX(0%);
-        }
-        to {
-          transform: translateX(-100%);
-        }
+<body>
+
+  <!-- ===== 左ナビ（トップと完全同じ構成） ===== -->
+  <nav>
+    <video id="randomVideo" autoplay muted loop playsinline></video>
+
+    <a href="portal.html">🏠 トップ</a>
+    <a href="portal-news.html">📰 お知らせ</a>
+    <a href="portal-tool.html">🛠 ツール</a>
+    <a href="portal-renraku.html">📢 掲示板連絡</a>
+    <a href="portal-pdf.html">📁 ファイル一覧</a>
+    <a href="portal-20251123.html">🏆 次回大会 特設ページ(11/23)</a>
+
+    <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
+      <img src="botan.png" alt="プール開館情報" width="120">
+    </a>
+
+    <a href="https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001" target="_blank">
+      <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
+    </a>
+
+    <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
+
+    <a href="https://yuma873.github.io/blush-nimble/index.html"
+       style="display:inline-block; padding:10px 20px; background-color:#f44336; color:white; text-decoration:none; border-radius:5px; font-weight:bold;">
+      🚪 ログアウト
+    </a>
+  </nav>
+
+  <!-- ===== メインコンテンツ ===== -->
+  <main>
+    <section>
+      <header>📰 最新のお知らせ</header>
+      <ul>
+        <li>2025/9/21 - 【重要】プール予約システム導入完了。以後、予約はトップページの予約ボタンから行ってください。</li>
+        <li>2025/8/17 - 夏休み明け1回目or2回目でAVGを実施します。</li>
+        <li>2025/7/23 - 夏休み中の学校練習のスクールバス：平塚7:50／愛甲8:10。帰りは11:30発。</li>
+        <li>2025/04/15 - 新年度スケジュールを公開しました。</li>
+      </ul>
+    </section>
+
+    <section>
+      <header>📢 大会関連情報</header>
+      <ul>
+        <li>2025/08/24 - <strong>選手権大会</strong>の申込みは9/1まで。600円を添えて提出。出場種目等は
+          <a href="portal-20250923.html" target="_blank">こちら</a>をご確認ください。
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <header>⏳ 大会カウントダウン (2025年日程／2026年度版登録済み)</header>
+      <ul id="countdown-list"></ul>
+    </section>
+
+    <section class="update-time">最終更新: 2025/8/15 8:17.22</section>
+
+    <button onclick="location.href='portal.html'">ポータルトップへ戻る</button>
+  </main>
+
+  <!-- 🎬 ランダム動画スクリプト -->
+  <script>
+    const videos = [
+      "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
+      "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
+      "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
+    ];
+    const randomVideo = videos[Math.floor(Math.random() * videos.length)];
+    document.getElementById("randomVideo").src = randomVideo;
+  </script>
+
+  <!-- 🕒 カウントダウンスクリプト -->
+  <script>
+    const events = [
+      { name: "春季記録会(24-25)", date: "2026-05-24" },
+      { name: "夏季記録会", date: "2026-06-15" },
+      { name: "県高校総体(20-22)", date: "2026-06-20" },
+      { name: "北相地区大会", date: "2026-07-28" },
+      { name: "北相地区新人", date: "2026-09-13" },
+      { name: "県新人(27-28)", date: "2026-09-27" }
+    ];
+
+    const today = new Date();
+    const list = document.getElementById("countdown-list");
+
+    events.forEach((e) => {
+      const d = Math.ceil((new Date(e.date) - today) / (1000 * 60 * 60 * 24));
+      let c = "#666";
+      if (d <= 7) c = "red";
+      else if (d <= 30) c = "orange";
+      else if (d <= 50) c = "goldenrod";
+
+      const li = document.createElement("li");
+      if (d > 60) {
+        li.innerHTML = `<span style="color:#aaa; font-size:0.9em;">${e.name}：あと ${d}日</span>`;
+      } else {
+        li.innerHTML = `${e.name}：あと <strong style="color:${c}">${d}日</strong>`;
       }
-    </style>
-  </body>
+      list.appendChild(li);
+    });
+  </script>
+
+  <!-- 📰 テロップ -->
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span>🚨 大会に向けて調整を進めましょう ／ 📢 目指せ高校総体進出 ／ 🏊 日々の練習を大切に！</span>
+    </div>
+  </div>
+
+</body>
 </html>
