@@ -295,17 +295,6 @@ window.PushCodeInit = function() {
           src="https://calendar.google.com/calendar/embed?src=mk79b6tlc7iif9of4d5vblbjckvjbjel%40import.calendar.google.com&ctz=Asia%2FTokyo"
         ></iframe>
       </section>
-<section>
-  <header>遠隔監視システム for pool </header>
-  <iframe
-    src="https://yuma873.github.io/blush-nimble/tempnavi.html"
-    width="100%"
-    height="600"
-    style="border: 1px solid #ccc; margin-top: 10px;"
-    title="ナビゲーション"
-    loading="lazy"
-  ></iframe>
-</section>
 
 <section>
   <header
@@ -363,10 +352,7 @@ window.PushCodeInit = function() {
       ></iframe>
     </section>
 
-  <section>
-  <h2>🚨 神奈川県 緊急情報</h2>
-  <ul id="kanagawa-rss"></ul>
-</section>
+
 
 <script>
 async function loadKanagawaRSS() {
@@ -746,6 +732,7 @@ loadKanagawaRSS();
       </script>
 
       <div class="video-list">
+        <li>プロモーションビデオ - 定期更新</li>
     <video controls>
       <source src="video1.mp4" type="video/mp4">
     </video>
@@ -838,7 +825,7 @@ loadKanagawaRSS();
   // 1分ごとに通知
   function startNotificationLoop() {
     showNotification(); // 最初に1回表示
-    setInterval(showNotification, 60000); // 60000ms = 1分ごと
+    setInterval(showNotification, 100000); // 60000ms = 1分ごと
   }
 
   // 通知を表示
