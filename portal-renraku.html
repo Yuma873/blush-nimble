@@ -16,60 +16,48 @@
       overflow: hidden;
     }
 
-    /* ===== 左ナビ ===== */
+    /* ===== 左ナビ（トップと同じ） ===== */
     nav {
-      width: 240px;
+      width: 220px;                 /* トップと同じ */
       background-color: #2c3e50;
       color: white;
       padding: 10px;
       box-sizing: border-box;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       position: fixed;
       top: 0;
       left: 0;
-      height: 100%;
+      height: 100vh;
       overflow-y: auto;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
       z-index: 1000;
     }
 
     nav video {
       width: 100%;
-      border-radius: 8px;
+      border-radius: 5px;
       margin-bottom: 10px;
     }
 
     nav a {
       display: block;
-      width: 100%;
       color: white;
       text-decoration: none;
       padding: 12px;
-      margin: 6px 0;
+      margin: 8px 0;
       background-color: #34495e;
       border-radius: 6px;
-      text-align: center;
       transition: background-color 0.3s;
+      text-align: left;
     }
+    nav a:hover { background-color: #1abc9c; }
 
-    nav a:hover {
-      background-color: #1abc9c;
-    }
+    nav img { display: block; margin: 8px auto; }
 
-    nav img {
-      display: block;
-      width: 120px;
-      border-radius: 6px;
-      margin: 8px 0;
-    }
-
-    /* ===== メインエリア ===== */
+    /* ===== main ===== */
     main {
       flex: 1;
       padding: 30px;
-      margin-left: 260px;
+      margin-left: 240px; /* nav幅(220) + 20px余白 = 240 に合わせる（トップと同じ） */
       overflow-y: auto;
     }
 
@@ -90,10 +78,7 @@
       border-bottom: 1px solid #ddd;
       padding: 10px 0;
     }
-
-    .board-item:last-child {
-      border-bottom: none;
-    }
+    .board-item:last-child { border-bottom: none; }
 
     .board-item .date {
       color: #888;
@@ -118,12 +103,9 @@
       margin-top: 20px;
       transition: background-color 0.3s;
     }
+    button:hover { background-color: #16a085; }
 
-    button:hover {
-      background-color: #16a085;
-    }
-
-    /* ===== テロップ ===== */
+    /* ===== 下テロップ ===== */
     .ticker-wrap {
       width: 100%;
       overflow: hidden;
@@ -135,76 +117,63 @@
       left: 0;
       z-index: 9999;
     }
-
     .ticker {
       display: inline-block;
       white-space: nowrap;
       animation: tickerScroll 25s linear infinite;
       padding-left: 100%;
     }
-
     @keyframes tickerScroll {
-      from { transform: translateX(0%); }
-      to { transform: translateX(-100%); }
+      from { transform: translateX(0%); } to { transform: translateX(-100%); }
     }
 
-    /* ===== スマホ対応 ===== */
-    @media (max-width: 768px) {
+    /* ===== スマホ対応（トップと同じ挙動） ===== */
+    @media (max-width: 600px) {
+      body { flex-direction: column; }
       nav {
         position: relative;
         width: 100%;
         height: auto;
-        flex-direction: row;
+        box-shadow: none;
+        display: flex;
         flex-wrap: wrap;
-        justify-content: center;
+        justify-content: space-around;
       }
-
-      nav video {
-        display: none;
-      }
-
-      nav a {
-        flex: 1 1 40%;
-        margin: 4px;
-        font-size: 0.9em;
-      }
-
-      main {
-        margin-left: 0;
-        padding: 15px;
-      }
+      nav a { flex: 1 1 40%; margin: 5px; text-align: center; }
+      main { margin-left: 0; padding: 20px; }
+      nav video { display: none; } /* スマホでは動画非表示（トップと同じ） */
     }
   </style>
 </head>
 
 <body>
   <nav>
-    <!-- 🎬 ランダム動画 -->
+    <!-- ランダム動画（トップと同じ） -->
     <video id="randomVideo" autoplay muted loop playsinline></video>
 
-    <!-- 🏠 メニュー -->
+    <!-- メニュー（順番・内容はトップと完全一致） -->
     <a href="portal.html">🏠 トップ</a>
     <a href="portal-news.html">📰 お知らせ</a>
     <a href="portal-tool.html">🛠 ツール</a>
     <a href="portal-renraku.html">📢 掲示板連絡</a>
-    <a href="portal-pdf.html">📁 ファイル一覧</a>
-    <a href="portal-20251123.html">🏆 次回大会 特設ページ(11/23)</a>
+    <a href="portal-pdf.html">📁ファイル一覧</a>
+    <a href="portal-20251123.html">🏆次回大会 特設ページ(11/23)</a>
 
-    <!-- 📅 予約リンク類 -->
+    <!-- プール開館情報（画像リンク） -->
     <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
-      <img src="botan.png" alt="プール開館情報">
+      <img src="botan.png" alt="プール開館情報" width="120">
     </a>
+
+    <!-- プール予約（画像リンク） -->
     <a href="https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001" target="_blank">
-      <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約">
+      <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
     </a>
 
-    <!-- その他リンク -->
     <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
-    <a href="portal-form.html">📝 アンケート</a>
 
-    <!-- 🚪 ログアウト -->
-    <a href="https://yuma873.github.io/blush-nimble/index.html" 
-      style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">
+    <!-- ログアウト（トップと同じ見た目） -->
+    <a href="https://yuma873.github.io/blush-nimble/index.html"
+      style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 8px;">
       🚪ログアウト
     </a>
   </nav>
@@ -279,7 +248,7 @@
     </div>
   </div>
 
-  <!-- 🎥 ランダム動画スクリプト -->
+  <!-- 🎥 ランダム動画スクリプト（トップと同じ） -->
   <script>
     const videos = [
       "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
