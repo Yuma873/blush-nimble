@@ -13,28 +13,31 @@
       background-color: #f5f5f5;
       display: flex;
       min-height: 100vh;
+      overflow: hidden;
     }
 
-    /* ===== 左ナビ固定 ===== */
+    /* ===== 左ナビ（ポータル共通） ===== */
     nav {
-      width: 240px;
+      width: 220px;
       background-color: #2c3e50;
       color: white;
       padding: 10px;
-      min-height: 100vh;
       box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       position: fixed;
       top: 0;
       left: 0;
+      height: 100vh;
       overflow-y: auto;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     nav video {
       width: 100%;
-      border-radius: 8px;
+      border-radius: 5px;
       margin-bottom: 10px;
     }
 
@@ -45,7 +48,7 @@
       color: white;
       text-decoration: none;
       padding: 12px;
-      margin: 6px 0;
+      margin: 8px 0;
       background-color: #34495e;
       border-radius: 6px;
       transition: background-color 0.3s;
@@ -57,15 +60,17 @@
 
     nav img {
       display: block;
-      margin: 0 auto 8px auto;
+      margin: 8px auto;
       border-radius: 6px;
     }
 
-    /* ===== メインエリア ===== */
+    /* ===== メイン ===== */
     main {
       flex: 1;
       padding: 30px;
-      margin-left: 260px;
+      margin-left: 240px;
+      overflow-y: auto;
+      box-sizing: border-box;
     }
 
     header h1 {
@@ -137,19 +142,20 @@
       margin-top: 20px;
     }
 
-    /* ===== スマホ対応 ===== */
+    /* ===== スマホ対応（トップ共通） ===== */
     @media(max-width: 768px) {
-      body { flex-direction: column; }
+      body { flex-direction: column; overflow: auto; }
       nav {
         position: relative;
         width: 100%;
-        min-height: auto;
-        flex-direction: row;
+        height: auto;
+        box-shadow: none;
+        display: flex;
         flex-wrap: wrap;
-        justify-content: center;
+        justify-content: space-around;
       }
       nav a {
-        width: 45%;
+        flex: 1 1 40%;
         margin: 5px;
         font-size: 0.9em;
       }
@@ -164,7 +170,7 @@
 
 <body>
 
-<!-- ===== 左ナビ（トップページと完全同じ） ===== -->
+<!-- ===== 左ナビ（完全統一） ===== -->
 <nav>
   <video id="randomVideo" autoplay muted loop playsinline></video>
 
@@ -187,8 +193,8 @@
 
   <a href="https://yuma873.github.io/blush-nimble/index.html"
      style="display: inline-block; padding: 10px 20px; background-color: #f44336;
-            color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
-     🚪 ログアウト
+            color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 8px;">
+     🚪ログアウト
   </a>
 </nav>
 
@@ -201,7 +207,7 @@
   <section class="section-card">
     <h2>大会情報</h2>
     <p>📅 <strong>日付：</strong>2025年11月23日（日）</p>
-    <p>📍 <strong>場所：</strong>平塚総合公園温水プール(短)</p>
+    <p>📍 <strong>場所：</strong>平塚総合公園温水プール（短水路）</p>
     <p>⏰ <strong>集合時間・場所：</strong>未定</p>
     <p>🎯 <strong>対象：</strong>全年齢</p>
     <p>🏢 <strong>主催：</strong>平塚水泳協会　平塚市　平塚市教育委員会　平塚市スポーツ協会</p>
@@ -216,8 +222,8 @@
       <li>🏊 25/50/100m 平泳ぎ</li>
       <li>🏊 25/50/100m 自由形</li>
       <li>🏊 100m 個人メドレー</li>
-      <li>🏊 4×50m メドレーリレー(男・女・混合)</li>
-      <li>🏊 4×50m フリーリレー(男・女・混合)</li>
+      <li>🏊 4×50m メドレーリレー（男・女・混合）</li>
+      <li>🏊 4×50m フリーリレー（男・女・混合）</li>
     </ul>
   </section>
 
@@ -228,8 +234,8 @@
         <tr><th>時間</th><th>内容</th></tr>
       </thead>
       <tbody>
-        <tr><td>-</td><td>集合</td></tr>
-        <tr><td></td><td>引率:<span style="border: 1px solid black; border-radius: 50%; padding: 5px;">未</span></td></tr>
+        <tr><td>-</td><td>集合（略市内で）</td></tr>
+        <tr><td></td><td>引率: <span style="border: 1px solid black; border-radius: 50%; padding: 5px;">未</span></td></tr>
         <tr><td>8:45</td><td>開場</td></tr>
         <tr><td>10:30</td><td>競技開始</td></tr>
         <tr><td>17:00</td><td>終了予定</td></tr>
@@ -246,7 +252,7 @@
     <h2>アクセス</h2>
     <p>📍 平塚総合公園温水プール</p>
     <p>住所：平塚市大原1-1</p>
-    <p>🚃 電車：ＪＲ東海道本線 「平塚駅」 徒歩30分</p>
+    <p>🚃 電車：ＪＲ東海道本線「平塚駅」徒歩30分</p>
     <p>🚌 バス：神奈川中央交通 平塚駅・伊勢原駅から「共済病院前・総合公園西」徒歩3分</p>
   </section>
 
@@ -275,30 +281,28 @@
 
     <h3>注意事項</h3>
     <ul>
-      <li>1名2種目以上3種目以下(リレーを除く)</li>
-      <li>男女別、種目別のタイム決勝</li>
-      <li>リレー種目は、各チーム、男女混合各年齢区分1チーム。複数チーム参加する場合はA、B、C...とチーム名末尾にアルファベットを記入</li>
-      <li>混合リレー種目は、男女各2名でのチーム編成</li>
+      <li>1名2種目以上3種目以下（リレーを除く）</li>
+      <li>男女別・種目別のタイム決勝</li>
+      <li>リレー種目はチーム名末尾にA・B・Cを記入</li>
+      <li>混合リレーは男女各2名で構成</li>
       <li>個人種目(1種目) 1,000円</li>
     </ul>
   </section>
 
   <section class="section-card">
     <h2>備考</h2>
-    <p>Classroomに要項を掲載済みです。10/13までに入力、10/16までに参加費の支払いを行ってください。</p>
+    <p>Classroomに要項を掲載済みです。10/13までに入力、10/16までに参加費を支払ってください。</p>
   </section>
-
 </main>
 
-<!-- ===== ランダム動画スクリプト ===== -->
+<!-- ===== ランダム動画 ===== -->
 <script>
   const videos = [
     "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
     "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
     "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
   ];
-  const randomIndex = Math.floor(Math.random() * videos.length);
-  const randomVideo = videos[randomIndex];
+  const randomVideo = videos[Math.floor(Math.random() * videos.length)];
   document.getElementById("randomVideo").src = randomVideo;
 </script>
 
