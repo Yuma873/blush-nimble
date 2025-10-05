@@ -1,144 +1,233 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ポータルサイト - その他ツール埋め込み</title>
-        <link rel="shortcut icon" href="https://github-production-user-asset-6210df.s3.amazonaws.com/190838393/482406787-c0dc2a13-c5be-4828-ba6d-32942060e22a.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250826%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250826T231916Z&X-Amz-Expires=300&X-Amz-Signature=ed1361c6d5bc256577817bc11b01a74986731930ceaee1f4a5e9589d1067fa91&X-Amz-SignedHeaders=host" type="image/png">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ポータルサイト - 天気埋め込み</title>
+  <link rel="shortcut icon" href="favicon4.png" type="image/png">
 
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        display: flex;
-        background-color: #f5f5f5;
-        height: 100vh;
-        overflow: hidden;
-      }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      background-color: #f5f5f5;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ===== 左ナビ固定 ===== */
+    nav {
+      width: 240px;
+      background-color: #2c3e50;
+      color: white;
+      padding: 10px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+
+    nav video {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    nav a {
+      display: block;
+      width: 100%;
+      color: white;
+      text-decoration: none;
+      padding: 12px;
+      margin: 6px 0;
+      background-color: #34495e;
+      border-radius: 6px;
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+
+    nav a:hover {
+      background-color: #1abc9c;
+    }
+
+    nav img {
+      display: block;
+      width: 120px;
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+
+    /* ===== メインエリア ===== */
+    main {
+      flex: 1;
+      padding: 30px;
+      margin-left: 260px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    header {
+      font-size: 1.8em;
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+
+    .iframe-container {
+      width: 100%;
+      height: 75vh;
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #1abc9c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #16a085;
+    }
+
+    /* ===== テロップ ===== */
+    .ticker-wrap {
+      width: 100%;
+      overflow: hidden;
+      background-color: #2c3e50;
+      color: white;
+      padding: 8px 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      z-index: 9999;
+    }
+
+    .ticker {
+      display: inline-block;
+      white-space: nowrap;
+      animation: tickerScroll 25s linear infinite;
+      padding-left: 100%;
+    }
+
+    @keyframes tickerScroll {
+      from { transform: translateX(0%); }
+      to { transform: translateX(-100%); }
+    }
+
+    /* ===== スマホ対応 ===== */
+    @media (max-width: 768px) {
       nav {
-        width: 220px;
-        background-color: #2c3e50;
-        color: white;
-        padding: 10px;
-        min-height: 100vh;
-        box-sizing: border-box;
+        position: relative;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
       }
+
+      nav video {
+        display: none;
+      }
+
       nav a {
-        display: block;
-        color: white;
-        text-decoration: none;
-        padding: 12px;
-        margin: 8px 0;
-        background-color: #34495e;
-        border-radius: 6px;
-        transition: background-color 0.3s;
+        flex: 1 1 40%;
+        margin: 4px;
+        font-size: 0.9em;
       }
-      nav a:hover {
-        background-color: #1abc9c;
-      }
+
       main {
-        flex: 1;
-        padding: 10px 10px 60px; /* 下に固定フッターの余白 */
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
+        margin-left: 0;
+        padding: 15px;
       }
-      header {
-        font-size: 1.8em;
-        margin-bottom: 15px;
-        color: #2c3e50;
-      }
+
       .iframe-container {
-        flex: 1;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+        height: 65vh;
       }
-      iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-      }
-      button {
-        margin-top: 15px;
-        padding: 10px 20px;
-        font-size: 1em;
-        background-color: #1abc9c;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        align-self: flex-start;
-      }
+    }
+  </style>
+</head>
 
-      .ticker-wrap {
-        width: 100%;
-        overflow: hidden;
-        background-color: #2c3e50;
-        color: white;
-        padding: 8px 0;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        z-index: 9999;
-      }
+<body>
+  <nav>
+    <!-- 🎬 ランダム動画 -->
+    <video id="randomVideo" autoplay muted loop playsinline></video>
 
-      .ticker {
-        display: inline-block;
-        white-space: nowrap;
-        animation: tickerScroll 25s linear infinite;
-        padding-left: 100%;
-      }
+    <!-- 🏠 メニュー -->
+    <a href="portal.html">🏠 トップ</a>
+    <a href="portal-news.html">📰 お知らせ</a>
+    <a href="portal-tool.html">🛠 ツール</a>
+    <a href="portal-renraku.html">📢 掲示板連絡</a>
+    <a href="portal-pdf.html">📁 ファイル一覧</a>
+    <a href="portal-20251123.html">🏆 次回大会 特設ページ(11/23)</a>
 
-      @keyframes tickerScroll {
-        from {
-          transform: translateX(0%);
-        }
-        to {
-          transform: translateX(-100%);
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <nav>
-      <img
-        src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
-        alt="メニュー画像"
-        style="width: 100%; border-radius: 5px; margin-bottom: 10px"
-      />
-      <a href="portal.html">🏠 トップ</a>
-      <a href="portal-news.html">📰 お知らせ</a>
-      <a href="portal-tool.html">🛠 ツール</a>
-      <a href="portal-renraku.html">📢 掲示板連絡</a>
-      <a href="portal-umekomi.html">🧰水泳関連 ツールポータル</a>
-      <a href="portal-tenki.html">⛅️今後の天気【プール練の参考に】</a>
-      <a href="portal-pdf.html">📁ファイル一覧</a>
-          <a href="portal-form.html">📝 アンケート</a>
+    <!-- 📅 予約ボタン -->
+    <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
+      <img src="botan.png" alt="プール開館情報">
+    </a>
+    <a href="https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001" target="_blank">
+      <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約">
+    </a>
 
-      <a href="https://yuma873.github.io/blush-nimble/index.html" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">🚪ログアウト</a>
+    <!-- その他 -->
+    <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
+    <a href="portal-form.html">📝 アンケート</a>
 
-    </nav>
-    <main>
-      <header>🛠 天気埋め込み</header>
-      <div class="iframe-container">
-        <iframe
-          src="https://www.toshin.com/weather/member/detail?id=62462"
-          loading="lazy"
-          title="weather"
-        ></iframe>
-      </div>
-      <button onclick="location.href='portal.html'">トップへ戻る</button>
-    </main>
+    <!-- 🚪 ログアウト -->
+    <a href="https://yuma873.github.io/blush-nimble/index.html"
+       style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">
+      🚪ログアウト
+    </a>
+  </nav>
 
-    <div class="ticker-wrap">
-      <div class="ticker">
-        <span
-          >🚨 このページは全国学校のお天気ページを埋め込んでいます ／ 📢
-          トップへ戻るには上のボタンをクリックしてください</span
-        >
-      </div>
+  <main>
+    <header>⛅️ 今後の天気（プール練の参考に）</header>
+    <div class="iframe-container">
+      <iframe
+        src="https://www.toshin.com/weather/member/detail?id=62462"
+        loading="lazy"
+        title="weather">
+      </iframe>
     </div>
-  </body>
+    <button onclick="location.href='portal.html'">ポータルトップへ戻る</button>
+  </main>
+
+  <div class="ticker-wrap">
+    <div class="ticker">
+      ☀️ このページは「全国学校のお天気」ページを埋め込んでいます ／ 📢 トップへ戻るには上のボタンをクリック！
+    </div>
+  </div>
+
+  <!-- 🎥 ランダム動画スクリプト -->
+  <script>
+    const videos = [
+      "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
+      "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
+      "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
+    ];
+    const randomIndex = Math.floor(Math.random() * videos.length);
+    document.getElementById("randomVideo").src = videos[randomIndex];
+  </script>
+</body>
 </html>
