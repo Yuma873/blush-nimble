@@ -13,12 +13,11 @@
       display: flex;
       background-color: #f5f5f5;
       min-height: 100vh;
-      overflow: hidden;
     }
 
     /* ===== 左ナビ（トップと同じ） ===== */
     nav {
-      width: 220px;                 /* トップと同じ */
+      width: 220px;
       background-color: #2c3e50;
       color: white;
       padding: 10px;
@@ -57,8 +56,10 @@
     main {
       flex: 1;
       padding: 30px;
-      margin-left: 240px; /* nav幅(220) + 20px余白 = 240 に合わせる（トップと同じ） */
-      overflow-y: auto;
+      margin-left: 240px; /* nav(220) + 余白20 */
+      overflow-y: auto;   /* ←右側だけスクロール可 */
+      height: 100vh;
+      box-sizing: border-box;
     }
 
     header {
@@ -124,10 +125,11 @@
       padding-left: 100%;
     }
     @keyframes tickerScroll {
-      from { transform: translateX(0%); } to { transform: translateX(-100%); }
+      from { transform: translateX(0%); }
+      to { transform: translateX(-100%); }
     }
 
-    /* ===== スマホ対応（トップと同じ挙動） ===== */
+    /* ===== スマホ対応 ===== */
     @media (max-width: 600px) {
       body { flex-direction: column; }
       nav {
@@ -140,18 +142,16 @@
         justify-content: space-around;
       }
       nav a { flex: 1 1 40%; margin: 5px; text-align: center; }
-      main { margin-left: 0; padding: 20px; }
-      nav video { display: none; } /* スマホでは動画非表示（トップと同じ） */
+      main { margin-left: 0; padding: 20px; height: auto; }
+      nav video { display: none; }
     }
   </style>
 </head>
 
 <body>
   <nav>
-    <!-- ランダム動画（トップと同じ） -->
     <video id="randomVideo" autoplay muted loop playsinline></video>
 
-    <!-- メニュー（順番・内容はトップと完全一致） -->
     <a href="portal.html">🏠 トップ</a>
     <a href="portal-news.html">📰 お知らせ</a>
     <a href="portal-tool.html">🛠 ツール</a>
@@ -159,19 +159,16 @@
     <a href="portal-pdf.html">📁ファイル一覧</a>
     <a href="portal-20251123.html">🏆次回大会 特設ページ(11/23)</a>
 
-    <!-- プール開館情報（画像リンク） -->
     <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
       <img src="botan.png" alt="プール開館情報" width="120">
     </a>
 
-    <!-- プール予約（画像リンク） -->
     <a href="https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001" target="_blank">
       <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
     </a>
 
     <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
 
-    <!-- ログアウト（トップと同じ見た目） -->
     <a href="https://yuma873.github.io/blush-nimble/index.html"
       style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 8px;">
       🚪ログアウト
@@ -248,7 +245,7 @@
     </div>
   </div>
 
-  <!-- 🎥 ランダム動画スクリプト（トップと同じ） -->
+  <!-- 🎥 ランダム動画スクリプト -->
   <script>
     const videos = [
       "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
@@ -257,8 +254,7 @@
     ];
     const randomIndex = Math.floor(Math.random() * videos.length);
     const randomVideo = videos[randomIndex];
-    const videoElement = document.getElementById("randomVideo");
-    videoElement.src = randomVideo;
+    document.getElementById("randomVideo").src = randomVideo;
   </script>
 </body>
 </html>
