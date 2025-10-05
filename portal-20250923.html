@@ -15,15 +15,20 @@
       min-height: 100vh;
     }
 
+    /* === ナビ部分 === */
     nav {
       width: 220px;
       background-color: #2c3e50;
       color: white;
       padding: 10px;
       min-height: 100vh;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
     }
 
-    nav img {
+    nav video {
       width: 100%;
       border-radius: 5px;
       margin-bottom: 10px;
@@ -34,23 +39,25 @@
       color: white;
       text-decoration: none;
       padding: 12px;
-      margin: 8px 0;
+      margin: 6px 0;
       background-color: #34495e;
       border-radius: 6px;
       transition: background-color 0.3s;
+      text-align: center;
     }
 
     nav a:hover {
       background-color: #1abc9c;
     }
 
+    /* === メイン部分 === */
     main {
       flex: 1;
       padding: 30px;
     }
 
     header h1 {
-      font-size: 1.2em;
+      font-size: 1.4em;
       color: #2c3e50;
       margin-bottom: 25px;
       text-align: center;
@@ -132,123 +139,147 @@
 </head>
 <body>
 
-  <!-- 🔽 nav.htmlを読み込み -->
-  <div id="nav-placeholder"></div>
+<!-- ===== ナビゲーション（動画ランダム再生つき） ===== -->
+<nav>
+  <video id="randomVideo" autoplay loop muted playsinline></video>
+
   <script>
-    fetch("nav.html")
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById("nav-placeholder").innerHTML = html;
-      })
-      .catch(error => console.error("nav.htmlの読み込みに失敗しました:", error));
+    // ランダム動画設定
+    const videos = [
+      "video1.mp4","video2.mp4","video3.mp4","video5.mp4",
+      "V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4",
+      "V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"
+    ];
+    const randomVideo = videos[Math.floor(Math.random() * videos.length)];
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("randomVideo").src = randomVideo;
+    });
   </script>
 
-  <main>
-    <header>
-      <h1>9/23 選手権大会 特設ページ</h1>
-    </header>
+  <a href="portal.html">🏠 トップ</a>
+  <a href="portal-news.html">📰 お知らせ</a>
+  <a href="portal-tool.html">🛠 ツール</a>
+  <a href="portal-renraku.html">📢 連絡掲示板</a>
+  <a href="portal-pdf.html">📁 ファイル一覧</a>
+  <a href="portal-20251123.html">🏆 次回大会 特設ページ(11/23)</a>
+  <a href="portal-umekomi.html">🧰 水泳関連ツール</a>
+  <a href="portal-tenki.html">⛅️ 今後の天気</a>
+  <a href="portal-form.html">📝 アンケート</a>
 
-    <!-- 大会情報 -->
-    <section class="section-card">
-      <h2>大会情報</h2>
-      <p>📅 <strong>日付：</strong>2025年9月23日（火）</p>
-      <p>📍 <strong>場所：</strong>NITTANパークおおね（秦野市立おおね公園）</p>
-      <p>⏰ <strong>集合時間・場所：</strong>8:25 プール前</p>
-      <p>🎯 <strong>対象：</strong>前期生（大会は全年齢対象）</p>
-      <p>🏢 <strong>主催：</strong>伊勢原市スポーツ協会　伊勢原市水泳協会</p>
-      <a href="https://www.dropbox.com/scl/fi/y4ipmttxg5ix793ykwoe7/0923.pdf?rlkey=c9e45pm0vz32lncft5k7pihg0&st=dpljjmlg&dl=0" target="_blank" class="button-link">📄 大会要項を見る</a>
-    </section>
+  <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
+    <img src="botan.png" alt="プール開館情報" width="120">
+  </a>
+  <a href="https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001" target="_blank">
+    <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
+  </a>
 
-    <!-- 種目一覧 -->
-    <section class="section-card">
-      <h2>種目一覧</h2>
-      <ul class="checklist">
-        <li>🏊 50m バタフライ</li>
-        <li>🏊 50m 背泳ぎ</li>
-        <li>🏊 50m 平泳ぎ</li>
-        <li>🏊 50m 自由形</li>
-        <li>🏊 100m 個人メドレー</li>
-        <li>🏊 4×25m フリーリレー</li>
-      </ul>
-    </section>
+  <a href="https://yuma873.github.io/blush-nimble/index.html"
+     style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+     🚪 ログアウト
+  </a>
+</nav>
 
-    <!-- タイムスケジュール -->
-    <section class="section-card">
-      <h2>タイムスケジュール</h2>
-      <table>
-        <thead>
-          <tr><th>時間</th><th>内容</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>8:25</td><td>集合</td></tr>
-          <tr><td>8:35~8:45</td><td>会場設営</td></tr>
-          <tr><td>9:20</td><td>選手受付開始</td></tr>
-          <tr><td>9:25</td><td>リレーオーダー記入(9:25提出〆)</td></tr>
-          <tr><td>9:30</td><td>開場</td></tr>
-          <tr><td></td><td>引率:<span style="border: 1px solid black; border-radius: 50%; padding: 5px;">川</span></td></tr>
-          <tr><td>9:50</td><td>W-UP 5,6レーン</td></tr>
-          <tr><td>10:15</td><td>開会式</td></tr>
-          <tr><td>10:20</td><td>競技開始</td></tr>
-          <tr><td>12:30</td><td>終了予定</td></tr>
-        </tbody>
-      </table>
-    </section>
+<!-- ===== メインコンテンツ ===== -->
+<main>
+  <header>
+    <h1>9/23 選手権大会 特設ページ</h1>
+  </header>
 
-    <!-- 結果URL -->
-    <section class="section-card">
-      <h2>結果URL</h2>
-      <a href="https://www.dropbox.com/scl/fi/t1akzrkjk008b89bgvwlm/21-2025.pdf?rlkey=xf85b9o66ufgivj6is4qduddz&st=ztn77fzl&dl=0" target="_blank" class="button-link">📊 結果を見る</a>
-    </section>
+  <section class="section-card">
+    <h2>大会情報</h2>
+    <p>📅 <strong>日付：</strong>2025年9月23日（火）</p>
+    <p>📍 <strong>場所：</strong>NITTANパークおおね（秦野市立おおね公園）</p>
+    <p>⏰ <strong>集合時間・場所：</strong>8:25 プール前</p>
+    <p>🎯 <strong>対象：</strong>前期生（大会は全年齢対象）</p>
+    <p>🏢 <strong>主催：</strong>伊勢原市スポーツ協会　伊勢原市水泳協会</p>
+    <a href="https://www.dropbox.com/scl/fi/y4ipmttxg5ix793ykwoe7/0923.pdf?rlkey=c9e45pm0vz32lncft5k7pihg0&st=dpljjmlg&dl=0"
+       target="_blank" class="button-link">📄 大会要項を見る</a>
+  </section>
 
-    <!-- アクセス -->
-    <section class="section-card">
-      <h2>アクセス</h2>
-      <p>📍 NITTANパークおおね</p>
-      <p>住所：〒257-0007 神奈川県秦野市鶴巻940番地</p>
-      <p>🚃 電車：小田急小田原線『東海大学前駅』下車 徒歩15分</p>
-      <p>🚌 バス：神奈川中央バス 鶴巻温泉駅発 東海大学行『下落幡』下車 徒歩1分</p>
-    </section>
+  <section class="section-card">
+    <h2>種目一覧</h2>
+    <ul class="checklist">
+      <li>🏊 50m バタフライ</li>
+      <li>🏊 50m 背泳ぎ</li>
+      <li>🏊 50m 平泳ぎ</li>
+      <li>🏊 50m 自由形</li>
+      <li>🏊 100m 個人メドレー</li>
+      <li>🏊 4×25m フリーリレー</li>
+    </ul>
+  </section>
 
-    <!-- 持ち物・注意事項 -->
-    <section class="section-card">
-      <h2>持ち物・注意事項</h2>
-      <h3>必須なもの</h3>
-      <ul class="checklist">
-        <li class="essential">✅ サンダル（中用）とサンダル袋</li>
-        <li class="essential">✅ 外靴袋・靴下袋</li>
-        <li class="essential">📝 筆記用具</li>
-        <li class="essential">💧 水着・キャップ・ゴーグル・タオル</li>
-        <li class="essential">👕 濡れてもよいTシャツや短パン（体操着でも可）</li>
-        <li class="essential">🥤 飲み物</li>
-        <li class="essential">💰 交通費や小銭</li>
-      </ul>
+  <section class="section-card">
+    <h2>タイムスケジュール</h2>
+    <table>
+      <thead>
+        <tr><th>時間</th><th>内容</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>8:25</td><td>集合</td></tr>
+        <tr><td>8:35~8:45</td><td>会場設営</td></tr>
+        <tr><td>9:20</td><td>選手受付開始</td></tr>
+        <tr><td>9:25</td><td>リレーオーダー記入(9:25提出〆)</td></tr>
+        <tr><td>9:30</td><td>開場</td></tr>
+        <tr><td></td><td>引率:<span style="border: 1px solid black; border-radius: 50%; padding: 5px;">川</span></td></tr>
+        <tr><td>9:50</td><td>W-UP 5,6レーン</td></tr>
+        <tr><td>10:15</td><td>開会式</td></tr>
+        <tr><td>10:20</td><td>競技開始</td></tr>
+        <tr><td>12:30</td><td>終了予定</td></tr>
+      </tbody>
+    </table>
+  </section>
 
-      <h3>あった方がよいもの</h3>
-      <ul class="checklist">
-        <li class="optional">👜 大きなバッグを入れられるゴミ袋</li>
-        <li class="optional">🗑 小さなゴミ袋</li>
-        <li class="optional">🍙 入場前・退場後の補食</li>
-        <li class="optional">🧊 凍らせた飲み物やゼリー</li>
-        <li class="optional">💧 予備の水着・キャップ・ゴーグル</li>
-        <li class="optional">🧴 セーム（吸水タオル）</li>
-      </ul>
+  <section class="section-card">
+    <h2>結果URL</h2>
+    <a href="https://www.dropbox.com/scl/fi/t1akzrkjk008b89bgvwlm/21-2025.pdf?rlkey=xf85b9o66ufgivj6is4qduddz&st=ztn77fzl&dl=0"
+       target="_blank" class="button-link">📊 結果を見る</a>
+  </section>
 
-      <h3>注意事項</h3>
-      <ul>
-        <li>1名2種目以内(リレーを除く)</li>
-        <li>男女別、種目別のタイム決勝</li>
-        <li>各区分1位〜3位に賞状授与</li>
-        <li>個人種目1種目600円(参加賞込み)</li>
-        <li>9月6日以降、二次要項をHPにてお知らせ</li>
-      </ul>
-    </section>
+  <section class="section-card">
+    <h2>アクセス</h2>
+    <p>📍 NITTANパークおおね</p>
+    <p>住所：〒257-0007 神奈川県秦野市鶴巻940番地</p>
+    <p>🚃 電車：小田急小田原線『東海大学前駅』下車 徒歩15分</p>
+    <p>🚌 バス：神奈川中央バス 鶴巻温泉駅発 東海大学行『下落幡』下車 徒歩1分</p>
+  </section>
 
-    <!-- 備考 -->
-    <section class="section-card">
-      <h2>備考</h2>
-      <p><b><u>この大会は終了しました。</u></b></p>
-    </section>
-  </main>
+  <section class="section-card">
+    <h2>持ち物・注意事項</h2>
+    <h3>必須なもの</h3>
+    <ul class="checklist">
+      <li class="essential">✅ サンダル（中用）とサンダル袋</li>
+      <li class="essential">✅ 外靴袋・靴下袋</li>
+      <li class="essential">📝 筆記用具</li>
+      <li class="essential">💧 水着・キャップ・ゴーグル・タオル</li>
+      <li class="essential">👕 濡れてもよいTシャツや短パン</li>
+      <li class="essential">🥤 飲み物</li>
+      <li class="essential">💰 交通費や小銭</li>
+    </ul>
 
+    <h3>あった方がよいもの</h3>
+    <ul class="checklist">
+      <li class="optional">👜 大きなバッグを入れられるゴミ袋</li>
+      <li class="optional">🗑 小さなゴミ袋</li>
+      <li class="optional">🍙 入場前・退場後の補食</li>
+      <li class="optional">🧊 凍らせた飲み物やゼリー</li>
+      <li class="optional">💧 予備の水着・キャップ・ゴーグル</li>
+      <li class="optional">🧴 セーム（吸水タオル）</li>
+    </ul>
+
+    <h3>注意事項</h3>
+    <ul>
+      <li>1名2種目以内(リレーを除く)</li>
+      <li>男女別、種目別のタイム決勝</li>
+      <li>各区分1位〜3位に賞状授与</li>
+      <li>個人種目1種目600円(参加賞込み)</li>
+      <li>9月6日以降、二次要項をHPにてお知らせ</li>
+    </ul>
+  </section>
+
+  <section class="section-card">
+    <h2>備考</h2>
+    <p><b><u>この大会は終了しました。</u></b></p>
+  </section>
+</main>
 </body>
 </html>
