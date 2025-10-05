@@ -160,11 +160,35 @@ window.PushCodeInit = function() {
   </head>
   <body>
     <nav>
-      <img
-        src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
-        alt="メニュー画像"
-        style="width: 100%; border-radius: 5px; margin-bottom: 10px"
-      />
+    
+      
+      
+      <video
+  id="randomVideo"
+  autoplay
+  loop
+  muted
+  playsinline
+  style="width: 100%; border-radius: 5px; margin-bottom: 10px;"
+></video>
+
+<script>
+  // 動画ファイル名のリスト
+  const videos = [
+    "video1.mp4", "video2.mp4", "video3.mp4",  "video5.mp4",
+    "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
+    "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
+  ];
+
+  // ランダムに1つ選ぶ
+  const randomIndex = Math.floor(Math.random() * videos.length);
+  const randomVideo = videos[randomIndex];
+
+  // <video>タグに反映
+  const videoElement = document.getElementById("randomVideo");
+  videoElement.src = randomVideo;
+</script>
+
       <a href="portal-news.html">📰 お知らせ</a>
       <a href="portal-tool.html">🛠 ツール</a>
       <a href="portal-pdf.html">📁ファイル一覧</a>
