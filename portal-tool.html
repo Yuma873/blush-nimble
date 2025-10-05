@@ -2,9 +2,9 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ポータルサイト - ツール</title>
-        <link rel="shortcut icon" href="favicon2.png" type="image/png">
+    <link rel="shortcut icon" href="favicon2.png" type="image/png">
 
     <style>
       body {
@@ -12,15 +12,30 @@
         margin: 0;
         display: flex;
         background-color: #f5f5f5;
+        height: 100vh;
+        overflow: hidden;
       }
+
+      /* 左ナビ */
       nav {
-        width: 220px;
+        width: 230px;
         background-color: #2c3e50;
         color: white;
         padding: 10px;
         min-height: 100vh;
         box-sizing: border-box;
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow-y: auto;
       }
+
+      nav video {
+        width: 100%;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+
       nav a {
         display: block;
         color: white;
@@ -30,27 +45,36 @@
         background-color: #34495e;
         border-radius: 6px;
         transition: background-color 0.3s;
+        text-align: center;
       }
+
       nav a:hover {
         background-color: #1abc9c;
       }
+
       main {
         flex: 1;
         padding: 30px;
+        margin-left: 230px;
         box-sizing: border-box;
+        height: 100vh;
+        overflow-y: auto;
       }
+
       header {
         font-size: 1.8em;
         margin-bottom: 15px;
         color: #2c3e50;
       }
+
       details {
         background: #fff;
         margin-bottom: 20px;
         padding: 15px 20px;
         border-radius: 8px;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
       }
+
       summary {
         font-size: 1.3em;
         font-weight: bold;
@@ -59,35 +83,43 @@
         user-select: none;
         color: #2c3e50;
       }
+
       summary::-webkit-details-marker {
         display: none;
       }
+
       summary::before {
         content: "▶ ";
         display: inline-block;
         transform-origin: center;
         transition: transform 0.2s ease;
       }
+
       details[open] summary::before {
         transform: rotate(90deg);
       }
+
       ul {
         margin-top: 12px;
         padding-left: 20px;
         list-style-type: disc;
       }
+
       ul li {
         margin-bottom: 10px;
         font-size: 1.1em;
       }
+
       ul li a {
         color: #1abc9c;
         text-decoration: none;
         font-weight: 600;
       }
+
       ul li a:hover {
         text-decoration: underline;
       }
+
       button {
         padding: 10px 20px;
         font-size: 1em;
@@ -98,7 +130,8 @@
         cursor: pointer;
         margin-top: 20px;
       }
-      /* 固定フッター（お知らせテキスト） */
+
+      /* 下部テロップ */
       .ticker-wrap {
         width: 100%;
         overflow: hidden;
@@ -111,12 +144,14 @@
         z-index: 9999;
         font-size: 0.9em;
       }
+
       .ticker {
         display: inline-block;
         white-space: nowrap;
         animation: tickerScroll 25s linear infinite;
         padding-left: 100%;
       }
+
       @keyframes tickerScroll {
         from {
           transform: translateX(0%);
@@ -125,25 +160,49 @@
           transform: translateX(-100%);
         }
       }
+
+      /* スマホ対応 */
+      @media (max-width: 768px) {
+        body {
+          flex-direction: column;
+        }
+        nav {
+          position: relative;
+          width: 100%;
+          min-height: auto;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        main {
+          margin-left: 0;
+          padding: 15px;
+        }
+      }
     </style>
   </head>
   <body>
     <nav>
-      <img
-        src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
-        alt="メニュー画像"
-        style="width: 100%; border-radius: 5px; margin-bottom: 10px"
-      />
+      <!-- ランダム動画 -->
+      <video id="randomVideo" autoplay muted loop playsinline></video>
+
+      <!-- ナビ項目 -->
       <a href="portal.html">🏠 トップ</a>
       <a href="portal-news.html">📰 お知らせ</a>
       <a href="portal-tool.html">🛠 ツール</a>
       <a href="portal-renraku.html">📢 掲示板連絡</a>
-      <a href="portal-umekomi.html">🧰水泳関連 ツールポータル</a>
-      <a href="portal-tenki.html">⛅️今後の天気【プール練の参考に】</a>
-      <a href="portal-pdf.html">📁ファイル一覧</a>
-          <a href="portal-form.html">📝 アンケート</a>
-
-      <a href="https://yuma873.github.io/blush-nimble/index.html" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">🚪ログアウト</a>
+      <a href="portal-pdf.html">📁 ファイル一覧</a>
+      <a href="portal-20251123.html">🏆 次回大会 特設ページ(11/23)</a>
+      <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
+        <img src="botan.png" alt="プール開館情報" width="120">
+      </a>
+      <a href="https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001" target="_blank">
+        <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
+      </a>
+      <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
+      <a href="https://yuma873.github.io/blush-nimble/index.html"
+         style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white;
+         text-decoration: none; border-radius: 5px; font-weight: bold;">🚪 ログアウト</a>
     </nav>
 
     <main>
@@ -152,55 +211,53 @@
       <details open>
         <summary>🏢 市区町村・県サイト</summary>
         <ul>
-          <li><a href="https://sites.google.com/view/iseharasa/%E3%83%9B%E3%83%BC%E3%83%A0" target="_blank" rel="noopener">伊勢原市水泳協会</a> - 伊勢原市水泳協会公式HP</li>
-          <li><a href="https://sites.google.com/site/kanagawajhsswimming/" target="_blank" rel="noopener">神奈川県中体連水泳専門部</a> - 中体連水泳専門部公式HP</li>
-                    <li><a href="https://www.k-swim.net/" target="_blank" rel="noopener">神奈川県高体連水泳専門部</a> - 高体連水泳専門部公式HP</li>
-          <li><a href="https://swimhiratsuka.web.fc2.com/" target="_blank" rel="noopener">平塚水泳協会</a> - 平塚市公認水泳協会HP</li>
+          <li><a href="https://sites.google.com/view/iseharasa/" target="_blank">伊勢原市水泳協会</a> - 伊勢原市水泳協会公式HP</li>
+          <li><a href="https://sites.google.com/site/kanagawajhsswimming/" target="_blank">神奈川県中体連水泳専門部</a></li>
+          <li><a href="https://www.k-swim.net/" target="_blank">神奈川県高体連水泳専門部</a></li>
+          <li><a href="https://swimhiratsuka.web.fc2.com/" target="_blank">平塚水泳協会</a></li>
         </ul>
       </details>
 
       <details>
         <summary>🏊‍♀️ プール</summary>
         <ul>
-          <li><a href="https://www.green-pool.jp/" target="_blank" rel="noopener">さがみはらグリーンプール</a> - <b><u>【改修工事に伴う休業】メーンプール:R8 1/4~R9 2/28まで、サブプール:R7 10/1~R8 5/31まで</u></b></li>
-          <li><a href="https://yokohama-sport.jp/waterarena/" target="_blank" rel="noopener">横浜国際プール</a> - 国際規格の50mプールを備えた屋内温水施設（愛称「ウォーターアリーナ」）</li>
-          <li><a href="https://www.city.hiratsuka.kanagawa.jp/koen/page-c_00812.html" target="_blank" rel="noopener">平塚総合公園温水プール</a> - 50mプールと20mプールを備えた屋内温水プール</li>
+          <li><a href="https://www.green-pool.jp/" target="_blank">さがみはらグリーンプール</a></li>
+          <li><a href="https://yokohama-sport.jp/waterarena/" target="_blank">横浜国際プール</a></li>
+          <li><a href="https://www.city.hiratsuka.kanagawa.jp/koen/page-c_00812.html" target="_blank">平塚総合公園温水プール</a></li>
         </ul>
       </details>
 
       <details>
         <summary>📅 スケジュール・メモ</summary>
         <ul>
-          <li><a href="https://calendar.google.com/calendar/embed?src=mk79b6tlc7iif9of4d5vblbjckvjbjel%40import.calendar.google.com&ctz=Asia%2FTokyo" target="_blank" rel="noopener">日程カレンダー</a> - Googleカレンダーで予定管理</li>
-          <li><a href="https://aquatics.or.jp/calendar/" target="_blank" rel="noopener">日水連 大会予定</a> - 日本の競泳の予定確認</li>
-          <li><a href="https://yokohama-sport.jp/waterarena/schedule/" target="_blank" rel="noopener">横国 利用予定</a> - プール予定を確認</li>
+          <li><a href="https://calendar.google.com/calendar/embed?src=mk79b6tlc7iif9of4d5vblbjckvjbjel%40import.calendar.google.com&ctz=Asia%2FTokyo" target="_blank">日程カレンダー</a></li>
+          <li><a href="https://aquatics.or.jp/calendar/" target="_blank">日水連 大会予定</a></li>
+          <li><a href="https://yokohama-sport.jp/waterarena/schedule/" target="_blank">横国 利用予定</a></li>
         </ul>
       </details>
 
       <details>
         <summary>⛅️ 天気・気象</summary>
         <ul>
-          <li><a href="https://www.jma.go.jp/bosai/forecast/" target="_blank" rel="noopener">気象庁（天気予報）</a> - 正確な天気・警報情報</li>
-          <li><a href="https://www.accuweather.com/ja/jp/japan-weather" target="_blank" rel="noopener">AccuWeather</a> - 地域別詳細な天気情報</li>
-          <li><a href="https://tenki.jp/" target="_blank" rel="noopener">tenki.jp</a> - 民間天気サイト、時間ごとに確認可</li>
+          <li><a href="https://www.jma.go.jp/bosai/forecast/" target="_blank">気象庁</a></li>
+          <li><a href="https://tenki.jp/" target="_blank">tenki.jp</a></li>
         </ul>
       </details>
 
       <details>
         <summary>🧘‍♀️ コンディショニング・健康</summary>
         <ul>
-          <li><a href="https://swim-media.com/" target="_blank" rel="noopener">水泳コラム</a> - 陸トレの情報が満載</li>
-          <li><a href="https://fitonapp.com/" target="_blank" rel="noopener">FitOn</a> - ストレッチ・筋トレ動画が無料で見られる</li>
+          <li><a href="https://swim-media.com/" target="_blank">水泳コラム</a></li>
+          <li><a href="https://fitonapp.com/" target="_blank">FitOn</a></li>
         </ul>
       </details>
 
       <details>
         <summary> その他</summary>
         <ul>
-          <li><a href="https://best-swim.com/login.html" target="_blank" rel="noopener">BEST SWIM</a> - 最新のベストタイム情報</li>
-          <li><a href="https://result.swim.or.jp/" target="_blank" rel="noopener">Results Of Japan Swimming</a> - 過去の大会の結果を確認</li>
-          <li><a href="https://live-results.swim.or.jp/" target="_blank" rel="noopener">Live results swimming</a> - 最新の大会情報</li>
-          <li><a href="https://yuma873.github.io/blush-nimble/toolshu.html" target="_blank" rel="noopener">その他ツール</a> - ツールトップページへ</li>
+          <li><a href="https://best-swim.com/login.html" target="_blank">BEST SWIM</a></li>
+          <li><a href="https://result.swim.or.jp/" target="_blank">Results Of Japan Swimming</a></li>
+          <li><a href="https://live-results.swim.or.jp/" target="_blank">Live results swimming</a></li>
         </ul>
       </details>
 
@@ -209,8 +266,21 @@
 
     <div class="ticker-wrap">
       <div class="ticker">
-        <span>🚨 このページは現在編集中です。一部機能しないページがあります。 ／ 📢 こちらからツールページに移行するとログインが不要です ／ 🆕 タイム管理でSwimaneにリンクします</span>
+        <span>🚨 このページは現在編集中です。一部機能しないページがあります ／ 📢 ツール一覧の内容は随時更新予定です</span>
       </div>
     </div>
+
+    <script>
+      // ランダム動画スクリプト
+      const videos = [
+        "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
+        "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
+        "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
+      ];
+      const randomIndex = Math.floor(Math.random() * videos.length);
+      const randomVideo = videos[randomIndex];
+      const videoElement = document.getElementById("randomVideo");
+      videoElement.src = randomVideo;
+    </script>
   </body>
 </html>
