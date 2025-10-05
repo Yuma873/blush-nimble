@@ -15,23 +15,23 @@
       min-height: 100vh;
     }
 
-    /* === ナビ部分 === */
+    /* 左ナビ（固定 + スクロール対応） */
     nav {
-      width: 220px;
+      width: 240px;
       background-color: #2c3e50;
       color: white;
       padding: 10px;
       min-height: 100vh;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow-y: auto;
     }
 
     nav video {
       width: 100%;
-      border-radius: 5px;
-      margin-bottom: 10px;
+      border-radius: 8px;
+      margin-bottom: 12px;
     }
 
     nav a {
@@ -39,7 +39,7 @@
       color: white;
       text-decoration: none;
       padding: 12px;
-      margin: 6px 0;
+      margin: 8px 0;
       background-color: #34495e;
       border-radius: 6px;
       transition: background-color 0.3s;
@@ -50,14 +50,20 @@
       background-color: #1abc9c;
     }
 
-    /* === メイン部分 === */
+    nav img {
+      display: block;
+      margin: 6px auto;
+      border-radius: 5px;
+    }
+
     main {
       flex: 1;
       padding: 30px;
+      margin-left: 260px;
     }
 
     header h1 {
-      font-size: 1.4em;
+      font-size: 1.3em;
       color: #2c3e50;
       margin-bottom: 25px;
       text-align: center;
@@ -131,40 +137,33 @@
 
     /* スマホ対応 */
     @media(max-width: 768px) {
-      body { flex-direction: column; }
-      nav { width: 100%; min-height: auto; }
-      main { padding: 15px; }
+      body {
+        flex-direction: column;
+      }
+      nav {
+        width: 100%;
+        min-height: auto;
+        position: relative;
+      }
+      main {
+        margin-left: 0;
+        padding: 15px;
+      }
     }
   </style>
 </head>
 <body>
 
-<!-- ===== ナビゲーション（動画ランダム再生つき） ===== -->
+<!-- ===== 左ナビ（トップと完全同じ構成） ===== -->
 <nav>
-  <video id="randomVideo" autoplay loop muted playsinline></video>
-
-  <script>
-    // ランダム動画設定
-    const videos = [
-      "video1.mp4","video2.mp4","video3.mp4","video5.mp4",
-      "V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4",
-      "V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"
-    ];
-    const randomVideo = videos[Math.floor(Math.random() * videos.length)];
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("randomVideo").src = randomVideo;
-    });
-  </script>
+  <video id="randomVideo" autoplay muted loop playsinline></video>
 
   <a href="portal.html">🏠 トップ</a>
   <a href="portal-news.html">📰 お知らせ</a>
   <a href="portal-tool.html">🛠 ツール</a>
-  <a href="portal-renraku.html">📢 連絡掲示板</a>
+  <a href="portal-renraku.html">📢 掲示板連絡</a>
   <a href="portal-pdf.html">📁 ファイル一覧</a>
   <a href="portal-20251123.html">🏆 次回大会 特設ページ(11/23)</a>
-  <a href="portal-umekomi.html">🧰 水泳関連ツール</a>
-  <a href="portal-tenki.html">⛅️ 今後の天気</a>
-  <a href="portal-form.html">📝 アンケート</a>
 
   <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
     <img src="botan.png" alt="プール開館情報" width="120">
@@ -173,8 +172,10 @@
     <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
   </a>
 
+  <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
+
   <a href="https://yuma873.github.io/blush-nimble/index.html"
-     style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+     style="display:inline-block; padding:10px 20px; background-color:#f44336; color:white; text-decoration:none; border-radius:5px; font-weight:bold;">
      🚪 ログアウト
   </a>
 </nav>
@@ -192,8 +193,7 @@
     <p>⏰ <strong>集合時間・場所：</strong>8:25 プール前</p>
     <p>🎯 <strong>対象：</strong>前期生（大会は全年齢対象）</p>
     <p>🏢 <strong>主催：</strong>伊勢原市スポーツ協会　伊勢原市水泳協会</p>
-    <a href="https://www.dropbox.com/scl/fi/y4ipmttxg5ix793ykwoe7/0923.pdf?rlkey=c9e45pm0vz32lncft5k7pihg0&st=dpljjmlg&dl=0"
-       target="_blank" class="button-link">📄 大会要項を見る</a>
+    <a href="https://www.dropbox.com/scl/fi/y4ipmttxg5ix793ykwoe7/0923.pdf?rlkey=c9e45pm0vz32lncft5k7pihg0&dl=0" target="_blank" class="button-link">📄 大会要項を見る</a>
   </section>
 
   <section class="section-card">
@@ -216,12 +216,11 @@
       </thead>
       <tbody>
         <tr><td>8:25</td><td>集合</td></tr>
-        <tr><td>8:35~8:45</td><td>会場設営</td></tr>
+        <tr><td>8:35〜8:45</td><td>会場設営</td></tr>
         <tr><td>9:20</td><td>選手受付開始</td></tr>
-        <tr><td>9:25</td><td>リレーオーダー記入(9:25提出〆)</td></tr>
-        <tr><td>9:30</td><td>開場</td></tr>
-        <tr><td></td><td>引率:<span style="border: 1px solid black; border-radius: 50%; padding: 5px;">川</span></td></tr>
-        <tr><td>9:50</td><td>W-UP 5,6レーン</td></tr>
+        <tr><td>9:25</td><td>リレーオーダー記入（提出〆）</td></tr>
+        <tr><td>9:30</td><td>開場（引率：川）</td></tr>
+        <tr><td>9:50</td><td>W-UP 5・6レーン</td></tr>
         <tr><td>10:15</td><td>開会式</td></tr>
         <tr><td>10:20</td><td>競技開始</td></tr>
         <tr><td>12:30</td><td>終了予定</td></tr>
@@ -231,16 +230,15 @@
 
   <section class="section-card">
     <h2>結果URL</h2>
-    <a href="https://www.dropbox.com/scl/fi/t1akzrkjk008b89bgvwlm/21-2025.pdf?rlkey=xf85b9o66ufgivj6is4qduddz&st=ztn77fzl&dl=0"
-       target="_blank" class="button-link">📊 結果を見る</a>
+    <a href="https://www.dropbox.com/scl/fi/t1akzrkjk008b89bgvwlm/21-2025.pdf?dl=0" target="_blank" class="button-link">📊 結果を見る</a>
   </section>
 
   <section class="section-card">
     <h2>アクセス</h2>
     <p>📍 NITTANパークおおね</p>
     <p>住所：〒257-0007 神奈川県秦野市鶴巻940番地</p>
-    <p>🚃 電車：小田急小田原線『東海大学前駅』下車 徒歩15分</p>
-    <p>🚌 バス：神奈川中央バス 鶴巻温泉駅発 東海大学行『下落幡』下車 徒歩1分</p>
+    <p>🚃 東海大学前駅 徒歩15分</p>
+    <p>🚌 鶴巻温泉駅発「下落幡」下車 徒歩1分</p>
   </section>
 
   <section class="section-card">
@@ -251,28 +249,28 @@
       <li class="essential">✅ 外靴袋・靴下袋</li>
       <li class="essential">📝 筆記用具</li>
       <li class="essential">💧 水着・キャップ・ゴーグル・タオル</li>
-      <li class="essential">👕 濡れてもよいTシャツや短パン</li>
+      <li class="essential">👕 濡れてもよい服装（体操着可）</li>
       <li class="essential">🥤 飲み物</li>
       <li class="essential">💰 交通費や小銭</li>
     </ul>
 
     <h3>あった方がよいもの</h3>
     <ul class="checklist">
-      <li class="optional">👜 大きなバッグを入れられるゴミ袋</li>
+      <li class="optional">👜 バッグを入れるゴミ袋</li>
       <li class="optional">🗑 小さなゴミ袋</li>
-      <li class="optional">🍙 入場前・退場後の補食</li>
-      <li class="optional">🧊 凍らせた飲み物やゼリー</li>
-      <li class="optional">💧 予備の水着・キャップ・ゴーグル</li>
-      <li class="optional">🧴 セーム（吸水タオル）</li>
+      <li class="optional">🍙 補食</li>
+      <li class="optional">🧊 凍らせた飲み物</li>
+      <li class="optional">💧 予備の水着・キャップ</li>
+      <li class="optional">🧴 セーム</li>
     </ul>
 
     <h3>注意事項</h3>
     <ul>
-      <li>1名2種目以内(リレーを除く)</li>
-      <li>男女別、種目別のタイム決勝</li>
-      <li>各区分1位〜3位に賞状授与</li>
-      <li>個人種目1種目600円(参加賞込み)</li>
-      <li>9月6日以降、二次要項をHPにてお知らせ</li>
+      <li>1名2種目以内（リレー除く）</li>
+      <li>男女別・種目別のタイム決勝</li>
+      <li>各区分1〜3位に賞状授与</li>
+      <li>個人種目1種目600円（参加賞込み）</li>
+      <li>9月6日以降、二次要項をHPに掲載</li>
     </ul>
   </section>
 
@@ -281,5 +279,18 @@
     <p><b><u>この大会は終了しました。</u></b></p>
   </section>
 </main>
+
+<!-- ===== ランダム動画スクリプト ===== -->
+<script>
+  const videos = [
+    "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
+    "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
+    "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
+  ];
+  const randomIndex = Math.floor(Math.random() * videos.length);
+  const randomVideo = videos[randomIndex];
+  document.getElementById("randomVideo").src = randomVideo;
+</script>
+
 </body>
 </html>
