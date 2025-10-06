@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ポータルサイト - カレンダー</title>
+<link rel="shortcut icon" href="favicon2.png" type="image/png">
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -16,7 +17,7 @@ body {
 
 /* 左ナビ固定 */
 nav {
-  width: 220px;
+  width: 230px;
   background-color: #2c3e50;
   color: white;
   padding: 10px;
@@ -26,19 +27,21 @@ nav {
   left: 0;
   height: 100vh;
   overflow-y: auto;
+  z-index: 1000;
 }
 
+nav video { width: 100%; border-radius: 8px; margin-bottom: 10px; }
 nav a {
   display: block;
   color: white;
   text-decoration: none;
-  padding: 8px;
-  margin: 4px 0;
+  padding: 10px;
+  margin: 5px 0;
   background-color: #34495e;
   border-radius: 6px;
   text-align: center;
+  transition: 0.3s;
 }
-
 nav a:hover { background-color: #1abc9c; }
 
 main {
@@ -48,34 +51,32 @@ main {
   overflow: auto;
 }
 
-/* カレンダー */
 .calendar-nav {
   display: flex;
   justify-content: space-between;
-  max-width: 700px;
   margin-bottom: 10px;
 }
 .calendar-nav button {
-  padding: 5px 10px;
+  padding: 6px 12px;
+  font-size: 16px;
   cursor: pointer;
 }
 
 table.calendar {
   border-collapse: collapse;
   width: 100%;
-  max-width: 700px;
 }
+
 table.calendar th, table.calendar td {
   border: 1px solid #ccc;
   width: 14.28%;
   text-align: left;
   vertical-align: top;
-  padding: 5px;
-  height: 100px;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  padding: 4px;
+  height: 120px;
   position: relative;
+  background-color: #fff;
+  box-sizing: border-box;
 }
 
 table.calendar th {
@@ -83,14 +84,14 @@ table.calendar th {
   color: white;
 }
 
-td.today { border: 2px solid #1abc9c; }
 td.saturday { background-color: #f0f8ff; }
 td.sunday { background-color: #fff0f0; }
+td.today { border: 2px solid #1abc9c; }
 
 .event {
   padding: 2px 4px;
   margin: 2px 0;
-  border-radius: 3px;
+  border-radius: 4px;
   color: white;
   font-size: 12px;
   display: block;
@@ -105,23 +106,17 @@ td.sunday { background-color: #fff0f0; }
 .school { background-color: green; }
 .other { background-color: orange; }
 
-.events-container {
-  max-height: 70px;
-  overflow-y: auto;
-  padding-right: 2px;
-}
-
 /* 凡例 */
 .legend {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   margin-top: 15px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .legend div {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 5px;
 }
 .legend span {
   width: 12px;
@@ -141,26 +136,33 @@ td.sunday { background-color: #fff0f0; }
   z-index: 1000;
   max-width: 200px;
   word-wrap: break-word;
+  font-size: 14px;
 }
 
 /* スマホ対応 */
 @media(max-width:768px){
-  nav { position: fixed; width: 100%; height: auto; display: flex; overflow-x: auto; white-space: nowrap; }
-  nav a { display: inline-block; margin: 4px; font-size: 0.9em; }
-  main { margin-left: 0; margin-top: 150px; }
+  nav{ width:100%; height:auto; display:flex; overflow-x:auto; white-space:nowrap; }
+  nav a{ display:inline-block; margin:4px; font-size:0.9em; }
+  nav video{ display:none; }
+  main{ margin-left:0; margin-top:150px; height:calc(100vh-150px); }
+  table.calendar th, table.calendar td{ height:100px; }
 }
 </style>
 </head>
 <body>
 
 <nav>
+  <video id="randomVideo" autoplay loop muted playsinline style="width:100%; border-radius:5px; margin-bottom:10px;"></video>
   <a href="portal.html">🏠 トップ</a>
   <a href="portal-news.html">📰 お知らせ</a>
   <a href="portal-tool.html">🛠 ツール</a>
   <a href="portal-renraku.html">📢 掲示板連絡</a>
-  <a href="portal-pdf.html">📁ファイル一覧</a>
+  <a href="portal-pdf.html">📁 ファイル一覧</a>
   <a href="portal-20251123.html">🏆次回大会 特設ページ(11/23)</a>
+  <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank"><img src="botan.png" alt="プール開館情報" width="120"></a>
+  <a href="https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001" target="_blank"><img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120"></a>
   <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
+  <a href="https://yuma873.github.io/blush-nimble/index.html" style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">🚪ログアウト</a>
 </nav>
 
 <main>
@@ -173,10 +175,10 @@ td.sunday { background-color: #fff0f0; }
 <h2 id="month-year"></h2>
 
 <table class="calendar">
-  <thead>
-    <tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr>
-  </thead>
-  <tbody id="calendar-body"></tbody>
+<thead>
+<tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr>
+</thead>
+<tbody id="calendar-body"></tbody>
 </table>
 
 <div class="legend">
@@ -190,67 +192,70 @@ td.sunday { background-color: #fff0f0; }
 </main>
 
 <script>
+// ランダム動画
+const videos=["video1.mp4","video2.mp4","video3.mp4","video5.mp4","V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4","V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
+document.getElementById("randomVideo").src=videos[Math.floor(Math.random()*videos.length)];
+
 // --- 予定設定 ---
-const events = [
-  { date: '2025-10-07', time: '14:00~16:00', name: '水泳部練習', type: 'practice', location: '体育館' },
-  { date: '2025-10-07', time: '16:30~18:00', name: 'ミーティング', type: 'other', location: '会議室' },
-  { date: '2025-10-10', time: '9:00~12:00', name: '大会：市大会', type: 'tournament', location: '市民プール' },
-  { date: '2025-10-15', time: '13:00~15:00', name: '文化祭準備', type: 'school', location: '学校グラウンド' },
-  { date: '2025-10-20', time: '10:00~12:00', name: '部活練習', type: 'practice', location: '体育館' },
+const events=[
+  { date:'2025-10-07', time:'14:00~16:00', name:'水泳部練習', type:'practice', location:'体育館' },
+  { date:'2025-10-07', time:'16:30~18:00', name:'ミーティング', type:'other', location:'会議室' },
+  { date:'2025-10-10', time:'9:00~12:00', name:'大会：市大会', type:'tournament', location:'市民プール' },
+  { date:'2025-10-15', time:'13:00~15:00', name:'文化祭準備', type:'school', location:'学校グラウンド' },
+  { date:'2025-10-20', time:'10:00~12:00', name:'部活練習', type:'practice', location:'体育館' },
 ];
 
-let currentDate = new Date();
-function zeroPad(n){ return n.toString().padStart(2,'0'); }
+let currentDate=new Date();
+function zeroPad(n){return n.toString().padStart(2,'0');}
 
 function generateCalendar(dateObj){
-  const year = dateObj.getFullYear();
-  const month = dateObj.getMonth();
-  const today = new Date();
-  document.getElementById('month-year').textContent = `${year}年 ${month+1}月`;
+  const year=dateObj.getFullYear();
+  const month=dateObj.getMonth();
+  const today=new Date();
 
-  const firstDay = new Date(year,month,1).getDay();
-  const lastDate = new Date(year,month+1,0).getDate();
-  const calendarBody = document.getElementById('calendar-body');
-  calendarBody.innerHTML = '';
-  let row = document.createElement('tr');
+  document.getElementById('month-year').textContent=`${year}年 ${month+1}月`;
+  const firstDay=new Date(year,month,1).getDay();
+  const lastDate=new Date(year,month+1,0).getDate();
+  const calendarBody=document.getElementById('calendar-body');
+  calendarBody.innerHTML='';
 
+  let row=document.createElement('tr');
   for(let i=0;i<firstDay;i++){ row.appendChild(document.createElement('td')); }
 
   for(let day=1;day<=lastDate;day++){
     if((firstDay+day-1)%7===0 && day!==1){ calendarBody.appendChild(row); row=document.createElement('tr'); }
 
-    const cell = document.createElement('td');
-    const cellDateStr = `${year}-${zeroPad(month+1)}-${zeroPad(day)}`;
-    cell.dataset.date = cellDateStr;
-    cell.innerHTML = `<strong>${day}</strong><br>`;
-
+    const cell=document.createElement('td');
+    const cellDateStr=`${year}-${zeroPad(month+1)}-${zeroPad(day)}`;
+    cell.dataset.date=cellDateStr;
+    cell.innerHTML=`<strong>${day}</strong><br>`;
     const dayOfWeek=(firstDay+day-1)%7;
     if(dayOfWeek===0) cell.classList.add('sunday');
     if(dayOfWeek===6) cell.classList.add('saturday');
     if(day===today.getDate() && month===today.getMonth() && year===today.getFullYear()) cell.classList.add('today');
 
-    // 予定を表示
-    const eventsForDay = events.filter(ev=>ev.date===cellDateStr);
-    if(eventsForDay.length>0){
-      const container=document.createElement('div');
-      container.className='events-container';
-      eventsForDay.forEach(ev=>{
-        const div=document.createElement('span');
-        div.className=`event ${ev.type}`;
-        div.textContent=`${ev.time} ${ev.name}`;
-        div.addEventListener('click',(e)=>showPopup(e,ev));
-        container.appendChild(div);
-      });
-      cell.appendChild(container);
-    }
+    // イベント表示用コンテナを固定高さに
+    const eventsContainer=document.createElement('div');
+    eventsContainer.style.maxHeight='70px';
+    eventsContainer.style.overflowY='auto';
 
+    events.filter(ev=>ev.date===cellDateStr).forEach(ev=>{
+      const div=document.createElement('span');
+      div.className=`event ${ev.type}`;
+      div.textContent=`${ev.time} ${ev.name}`;
+      div.addEventListener('click',e=>showPopup(e,ev));
+      eventsContainer.appendChild(div);
+    });
+
+    cell.appendChild(eventsContainer);
     row.appendChild(cell);
   }
-  while(row.children.length<7) row.appendChild(document.createElement('td'));
+
+  while(row.children.length<7){ row.appendChild(document.createElement('td')); }
   calendarBody.appendChild(row);
 }
 
-// --- ポップアップ ---
+// ポップアップ
 const popup=document.getElementById('popup');
 function showPopup(e,ev){
   popup.style.display='block';
@@ -262,16 +267,15 @@ function showPopup(e,ev){
   popup.style.top=top+'px';
   popup.innerHTML=`<strong>${ev.name}</strong><br>${ev.time}<br>場所: ${ev.location}`;
 }
-document.addEventListener('click',e=>{
-  if(!e.target.classList.contains('event')) popup.style.display='none';
-});
+document.addEventListener('click',e=>{ if(!e.target.classList.contains('event')) popup.style.display='none'; });
 
 // ナビゲーション
-document.getElementById('prev-month').addEventListener('click',()=>{currentDate.setMonth(currentDate.getMonth()-1); generateCalendar(currentDate);});
-document.getElementById('next-month').addEventListener('click',()=>{currentDate.setMonth(currentDate.getMonth()+1); generateCalendar(currentDate);});
-document.getElementById('today-btn').addEventListener('click',()=>{currentDate=new Date(); generateCalendar(currentDate);});
+document.getElementById('prev-month').addEventListener('click',()=>{ currentDate.setMonth(currentDate.getMonth()-1); generateCalendar(currentDate); });
+document.getElementById('next-month').addEventListener('click',()=>{ currentDate.setMonth(currentDate.getMonth()+1); generateCalendar(currentDate); });
+document.getElementById('today-btn').addEventListener('click',()=>{ currentDate=new Date(); generateCalendar(currentDate); });
 
 generateCalendar(currentDate);
 </script>
+
 </body>
 </html>
