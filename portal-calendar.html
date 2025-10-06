@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ポータルサイト - カレンダー</title>
 <link rel="shortcut icon" href="favicon2.png" type="image/png">
@@ -75,8 +75,8 @@ table.calendar th, table.calendar td {
   padding: 4px;
   height: 120px;
   position: relative;
-  background-color: #fff;
   box-sizing: border-box;
+  background-color: #fff;
 }
 
 table.calendar th {
@@ -88,6 +88,7 @@ td.saturday { background-color: #f0f8ff; }
 td.sunday { background-color: #fff0f0; }
 td.today { border: 2px solid #1abc9c; }
 
+/* イベント */
 .event {
   padding: 2px 4px;
   margin: 2px 0;
@@ -230,15 +231,20 @@ function generateCalendar(dateObj){
     cell.dataset.date=cellDateStr;
     cell.innerHTML=`<strong>${day}</strong><br>`;
     const dayOfWeek=(firstDay+day-1)%7;
+
+    // 土日色付け
     if(dayOfWeek===0) cell.classList.add('sunday');
     if(dayOfWeek===6) cell.classList.add('saturday');
+
+    // 今日強調
     if(day===today.getDate() && month===today.getMonth() && year===today.getFullYear()) cell.classList.add('today');
 
-    // イベント表示用コンテナを固定高さに
+    // イベント表示用コンテナ
     const eventsContainer=document.createElement('div');
-    eventsContainer.style.maxHeight='70px';
+    eventsContainer.style.maxHeight='80px';
     eventsContainer.style.overflowY='auto';
 
+    // イベント追加
     events.filter(ev=>ev.date===cellDateStr).forEach(ev=>{
       const div=document.createElement('span');
       div.className=`event ${ev.type}`;
