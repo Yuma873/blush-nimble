@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>総合TOP</title>
-      <link rel="shortcut icon" href="favicon.png" type="image/png">
+    <link rel="shortcut icon" href="favicon.png" type="image/png">
+    <meta name="description" content="総合TOPページ。メニュー表生成機やツールサイト、ポータルサイトへのリンク集です。">
 
     <style>
       body {
@@ -13,63 +14,89 @@
         color: #2c3e50;
         padding: 20px;
       }
+
       h1 {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
+        font-size: 2em;
       }
+
       ul {
-        max-width: 600px;
-        margin: 0 auto;
-        padding-left: 0;
         list-style: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
       }
+
       li {
-        background: white;
-        margin-bottom: 15px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+        padding: 20px 25px;
+        transition: transform 0.2s, box-shadow 0.2s;
       }
+
+      li:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      h2 {
+        margin: 0 0 10px 0;
+        font-size: 1.4em;
+        color: #2c3e50;
+      }
+
       a {
+        display: inline-block;
         color: #1abc9c;
         text-decoration: none;
         font-weight: bold;
-        word-break: break-all;
+        font-size: 1.1em;
       }
+
+      a::before {
+        content: "🔗 ";
+      }
+
       a:hover {
         text-decoration: underline;
+      }
+
+      @media screen and (max-width: 480px) {
+        body {
+          padding: 10px;
+        }
+        li {
+          padding: 15px 18px;
+        }
+        h2 {
+          font-size: 1.2em;
+        }
+        a {
+          font-size: 1em;
+        }
       }
     </style>
   </head>
   <body>
     <h1>総合TOP</h1>
-    <ul>
+    <ul role="list" aria-label="総合TOPのリンク一覧">
       <li>
-        <h1>メニュー表生成機</h1>
-        <a
-          href="https://yuma873.github.io/blush-nimble/menu.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          >https://yuma873.github.io/blush-nimble/menu.html</a
-        >
+        <h2>メニュー表生成機</h2>
+        <a href="https://yuma873.github.io/blush-nimble/menu.html" target="_blank" rel="noopener noreferrer">メニュー表生成機を開く</a>
       </li>
       <li>
-        <h1>ツールサイト トップページへ</h1>
-        <a
-          href="https://yuma873.github.io/blush-nimble/toolshu.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          >https://yuma873.github.io/blush-nimble/toolshu.html</a
-        >
+        <h2>ツールサイト トップページ</h2>
+        <a href="https://yuma873.github.io/blush-nimble/toolshu.html" target="_blank" rel="noopener noreferrer">ツールサイト トップページを開く</a>
       </li>
       <li>
-        <h1>ポータルサイト トップページへ</h1>
-        <a
-          href="https://yuma873.github.io/blush-nimble/index.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          >https://yuma873.github.io/blush-nimble/index.html</a
-        >
+        <h2>ポータルサイト トップページ</h2>
+        <a href="https://yuma873.github.io/blush-nimble/index.html" target="_blank" rel="noopener noreferrer">ポータルサイト トップページを開く</a>
       </li>
     </ul>
   </body>
