@@ -124,7 +124,8 @@ button:enabled {
   color: white;
   cursor: pointer;
 }
-  .checkboxItem {
+
+.checkboxItem {
   display: flex;
   align-items: center;
   column-gap: 4px;
@@ -194,9 +195,9 @@ button:enabled {
       </li>
     </ul>
     <label class="checkboxItem">
-  <input type="checkbox" name="confirmCheck" value="情報を確認しました。" class="checkbox" checked />
-  情報を確認しました。
-</label>
+      <input type="checkbox" id="confirmCheck" class="checkbox" />
+      情報を確認しました。
+    </label>
     <button id="step0Next" disabled>次へ</button>
   </div>
 
@@ -226,6 +227,8 @@ button:enabled {
   <div class="box" id="passwordBox1" style="display:none;">
     <p>第1パスワードを入力してください。</p>
     <input type="password" id="passwordField1" placeholder="パスワード1">
+    <button id="passwordBtn1">決定</button>
+    <p id="passwordMsg1" style="color:red;"></p>
   </div>
 
   <!-- reCAPTCHA2 -->
@@ -238,6 +241,8 @@ button:enabled {
   <div class="box" id="passwordBox2" style="display:none;">
     <p>第2パスワードを入力してください。</p>
     <input type="password" id="passwordField2" placeholder="パスワード2">
+    <button id="passwordBtn2">決定</button>
+    <p id="passwordMsg2" style="color:red;"></p>
   </div>
 
   <!-- 読み込み -->
@@ -269,66 +274,40 @@ function setStep(stepNum){
 // ステップ0: 注意事項確認
 const confirmCheck = document.getElementById("confirmCheck");
 const step0Next = document.getElementById("step0Next");
+
 confirmCheck.addEventListener("change", function(){
   step0Next.disabled = !this.checked;
 });
+
 step0Next.addEventListener("click", function(){
   document.getElementById("step0Box").style.display = "none";
   document.getElementById("captchaBox1").style.display = "block";
   setStep(1);
 });
 
-// reCAPTCHA1
-function onRecaptcha1Success(){
-  document.getElementById("captchaBox1").style.display = "none";
-  document.getElementById("passwordBox1").style.display = "block";
-  setStep(2);
-}
-
-// パスワード1
-const PASSWORD1 = "s123025@jishukan.ed.jp"; 
-const passwordField1 = document.getElementById("passwordField1");
-passwordField1.addEventListener("input", function(){
-  if(this.value === PASSWORD1){
+// パスワード1決定
+const correctPassword1 = "pass1"; // ここに本来のパスワード
+document.getElementById("passwordBtn1").addEventListener("click", function(){
+  const val = document.getElementById("passwordField1").value;
+  if(val === correctPassword1){
+    document.getElementById("passwordBox1").style.display = "none";
     document.getElementById("captchaBox2").style.display = "block";
-    passwordField1.disabled = true;
     setStep(3);
+  } else {
+    document.getElementById("passwordMsg1").textContent = "パスワードが違います。";
   }
 });
 
-// reCAPTCHA2
-function onRecaptcha2Success(){
-  document.getElementById("captchaBox2").style.display = "none";
-  document.getElementById("passwordBox2").style.display = "block";
-  setStep(4);
-}
-
-// パスワード2
-const PASSWORD2 = "wlnhh22791@yahoo.co.jp";
-const passwordField2 = document.getElementById("passwordField2");
-passwordField2.addEventListener("input", function(){
-  if(this.value === PASSWORD2){
+// パスワード2決定
+const correctPassword2 = "pass2"; // ここに本来のパスワード
+document.getElementById("passwordBtn2").addEventListener("click", function(){
+  const val = document.getElementById("passwordField2").value;
+  if(val === correctPassword2){
     document.getElementById("passwordBox2").style.display = "none";
-    document.getElementById("loadingBox").style.display = "block";
+    document.getElementById("goReservation").disabled = false;
     setStep(5);
-    let countdown = 10;
-    const interval = setInterval(()=>{
-      countdown--;
-      document.getElementById("loadingBox").querySelector("p").textContent = `準備中です…今しばらく待ちください。`;
-      if(countdown<=0){
-        clearInterval(interval);
-        document.getElementById("loadingBox").style.display = "none";
-        document.getElementById("goReservation").disabled = false;
-      }
-    },1000);
-  }
-});
-
-// 予約ボタン
-const goBtn = document.getElementById("goReservation");
-goBtn.addEventListener("click", function(){
-  if(confirm("認証に成功しました。予約サイトにアクセスしますか？")){
-    window.open("https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001","_blank");
+  } else {
+    document.getElementById("passwordMsg2").textContent = "パスワードが違います。";
   }
 });
 </script>
