@@ -6,146 +6,125 @@
 <title>ポータルサイト - 予約</title>
 <link rel="shortcut icon" href="favicon2.png" type="image/png">
 <style>
-:root {
-  --bg-color: #f5f5f5;
-  --text-color: #333;
-  --nav-bg: #2c3e50;
-  --accent: #1abc9c;
-}
-
-body.dark {
-  --bg-color: #1e1e1e;
-  --text-color: #f0f0f0;
-  --nav-bg: #111;
-}
-
 body {
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: Arial, sans-serif;
   margin: 0;
   display: flex;
-  flex-direction: column;
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background-color: #f5f5f5;
   min-height: 100vh;
-  transition: background 0.3s, color 0.3s;
 }
 
+/* 左ナビ固定 */
 nav {
-  width: 100%;
-  background-color: var(--nav-bg);
+  width: 230px;
+  background-color: #2c3e50;
   color: white;
   padding: 10px;
   box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1000;
 }
-nav video { width: 100px; border-radius: 8px; }
+
+nav video { width: 100%; border-radius: 8px; margin-bottom: 10px; }
 nav a {
+  display: block;
   color: white;
   text-decoration: none;
   padding: 10px;
+  margin: 5px 0;
   background-color: #34495e;
   border-radius: 6px;
-  margin-left: 10px;
+  text-align: center;
   transition: 0.3s;
 }
-nav a:hover { background-color: var(--accent); }
+nav a:hover { background-color: #1abc9c; }
 
 main {
   flex: 1;
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-h2 {
-  color: var(--accent);
-  margin-bottom: 10px;
-}
-
-.notice {
-  background: #fff;
+  margin-left: 230px;
   padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 20px;
+  overflow: auto;
 }
-body.dark .notice {
-  background: #222;
-  border-color: #444;
-}
-.notice a { color: var(--accent); word-break: break-all; }
-.notice h3 { color: var(--accent); border-bottom: 1px solid #ccc; padding-bottom: 5px; }
-#updated { font-size: 14px; color: gray; }
 
-/* ボタン・reCAPTCHA */
-#reservationSection {
-  margin-top: auto;
-  text-align: center;
-  padding: 20px;
+/* ボックス */
+.box {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
-button {
-  padding: 12px 20px;
-  border: none;
+
+/* 注意事項・お知らせ */
+.box h3 {
+  margin-top: 0;
+  color: #e74c3c;
+}
+.box ul {
+  padding-left: 20px;
+}
+.box a {
+  color: #3498db;
+  text-decoration: none;
+}
+.box a:hover {
+  text-decoration: underline;
+}
+
+/* ステップ表示 */
+.steps {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+.step {
+  flex: 1;
+  text-align: center;
+  padding: 8px;
   border-radius: 6px;
-  font-size: 16px;
+  background-color: #ccc;
+  margin: 0 5px;
   transition: 0.3s;
+}
+.step.active {
+  background-color: #1abc9c;
+  color: white;
+}
+
+/* パスワードとボタン */
+#passwordField, #goReservation {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 #goReservation {
   background-color: #888;
   color: white;
   cursor: not-allowed;
+  border: none;
+  transition: 0.3s;
 }
 #goReservation:enabled {
-  background-color: var(--accent);
+  background-color: #1abc9c;
   cursor: pointer;
-}
-#darkToggle {
-  margin-left: 10px;
-  background-color: var(--accent);
-  color: white;
-}
-
-/* モーダル */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.modal.show { display: flex; opacity: 1; }
-.modal .content {
-  background: white;
-  color: black;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  transform: translateY(-10px);
-  animation: fadeIn 0.3s ease forwards;
-}
-body.dark .modal .content { background: #333; color: #fff; }
-@keyframes fadeIn {
-  from { transform: translateY(-10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
 }
 
 /* スマホ対応 */
 @media(max-width:768px){
-  nav{ flex-direction: column; align-items: flex-start; }
+  nav{ width:100%; height:auto; display:flex; overflow-x:auto; white-space:nowrap; }
+  nav a{ display:inline-block; margin:4px; font-size:0.9em; }
   nav video{ display:none; }
-  main{ padding: 10px; }
+  main{ margin-left:0; margin-top:150px; }
 }
 </style>
 </head>
@@ -153,115 +132,99 @@ body.dark .modal .content { background: #333; color: #fff; }
 
 <nav>
   <video id="randomVideo" autoplay loop muted playsinline></video>
-  <div>
-    <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
-    <a href="https://yuma873.github.io/blush-nimble/index.html" style="background:#f44336;">ログアウト</a>
-    <button id="darkToggle">🌗 ダークモード</button>
-  </div>
+  <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
+  <a href="https://yuma873.github.io/blush-nimble/index.html" style="background-color:#f44336;font-weight:bold;">ログアウト</a>
 </nav>
 
 <main>
-  <!-- ⚠ 注意事項・お知らせ（ページ上部） -->
-  <div class="notice">
-    <h3>⚠ 注意事項</h3>
-    <p>予約前にかならず休館等の情報をご確認ください。<br>
-       なお、トレーニングルームの利用には管理者の承諾が必要です。</p>
-    <p>各プールURL：</p>
+  <!-- 注意事項 -->
+  <div class="box">
+    <h3>注意事項</h3>
     <ul>
-      <li><a href="http://www.green-pool.jp/" target="_blank">グリーンプール</a></li>
-      <li><a href="https://www.city.hiratsuka.kanagawa.jp/koen/page-c_00812.html" target="_blank">ひらつかアリーナ</a></li>
-      <li><a href="https://yokohama-sport.jp/waterarena/" target="_blank">横浜ウォータープレイス</a></li>
+      <li>予約前にかならず休館等の情報をご確認ください。</li>
+      <li>トレーニングルームの利用には管理者の承諾が必要です。</li>
+      <li>各プールURL:
+        <a href="http://www.green-pool.jp/" target="_blank">Green Pool</a>,
+        <a href="https://www.city.hiratsuka.kanagawa.jp/koen/page-c_00812.html" target="_blank">Hiratsuka</a>,
+        <a href="https://yokohama-sport.jp/waterarena/" target="_blank">Yokohama</a>
+      </li>
     </ul>
-
-    <h3>📢 お知らせ</h3>
-    <p>11月の登録が完了しました。<br>
-       ご予約は11月分までお取りいただけます。</p>
-    <p id="updated">最終更新：</p>
   </div>
+
+  <!-- お知らせ -->
+  <div class="box">
+    <h3>お知らせ</h3>
+    <p>11月の登録が完了しました。ご予約は11月分までお取りいただけます。</p>
+    <p>最終更新: <span id="lastUpdate"></span></p>
+  </div>
+
+  <!-- ステップ表示 -->
+  <div class="steps">
+    <div class="step active" id="step1">1. 認証</div>
+    <div class="step" id="step2">2. パスワード</div>
+    <div class="step" id="step3">3. 予約</div>
+  </div>
+
+  <!-- reCAPTCHA -->
+  <div class="box" id="captchaBox">
+    <p>まず、下のreCAPTCHAを完了してください。</p>
+    <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g" data-callback="onRecaptchaSuccess"></div>
+  </div>
+
+  <!-- パスワード -->
+  <div class="box" id="passwordBox" style="display:none;">
+    <p>認証に成功しました。パスワードを入力してください。</p>
+    <input type="password" id="passwordField" placeholder="パスワード">
+  </div>
+
+  <!-- 予約ボタン -->
+  <button id="goReservation" disabled>予約サイトへ</button>
 </main>
-
-<!-- ✅ 予約ボタンとreCAPTCHA（ページ下部） -->
-<div id="reservationSection">
-  <div class="g-recaptcha"
-       data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"
-       data-callback="onRecaptchaSuccess"></div>
-  <br><br>
-  <button id="goReservation" disabled>予約ページへ</button>
-</div>
-
-<!-- パスワードモーダル -->
-<div id="passwordModal" class="modal">
-  <div class="content">
-    <h3>アクセス認証</h3>
-    <p>reCAPTCHA認証が完了しました。<br>アクセス用パスワードを入力してください。</p>
-    <input type="password" id="passwordInput" placeholder="パスワードを入力" style="padding:8px;width:80%;margin:10px 0;border-radius:5px;border:1px solid #ccc;">
-    <div class="modal-buttons">
-      <button id="passwordOk" style="background:#1abc9c;color:white;">OK</button>
-      <button id="passwordCancel" style="background:#ccc;">キャンセル</button>
-    </div>
-  </div>
-</div>
-
-<!-- 確認モーダル -->
-<div id="confirmModal" class="modal">
-  <div class="content">
-    <h3>確認</h3>
-    <p>認証が完了しました。<br>予約ページを新しいタブで開きますが、よろしいですか？</p>
-    <div class="modal-buttons">
-      <button id="okBtn" style="background:#1abc9c;color:white;">OK</button>
-      <button id="cancelBtn" style="background:#ccc;">キャンセル</button>
-    </div>
-  </div>
-</div>
 
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
-// reCAPTCHA → パスワードモーダル
-function onRecaptchaSuccess() {
-  document.getElementById("passwordModal").classList.add("show");
-}
-
-// パスワード確認
-document.getElementById("passwordOk").onclick = function() {
-  const input = document.getElementById("passwordInput").value.trim();
-  if (input === "portal2025") {
-    document.getElementById("passwordModal").classList.remove("show");
-    document.getElementById("goReservation").disabled = false;
-  } else {
-    alert("パスワードが違います。再入力してください。");
-    grecaptcha.reset();
-    document.getElementById("passwordModal").classList.remove("show");
-  }
-};
-document.getElementById("passwordCancel").onclick = () => {
-  document.getElementById("passwordModal").classList.remove("show");
-  grecaptcha.reset();
-};
-
-// 予約ボタン → 確認モーダル
-document.getElementById("goReservation").addEventListener("click", function() {
-  document.getElementById("confirmModal").classList.add("show");
-});
-document.getElementById("okBtn").onclick = function() {
-  window.open("https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001", "_blank");
-  document.getElementById("confirmModal").classList.remove("show");
-};
-document.getElementById("cancelBtn").onclick = function() {
-  document.getElementById("confirmModal").classList.remove("show");
-};
-
-// ダークモード
-document.getElementById("darkToggle").addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-});
-
 // ランダム動画
 const videos = ["video1.mp4","video2.mp4","video3.mp4","video5.mp4","V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4","V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
 document.getElementById("randomVideo").src = videos[Math.floor(Math.random()*videos.length)];
 
 // 最終更新日
-const today = new Date();
-document.getElementById("updated").textContent = "最終更新：" + today.getFullYear() + "年" + (today.getMonth()+1) + "月" + today.getDate() + "日";
+document.getElementById("lastUpdate").textContent = new Date().toLocaleDateString();
+
+// ステップ管理
+function setStep(stepNum){
+  for(let i=1;i<=3;i++){
+    document.getElementById('step'+i).classList.remove('active');
+  }
+  document.getElementById('step'+stepNum).classList.add('active');
+}
+
+// reCAPTCHA成功
+function onRecaptchaSuccess(){
+  document.getElementById("captchaBox").style.display = "none";
+  document.getElementById("passwordBox").style.display = "block";
+  setStep(2);
+}
+
+// パスワード処理
+const PASSWORD = "yourpassword"; // ←実際のパスワードに変更
+const passwordField = document.getElementById("passwordField");
+const goBtn = document.getElementById("goReservation");
+
+passwordField.addEventListener("input", function(){
+  if(this.value === PASSWORD){
+    goBtn.disabled = false;
+    setStep(3);
+  } else {
+    goBtn.disabled = true;
+  }
+});
+
+// 予約ボタンクリック
+goBtn.addEventListener("click", function(){
+  if(confirm("認証に成功しました。予約サイトにアクセスしますか？")){
+    window.open("https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001", "_blank");
+  }
+});
 </script>
 
 </body>
