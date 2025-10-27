@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ポータルサイト - 予約</title>
+<link rel="shortcut icon" href="favicon2.png" type="image/png">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  display: flex;
+  background-color: #f5f5f5;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 左ナビ固定 */
+nav {
+  width: 230px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 10px;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+nav video { width: 100%; border-radius: 8px; margin-bottom: 10px; }
+nav a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  margin: 5px 0;
+  background-color: #34495e;
+  border-radius: 6px;
+  text-align: center;
+  transition: 0.3s;
+}
+nav a:hover { background-color: #1abc9c; }
+
+main {
+  flex: 1;
+  margin-left: 230px;
+  padding: 15px;
+  overflow: auto;
+  text-align: center;
+}
+
+#goReservation {
+  padding: 12px 20px;
+  background-color: #888;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: not-allowed;
+  transition: 0.3s;
+}
+#goReservation:enabled {
+  background-color: #1abc9c;
+  cursor: pointer;
+}
+
+/* スマホ対応 */
+@media(max-width:768px){
+  nav{ width:100%; height:auto; display:flex; overflow-x:auto; white-space:nowrap; }
+  nav a{ display:inline-block; margin:4px; font-size:0.9em; }
+  nav video{ display:none; }
+  main{ margin-left:0; margin-top:150px; height:calc(100vh-150px); }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <video id="randomVideo" autoplay loop muted playsinline></video>
+  <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
+  <a href="https://yuma873.github.io/blush-nimble/index.html"
+     style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">
+     ログアウト
+  </a>
+</nav>
+
+<main>
+  <h2>予約ページへ進む</h2>
+  <p>以下の認証を完了すると、予約サイトにアクセスできます。</p>
+
+  <!-- reCAPTCHA -->
+  <div class="g-recaptcha"
+       data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"
+       data-callback="onRecaptchaSuccess"></div>
+
+  <br>
+  <button id="goReservation" disabled>予約ページへ</button>
+</main>
+
+<!-- reCAPTCHAスクリプト -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<script>
+function onRecaptchaSuccess() {
+  const button = document.getElementById("goReservation");
+  button.disabled = false;
+  button.style.cursor = "pointer";
+}
+
+document.getElementById("goReservation").addEventListener("click", function() {
+  const response = grecaptcha.getResponse();
+  if (response.length === 0) {
+    alert("reCAPTCHAを完了してください。");
+    return;
+  }
+  // 認証済みなら予約ページへ
+  window.location.href = "https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001";
+});
+</script>
+
+</body>
+</html>
