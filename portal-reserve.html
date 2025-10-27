@@ -168,40 +168,40 @@ button:enabled {
 
   <!-- ステップ表示 -->
   <div class="steps">
-    <div class="step active" id="step1">1. reCAPTCHA1</div>
-    <div class="step" id="step2">2. パスワード1</div>
-    <div class="step" id="step3">3. reCAPTCHA2</div>
-    <div class="step" id="step4">4. パスワード2</div>
-    <div class="step" id="step5">5. 予約</div>
+    <div class="step active" id="step1">1. 第一認証</div>
+    <div class="step" id="step2">2. 第1パスワード</div>
+    <div class="step" id="step3">3. 第2認証</div>
+    <div class="step" id="step4">4. 第2パスワード</div>
+    <div class="step" id="step5">5. 予約ページ</div>
   </div>
 
   <!-- reCAPTCHA1 -->
   <div class="box" id="captchaBox1" style="display:none;">
-    <p>まず、下のreCAPTCHAを完了してください。</p>
+    <p></p>
     <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g" data-callback="onRecaptcha1Success"></div>
   </div>
 
   <!-- パスワード1 -->
   <div class="box" id="passwordBox1" style="display:none;">
-    <p>reCAPTCHA1を通過しました。パスワード1を入力してください。</p>
+    <p>第1パスワードを入力してください。</p>
     <input type="password" id="passwordField1" placeholder="パスワード1">
   </div>
 
   <!-- reCAPTCHA2 -->
   <div class="box" id="captchaBox2" style="display:none;">
-    <p>次に、reCAPTCHA2を完了してください。</p>
+    <p></p>
     <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g" data-callback="onRecaptcha2Success"></div>
   </div>
 
   <!-- パスワード2 -->
   <div class="box" id="passwordBox2" style="display:none;">
-    <p>reCAPTCHA2を通過しました。パスワード2を入力してください。</p>
+    <p>第2パスワードを入力してください。</p>
     <input type="password" id="passwordField2" placeholder="パスワード2">
   </div>
 
   <!-- 読み込み -->
   <div class="box" id="loadingBox" style="display:none;">
-    <p>準備中です…10秒待ってください。</p>
+    <p>準備中です…今しばらくお待ちください。</p>
   </div>
 
   <!-- 予約ボタン -->
@@ -245,7 +245,7 @@ function onRecaptcha1Success(){
 }
 
 // パスワード1
-const PASSWORD1 = "pass1"; 
+const PASSWORD1 = "s123025@jishukan.ed.jp"; 
 const passwordField1 = document.getElementById("passwordField1");
 passwordField1.addEventListener("input", function(){
   if(this.value === PASSWORD1){
@@ -263,7 +263,7 @@ function onRecaptcha2Success(){
 }
 
 // パスワード2
-const PASSWORD2 = "pass2";
+const PASSWORD2 = "wlnhh22791@yahoo.co.jp";
 const passwordField2 = document.getElementById("passwordField2");
 passwordField2.addEventListener("input", function(){
   if(this.value === PASSWORD2){
@@ -273,7 +273,7 @@ passwordField2.addEventListener("input", function(){
     let countdown = 10;
     const interval = setInterval(()=>{
       countdown--;
-      document.getElementById("loadingBox").querySelector("p").textContent = `準備中です…${countdown}秒待ってください。`;
+      document.getElementById("loadingBox").querySelector("p").textContent = `準備中です…今しばらく待ちください。`;
       if(countdown<=0){
         clearInterval(interval);
         document.getElementById("loadingBox").style.display = "none";
