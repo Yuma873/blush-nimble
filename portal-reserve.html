@@ -124,6 +124,44 @@ button:enabled {
   color: white;
   cursor: pointer;
 }
+  .checkboxItem {
+  display: flex;
+  align-items: center;
+  column-gap: 4px;
+  width: fit-content;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.checkboxItem:not(:last-of-type) {
+  margin-bottom: 16px;
+}
+
+.checkbox {
+  appearance: none;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #06b6d4;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.checkbox:checked {
+  background-color: #06b6d4;
+}
+
+.checkbox:checked::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 3px;
+  width: 12px;
+  height: 6px;
+  border-bottom: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  transform: rotate(-45deg);
+}
 
 /* スマホ対応 */
 @media(max-width:768px){
@@ -156,13 +194,17 @@ button:enabled {
       </li>
     </ul>
     <label><input type="checkbox" id="confirmCheck"> 情報を確認しました。</label>
+    <label class="checkboxItem">
+  <input type="checkbox" name="confirmCheck" value="情報を確認しました。" class="checkbox" checked />
+  情報を確認しました。
+</label>
     <button id="step0Next" disabled>次へ</button>
   </div>
 
   <!-- お知らせ -->
   <div class="box">
     <h3>お知らせ</h3>
-    <p>11月の登録が完了しました。ご予約は11月分までお取りいただけます。</p>
+    <p>11月の登録が完了しました。認証を行って、アクセスしてください。</p>
     <p>最終更新: <span id="lastUpdate"></span></p>
   </div>
 
