@@ -62,14 +62,37 @@ nav a:hover { background-color: var(--accent); }
 main {
   flex: 1;
   margin-left: 230px;
-  padding: 20px;
+  padding: 25px;
   overflow: auto;
   text-align: center;
+  line-height: 1.6;
 }
 
 h2 {
   color: var(--accent);
   margin-bottom: 10px;
+}
+
+.notice {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-top: 20px;
+  text-align: left;
+}
+.notice a {
+  color: var(--accent);
+  word-break: break-all;
+}
+.notice h3 {
+  color: var(--accent);
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+#updated {
+  font-size: 14px;
+  color: gray;
 }
 
 /* ボタン */
@@ -137,15 +160,6 @@ body.dark #modal .content {
 </head>
 <body>
 
-<!-- 🔐 パスワード保護 -->
-<script>
-const pass = prompt("アクセス用パスワードを入力してください：");
-if (pass !== "portal2025") {
-  alert("パスワードが違います。アクセスできません。");
-  location.href = "https://yuma873.github.io/blush-nimble/index.html";
-}
-</script>
-
 <nav>
   <video id="randomVideo" autoplay loop muted playsinline></video>
   <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
@@ -167,6 +181,23 @@ if (pass !== "portal2025") {
 
   <br>
   <button id="goReservation" disabled>予約ページへ</button>
+
+  <div class="notice">
+    <h3>⚠ 注意事項</h3>
+    <p>予約前にかならず休館等の情報をご確認ください。<br>
+       なお、トレーニングルームの利用には管理者の承諾が必要です。</p>
+    <p>各プールURL：</p>
+    <ul>
+      <li><a href="http://www.green-pool.jp/" target="_blank">グリーンプール</a></li>
+      <li><a href="https://www.city.hiratsuka.kanagawa.jp/koen/page-c_00812.html" target="_blank">ひらつかアリーナ</a></li>
+      <li><a href="https://yokohama-sport.jp/waterarena/" target="_blank">横浜ウォータープレイス</a></li>
+    </ul>
+
+    <h3>📢 お知らせ</h3>
+    <p>11月の登録が完了しました。<br>
+       ご予約は11月分までお取りいただけます。</p>
+    <p id="updated">最終更新：</p>
+  </div>
 </main>
 
 <!-- モーダル -->
@@ -185,20 +216,21 @@ if (pass !== "portal2025") {
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 <script>
-// ✅ reCAPTCHA完了でボタン有効化
+// ✅ reCAPTCHA完了でパスワード入力へ
 function onRecaptchaSuccess() {
-  document.getElementById("goReservation").disabled = false;
-  document.getElementById("goReservation").style.cursor = "pointer";
+  const pass = prompt("アクセス用パスワードを入力してください：");
+  if (pass === "portal2025") {
+    document.getElementById("goReservation").disabled = false;
+    document.getElementById("goReservation").style.cursor = "pointer";
+  } else {
+    alert("パスワードが違います。アクセスできません。");
+    grecaptcha.reset(); // reCAPTCHAをリセット
+  }
 }
 
 // ✅ モーダル確認
 const modal = document.getElementById("modal");
 document.getElementById("goReservation").addEventListener("click", function() {
-  const response = grecaptcha.getResponse();
-  if (response.length === 0) {
-    alert("reCAPTCHAを完了してください。");
-    return;
-  }
   modal.style.display = "flex";
 });
 document.getElementById("okBtn").onclick = function() {
@@ -210,8 +242,7 @@ document.getElementById("cancelBtn").onclick = function() {
 };
 
 // 🌗 ダークモード切替
-const darkToggle = document.getElementById("darkToggle");
-darkToggle.addEventListener("click", () => {
+document.getElementById("darkToggle").addEventListener("click", () => {
   document.body.classList.toggle("dark");
 });
 
@@ -221,8 +252,12 @@ const videos = [
   "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
   "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
 ];
-const randomIndex = Math.floor(Math.random() * videos.length);
-document.getElementById("randomVideo").src = videos[randomIndex];
+document.getElementById("randomVideo").src = videos[Math.floor(Math.random() * videos.length)];
+
+// 🗓 最終更新日（自動）
+const today = new Date();
+document.getElementById("updated").textContent =
+  "最終更新：" + today.getFullYear() + "年" + (today.getMonth()+1) + "月" + today.getDate() + "日";
 </script>
 
 </body>
