@@ -13,7 +13,7 @@
   --accent: #1abc9c;
 }
 
-/* ダークモード */
+/* 🌙 ダークモード */
 body.dark {
   --bg-color: #1e1e1e;
   --text-color: #f0f0f0;
@@ -73,6 +73,7 @@ h2 {
   margin-bottom: 10px;
 }
 
+/* 注意・お知らせ */
 .notice {
   background: #fff;
   padding: 15px;
@@ -80,6 +81,10 @@ h2 {
   border: 1px solid #ccc;
   margin-top: 20px;
   text-align: left;
+}
+body.dark .notice {
+  background: #222;
+  border-color: #444;
 }
 .notice a {
   color: var(--accent);
@@ -118,8 +123,8 @@ button {
   color: white;
 }
 
-/* モーダル */
-#modal {
+/* モーダル共通 */
+.modal {
   display: none;
   position: fixed;
   top: 0; left: 0;
@@ -128,8 +133,12 @@ button {
   justify-content: center;
   align-items: center;
   z-index: 2000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
-#modal .content {
+.modal.show { display: flex; opacity: 1; }
+
+.modal .content {
   background: white;
   color: black;
   padding: 20px;
@@ -138,10 +147,16 @@ button {
   max-width: 400px;
   text-align: center;
   box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  transform: translateY(-10px);
+  animation: fadeIn 0.3s ease forwards;
 }
-body.dark #modal .content {
+body.dark .modal .content {
   background: #333;
   color: #fff;
+}
+@keyframes fadeIn {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 .modal-buttons button {
   margin: 10px;
@@ -189,8 +204,8 @@ body.dark #modal .content {
     <p>各プールURL：</p>
     <ul>
       <li><a href="http://www.green-pool.jp/" target="_blank">グリーンプール</a></li>
-      <li><a href="https://www.city.hiratsuka.kanagawa.jp/koen/page-c_00812.html" target="_blank">ひらつかアリーナ</a></li>
-      <li><a href="https://yokohama-sport.jp/waterarena/" target="_blank">横浜ウォータープレイス</a></li>
+      <li><a href="https://www.city.hiratsuka.kanagawa.jp/koen/page-c_00812.html" target="_blank">平塚総合公園温水プール</a></li>
+      <li><a href="https://yokohama-sport.jp/waterarena/" target="_blank">横浜国際プール</a></li>
     </ul>
 
     <h3>📢 お知らせ</h3>
@@ -200,8 +215,21 @@ body.dark #modal .content {
   </div>
 </main>
 
-<!-- モーダル -->
-<div id="modal">
+<!-- 💬 パスワード入力モーダル -->
+<div id="passwordModal" class="modal">
+  <div class="content">
+    <h3>アクセス認証</h3>
+    <p>reCAPTCHA認証が完了しました。<br>アクセス用パスワードを入力してください。</p>
+    <input type="password" id="passwordInput" placeholder="パスワードを入力" style="padding:8px;width:80%;margin:10px 0;border-radius:5px;border:1px solid #ccc;">
+    <div class="modal-buttons">
+      <button id="passwordOk" style="background:#1abc9c;color:white;">OK</button>
+      <button id="passwordCancel" style="background:#ccc;">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- 💬 確認モーダル -->
+<div id="confirmModal" class="modal">
   <div class="content">
     <h3>確認</h3>
     <p>認証が完了しました。<br>予約ページを新しいタブで開きますが、よろしいですか？</p>
@@ -216,29 +244,38 @@ body.dark #modal .content {
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 <script>
-// ✅ reCAPTCHA完了でパスワード入力へ
+// ✅ reCAPTCHA → パスワードモーダル表示
 function onRecaptchaSuccess() {
-  const pass = prompt("アクセス用パスワードを入力してください：");
-  if (pass === "Loco@0923") {
-    document.getElementById("goReservation").disabled = false;
-    document.getElementById("goReservation").style.cursor = "pointer";
-  } else {
-    alert("パスワードが違います。アクセスできません。");
-    grecaptcha.reset(); // reCAPTCHAをリセット
-  }
+  document.getElementById("passwordModal").classList.add("show");
 }
 
-// ✅ モーダル確認
-const modal = document.getElementById("modal");
+// ✅ パスワード入力確認
+document.getElementById("passwordOk").onclick = function() {
+  const input = document.getElementById("passwordInput").value.trim();
+  if (input === "portal2025") {
+    document.getElementById("passwordModal").classList.remove("show");
+    document.getElementById("goReservation").disabled = false;
+  } else {
+    alert("パスワードが違います。再入力してください。");
+    grecaptcha.reset();
+    document.getElementById("passwordModal").classList.remove("show");
+  }
+};
+document.getElementById("passwordCancel").onclick = () => {
+  document.getElementById("passwordModal").classList.remove("show");
+  grecaptcha.reset();
+};
+
+// ✅ 予約ボタン → 確認モーダル
 document.getElementById("goReservation").addEventListener("click", function() {
-  modal.style.display = "flex";
+  document.getElementById("confirmModal").classList.add("show");
 });
 document.getElementById("okBtn").onclick = function() {
   window.open("https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001", "_blank");
-  modal.style.display = "none";
+  document.getElementById("confirmModal").classList.remove("show");
 };
 document.getElementById("cancelBtn").onclick = function() {
-  modal.style.display = "none";
+  document.getElementById("confirmModal").classList.remove("show");
 };
 
 // 🌗 ダークモード切替
@@ -254,7 +291,7 @@ const videos = [
 ];
 document.getElementById("randomVideo").src = videos[Math.floor(Math.random() * videos.length)];
 
-// 🗓 最終更新日（自動）
+// 🗓 最終更新日
 const today = new Date();
 document.getElementById("updated").textContent =
   "最終更新：" + today.getFullYear() + "年" + (today.getMonth()+1) + "月" + today.getDate() + "日";
