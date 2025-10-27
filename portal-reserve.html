@@ -29,7 +29,12 @@ nav {
   z-index: 1000;
 }
 
-nav video { width: 100%; border-radius: 8px; margin-bottom: 10px; }
+nav video {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
 nav a {
   display: block;
   color: white;
@@ -210,7 +215,7 @@ button:enabled {
 
   <!-- ステップ表示 -->
   <div class="steps">
-    <div class="step active" id="step1">1. 第一認証</div>
+    <div class="step" id="step1">1. 第一認証</div>
     <div class="step" id="step2">2. 第1パスワード</div>
     <div class="step" id="step3">3. 第2認証</div>
     <div class="step" id="step4">4. 第2パスワード</div>
@@ -219,7 +224,7 @@ button:enabled {
 
   <!-- reCAPTCHA1 -->
   <div class="box" id="captchaBox1" style="display:none;">
-    <p></p>
+    <p>第一認証を行ってください。</p>
     <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g" data-callback="onRecaptcha1Success"></div>
   </div>
 
@@ -233,7 +238,7 @@ button:enabled {
 
   <!-- reCAPTCHA2 -->
   <div class="box" id="captchaBox2" style="display:none;">
-    <p></p>
+    <p>第2認証を行ってください。</p>
     <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g" data-callback="onRecaptcha2Success"></div>
   </div>
 
@@ -256,59 +261,88 @@ button:enabled {
 
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
-// ランダム動画
+// ---- ランダム動画 ----
 const videos = ["video1.mp4","video2.mp4","video3.mp4","video5.mp4","V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4","V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
-document.getElementById("randomVideo").src = videos[Math.floor(Math.random()*videos.length)];
+const videoElem = document.getElementById("randomVideo");
+videoElem.src = videos[Math.floor(Math.random() * videos.length)];
+videoElem.onerror = () => { videoElem.style.display = "none"; };
 
-// 最終更新日
+// ---- 最終更新日 ----
 document.getElementById("lastUpdate").textContent = new Date().toLocaleDateString();
 
-// ステップ管理
-function setStep(stepNum){
-  for(let i=1;i<=5;i++){
-    document.getElementById('step'+i).classList.remove('active');
+// ---- ステップ管理 ----
+function setStep(stepNum) {
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById("step" + i).classList.remove("active");
   }
-  if(stepNum>0) document.getElementById('step'+stepNum).classList.add('active');
+  if (stepNum > 0) document.getElementById("step" + stepNum).classList.add("active");
 }
 
-// ステップ0: 注意事項確認
+// ---- 初期化 ----
+window.addEventListener("DOMContentLoaded", () => {
+  setStep(0);
+});
+
+// ---- ステップ0: 注意事項確認 ----
 const confirmCheck = document.getElementById("confirmCheck");
 const step0Next = document.getElementById("step0Next");
 
-confirmCheck.addEventListener("change", function(){
+confirmCheck.addEventListener("change", function () {
   step0Next.disabled = !this.checked;
 });
 
-step0Next.addEventListener("click", function(){
+step0Next.addEventListener("click", function () {
   document.getElementById("step0Box").style.display = "none";
   document.getElementById("captchaBox1").style.display = "block";
   setStep(1);
 });
 
-// パスワード1決定
-const correctPassword1 = "pass1"; // ここに本来のパスワード
-document.getElementById("passwordBtn1").addEventListener("click", function(){
-  const val = document.getElementById("passwordField1").value;
-  if(val === correctPassword1){
+// ---- reCAPTCHA コールバック ----
+function onRecaptcha1Success() {
+  document.getElementById("captchaBox1").style.display = "none";
+  document.getElementById("passwordBox1").style.display = "block";
+  setStep(2);
+}
+
+function onRecaptcha2Success() {
+  document.getElementById("captchaBox2").style.display = "none";
+  document.getElementById("passwordBox2").style.display = "block";
+  setStep(4);
+}
+
+// ---- パスワード認証 ----
+const correctPassword1 = "pass1";
+const correctPassword2 = "pass2";
+
+document.getElementById("passwordBtn1").addEventListener("click", function () {
+  const val = document.getElementById("passwordField1").value.trim();
+  const msg = document.getElementById("passwordMsg1");
+  if (val === correctPassword1) {
+    msg.textContent = "";
     document.getElementById("passwordBox1").style.display = "none";
     document.getElementById("captchaBox2").style.display = "block";
     setStep(3);
   } else {
-    document.getElementById("passwordMsg1").textContent = "パスワードが違います。";
+    msg.textContent = "パスワードが違います。";
   }
 });
 
-// パスワード2決定
-const correctPassword2 = "pass2"; // ここに本来のパスワード
-document.getElementById("passwordBtn2").addEventListener("click", function(){
-  const val = document.getElementById("passwordField2").value;
-  if(val === correctPassword2){
+document.getElementById("passwordBtn2").addEventListener("click", function () {
+  const val = document.getElementById("passwordField2").value.trim();
+  const msg = document.getElementById("passwordMsg2");
+  if (val === correctPassword2) {
+    msg.textContent = "";
     document.getElementById("passwordBox2").style.display = "none";
     document.getElementById("goReservation").disabled = false;
     setStep(5);
   } else {
-    document.getElementById("passwordMsg2").textContent = "パスワードが違います。";
+    msg.textContent = "パスワードが違います。";
   }
+});
+
+// ---- 予約ページへ遷移 ----
+document.getElementById("goReservation").addEventListener("click", function () {
+  window.location.href = "https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001";
 });
 </script>
 
