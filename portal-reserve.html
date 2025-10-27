@@ -30,7 +30,11 @@ nav {
   z-index: 1000;
 }
 
-nav video { width: 100%; border-radius: 8px; margin-bottom: 10px; }
+nav video {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
 nav a {
   display: block;
   color: white;
@@ -42,7 +46,9 @@ nav a {
   text-align: center;
   transition: 0.3s;
 }
-nav a:hover { background-color: #1abc9c; }
+nav a:hover {
+  background-color: #1abc9c;
+}
 
 main {
   flex: 1;
@@ -69,10 +75,26 @@ main {
 
 /* スマホ対応 */
 @media(max-width:768px){
-  nav{ width:100%; height:auto; display:flex; overflow-x:auto; white-space:nowrap; }
-  nav a{ display:inline-block; margin:4px; font-size:0.9em; }
-  nav video{ display:none; }
-  main{ margin-left:0; margin-top:150px; height:calc(100vh-150px); }
+  nav {
+    width:100%;
+    height:auto;
+    display:flex;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+  nav a {
+    display:inline-block;
+    margin:4px;
+    font-size:0.9em;
+  }
+  nav video {
+    display:none;
+  }
+  main {
+    margin-left:0;
+    margin-top:150px;
+    height:calc(100vh-150px);
+  }
 }
 </style>
 </head>
@@ -110,15 +132,35 @@ function onRecaptchaSuccess() {
   button.style.cursor = "pointer";
 }
 
+// ボタン押下時の処理
 document.getElementById("goReservation").addEventListener("click", function() {
   const response = grecaptcha.getResponse();
   if (response.length === 0) {
     alert("reCAPTCHAを完了してください。");
     return;
   }
-  // 認証済みなら予約ページへ
-  window.location.href = "https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001";
+
+  // 確認メッセージを出す
+  const confirmed = confirm("reCAPTCHAが完了しました。\n予約ページを新しいタブで開きますが、よろしいですか？");
+  if (confirmed) {
+    // 新しいタブで開く
+    window.open("https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001", "_blank");
+  } else {
+    alert("キャンセルされました。");
+  }
 });
+</script>
+
+<!-- ランダム動画設定 -->
+<script>
+const videos = [
+  "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
+  "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
+  "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
+];
+const randomIndex = Math.floor(Math.random() * videos.length);
+const randomVideo = videos[randomIndex];
+document.getElementById("randomVideo").src = randomVideo;
 </script>
 
 </body>
