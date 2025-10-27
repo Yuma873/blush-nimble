@@ -13,7 +13,6 @@
   --accent: #1abc9c;
 }
 
-/* 🌙 ダークモード */
 body.dark {
   --bg-color: #1e1e1e;
   --text-color: #f0f0f0;
@@ -24,48 +23,42 @@ body {
   font-family: "Segoe UI", Arial, sans-serif;
   margin: 0;
   display: flex;
+  flex-direction: column;
   background-color: var(--bg-color);
   color: var(--text-color);
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   transition: background 0.3s, color 0.3s;
 }
 
-/* 左ナビ固定 */
 nav {
-  width: 230px;
+  width: 100%;
   background-color: var(--nav-bg);
   color: white;
   padding: 10px;
   box-sizing: border-box;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  overflow-y: auto;
-  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-nav video { width: 100%; border-radius: 8px; margin-bottom: 10px; }
+nav video { width: 100px; border-radius: 8px; }
 nav a {
-  display: block;
   color: white;
   text-decoration: none;
   padding: 10px;
-  margin: 5px 0;
   background-color: #34495e;
   border-radius: 6px;
-  text-align: center;
+  margin-left: 10px;
   transition: 0.3s;
 }
 nav a:hover { background-color: var(--accent); }
 
 main {
   flex: 1;
-  margin-left: 230px;
-  padding: 25px;
-  overflow: auto;
-  text-align: center;
-  line-height: 1.6;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 h2 {
@@ -73,34 +66,27 @@ h2 {
   margin-bottom: 10px;
 }
 
-/* 注意・お知らせ */
 .notice {
   background: #fff;
   padding: 15px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  margin-top: 20px;
-  text-align: left;
+  margin-bottom: 20px;
 }
 body.dark .notice {
   background: #222;
   border-color: #444;
 }
-.notice a {
-  color: var(--accent);
-  word-break: break-all;
-}
-.notice h3 {
-  color: var(--accent);
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 5px;
-}
-#updated {
-  font-size: 14px;
-  color: gray;
-}
+.notice a { color: var(--accent); word-break: break-all; }
+.notice h3 { color: var(--accent); border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+#updated { font-size: 14px; color: gray; }
 
-/* ボタン */
+/* ボタン・reCAPTCHA */
+#reservationSection {
+  margin-top: auto;
+  text-align: center;
+  padding: 20px;
+}
 button {
   padding: 12px 20px;
   border: none;
@@ -118,12 +104,12 @@ button {
   cursor: pointer;
 }
 #darkToggle {
-  margin-top: 10px;
+  margin-left: 10px;
   background-color: var(--accent);
   color: white;
 }
 
-/* モーダル共通 */
+/* モーダル */
 .modal {
   display: none;
   position: fixed;
@@ -137,7 +123,6 @@ button {
   transition: opacity 0.3s ease;
 }
 .modal.show { display: flex; opacity: 1; }
-
 .modal .content {
   background: white;
   color: black;
@@ -150,26 +135,17 @@ button {
   transform: translateY(-10px);
   animation: fadeIn 0.3s ease forwards;
 }
-body.dark .modal .content {
-  background: #333;
-  color: #fff;
-}
+body.dark .modal .content { background: #333; color: #fff; }
 @keyframes fadeIn {
   from { transform: translateY(-10px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
-.modal-buttons button {
-  margin: 10px;
-  padding: 8px 20px;
-  border-radius: 5px;
-}
 
 /* スマホ対応 */
 @media(max-width:768px){
-  nav{ width:100%; height:auto; display:flex; overflow-x:auto; white-space:nowrap; }
-  nav a{ display:inline-block; margin:4px; font-size:0.9em; }
+  nav{ flex-direction: column; align-items: flex-start; }
   nav video{ display:none; }
-  main{ margin-left:0; margin-top:150px; height:calc(100vh-150px); }
+  main{ padding: 10px; }
 }
 </style>
 </head>
@@ -177,26 +153,15 @@ body.dark .modal .content {
 
 <nav>
   <video id="randomVideo" autoplay loop muted playsinline></video>
-  <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
-  <a href="https://yuma873.github.io/blush-nimble/index.html"
-     style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">
-     ログアウト
-  </a>
-  <button id="darkToggle">🌗 ダークモード</button>
+  <div>
+    <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
+    <a href="https://yuma873.github.io/blush-nimble/index.html" style="background:#f44336;">ログアウト</a>
+    <button id="darkToggle">🌗 ダークモード</button>
+  </div>
 </nav>
 
 <main>
-  <h2>予約ページへ進む</h2>
-  <p>以下の認証を完了すると、予約サイトにアクセスできます。</p>
-
-  <!-- reCAPTCHA -->
-  <div class="g-recaptcha"
-       data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"
-       data-callback="onRecaptchaSuccess"></div>
-
-  <br>
-  <button id="goReservation" disabled>予約ページへ</button>
-
+  <!-- ⚠ 注意事項・お知らせ（ページ上部） -->
   <div class="notice">
     <h3>⚠ 注意事項</h3>
     <p>予約前にかならず休館等の情報をご確認ください。<br>
@@ -204,8 +169,8 @@ body.dark .modal .content {
     <p>各プールURL：</p>
     <ul>
       <li><a href="http://www.green-pool.jp/" target="_blank">グリーンプール</a></li>
-      <li><a href="https://www.city.hiratsuka.kanagawa.jp/koen/page-c_00812.html" target="_blank">平塚総合公園温水プール</a></li>
-      <li><a href="https://yokohama-sport.jp/waterarena/" target="_blank">横浜国際プール</a></li>
+      <li><a href="https://www.city.hiratsuka.kanagawa.jp/koen/page-c_00812.html" target="_blank">ひらつかアリーナ</a></li>
+      <li><a href="https://yokohama-sport.jp/waterarena/" target="_blank">横浜ウォータープレイス</a></li>
     </ul>
 
     <h3>📢 お知らせ</h3>
@@ -215,7 +180,16 @@ body.dark .modal .content {
   </div>
 </main>
 
-<!-- 💬 パスワード入力モーダル -->
+<!-- ✅ 予約ボタンとreCAPTCHA（ページ下部） -->
+<div id="reservationSection">
+  <div class="g-recaptcha"
+       data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"
+       data-callback="onRecaptchaSuccess"></div>
+  <br><br>
+  <button id="goReservation" disabled>予約ページへ</button>
+</div>
+
+<!-- パスワードモーダル -->
 <div id="passwordModal" class="modal">
   <div class="content">
     <h3>アクセス認証</h3>
@@ -228,7 +202,7 @@ body.dark .modal .content {
   </div>
 </div>
 
-<!-- 💬 確認モーダル -->
+<!-- 確認モーダル -->
 <div id="confirmModal" class="modal">
   <div class="content">
     <h3>確認</h3>
@@ -240,16 +214,14 @@ body.dark .modal .content {
   </div>
 </div>
 
-<!-- reCAPTCHAスクリプト -->
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-
 <script>
-// ✅ reCAPTCHA → パスワードモーダル表示
+// reCAPTCHA → パスワードモーダル
 function onRecaptchaSuccess() {
   document.getElementById("passwordModal").classList.add("show");
 }
 
-// ✅ パスワード入力確認
+// パスワード確認
 document.getElementById("passwordOk").onclick = function() {
   const input = document.getElementById("passwordInput").value.trim();
   if (input === "portal2025") {
@@ -266,7 +238,7 @@ document.getElementById("passwordCancel").onclick = () => {
   grecaptcha.reset();
 };
 
-// ✅ 予約ボタン → 確認モーダル
+// 予約ボタン → 確認モーダル
 document.getElementById("goReservation").addEventListener("click", function() {
   document.getElementById("confirmModal").classList.add("show");
 });
@@ -278,23 +250,18 @@ document.getElementById("cancelBtn").onclick = function() {
   document.getElementById("confirmModal").classList.remove("show");
 };
 
-// 🌗 ダークモード切替
+// ダークモード
 document.getElementById("darkToggle").addEventListener("click", () => {
   document.body.classList.toggle("dark");
 });
 
-// 🎞️ ランダム動画
-const videos = [
-  "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
-  "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
-  "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
-];
-document.getElementById("randomVideo").src = videos[Math.floor(Math.random() * videos.length)];
+// ランダム動画
+const videos = ["video1.mp4","video2.mp4","video3.mp4","video5.mp4","V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4","V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
+document.getElementById("randomVideo").src = videos[Math.floor(Math.random()*videos.length)];
 
-// 🗓 最終更新日
+// 最終更新日
 const today = new Date();
-document.getElementById("updated").textContent =
-  "最終更新：" + today.getFullYear() + "年" + (today.getMonth()+1) + "月" + today.getDate() + "日";
+document.getElementById("updated").textContent = "最終更新：" + today.getFullYear() + "年" + (today.getMonth()+1) + "月" + today.getDate() + "日";
 </script>
 
 </body>
