@@ -97,7 +97,7 @@ main {
 }
 
 /* パスワードとボタン */
-#passwordField, #goReservation, #confirmCheck {
+input[type="password"], button, #confirmCheck {
   display: block;
   width: 100%;
   padding: 12px;
@@ -107,22 +107,22 @@ main {
   border: 1px solid #ccc;
   box-sizing: border-box;
 }
-#goReservation {
-  background-color: #888;
-  color: white;
-  cursor: not-allowed;
+
+button {
   border: none;
   transition: 0.3s;
 }
-#goReservation:enabled {
-  background-color: #1abc9c;
-  cursor: pointer;
+
+button:disabled {
+  background-color: #888;
+  color: white;
+  cursor: not-allowed;
 }
 
-/* ステップ0用チェックボックス */
-#confirmCheck {
-  width: auto;
-  display: inline-block;
+button:enabled {
+  background-color: #1abc9c;
+  color: white;
+  cursor: pointer;
 }
 
 /* スマホ対応 */
@@ -168,21 +168,40 @@ main {
 
   <!-- ステップ表示 -->
   <div class="steps">
-    <div class="step active" id="step1">1. 認証</div>
-    <div class="step" id="step2">2. パスワード</div>
-    <div class="step" id="step3">3. 予約</div>
+    <div class="step active" id="step1">1. reCAPTCHA1</div>
+    <div class="step" id="step2">2. パスワード1</div>
+    <div class="step" id="step3">3. reCAPTCHA2</div>
+    <div class="step" id="step4">4. パスワード2</div>
+    <div class="step" id="step5">5. 予約</div>
   </div>
 
-  <!-- reCAPTCHA -->
-  <div class="box" id="captchaBox" style="display:none;">
+  <!-- reCAPTCHA1 -->
+  <div class="box" id="captchaBox1" style="display:none;">
     <p>まず、下のreCAPTCHAを完了してください。</p>
-    <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g" data-callback="onRecaptchaSuccess"></div>
+    <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g" data-callback="onRecaptcha1Success"></div>
   </div>
 
-  <!-- パスワード -->
-  <div class="box" id="passwordBox" style="display:none;">
-    <p>認証に成功しました。パスワードを入力してください。</p>
-    <input type="password" id="passwordField" placeholder="パスワード">
+  <!-- パスワード1 -->
+  <div class="box" id="passwordBox1" style="display:none;">
+    <p>reCAPTCHA1を通過しました。パスワード1を入力してください。</p>
+    <input type="password" id="passwordField1" placeholder="パスワード1">
+  </div>
+
+  <!-- reCAPTCHA2 -->
+  <div class="box" id="captchaBox2" style="display:none;">
+    <p>次に、reCAPTCHA2を完了してください。</p>
+    <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g" data-callback="onRecaptcha2Success"></div>
+  </div>
+
+  <!-- パスワード2 -->
+  <div class="box" id="passwordBox2" style="display:none;">
+    <p>reCAPTCHA2を通過しました。パスワード2を入力してください。</p>
+    <input type="password" id="passwordField2" placeholder="パスワード2">
+  </div>
+
+  <!-- 読み込み -->
+  <div class="box" id="loadingBox" style="display:none;">
+    <p>準備中です…10秒待ってください。</p>
   </div>
 
   <!-- 予約ボタン -->
@@ -200,51 +219,75 @@ document.getElementById("lastUpdate").textContent = new Date().toLocaleDateStrin
 
 // ステップ管理
 function setStep(stepNum){
-  for(let i=1;i<=3;i++){
+  for(let i=1;i<=5;i++){
     document.getElementById('step'+i).classList.remove('active');
   }
   if(stepNum>0) document.getElementById('step'+stepNum).classList.add('active');
 }
 
-// ステップ0: チェックボックス処理
+// ステップ0: 注意事項確認
 const confirmCheck = document.getElementById("confirmCheck");
 const step0Next = document.getElementById("step0Next");
-
 confirmCheck.addEventListener("change", function(){
   step0Next.disabled = !this.checked;
 });
-
 step0Next.addEventListener("click", function(){
   document.getElementById("step0Box").style.display = "none";
-  document.getElementById("captchaBox").style.display = "block";
+  document.getElementById("captchaBox1").style.display = "block";
   setStep(1);
 });
 
-// reCAPTCHA成功
-function onRecaptchaSuccess(){
-  document.getElementById("captchaBox").style.display = "none";
-  document.getElementById("passwordBox").style.display = "block";
+// reCAPTCHA1
+function onRecaptcha1Success(){
+  document.getElementById("captchaBox1").style.display = "none";
+  document.getElementById("passwordBox1").style.display = "block";
   setStep(2);
 }
 
-// パスワード処理
-const PASSWORD = "yourpassword"; // ←実際のパスワードに変更
-const passwordField = document.getElementById("passwordField");
-const goBtn = document.getElementById("goReservation");
-
-passwordField.addEventListener("input", function(){
-  if(this.value === PASSWORD){
-    goBtn.disabled = false;
+// パスワード1
+const PASSWORD1 = "pass1"; 
+const passwordField1 = document.getElementById("passwordField1");
+passwordField1.addEventListener("input", function(){
+  if(this.value === PASSWORD1){
+    document.getElementById("captchaBox2").style.display = "block";
+    passwordField1.disabled = true;
     setStep(3);
-  } else {
-    goBtn.disabled = true;
   }
 });
 
-// 予約ボタンクリック
+// reCAPTCHA2
+function onRecaptcha2Success(){
+  document.getElementById("captchaBox2").style.display = "none";
+  document.getElementById("passwordBox2").style.display = "block";
+  setStep(4);
+}
+
+// パスワード2
+const PASSWORD2 = "pass2";
+const passwordField2 = document.getElementById("passwordField2");
+passwordField2.addEventListener("input", function(){
+  if(this.value === PASSWORD2){
+    document.getElementById("passwordBox2").style.display = "none";
+    document.getElementById("loadingBox").style.display = "block";
+    setStep(5);
+    let countdown = 10;
+    const interval = setInterval(()=>{
+      countdown--;
+      document.getElementById("loadingBox").querySelector("p").textContent = `準備中です…${countdown}秒待ってください。`;
+      if(countdown<=0){
+        clearInterval(interval);
+        document.getElementById("loadingBox").style.display = "none";
+        document.getElementById("goReservation").disabled = false;
+      }
+    },1000);
+  }
+});
+
+// 予約ボタン
+const goBtn = document.getElementById("goReservation");
 goBtn.addEventListener("click", function(){
   if(confirm("認証に成功しました。予約サイトにアクセスしますか？")){
-    window.open("https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001", "_blank");
+    window.open("https://www.r326.com/b/main.aspx?g=IIu0c8qZ2933SZW001","_blank");
   }
 });
 </script>
