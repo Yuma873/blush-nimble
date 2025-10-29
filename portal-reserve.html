@@ -171,7 +171,7 @@ button:enabled {
 
 /* OTPモーダル */
 @keyframes modalPop { 0%{transform:scale(0.8);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-#otp-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:10000; }
+#otp-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:10000; animation: fadeIn 0.5s ease-out; }
 #otp-content {
   background: linear-gradient(135deg, #005bac, #0081cc);
   color:white; padding:30px 25px; border-radius:12px; max-width:320px; width:90%;
@@ -179,8 +179,6 @@ button:enabled {
   user-select:none;
 }
 #otp-number { font-size:24px; margin:15px 0; letter-spacing:2px; font-weight:bold; }
-#otp-input { width:100%; padding:10px; border-radius:6px; border:none; font-size:16px; text-align:center; margin-bottom:10px; }
-#otp-error { color:#ff8080; font-size:13px; margin-bottom:10px; min-height:18px; }
 
 /* スマホ対応 */
 @media(max-width:768px){
@@ -225,8 +223,9 @@ button:enabled {
   <div class="box">
     <h3>お知らせ</h3>
     <p>11月の登録が完了しました。認証を行って、アクセスしてください。</p>
-    <p>管理者への連絡及び予定は、<a href="https://system.hawai-an.com/user/event_info.php" target="_blank">こちら</a>からアクセスできます。</p>
-    <p>グループID,個人ID,パスキーを紛失した場合は初回時のメールをご確認ください。</p>
+    <p>管理者への連絡及び予定は、<a href="https://system.hawai-an.com/user/event_info.php" target="_blank">こちら</a>からアクセスできます。
+</p>
+<p>グループID,個人ID,パスキーを紛失した場合は初回時のメールをご確認ください。</p>
     <p>最終更新: <span id="lastUpdate"></span></p>
   </div>
 
@@ -234,9 +233,11 @@ button:enabled {
   <div class="steps">
     <div class="step" id="step1">1. 第一認証</div>
     <div class="step" id="step2">2. 第1パスワード</div>
-    <div class="step" id="step3">3. 第2認証</div>
-    <div class="step" id="step4">4. 第2パスワード</div>
-    <div class="step" id="step5">5. 予約ページ</div>
+    <div class="step" id="step3">3. OTP1</div>
+    <div class="step" id="step4">4. 第二認証</div>
+    <div class="step" id="step5">5. 第2パスワード</div>
+    <div class="step" id="step6">6. OTP2</div>
+    <div class="step" id="step7">7. 予約ページ</div>
   </div>
 
   <!-- reCAPTCHA1 -->
@@ -280,11 +281,11 @@ button:enabled {
 <div id="otp-modal">
   <div id="otp-content">
     <h3>追加認証</h3>
-    <p>画面に表示された10桁の番号を入力してください</p>
+    <p>画面に表示された番号を入力してください</p>
     <div id="otp-number"></div>
-    <input type="text" id="otp-input" placeholder="番号を入力" />
-    <div id="otp-error"></div>
-    <button id="otp-verify-btn">認証</button>
+    <input type="text" id="otp-input" placeholder="番号を入力" style="width:100%; padding:10px; border-radius:6px; border:none; font-size:16px; text-align:center; margin-bottom:10px;" />
+    <div id="otp-error" style="color:#ff8080; font-size:13px; margin-bottom:10px; min-height:18px;"></div>
+    <button id="otp-btn" style="padding:10px 20px; width:100%; border:none; border-radius:6px; background-color:#00488c; color:white; font-size:16px; cursor:pointer;" onmouseover="this.style.backgroundColor='#003366'" onmouseout="this.style.backgroundColor='#00488c'">認証</button>
   </div>
 </div>
 
@@ -301,7 +302,7 @@ document.getElementById("lastUpdate").textContent = new Date().toLocaleDateStrin
 
 // ---- ステップ管理 ----
 function setStep(stepNum) {
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 7; i++) {
     document.getElementById("step" + i).classList.remove("active");
   }
   if (stepNum > 0) document.getElementById("step" + stepNum).classList.add("active");
@@ -315,11 +316,9 @@ window.addEventListener("DOMContentLoaded", () => {
 // ---- ステップ0: 注意事項確認 ----
 const confirmCheck = document.getElementById("confirmCheck");
 const step0Next = document.getElementById("step0Next");
-
 confirmCheck.addEventListener("change", function () {
   step0Next.disabled = !this.checked;
 });
-
 step0Next.addEventListener("click", function () {
   document.getElementById("step0Box").style.display = "none";
   document.getElementById("captchaBox1").style.display = "block";
@@ -336,44 +335,17 @@ function onRecaptcha1Success() {
 function onRecaptcha2Success() {
   document.getElementById("captchaBox2").style.display = "none";
   document.getElementById("passwordBox2").style.display = "block";
-  setStep(4);
+  setStep(5);
 }
 
 // ---- パスワード認証 ----
 const correctPassword1 = "pass1";
 const correctPassword2 = "pass2";
 
-document.getElementById("passwordBtn1").addEventListener("click", function () {
-  const val = document.getElementById("passwordField1").value.trim();
-  const msg = document.getElementById("passwordMsg1");
-  if (val === correctPassword1) {
-    msg.textContent = "";
-    document.getElementById("passwordBox1").style.display = "none";
-    document.getElementById("captchaBox2").style.display = "block";
-    setStep(3);
-  } else {
-    msg.textContent = "パスワードが違います。";
-  }
-});
-
-document.getElementById("passwordBtn2").addEventListener("click", function () {
-  const val = document.getElementById("passwordField2").value.trim();
-  const msg = document.getElementById("passwordMsg2");
-  if (val === correctPassword2) {
-    msg.textContent = "";
-    document.getElementById("passwordBox2").style.display = "none";
-    showOtpModal(); // パスワード2成功後にOTP表示
-    setStep(4);
-  } else {
-    msg.textContent = "パスワードが違います。";
-  }
-});
-
 // ---- OTP処理 ----
 let currentOtp = null;
-
-function showOtpModal() {
-  currentOtp = Math.floor(1000000000 + Math.random() * 9000000000); // 10桁
+function showOtpModal(callback) {
+  currentOtp = Math.floor(100000 + Math.random() * 900000); // 6桁
   document.getElementById("otp-number").textContent = currentOtp;
   document.getElementById("otp-modal").style.display = "flex";
   document.getElementById("otp-input").value = "";
@@ -383,26 +355,62 @@ function showOtpModal() {
   // コピー・右クリック・選択防止
   const otpNumberDiv = document.getElementById("otp-number");
   ["contextmenu","copy","mousedown","selectstart","keydown"].forEach(ev => otpNumberDiv.addEventListener(ev,e=>e.preventDefault()));
+
+  // OTPボタン
+  const otpBtn = document.getElementById("otp-btn");
+  otpBtn.onclick = function() { verifyOtp(callback); };
+
+  // Enterキーでも認証
+  document.getElementById("otp-input").onkeydown = function(e){
+    if(e.key === "Enter") verifyOtp(callback);
+  };
 }
 
-document.getElementById("otp-verify-btn").addEventListener("click", verifyOtp);
-document.getElementById("otp-input").addEventListener("keydown", function(e){
-  if(e.key==="Enter") verifyOtp();
-});
-
-function verifyOtp() {
+function verifyOtp(callback) {
   const input = document.getElementById("otp-input").value.trim();
   const error = document.getElementById("otp-error");
-
   if(input === currentOtp.toString()) {
     error.textContent = "";
     document.getElementById("otp-modal").style.display = "none";
-    document.getElementById("goReservation").disabled = false; // OTP成功で予約ボタン有効化
-    setStep(5); // ステップを予約ページに
+    if(callback) callback();
   } else {
     error.textContent = "番号が間違っています";
   }
 }
+
+// ---- パスワード1成功後 ----
+document.getElementById("passwordBtn1").addEventListener("click", function () {
+  const val = document.getElementById("passwordField1").value.trim();
+  const msg = document.getElementById("passwordMsg1");
+  if(val === correctPassword1) {
+    msg.textContent = "";
+    document.getElementById("passwordBox1").style.display = "none";
+    showOtpModal(() => {
+      document.getElementById("captchaBox2").style.display = "block";
+      setStep(4);
+    });
+    setStep(3); // OTP1ステップ
+  } else {
+    msg.textContent = "パスワードが違います。";
+  }
+});
+
+// ---- パスワード2成功後 ----
+document.getElementById("passwordBtn2").addEventListener("click", function () {
+  const val = document.getElementById("passwordField2").value.trim();
+  const msg = document.getElementById("passwordMsg2");
+  if(val === correctPassword2) {
+    msg.textContent = "";
+    document.getElementById("passwordBox2").style.display = "none";
+    showOtpModal(() => {
+      document.getElementById("goReservation").disabled = false;
+      setStep(7);
+    });
+    setStep(6); // OTP2ステップ
+  } else {
+    msg.textContent = "パスワードが違います。";
+  }
+});
 </script>
 </body>
 </html>
