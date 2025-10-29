@@ -169,6 +169,19 @@ button:enabled {
   transform: rotate(-45deg);
 }
 
+/* OTPモーダル */
+@keyframes modalPop { 0%{transform:scale(0.8);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+#otp-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:10000; }
+#otp-content {
+  background: linear-gradient(135deg, #005bac, #0081cc);
+  color:white; padding:30px 25px; border-radius:12px; max-width:320px; width:90%;
+  text-align:center; box-shadow:0 8px 24px rgba(0,0,0,0.3); animation: modalPop 0.4s ease-out;
+  user-select:none;
+}
+#otp-number { font-size:24px; margin:15px 0; letter-spacing:2px; font-weight:bold; }
+#otp-input { width:100%; padding:10px; border-radius:6px; border:none; font-size:16px; text-align:center; margin-bottom:10px; }
+#otp-error { color:#ff8080; font-size:13px; margin-bottom:10px; min-height:18px; }
+
 /* スマホ対応 */
 @media(max-width:768px){
   nav{ width:100%; height:auto; display:flex; overflow-x:auto; white-space:nowrap; }
@@ -212,9 +225,8 @@ button:enabled {
   <div class="box">
     <h3>お知らせ</h3>
     <p>11月の登録が完了しました。認証を行って、アクセスしてください。</p>
-    <p>管理者への連絡及び予定は、<a href="https://system.hawai-an.com/user/event_info.php" target="_blank">こちら</a>からアクセスできます。
-</p>
-<p>グループID,個人ID,パスキーを紛失した場合は初回時のメールをご確認ください。</p>
+    <p>管理者への連絡及び予定は、<a href="https://system.hawai-an.com/user/event_info.php" target="_blank">こちら</a>からアクセスできます。</p>
+    <p>グループID,個人ID,パスキーを紛失した場合は初回時のメールをご確認ください。</p>
     <p>最終更新: <span id="lastUpdate"></span></p>
   </div>
 
@@ -263,6 +275,18 @@ button:enabled {
   <!-- 予約ボタン -->
   <button id="goReservation" disabled>予約サイトへ</button>
 </main>
+
+<!-- OTPモーダル -->
+<div id="otp-modal">
+  <div id="otp-content">
+    <h3>追加認証</h3>
+    <p>画面に表示された10桁の番号を入力してください</p>
+    <div id="otp-number"></div>
+    <input type="text" id="otp-input" placeholder="番号を入力" />
+    <div id="otp-error"></div>
+    <button id="otp-verify-btn">認証</button>
+  </div>
+</div>
 
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
@@ -338,18 +362,47 @@ document.getElementById("passwordBtn2").addEventListener("click", function () {
   if (val === correctPassword2) {
     msg.textContent = "";
     document.getElementById("passwordBox2").style.display = "none";
-    document.getElementById("goReservation").disabled = false;
-    setStep(5);
+    showOtpModal(); // パスワード2成功後にOTP表示
+    setStep(4);
   } else {
     msg.textContent = "パスワードが違います。";
   }
 });
 
-// ---- 予約ページへ遷移 ----
-document.getElementById("goReservation").addEventListener("click", function () {
-  window.location.href = "https://www.r326.com/b/main.aspx?id=poolreservation";
-});
-</script>
+// ---- OTP処理 ----
+let currentOtp = null;
 
+function showOtpModal() {
+  currentOtp = Math.floor(1000000000 + Math.random() * 9000000000); // 10桁
+  document.getElementById("otp-number").textContent = currentOtp;
+  document.getElementById("otp-modal").style.display = "flex";
+  document.getElementById("otp-input").value = "";
+  document.getElementById("otp-error").textContent = "";
+  document.getElementById("otp-input").focus();
+
+  // コピー・右クリック・選択防止
+  const otpNumberDiv = document.getElementById("otp-number");
+  ["contextmenu","copy","mousedown","selectstart","keydown"].forEach(ev => otpNumberDiv.addEventListener(ev,e=>e.preventDefault()));
+}
+
+document.getElementById("otp-verify-btn").addEventListener("click", verifyOtp);
+document.getElementById("otp-input").addEventListener("keydown", function(e){
+  if(e.key==="Enter") verifyOtp();
+});
+
+function verifyOtp() {
+  const input = document.getElementById("otp-input").value.trim();
+  const error = document.getElementById("otp-error");
+
+  if(input === currentOtp.toString()) {
+    error.textContent = "";
+    document.getElementById("otp-modal").style.display = "none";
+    document.getElementById("goReservation").disabled = false; // OTP成功で予約ボタン有効化
+    setStep(5); // ステップを予約ページに
+  } else {
+    error.textContent = "番号が間違っています";
+  }
+}
+</script>
 </body>
 </html>
