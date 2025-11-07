@@ -185,6 +185,7 @@
           const input = prompt("現在のポイントを入力してください", "0");
           points = parseInt(input) || 0;
           pointsDisplay.textContent = `現在のポイント：${points}`;
+          pointsDisplay.style.color = "#333";
         }
 
         score = 0;
@@ -203,7 +204,9 @@
       countdownTime = 5;
       gameTime = 30;
       score = 0;
+      points = 0; // 🔹ポイントもリセット！
       isPlaying = false;
+
       countdownDisplay.textContent = "スタート待ち";
       timerDisplay.textContent = "30";
       timerDisplay.style.fontSize = "80px";
@@ -211,7 +214,9 @@
       scoreDisplay.textContent = "スコア：0";
       scoreDisplay.style.color = "black";
       achievementDisplay.style.display = "none";
+      pointsDisplay.textContent = "現在のポイント：0";
       pointsDisplay.style.color = "#333";
+
       startBtn.disabled = false;
     });
   </script>
