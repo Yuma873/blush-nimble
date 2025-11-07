@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ワニワニパニック タイマー</title>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      text-align: center;
+      background-color: #f0f8ff;
+      padding-top: 50px;
+    }
+    #countdown, #timer, #score {
+      font-size: 2em;
+      margin: 20px 0;
+    }
+    #tapArea {
+      display: inline-block;
+      background-color: #90ee90;
+      border: 3px solid #006400;
+      border-radius: 20px;
+      padding: 30px 80px;
+      font-size: 2em;
+      cursor: pointer;
+      user-select: none;
+    }
+    #tapArea:active {
+      background-color: #66cc66;
+    }
+    #resetBtn {
+      margin-top: 30px;
+      font-size: 1.2em;
+      padding: 10px 25px;
+      border-radius: 10px;
+      background-color: #add8e6;
+      border: 2px solid #4682b4;
+      cursor: pointer;
+    }
+    #resetBtn:hover {
+      background-color: #87cefa;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🐊 ワニワニパニック！</h1>
+  <div id="countdown">スタートまで：5</div>
+  <div id="timer">残り時間：30</div>
+  <div id="tapArea">タップ！</div>
+  <div id="score">スコア：0</div>
+  <button id="resetBtn">🔁 リセット</button>
+
+  <!-- 効果音 -->
+  <audio id="hitSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+  <audio id="startSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+  <audio id="endSound" src="https://actions.google.com/sounds/v1/cartoon/concussive_hit_guitar_boing.ogg"></audio>
+
+  <script>
+    let countdownTime = 5;
+    let gameTime = 30;
+    let score = 0;
+    let countdownTimer;
+    let gameTimer;
+    let isPlaying = false;
+
+    const countdownDisplay = document.getElementById("countdown");
+    const timerDisplay = document.getElementById("timer");
+    const scoreDisplay = document.getElementById("score");
+    const tapArea = document.getElementById("tapArea");
+    const resetBtn = document.getElementById("resetBtn");
+
+    const hitSound = document.getElementById("hitSound");
+    const startSound = document.getElementById("startSound");
+    const endSound = document.getElementById("endSound");
+
+    tapArea.style.pointerEvents = "none"; // 最初はタップ無効
+
+    function startCountdown() {
+      countdownTime = 5;
+      countdownDisplay.textContent = `スタートまで：${countdownTime}`;
+      countdownTimer = setInterval(() => {
+        countdownTime--;
+        countdownDisplay.textContent = `スタートまで：${countdownTime}`;
+        if (countdownTime <= 0) {
+          clearInterval(countdownTimer);
+          countdownDisplay.textContent = "スタート！";
+          startSound.play();
+          startGame();
+        }
+      }, 1000);
+    }
+
+    function startGame() {
+      tapArea.style.pointerEvents = "auto";
+      isPlaying = true;
+      gameTime = 30;
+      timerDisplay.textContent = `残り時間：${gameTime}`;
+      gameTimer = setInterval(() => {
+        gameTime--;
+        timerDisplay.textContent = `残り時間：${gameTime}`;
+        if (gameTime <= 0) {
+          clearInterval(gameTimer);
+          tapArea.style.pointerEvents = "none";
+          countdownDisplay.textContent = "終了！";
+          isPlaying = false;
+          endSound.play();
+        }
+      }, 1000);
+    }
+
+    tapArea.addEventListener("click", () => {
+      if (isPlaying) {
+        score++;
+        scoreDisplay.textContent = `スコア：${score}`;
+        hitSound.currentTime = 0; // 同じ音を連続で再生できるように
+        hitSound.play();
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      clearInterval(countdownTimer);
+      clearInterval(gameTimer);
+      countdownTime = 5;
+      gameTime = 30;
+      score = 0;
+      isPlaying = false;
+      countdownDisplay.textContent = `スタートまで：5`;
+      timerDisplay.textContent = `残り時間：30`;
+      scoreDisplay.textContent = `スコア：0`;
+      tapArea.style.pointerEvents = "none";
+      startCountdown();
+    });
+
+    // ページ読み込み時にカウントダウン開始
+    window.onload = startCountdown;
+  </script>
+</body>
+</html>
