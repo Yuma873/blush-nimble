@@ -8,33 +8,30 @@
       font-family: "Arial", sans-serif;
       text-align: center;
       background-color: #f0f8ff;
-      padding-top: 50px;
+      padding-top: 40px;
+      height: 100vh;
+      margin: 0;
     }
     #countdown, #timer, #score {
       font-size: 2em;
       margin: 20px 0;
     }
-    #tapArea {
-      display: inline-block;
-      background-color: #90ee90;
-      border: 3px solid #006400;
-      border-radius: 20px;
-      padding: 30px 80px;
-      font-size: 2em;
-      cursor: pointer;
-      user-select: none;
-    }
-    #tapArea:active {
-      background-color: #66cc66;
-    }
-    #resetBtn {
-      margin-top: 30px;
+    button {
+      margin: 10px;
       font-size: 1.2em;
       padding: 10px 25px;
       border-radius: 10px;
-      background-color: #add8e6;
       border: 2px solid #4682b4;
       cursor: pointer;
+    }
+    #startBtn {
+      background-color: #98fb98;
+    }
+    #startBtn:hover {
+      background-color: #7fffd4;
+    }
+    #resetBtn {
+      background-color: #add8e6;
     }
     #resetBtn:hover {
       background-color: #87cefa;
@@ -44,11 +41,14 @@
 <body>
 
   <h1>🐊 ワニワニパニック！</h1>
-  <div id="countdown">スタートまで：5</div>
+  <div id="countdown">スタート待ち</div>
   <div id="timer">残り時間：30</div>
-  <div id="tapArea">タップ！</div>
   <div id="score">スコア：0</div>
-  <button id="resetBtn">🔁 リセット</button>
+
+  <div>
+    <button id="startBtn">▶️ スタート</button>
+    <button id="resetBtn">🔁 リセット</button>
+  </div>
 
   <!-- 効果音 -->
   <audio id="hitSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
@@ -66,16 +66,16 @@
     const countdownDisplay = document.getElementById("countdown");
     const timerDisplay = document.getElementById("timer");
     const scoreDisplay = document.getElementById("score");
-    const tapArea = document.getElementById("tapArea");
+    const startBtn = document.getElementById("startBtn");
     const resetBtn = document.getElementById("resetBtn");
 
     const hitSound = document.getElementById("hitSound");
     const startSound = document.getElementById("startSound");
     const endSound = document.getElementById("endSound");
 
-    tapArea.style.pointerEvents = "none"; // 最初はタップ無効
-
+    // ===== カウントダウン開始 =====
     function startCountdown() {
+      startBtn.disabled = true;
       countdownTime = 5;
       countdownDisplay.textContent = `スタートまで：${countdownTime}`;
       countdownTimer = setInterval(() => {
@@ -90,8 +90,8 @@
       }, 1000);
     }
 
+    // ===== ゲーム開始 =====
     function startGame() {
-      tapArea.style.pointerEvents = "auto";
       isPlaying = true;
       gameTime = 30;
       timerDisplay.textContent = `残り時間：${gameTime}`;
@@ -100,23 +100,34 @@
         timerDisplay.textContent = `残り時間：${gameTime}`;
         if (gameTime <= 0) {
           clearInterval(gameTimer);
-          tapArea.style.pointerEvents = "none";
           countdownDisplay.textContent = "終了！";
-          isPlaying = false;
           endSound.play();
+          isPlaying = false;
+          startBtn.disabled = false;
         }
       }, 1000);
     }
 
-    tapArea.addEventListener("click", () => {
+    // ===== タップでスコア加算 =====
+    document.body.addEventListener("click", () => {
       if (isPlaying) {
         score++;
         scoreDisplay.textContent = `スコア：${score}`;
-        hitSound.currentTime = 0; // 同じ音を連続で再生できるように
+        hitSound.currentTime = 0;
         hitSound.play();
       }
     });
 
+    // ===== スタートボタン =====
+    startBtn.addEventListener("click", () => {
+      if (!isPlaying) {
+        score = 0;
+        scoreDisplay.textContent = `スコア：0`;
+        startCountdown();
+      }
+    });
+
+    // ===== リセットボタン =====
     resetBtn.addEventListener("click", () => {
       clearInterval(countdownTimer);
       clearInterval(gameTimer);
@@ -124,15 +135,11 @@
       gameTime = 30;
       score = 0;
       isPlaying = false;
-      countdownDisplay.textContent = `スタートまで：5`;
-      timerDisplay.textContent = `残り時間：30`;
-      scoreDisplay.textContent = `スコア：0`;
-      tapArea.style.pointerEvents = "none";
-      startCountdown();
+      countdownDisplay.textContent = "スタート待ち";
+      timerDisplay.textContent = "残り時間：30";
+      scoreDisplay.textContent = "スコア：0";
+      startBtn.disabled = false;
     });
-
-    // ページ読み込み時にカウントダウン開始
-    window.onload = startCountdown;
   </script>
 </body>
 </html>
