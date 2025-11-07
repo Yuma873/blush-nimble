@@ -30,6 +30,14 @@
     #score {
       font-size: 2em;
       margin: 20px 0;
+      transition: all 0.5s ease;
+    }
+    #achievement {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: red;
+      display: none;
+      margin-top: 20px;
     }
     button {
       margin: 10px;
@@ -59,6 +67,7 @@
   <div id="countdown">スタート待ち</div>
   <div id="timer">30</div>
   <div id="score">スコア：0</div>
+  <div id="achievement">達成！🎉</div>
 
   <div>
     <button id="startBtn">▶️ スタート</button>
@@ -83,6 +92,7 @@
     const scoreDisplay = document.getElementById("score");
     const startBtn = document.getElementById("startBtn");
     const resetBtn = document.getElementById("resetBtn");
+    const achievementDisplay = document.getElementById("achievement");
 
     const hitSound = document.getElementById("hitSound");
     const startSound = document.getElementById("startSound");
@@ -95,6 +105,8 @@
       countdownDisplay.textContent = `スタートまで：${countdownTime}`;
       timerDisplay.textContent = "30";
       timerDisplay.style.fontSize = "80px";
+      achievementDisplay.style.display = "none";
+      scoreDisplay.style.color = "black";
       countdownTimer = setInterval(() => {
         countdownTime--;
         countdownDisplay.textContent = `スタートまで：${countdownTime}`;
@@ -117,15 +129,26 @@
         timerDisplay.textContent = gameTime;
         if (gameTime <= 0) {
           clearInterval(gameTimer);
-          countdownDisplay.textContent = "終了！";
-          timerDisplay.textContent = "終了！";
-          timerDisplay.style.fontSize = "120px";
-          timerDisplay.style.color = "#ff0000";
-          endSound.play();
-          isPlaying = false;
-          startBtn.disabled = false;
+          endGame();
         }
       }, 1000);
+    }
+
+    // ===== ゲーム終了 =====
+    function endGame() {
+      countdownDisplay.textContent = "終了！";
+      timerDisplay.textContent = "終了！";
+      timerDisplay.style.fontSize = "120px";
+      timerDisplay.style.color = "#ff0000";
+      endSound.play();
+      isPlaying = false;
+      startBtn.disabled = false;
+
+      // 🔥 スコアが15以上なら「達成！」表示
+      if (score >= 15) {
+        scoreDisplay.style.color = "red";
+        achievementDisplay.style.display = "block";
+      }
     }
 
     // ===== タップでスコア加算 =====
@@ -163,6 +186,8 @@
       timerDisplay.style.fontSize = "80px";
       timerDisplay.style.color = "#ff4500";
       scoreDisplay.textContent = "スコア：0";
+      scoreDisplay.style.color = "black";
+      achievementDisplay.style.display = "none";
       startBtn.disabled = false;
     });
   </script>
