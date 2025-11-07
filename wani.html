@@ -11,8 +11,23 @@
       padding-top: 40px;
       height: 100vh;
       margin: 0;
+      user-select: none;
     }
-    #countdown, #timer, #score {
+    h1 {
+      margin-bottom: 10px;
+    }
+    #countdown {
+      font-size: 2em;
+      margin: 10px 0;
+    }
+    #timer {
+      font-size: 80px;
+      font-weight: bold;
+      color: #ff4500;
+      margin: 30px 0;
+      transition: all 0.3s ease;
+    }
+    #score {
       font-size: 2em;
       margin: 20px 0;
     }
@@ -42,7 +57,7 @@
 
   <h1>🐊 ワニワニパニック！</h1>
   <div id="countdown">スタート待ち</div>
-  <div id="timer">残り時間：30</div>
+  <div id="timer">30</div>
   <div id="score">スコア：0</div>
 
   <div>
@@ -78,6 +93,8 @@
       startBtn.disabled = true;
       countdownTime = 5;
       countdownDisplay.textContent = `スタートまで：${countdownTime}`;
+      timerDisplay.textContent = "30";
+      timerDisplay.style.fontSize = "80px";
       countdownTimer = setInterval(() => {
         countdownTime--;
         countdownDisplay.textContent = `スタートまで：${countdownTime}`;
@@ -94,13 +111,16 @@
     function startGame() {
       isPlaying = true;
       gameTime = 30;
-      timerDisplay.textContent = `残り時間：${gameTime}`;
+      timerDisplay.textContent = gameTime;
       gameTimer = setInterval(() => {
         gameTime--;
-        timerDisplay.textContent = `残り時間：${gameTime}`;
+        timerDisplay.textContent = gameTime;
         if (gameTime <= 0) {
           clearInterval(gameTimer);
           countdownDisplay.textContent = "終了！";
+          timerDisplay.textContent = "終了！";
+          timerDisplay.style.fontSize = "120px";
+          timerDisplay.style.color = "#ff0000";
           endSound.play();
           isPlaying = false;
           startBtn.disabled = false;
@@ -123,6 +143,9 @@
       if (!isPlaying) {
         score = 0;
         scoreDisplay.textContent = `スコア：0`;
+        countdownDisplay.textContent = "カウントダウン開始！";
+        timerDisplay.style.color = "#ff4500";
+        timerDisplay.style.fontSize = "80px";
         startCountdown();
       }
     });
@@ -136,7 +159,9 @@
       score = 0;
       isPlaying = false;
       countdownDisplay.textContent = "スタート待ち";
-      timerDisplay.textContent = "残り時間：30";
+      timerDisplay.textContent = "30";
+      timerDisplay.style.fontSize = "80px";
+      timerDisplay.style.color = "#ff4500";
       scoreDisplay.textContent = "スコア：0";
       startBtn.disabled = false;
     });
