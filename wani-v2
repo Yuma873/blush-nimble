@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ワニワニパニック タイマー</title>
+<style>
+body {
+  font-family: "Arial", sans-serif;
+  text-align: center;
+  background-color: #f0f8ff;
+  padding-top: 40px;
+  height: 100vh;
+  margin: 0;
+  user-select: none;
+}
+h1 { margin-bottom: 10px; }
+#countdown { font-size: 2em; margin: 10px 0; }
+#timer { font-size: 80px; font-weight: bold; color: #ff4500; margin: 30px 0; transition: all 0.3s ease; }
+#score { font-size: 2em; margin: 20px 0; transition: all 0.5s ease; }
+#achievement { font-size: 2.5em; font-weight: bold; color: red; display: none; margin-top: 20px; }
+#points { font-size: 1.8em; margin-top: 15px; color: #333; }
+#finalPoints { font-size: 3em; color: #ff0000; display: none; margin-top: 40px; font-weight: bold; }
+#ticketDisplay { font-size: 1.5em; margin-top: 20px; display: none; }
+#pointInput { font-size: 1.2em; padding: 8px; width: 120px; text-align: center; border-radius: 10px; border: 2px solid #4682b4; margin-bottom: 10px; }
+button { margin: 10px; font-size: 1.2em; padding: 10px 25px; border-radius: 10px; border: 2px solid #4682b4; cursor: pointer; }
+#startBtn { background-color: #98fb98; }
+#startBtn:hover { background-color: #7fffd4; }
+#resetBtn { background-color: #add8e6; }
+#resetBtn:hover { background-color: #87cefa; }
+</style>
+</head>
+<body>
+
+<h1>🐊 ワニワニパニック！</h1>
+<input id="pointInput" type="number" min="0" value="100" placeholder="ポイント入力">
+<div id="countdown">スタート待ち</div>
+<div id="timer">30</div>
+<div id="score">スコア：0</div>
+<div id="achievement">達成！🎉</div>
+<div id="points">現在のポイント：0</div>
+<div id="finalPoints"></div>
+<div id="ticketDisplay"></div>
+
+<div>
+<button id="startBtn">▶️ スタート</button>
+<button id="resetBtn">🔁 リセット</button>
+</div>
+
+<script>
+let countdownTime = 5;
+let gameTime = 30;
+let score = 0;
+let countdownTimer;
+let gameTimer;
+let isPlaying = false;
+let points = 0;
+
+const countdownDisplay = document.getElementById("countdown");
+const timerDisplay = document.getElementById("timer");
+const scoreDisplay = document.getElementById("score");
+const startBtn = document.getElementById("startBtn");
+const resetBtn = document.getElementById("resetBtn");
+const achievementDisplay = document.getElementById("achievement");
+const pointsDisplay = document.getElementById("points");
+const finalPointsDisplay = document.getElementById("finalPoints");
+const ticketDisplay = document.getElementById("ticketDisplay");
+const pointInput = document.getElementById("pointInput");
+
+// ===== 券計算 =====
+function calculateTickets(points) {
+  const tickets = [100, 50, 30, 20];
+  const result = {};
+  let remaining = points;
+  for (const t of tickets) {
+    const count = Math.floor(remaining / t);
+    if (count > 0) {
+      result[t] = count;
+      remaining -= t * count;
+    } else {
+      result[t] = 0;
+    }
+  }
+  return result;
+}
+
+// ===== カウントダウン開始 =====
+function startCountdown() {
+  startBtn.disabled = true;
+  pointInput.disabled = true;
+  countdownTime = 5;
+  countdownDisplay.textContent = `スタートまで：${countdownTime}`;
+  timerDisplay.textContent = "30";
+  timerDisplay.style.fontSize = "80px";
+  achievementDisplay.style.display = "none";
+  finalPointsDisplay.style.display = "none";
+  ticketDisplay.style.display = "none";
+  scoreDisplay.style.color = "black";
+  countdownTimer = setInterval(() => {
+    countdownTime--;
+    countdownDisplay.textContent = `スタートまで：${countdownTime}`;
+    if (countdownTime <= 0) {
+      clearInterval(countdownTimer);
+      countdownDisplay.textContent = "スタート！";
+      startGame();
+    }
+  }, 1000);
+}
+
+// ===== ゲーム開始 =====
+function startGame() {
+  isPlaying = true;
+  gameTime = 30;
+  timerDisplay.textContent = gameTime;
+  gameTimer = setInterval(() => {
+    gameTime--;
+    timerDisplay.textContent = gameTime;
+    if (gameTime <= 0) {
+      clearInterval(gameTimer);
+      endGame();
+    }
+  }, 1000);
+}
+
+// ===== ゲーム終了 =====
+function endGame() {
+  countdownDisplay.textContent = "終了！";
+  timerDisplay.textContent = "終了！";
+  timerDisplay.style.fontSize = "120px";
+  timerDisplay.style.color = "#ff0000";
+  isPlaying = false;
+  startBtn.disabled = false;
+  pointInput.disabled = false;
+
+  // スコア判定
+  if (score >= 15) {
+    scoreDisplay.style.color = "red";
+    achievementDisplay.style.display = "block";
+    points += 10;
+    pointsDisplay.style.color = "red";
+    pointsDisplay.textContent = `現在のポイント：${points} (+10pt)`;
+  } else {
+    points -= 30;
+    pointsDisplay.style.color = "blue";
+    pointsDisplay.textContent = `現在のポイント：${points} (-30pt)`;
+  }
+
+  // 大きくポイント表示
+  finalPointsDisplay.textContent = `あなたのポイント：${points} pt`;
+  finalPointsDisplay.style.display = "block";
+  finalPointsDisplay.style.color = points >= 0 ? "red" : "blue";
+
+  // 券枚数表示
+  const ticketCounts = calculateTickets(points);
+  let ticketText = "渡す券の枚数：<br>";
+  for (const t of [100,50,30,20]) {
+    ticketText += `${t}pt券：${ticketCounts[t]}枚<br>`;
+  }
+  ticketDisplay.innerHTML = ticketText;
+  ticketDisplay.style.display = "block";
+}
+
+// ===== タップでスコア加算 =====
+document.body.addEventListener("click", () => {
+  if (isPlaying) {
+    score++;
+    scoreDisplay.textContent = `スコア：${score}`;
+  }
+});
+
+// ===== スタートボタン =====
+startBtn.addEventListener("click", () => {
+  if (!isPlaying) {
+    points = parseInt(pointInput.value) || 0;
+    pointsDisplay.textContent = `現在のポイント：${points}`;
+    pointsDisplay.style.color = "#333";
+    score = 0;
+    scoreDisplay.textContent = `スコア：0`;
+    countdownDisplay.textContent = "カウントダウン開始！";
+    timerDisplay.style.color = "#ff4500";
+    timerDisplay.style.fontSize = "80px";
+    startCountdown();
+  }
+});
+
+// ===== リセットボタン =====
+resetBtn.addEventListener("click", () => {
+  clearInterval(countdownTimer);
+  clearInterval(gameTimer);
+  countdownTime = 5;
+  gameTime = 30;
+  score = 0;
+  points = parseInt(pointInput.value) || 100;
+  countdownDisplay.textContent = "スタート待ち";
+  timerDisplay.textContent = "30";
+  timerDisplay.style.fontSize = "80px";
+  timerDisplay.style.color = "#ff4500";
+  scoreDisplay.textContent = "スコア：0";
+  scoreDisplay.style.color = "black";
+  achievementDisplay.style.display = "none";
+  finalPointsDisplay.style.display = "none";
+  ticketDisplay.style.display = "none";
+  pointsDisplay.textContent = `現在のポイント：${points}`;
+  pointsDisplay.style.color = "#333";
+  startBtn.disabled = false;
+  pointInput.disabled = false;
+});
+</script>
+
+</body>
+</html>
