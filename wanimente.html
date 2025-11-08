@@ -2,27 +2,51 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>🐊 ワニワニパニック タイマー（メンテナンス中）</title>
+  <title>ワニワニパニック タイマー（メンテナンス中）</title>
   <style>
     body {
       font-family: "Arial", sans-serif;
       text-align: center;
       background-color: #f0f8ff;
-      padding-top: 150px;
+      padding-top: 40px;
       height: 100vh;
       margin: 0;
       user-select: none;
+      position: relative;
     }
     h1 {
-      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    #countdown, #timer, #score, #achievement, #points, #finalPoints, #pointInput, button {
+      pointer-events: none; /* 操作無効化 */
+      opacity: 0.3; /* 半透明にして使用不可っぽくする */
+    }
+
+    /* ===== メンテナンスオーバーレイ ===== */
+    #maintenanceOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(240, 248, 255, 0.95);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    #maintenanceOverlay h1 {
+      font-size: 2.8em;
       color: #ff4500;
       margin-bottom: 20px;
     }
-    p {
+    #maintenanceOverlay p {
       font-size: 1.3em;
       color: #333;
     }
-    button {
+    #returnBtn {
       margin-top: 40px;
       font-size: 1.3em;
       padding: 15px 35px;
@@ -32,17 +56,34 @@
       cursor: pointer;
       transition: 0.3s;
     }
-    button:hover {
+    #returnBtn:hover {
       background-color: #7fffd4;
     }
   </style>
 </head>
 <body>
 
-  <h1>⚙️ メンテナンス中です</h1>
-  <p>現在、システムの調整を行っています。<br>復旧までしばらくお待ちください。</p>
+  <h1>🐊 点数集計・計時システム 1号機</h1>
+  <p>使用方法は<a href="https://docs.google.com/document/d/1MTmxosIElmqmXjZRzm9dUah6UcAXDwl3AoHeZD47oOM/edit?tab=t.ts8ybe1skuu0" target="_blank">こちら</a></p>
+  <input id="pointInput" type="number" min="0" value="100" placeholder="ポイント入力">
+  <div id="countdown">所持ポイントを入力し、顧客に案内を実施してください。終了後、スタートボタンを押してください。</div>
+  <div id="timer">30</div>
+  <div id="score">スコア：0</div>
+  <div id="achievement">達成！🎉</div>
+  <div id="points">現在のポイント：0</div>
+  <div id="finalPoints"></div>
 
-  <button onclick="location.href='wani.html'">🔁 復帰（wani.htmlへ）</button>
+  <div>
+    <button id="startBtn">▶️ スタート</button>
+    <button id="resetBtn">🔁 リセット</button>
+  </div>
+
+  <!-- ===== メンテナンスオーバーレイ ===== -->
+  <div id="maintenanceOverlay">
+    <h1>⚙️ メンテナンス中です</h1>
+    <p>現在、システムの調整を行っています。<br>復旧までしばらくお待ちください。</p>
+    <button id="returnBtn" onclick="location.href='wani.html'">🔁 復帰（wani.htmlへ）</button>
+  </div>
 
 </body>
 </html>
