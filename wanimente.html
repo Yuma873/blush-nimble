@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>ワニワニパニック タイマー（メンテナンス中）</title>
+  <title>🐊 ワニワニパニック タイマー（メンテナンス中）</title>
   <style>
     body {
       font-family: "Arial", sans-serif;
@@ -17,9 +17,10 @@
     h1 {
       margin-bottom: 10px;
     }
-    #countdown, #timer, #score, #achievement, #points, #finalPoints, #pointInput, button {
-      pointer-events: none; /* 操作無効化 */
-      opacity: 0.3; /* 半透明にして使用不可っぽくする */
+    /* ゲーム部分を無効化・半透明化 */
+    #countdown, #timer, #score, #achievement, #points, #finalPoints, #pointInput, #startBtn, #resetBtn {
+      pointer-events: none;
+      opacity: 0.3;
     }
 
     /* ===== メンテナンスオーバーレイ ===== */
@@ -55,6 +56,8 @@
       background-color: #98fb98;
       cursor: pointer;
       transition: 0.3s;
+      z-index: 2000; /* 🔥 ボタンだけ最前面に */
+      pointer-events: auto; /* 🔥 クリック可能に戻す */
     }
     #returnBtn:hover {
       background-color: #7fffd4;
@@ -64,9 +67,9 @@
 <body>
 
   <h1>🐊 点数集計・計時システム 1号機</h1>
-  <p>使用方法は<a href="https://docs.google.com/document/d/1MTmxosIElmqmXjZRzm9dUah6UcAXDwl3AoHeZD47oOM/edit?tab=t.ts8ybe1skuu0" target="_blank">こちら</a></p>
+  <p>このページはメンテナンスモードです。</p>
   <input id="pointInput" type="number" min="0" value="100" placeholder="ポイント入力">
-  <div id="countdown">所持ポイントを入力し、顧客に案内を実施してください。終了後、スタートボタンを押してください。</div>
+  <div id="countdown">（メンテナンス中は操作できません）</div>
   <div id="timer">30</div>
   <div id="score">スコア：0</div>
   <div id="achievement">達成！🎉</div>
@@ -81,8 +84,8 @@
   <!-- ===== メンテナンスオーバーレイ ===== -->
   <div id="maintenanceOverlay">
     <h1>⚙️ メンテナンス中です</h1>
-    <p>現在、システムの調整を行っています。<br>復旧までしばらくお待ちください。</p>
-    <button id="returnBtn" onclick="location.href='wani.html'">🔁 復帰（wani.htmlへ）</button>
+    <p>現在、システムを調整中です。<br>復旧後は以下のボタンから通常モードに戻せます。</p>
+    <button id="returnBtn" onclick="location.href='wani.html'">🔁 通常モードに戻る</button>
   </div>
 
 </body>
