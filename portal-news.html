@@ -3,38 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ポータルサイト - お知らせ/時間登録</title>
-  <link rel="shortcut icon" href="favicon2.png" type="image/png" />
+  <title>ポータルサイト - 予定</title>
+  <link rel="shortcut icon" href="favicon2.png" type="image/png">
 
   <style>
     body {
-      font-family: "Segoe UI", Arial, sans-serif;
+      font-family: Arial, sans-serif;
       margin: 0;
-      background-color: #f5f5f5;
       display: flex;
-      min-height: 100vh;
+      background-color: #f5f5f5;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    /* ===== 左ナビ ===== */
+    /* 左ナビ固定 */
     nav {
       width: 240px;
       background-color: #2c3e50;
       color: white;
-      padding: 15px;
+      padding: 10px;
+      box-sizing: border-box;
       position: fixed;
       top: 0;
       left: 0;
       height: 100vh;
       overflow-y: auto;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
       z-index: 1000;
-      box-sizing: border-box;
     }
 
     nav video {
       width: 100%;
-      border-radius: 10px;
-      margin-bottom: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
     }
 
     nav a {
@@ -45,9 +45,8 @@
       margin: 6px 0;
       background-color: #34495e;
       border-radius: 6px;
+      transition: background-color 0.3s;
       text-align: center;
-      transition: 0.3s;
-      font-weight: 500;
     }
 
     nav a:hover {
@@ -56,72 +55,51 @@
 
     nav img {
       display: block;
-      margin: 8px auto;
-      border-radius: 6px;
+      margin: 6px auto;
     }
 
-    /* ===== メイン部分 ===== */
     main {
       flex: 1;
-      padding: 30px;
-      margin-left: 260px;
+      padding: 15px;
+      margin-left: 240px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
       box-sizing: border-box;
     }
 
     header {
       font-size: 1.8em;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       color: #2c3e50;
-      font-weight: bold;
     }
 
-    section {
-      margin-bottom: 40px;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      animation: fadeIn 0.4s ease-in-out;
+    .iframe-container {
+      flex: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
     }
 
-    ul {
-      list-style: disc;
-      padding-left: 25px;
-      line-height: 1.7;
-      font-size: 1.05em;
-    }
-
-    li {
-      margin-bottom: 8px;
-    }
-
-    .update-time {
-      font-size: 0.9em;
-      color: #777;
-      text-align: right;
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
 
     button {
+      margin-top: 15px;
       padding: 10px 20px;
       font-size: 1em;
       background-color: #1abc9c;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 5px;
       cursor: pointer;
-      transition: 0.3s;
+      align-self: flex-start;
     }
 
-    button:hover {
-      background-color: #16a085;
-    }
-
-    /* ===== カウントダウン ===== */
-    #countdown-list li strong {
-      font-weight: bold;
-    }
-
-    /* ===== スクロールテロップ ===== */
+    /* テロップ */
     .ticker-wrap {
       width: 100%;
       overflow: hidden;
@@ -146,37 +124,42 @@
       to { transform: translateX(-100%); }
     }
 
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(10px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-
-    /* ===== スマホ対応 ===== */
-    @media(max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-
+    /* スマホ対応 */
+    @media (max-width: 768px) {
       nav {
+        position: fixed;
         width: 100%;
         height: auto;
-        position: relative;
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      nav a {
+        display: inline-block;
+        margin: 4px;
+        font-size: 0.9em;
+      }
+
+      nav video {
+        display: none;
       }
 
       main {
         margin-left: 0;
-        padding: 15px;
+        margin-top: 150px;
+        height: calc(100vh - 150px);
       }
     }
   </style>
 </head>
 
 <body>
-
-  <!-- ===== 左ナビ（トップと完全同じ構成） ===== -->
   <nav>
+    <!-- 🎬 ランダム動画 -->
     <video id="randomVideo" autoplay muted loop playsinline></video>
 
+    <!-- 📋 メニュー（トップと完全一致） -->
     <a href="portal.html">🏠 トップ</a>
     <a href="portal-news.html">📰 お知らせ</a>
     <a href="portal-tool.html">🛠 ツール</a>
@@ -194,87 +177,37 @@
 
     <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
 
+    <!-- 🚪 ログアウト -->
     <a href="https://yuma873.github.io/blush-nimble/index.html"
-       style="display:inline-block; padding:10px 20px; background-color:#f44336; color:white; text-decoration:none; border-radius:5px; font-weight:bold;">
-      🚪 ログアウト
-    </a>
+       style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;
+       text-decoration:none;border-radius:5px;font-weight:bold;margin-top:10px;">🚪ログアウト</a>
   </nav>
 
-  <!-- ===== メインコンテンツ ===== -->
   <main>
-    <section>
-      <header>📰 最新のお知らせ</header>
-      <ul>
-        <li>2025/10/30 - 今後、このお知らせは下記URLにまとめられます。</li>
-        <li>https://f.ieyasu.co/sys-portal/login/</li>
-      </ul>
-    </section>
-
-    <section>
-      <header>📢 大会関連情報</header>
-      <ul>
-       
-      </ul>
-    </section>
-
-    <section>
-      <header>⏳ 大会カウントダウン (2025年日程／2026年度版登録済み)</header>
-      <ul id="countdown-list"></ul>
-    </section>
-
-    <section class="update-time">最終更新: 2025/8/15 8:17.22</section>
-
-    <button onclick="location.href='portal.html'">ポータルトップへ戻る</button>
+    <header>🧰 予定一覧</header>
+    <div class="iframe-container">
+      <iframe src="https://f.ieyasu.co/sys-portal/login/"
+              loading="lazy"
+              title="その他ツール"></iframe>
+    </div>
+    <button onclick="location.href='https://f.ieyasu.co/sys-portal/login/'">ログインして利用する</button>
   </main>
 
-  <!-- 🎬 ランダム動画スクリプト -->
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span>🚨 このページはiframeでツールページを埋め込んでいます ／ 📢 トップへ戻るには上のボタンをクリックしてください</span>
+    </div>
+  </div>
+
   <script>
+    // 🎥 ランダム動画スクリプト
     const videos = [
       "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
       "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
       "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
     ];
-    const randomVideo = videos[Math.floor(Math.random() * videos.length)];
-    document.getElementById("randomVideo").src = randomVideo;
+    const randomIndex = Math.floor(Math.random() * videos.length);
+    document.getElementById("randomVideo").src = videos[randomIndex];
   </script>
-
-  <!-- 🕒 カウントダウンスクリプト -->
-  <script>
-    const events = [
-      { name: "春季記録会(24-25)", date: "2026-05-24" },
-      { name: "夏季記録会", date: "2026-06-15" },
-      { name: "県高校総体(20-22)", date: "2026-06-20" },
-      { name: "北相地区大会", date: "2026-07-28" },
-      { name: "北相地区新人", date: "2026-09-13" },
-      { name: "県新人(27-28)", date: "2026-09-27" }
-    ];
-
-    const today = new Date();
-    const list = document.getElementById("countdown-list");
-
-    events.forEach((e) => {
-      const d = Math.ceil((new Date(e.date) - today) / (1000 * 60 * 60 * 24));
-      let c = "#666";
-      if (d <= 7) c = "red";
-      else if (d <= 30) c = "orange";
-      else if (d <= 50) c = "goldenrod";
-
-      const li = document.createElement("li");
-      if (d > 60) {
-        li.innerHTML = `<span style="color:#aaa; font-size:0.9em;">${e.name}：あと ${d}日</span>`;
-      } else {
-        li.innerHTML = `${e.name}：あと <strong style="color:${c}">${d}日</strong>`;
-      }
-      list.appendChild(li);
-    });
-  </script>
-
-  <!-- 📰 テロップ -->
-  <div class="ticker-wrap">
-    <div class="ticker">
-      <span>🚨 大会に向けて調整を進めましょう ／ 📢 目指せ高校総体進出 ／ 🏊 日々の練習を大切に！</span>
-    </div>
-  </div>
-
 </body>
 </html>
