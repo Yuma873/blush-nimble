@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>乗換案内ページ</title>
+  <link rel="shortcut icon" href="favicon3.png" type="image/png">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
+      display: flex;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ===== 左ナビ ===== */
+    nav {
+      width: 220px;
+      background-color: #2c3e50;
+      color: white;
+      padding: 8px;
+      box-sizing: border-box;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    nav video {
+      width: 100%;
+      border-radius: 5px;
+      margin-bottom: 8px;
+    }
+
+    nav a {
+      display: block;
+      width: 100%;
+      text-align: center;
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      margin: 5px 0;
+      background-color: #34495e;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+      font-size: 0.95em;
+    }
+
+    nav a:hover { background-color: #1abc9c; }
+
+    nav img { display: block; margin: 5px auto; border-radius: 6px; }
+
+    /* ===== main ===== */
+    main {
+      flex: 1;
+      padding: 30px;
+      margin-left: 240px;
+      overflow-y: auto;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+
+    header h1 {
+      font-size: 1.4em;
+      color: #2c3e50;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .section-card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .section-card h2 {
+      margin-top: 0;
+      color: #1abc9c;
+      border-bottom: 2px solid #1abc9c;
+      padding-bottom: 5px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background-color: #2c3e50;
+      color: white;
+      margin-top: 20px;
+    }
+
+    /* ===== スマホ対応 ===== */
+    @media(max-width: 768px) {
+      body { flex-direction: column; overflow: auto; }
+      nav { position: relative; width: 100%; height: auto; box-shadow: none; display: flex; flex-wrap: wrap; justify-content: space-around; }
+      nav a { flex: 1 1 40%; margin: 5px; font-size: 0.9em; }
+      nav video { display: none; }
+      main { margin-left: 0; padding: 15px; height: auto; overflow-y: visible; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ===== 左ナビ ===== -->
+<nav>
+  <video id="randomVideo" autoplay muted loop playsinline></video>
+
+  <a href="portal.html">🏠 トップ</a>
+  <a href="portal-news.html">📰 お知らせ</a>
+  <a href="portal-tool.html">🛠 ツール</a>
+  <a href="portal-renraku.html">📢 掲示板連絡</a>
+  <a href="portal-pdf.html">📁 ファイル一覧</a>
+  <a href="portal-next.html">🏆 次回大会 特設ページ</a>
+
+  <a href="https://yuma873.github.io/blush-nimble/index.html"
+     style="display:inline-block;padding:10px 20px;background-color:#f44336;
+            color:white;text-decoration:none;border-radius:5px;font-weight:bold;margin-top:8px;">
+     🚪ログアウト
+  </a>
+</nav>
+
+<!-- ===== メイン ===== -->
+<main>
+  <header><h1>乗換案内ページ</h1></header>
+
+  <section class="section-card">
+    <h2>Yahoo! 乗換案内</h2>
+    <p>出発駅・到着駅を選んで検索できます。</p>
+    <iframe src="https://transit.yahoo.co.jp/search/result?from=平塚&to=湘南台" 
+            width="100%" height="500" frameborder="0" scrolling="no"></iframe>
+  </section>
+</main>
+
+<!-- 🎥 ランダム動画 -->
+<script>
+  const videos = [
+    "video1.mp4","video2.mp4","video3.mp4","video5.mp4",
+    "V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4",
+    "V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"
+  ];
+  document.getElementById("randomVideo").src =
+    videos[Math.floor(Math.random() * videos.length)];
+</script>
+
+</body>
+</html>
