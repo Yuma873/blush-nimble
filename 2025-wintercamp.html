@@ -1,263 +1,287 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>2025年度 水泳部 冬合宿</title>
-    <link rel="icon" href="favicon.png" type="image/png" />
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2025年度 水泳部 冬季合宿</title>
+  <link rel="icon" href="favicon.png" type="image/png">
 
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        line-height: 1.8;
-        margin: 0;
-        padding: 0;
-        background-color: #f8f8f8;
+  <style>
+    :root {
+      --main-color: #003c8f;
+      --accent-bg: #f4f6fa;
+      --card-bg: #ffffff;
+      --border: #d0d5dd;
+      --text: #333;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Yu Gothic", "Hiragino Sans", sans-serif;
+      background: var(--accent-bg);
+      color: var(--text);
+      line-height: 1.9;
+    }
+
+    header {
+      background: var(--main-color);
+      color: white;
+      padding: 1.8rem 1rem;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.9rem;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.5rem 1.7rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    h2 {
+      border-left: 6px solid var(--main-color);
+      padding-left: 0.6rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--main-color);
+    }
+
+    h3 {
+      margin-top: 1.5rem;
+      font-size: 1.15rem;
+      color: #444;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    table th, table td {
+      border: 1px solid var(--border);
+      padding: 0.7rem;
+    }
+
+    table th {
+      background: #eef1f5;
+      width: 30%;
+      font-weight: 600;
+    }
+
+    ul {
+      padding-left: 1.3rem;
+      margin: 0.6rem 0 0 0;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    footer {
+      background: #e8e8e8;
+      text-align: center;
+      padding: 1.3rem;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #444;
+    }
+
+    /* チェックボックス目立たせ */
+    #checklist label {
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-right: 0.5rem;
+    }
+
+    /* スマホ最適化 */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.6rem;
       }
-      header {
-        background: #0044cc;
-        color: white;
-        padding: 1rem 0;
-        text-align: center;
-      }
-      .container {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 1rem 1.5rem;
-        background: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-      h1,
-      h2,
-      h3 {
-        color: #333;
-        margin-top: 2rem;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 1.5rem;
-        overflow-x: auto;
-        display: block;
-      }
-      table th,
-      table td {
-        border: 1px solid #ddd;
-        padding: 0.6rem;
-        text-align: left;
+      .card {
+        padding: 1.2rem;
       }
       table th {
-        background: #f0f0f0;
-        width: 30%;
+        width: 40%;
       }
-      ul {
-        padding-left: 1.5rem;
-      }
-      li {
-        margin-bottom: 0.6rem;
-      }
-      footer {
-        text-align: center;
-        padding: 1rem;
-        background: #f0f0f0;
-        margin-top: 2rem;
-      }
-    </style>
-  </head>
+    }
+  </style>
+</head>
 
-  <body>
-    <header>
-      <h1>2025年度 水泳部 冬合宿</h1>
-    </header>
+<body>
 
-    <div class="container">
+<header>
+  <h1>2025年度 水泳部 冬季合宿</h1>
+</header>
 
-      <!-- 概要 -->
-      <section>
-        <h2>合宿概要</h2>
-        <p>2025年度水泳部冬季合宿の概要です。時刻等は今後変更となる場合があります。</p>
-        <p>※現在は2024年度版のデータを参考表示中です。内容が確定次第、更新します。（9/23 20:00）</p>
-      </section>
+<div class="container">
 
-      <!-- プレメニュー -->
-      <section>
-        <h2>プレメニュー実施について</h2>
-        <p>合宿当日のメニュー強度を確認するため、事前練習（プレメニュー）を実施します。</p>
-        <ul>
-          <li>日時：2025/12/14 9:00〜11:30</li>
-          <li>場所：伊勢原スイミングクラブ</li>
-          <li>概要：詳細は Classroom を参照してください。</li>
-        </ul>
-      </section>
+  <!-- 概要 -->
+  <div class="card">
+    <h2>合宿概要</h2>
+    <p>2025年度水泳部冬季合宿の概要です。時刻等は今後変更の可能性があります。</p>
+    <p>※現在は2024年度データを参考表示中（9/23 20:00 更新）</p>
+  </div>
 
-      <!-- 目的 -->
-      <section>
-        <h2>合宿の目的</h2>
-        <ul>
-          <li>水泳に集中できる環境で、体力・技術・精神面の向上を図る。</li>
-          <li>集団生活を通して、自らの役割理解やチームワークの向上を目指す。</li>
-          <li>よく食べ、よく休み、競技力向上に必要な生活リズムを習得する。</li>
-        </ul>
-      </section>
+  <!-- プレメニュー -->
+  <div class="card">
+    <h2>プレメニュー実施について</h2>
+    <ul>
+      <li>日時：2025/12/14 9:00〜11:30</li>
+      <li>場所：伊勢原スイミングクラブ</li>
+      <li>詳細は Classroom にて案内します。</li>
+    </ul>
+  </div>
 
-      <!-- 留意点 -->
-      <section>
-        <h2>合宿中の留意点</h2>
-        <ul>
-          <li>時間厳守を徹底し、チームとしての規律を守ること。</li>
-          <li>事前に体調を整え、栄養・休息を意識した生活を送ること。</li>
-          <li>学校生活に不要な物は持ち込まないこと。</li>
-          <li>施設利用客に迷惑をかけないよう、節度ある行動をとること。</li>
-          <li>部屋での休憩は次の練習のための準備であり、騒がないこと。</li>
-          <li>限界に挑む姿勢を持ちつつ、過度な無理による怪我・体調不良を避けること。</li>
-          <li>「自己の限界を超えた」と感じられる経験を目標とすること。</li>
-          <li>欠席・遅刻は学校携帯（070-4382-2331）または JOIN で顧問へ連絡。</li>
-          <li>緊急時は保護者に迎えに来てもらうため、事前共有しておくこと。</li>
-        </ul>
-      </section>
+  <!-- 目的 -->
+  <div class="card">
+    <h2>合宿の目的</h2>
+    <ul>
+      <li>競技に集中できる環境で、体力・技術・精神面の向上を図る。</li>
+      <li>集団生活を通し、役割理解とチームワークを高める。</li>
+      <li>食事・休養を重視し、競技力向上に必要な生活リズムを習得する。</li>
+    </ul>
+  </div>
 
-      <!-- 合宿詳細 -->
-      <section>
-        <h2>合宿詳細</h2>
-        <table>
-          <tr>
-            <th>実施日</th>
-            <td>2025年12月24日（水）〜12月26日（金）〈2泊3日〉</td>
-          </tr>
-          <tr>
-            <th>場所</th>
-            <td>
-              桐花園<br />
-              〒252-0181 神奈川県相模原市緑区佐野川1822<br />
-              電話：042-687-2239
-            </td>
-          </tr>
-          <tr>
-            <th>引率</th>
-            <td>栁澤 渉</td>
-          </tr>
-          <tr>
-            <th>参加生徒</th>
-            <td>1年3名、2年5名、3年2名、4年5名、5年3名　計18名</td>
-          </tr>
-        </table>
-      </section>
+  <!-- 留意点 -->
+  <div class="card">
+    <h2>合宿中の留意事項</h2>
+    <ul>
+      <li>時間厳守を徹底し、チームの規律を守ること。</li>
+      <li>体調管理・十分な睡眠・栄養補給を意識すること。</li>
+      <li>学校生活に不要な物は持ち込まないこと。</li>
+      <li>施設利用者へ配慮し、騒がないこと。</li>
+      <li>休憩時間は次の練習のための体力回復を優先すること。</li>
+      <li>限界に挑む姿勢を持ちつつ、怪我・体調悪化を避けること。</li>
+      <li>欠席・遅刻は学校携帯（070-4382-2331）または JOIN で連絡。</li>
+      <li>緊急時は保護者が迎えに来るため、事前に依頼しておくこと。</li>
+    </ul>
+  </div>
 
-      <!-- 持ち物チェックリスト -->
-      <section>
-        <h2>持ち物チェックリスト</h2>
-        <ul id="checklist">
-          <li><label><input type="checkbox" data-id="item1" /> 水泳用具一式（練習用・レース用水着、シリコンキャップ等）</label></li>
-          <li><label><input type="checkbox" data-id="item2" /> プルブイ</label></li>
-          <li><label><input type="checkbox" data-id="item3" /> パドル</label></li>
-          <li><label><input type="checkbox" data-id="item4" /> フィン</label></li>
-          <li><label><input type="checkbox" data-id="item5" /> サンダル</label></li>
-          <li><label><input type="checkbox" data-id="item6" /> 運動着・運動靴・体育館履き</label></li>
-          <li><label><input type="checkbox" data-id="item7" /> 着替え・下着</label></li>
-          <li><label><input type="checkbox" data-id="item8" /> 防寒具</label></li>
-          <li><label><input type="checkbox" data-id="item9" /> 保険証のコピー</label></li>
-          <li><label><input type="checkbox" data-id="item10" /> 洗面用具</label></li>
-          <li><label><input type="checkbox" data-id="item11" /> 常備薬</label></li>
-          <li><label><input type="checkbox" data-id="item12" /> 筆記用具</label></li>
-          <li><label><input type="checkbox" data-id="item13" /> しおり</label></li>
-          <li><label><input type="checkbox" data-id="item14" /> 栄養補給用補助食</label></li>
-          <li><label><input type="checkbox" data-id="item15" /> 体温計</label></li>
-          <li><label><input type="checkbox" data-id="item16" /> マスク</label></li>
-          <li><label><input type="checkbox" data-id="item17" /> 雨具</label></li>
-          <li><label><input type="checkbox" data-id="item18" /> 冬休みの課題・勉強道具</label></li>
-          <li><label><input type="checkbox" data-id="item19" /> モバイルバッテリー・充電器</label></li>
-        </ul>
+  <!-- 詳細 -->
+  <div class="card">
+    <h2>合宿詳細</h2>
+    <table>
+      <tr><th>実施日</th><td>2025年12月24日（水）〜26日（金）〈2泊3日〉</td></tr>
+      <tr>
+        <th>場所</th>
+        <td>桐花園<br>〒252-0181 神奈川県相模原市緑区佐野川1822<br>電話：042-687-2239</td>
+      </tr>
+      <tr><th>引率</th><td>栁澤 渉</td></tr>
+      <tr><th>参加生徒</th><td>計18名（1年3名 / 2年5名 / 3年2名 / 4年5名 / 5年3名）</td></tr>
+    </table>
+  </div>
 
-        <script>
-          document
-            .querySelectorAll('#checklist input[type="checkbox"]')
-            .forEach((checkbox) => {
-              const id = checkbox.getAttribute("data-id");
-              const savedState = localStorage.getItem(id);
-              if (savedState === "true") {
-                checkbox.checked = true;
-              }
+  <!-- 持ち物 -->
+  <div class="card">
+    <h2>持ち物チェックリスト</h2>
+    <ul id="checklist">
+      <li><label><input type="checkbox" data-id="item1"> 水泳用具一式（練習用・レース用水着、シリコンキャップ）</label></li>
+      <li><label><input type="checkbox" data-id="item2"> プルブイ</label></li>
+      <li><label><input type="checkbox" data-id="item3"> パドル</label></li>
+      <li><label><input type="checkbox" data-id="item4"> フィン</label></li>
+      <li><label><input type="checkbox" data-id="item5"> サンダル</label></li>
+      <li><label><input type="checkbox" data-id="item6"> 運動着・体育館履き</label></li>
+      <li><label><input type="checkbox" data-id="item7"> 着替え・下着</label></li>
+      <li><label><input type="checkbox" data-id="item8"> 防寒具</label></li>
+      <li><label><input type="checkbox" data-id="item9"> 保険証のコピー</label></li>
+      <li><label><input type="checkbox" data-id="item10"> 洗面用具</label></li>
+      <li><label><input type="checkbox" data-id="item11"> 常備薬</label></li>
+      <li><label><input type="checkbox" data-id="item12"> 筆記用具</label></li>
+      <li><label><input type="checkbox" data-id="item13"> しおり</label></li>
+      <li><label><input type="checkbox" data-id="item14"> 栄養補給食</label></li>
+      <li><label><input type="checkbox" data-id="item15"> 体温計</label></li>
+      <li><label><input type="checkbox" data-id="item16"> マスク</label></li>
+      <li><label><input type="checkbox" data-id="item17"> 雨具</label></li>
+      <li><label><input type="checkbox" data-id="item18"> 冬休みの課題・勉強道具</label></li>
+      <li><label><input type="checkbox" data-id="item19"> モバイルバッテリー・充電器</label></li>
+    </ul>
 
-              checkbox.addEventListener("change", () => {
-                localStorage.setItem(id, checkbox.checked);
-              });
-            });
-        </script>
-      </section>
+    <script>
+      document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+        const id = cb.getAttribute("data-id");
+        const saved = localStorage.getItem(id);
+        if (saved === "true") cb.checked = true;
 
-      <!-- スケジュール -->
-      <section>
-        <h2>合宿スケジュール（2024年度参考）</h2>
+        cb.addEventListener("change", () => {
+          localStorage.setItem(id, cb.checked);
+        });
+      });
+    </script>
+  </div>
 
-        <h3>1日目（12月24日 火）</h3>
-        <ul>
-          <li>16:35　町田生徒 集合（JR横浜線 町田駅 3番線ホーム先頭）</li>
-          <li>16:46　町田駅出発 → 橋本駅で合流</li>
-          <li>16:50　橋本生徒 集合</li>
-          <li>17:01　橋本駅発 → 八王子駅へ</li>
-          <li>17:12　八王子駅着</li>
-          <li>17:23　八王子駅発 → 高尾駅着（17:30）</li>
-          <li>17:45　高尾駅発 → 17:58 藤野駅着 → 送迎バス</li>
-          <li>18:15　桐花園到着・部屋確認</li>
-          <li>18:40〜19:30　夕食・準備</li>
-          <li>19:45〜20:30　プール練習①</li>
-          <li>20:30〜22:00　入浴</li>
-          <li>22:00〜22:30　ミーティング</li>
-          <li>22:30　就寝</li>
-        </ul>
+  <!-- スケジュール -->
+  <div class="card">
+    <h2>合宿スケジュール（2024年度参考）</h2>
 
-        <h3>2日目（12月25日 水）</h3>
-        <ul>
-          <li>7:00　起床</li>
-          <li>7:30〜9:10　朝食・休憩</li>
-          <li>9:30〜11:30　体育館（レク・陸トレ）</li>
-          <li>12:10〜14:30　昼食・レク（山崎氏引退式）</li>
-          <li>14:40〜15:40　休憩</li>
-          <li>16:00〜17:00　プール練習②</li>
-          <li>18:00〜18:45　夕食</li>
-          <li>19:30〜20:30　プール練習④</li>
-          <li>21:00〜22:00　入浴</li>
-          <li>22:00〜22:30　ミーティング</li>
-          <li>23:00　就寝</li>
-        </ul>
+    <h3>【1日目】12/24（火）</h3>
+    <ul>
+      <li>16:35　町田集合 → 16:46 出発</li>
+      <li>16:50　橋本集合 → 17:01 出発</li>
+      <li>17:12　八王子着 → 17:23 発</li>
+      <li>17:30　高尾着 → 17:45 発</li>
+      <li>17:58　藤野着 → バス移動</li>
+      <li>18:15　桐花園着・部屋確認</li>
+      <li>19:45〜20:30　プール練習①</li>
+      <li>20:30〜22:00　入浴</li>
+      <li>22:30　就寝</li>
+    </ul>
 
-        <h3>3日目（12月26日 木）</h3>
-        <ul>
-          <li>6:00　起床・帰り支度</li>
-          <li>6:30〜7:30　朝食・身支度</li>
-          <li>8:30〜9:45　プール練習④（タイムトライアル）</li>
-          <li>11:00　チェックアウト → バス移動</li>
-          <li>11:15　藤野駅着 → 11:27 発</li>
-          <li>→ 高尾駅 → 八王子駅で解散</li>
-        </ul>
-      </section>
+    <h3>【2日目】12/25（水）</h3>
+    <ul>
+      <li>7:00　起床</li>
+      <li>9:30〜11:30　体育館（レク・陸トレ）</li>
+      <li>12:10〜14:30　昼食・レク</li>
+      <li>16:00〜17:00　プール練習②</li>
+      <li>19:30〜20:30　プール練習④</li>
+      <li>23:00　就寝</li>
+    </ul>
 
-      <!-- 緊急連絡先 -->
-      <section>
-        <h2>緊急連絡先</h2>
-        <table>
-          <tr>
-            <th>学校携帯</th>
-            <td>070-4382-2331</td>
-          </tr>
-          <tr>
-            <th>病院</th>
-            <td>
-              相模原赤十字病院<br />
-              〒252-0181 神奈川県相模原市緑区小渕1656-1<br />
-              電話：042-687-2229
-            </td>
-          </tr>
-        </table>
-      </section>
-    </div>
+    <h3>【3日目】12/26（木）</h3>
+    <ul>
+      <li>6:00　起床</li>
+      <li>8:30〜9:45　プール練習（タイムトライアル）</li>
+      <li>11:00　チェックアウト → 藤野駅へ</li>
+      <li>11:27　藤野発 → 高尾 → 八王子解散</li>
+    </ul>
+  </div>
 
-    <footer>
-      <p>
-        自修館中等教育学校 水泳部<br />
-        〒259-1185 神奈川県伊勢原市見附島411<br />
-        Tel: 0463-97-2100
-      </p>
-    </footer>
-  </body>
+  <!-- 連絡先 -->
+  <div class="card">
+    <h2>緊急連絡先</h2>
+    <table>
+      <tr><th>学校携帯</th><td>070-4382-2331</td></tr>
+      <tr>
+        <th>病院</th>
+        <td>相模原赤十字病院<br>〒252-0181 神奈川県相模原市緑区小渕1656-1<br>電話：042-687-2229</td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  自修館中等教育学校 水泳部｜〒259-1185 神奈川県伊勢原市見附島411｜Tel 0463-97-2100
+</footer>
+
+</body>
 </html>
