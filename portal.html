@@ -287,36 +287,27 @@ window.PushCodeInit = function() {
 
       <section>
   <header>🆕 新着情報</header>
-  <ul id="news-list"></ul>
-  <p class="update-time">最終更新: <span id="lastUpdated"></span></p>
-</section>
+  <ul id="top-news-list"></ul>
 
 <script>
-async function loadNews() {
+async function loadTopNews() {
   try {
-    const res = await fetch('news.json');
+    const res = await fetch('news-top.json');
     const data = await res.json();
-
-    const newsUl = document.getElementById("news-list");
-    newsUl.innerHTML = ""; // 古い内容をクリア
-
+    const list = document.getElementById('top-news-list');
+    list.innerHTML = '';
     data.news.forEach(item => {
-      const li = document.createElement("li");
+      const li = document.createElement('li');
       li.textContent = item.date ? `${item.date} - ${item.text}` : item.text;
-      newsUl.appendChild(li);
+      list.appendChild(li);
     });
-
   } catch (err) {
-    console.error("ニュースの読み込みに失敗:", err);
-    const newsUl = document.getElementById("news-list");
-    newsUl.innerHTML = "<li>ニュース取得できませんでした</li>";
+    console.error('トップページ新着情報の読み込みに失敗:', err);
+    document.getElementById('top-news-list').innerHTML = '<li>情報を取得できませんでした</li>';
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadNews();
-  document.getElementById("lastUpdated").textContent = new Date(document.lastModified).toLocaleString();
-});
+document.addEventListener('DOMContentLoaded', loadTopNews);
 </script>
 
       <section>
