@@ -286,20 +286,38 @@ window.PushCodeInit = function() {
     <button onclick="location.href='toolshu.html'">ツールポータル</button>
 
       <section>
-        <header>🆕 新着情報</header>
-        <ul>
-          <li>2025/11/15 - 時間管理システムと、お知らせは今後<a href="https://f.ieyasu.co/sys-portal/login/">こちらから</a>アクセスできます。</li>
-          <li>2025/10/29 - 予約認証ページを正式導入しました。</li>
-          <li>2025/10/29 - アンケートがエラーのため、11/16分は再度回答をお願いします。</li>
-          <li>2025/10/27 - 予約サイトを開く前に認証を追加しました。</li>
-          <li>2025/10/21 - 11/16にプール練習を実施します。Classroom,カレンダーに登録しましたので、必ずご確認ください。</li>
- <li>2025/10/04 - 次回からJホールでの陸トレになります。</li>
-          <li>2025/10/04 - 本日より、ポータルサイトはウインターモードになりました。</li>
-          <li>2025/6/20 - 持ちもの一覧を追加しました。</li>
-          <li>2025/01/20 - 新しいツールを追加しました。</li>
-        </ul>
-        <p class="update-time">最終更新: <span id="lastUpdated"></span></p>
-      </section>
+  <header>🆕 新着情報</header>
+  <ul id="news-list"></ul>
+  <p class="update-time">最終更新: <span id="lastUpdated"></span></p>
+</section>
+
+<script>
+async function loadNews() {
+  try {
+    const res = await fetch('news.json');
+    const data = await res.json();
+
+    const newsUl = document.getElementById("news-list");
+    newsUl.innerHTML = ""; // 古い内容をクリア
+
+    data.news.forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = item.date ? `${item.date} - ${item.text}` : item.text;
+      newsUl.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error("ニュースの読み込みに失敗:", err);
+    const newsUl = document.getElementById("news-list");
+    newsUl.innerHTML = "<li>ニュース取得できませんでした</li>";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadNews();
+  document.getElementById("lastUpdated").textContent = new Date(document.lastModified).toLocaleString();
+});
+</script>
 
       <section>
         <header>📌 サイトのご案内</header>
