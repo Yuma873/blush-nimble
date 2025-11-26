@@ -1,4 +1,137 @@
-<section>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ポータルサイト - お知らせ/時間登録</title>
+  <link rel="shortcut icon" href="favicon2.png" type="image/png" />
+
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
+      display: flex;
+      min-height: 100vh;
+    }
+    nav {
+      width: 240px;
+      background-color: #2c3e50;
+      color: white;
+      padding: 15px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+      box-sizing: border-box;
+    }
+    nav video {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    nav a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 12px;
+      margin: 6px 0;
+      background-color: #34495e;
+      border-radius: 6px;
+      text-align: center;
+      transition: 0.3s;
+      font-weight: 500;
+    }
+    nav a:hover { background-color: #1abc9c; }
+    nav img { display: block; margin: 8px auto; border-radius: 6px; }
+
+    main { flex: 1; padding: 30px; margin-left: 260px; box-sizing: border-box; }
+    header { font-size: 1.8em; margin-bottom: 20px; color: #2c3e50; font-weight: bold; }
+    section {
+      margin-bottom: 40px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    ul { list-style: disc; padding-left: 25px; line-height: 1.7; font-size: 1.05em; }
+    li { margin-bottom: 8px; }
+    .update-time { font-size: 0.9em; color: #777; text-align: right; }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #1abc9c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover { background-color: #16a085; }
+    @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
+    @media(max-width:768px){ body{flex-direction:column;} nav{width:100%; height:auto; position:relative;} main{margin-left:0; padding:15px;} }
+    .ticker-wrap { width: 100%; overflow: hidden; background-color: #2c3e50; color: white; padding: 8px 0; position: fixed; bottom: 0; left: 0; z-index: 9999; }
+    .ticker { display: inline-block; white-space: nowrap; animation: tickerScroll 25s linear infinite; padding-left: 100%; }
+    @keyframes tickerScroll { from{transform:translateX(0%);} to{transform:translateX(-100%);} }
+  </style>
+</head>
+
+<body>
+  <!-- ===== 左ナビ ===== -->
+  <nav>
+    <video id="randomVideo" autoplay muted loop playsinline></video>
+
+    <a href="portal.html">🏠 トップ</a>
+    <a href="portal-news.html">📰 お知らせ</a>
+    <a href="portal-tool.html">🛠 ツール</a>
+    <a href="portal-renraku.html">📢 掲示板連絡</a>
+    <a href="portal-pdf.html">📁 ファイル一覧</a>
+    <a href="portal-next.html">🏆 次回大会 特設ページ</a>
+
+    <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
+      <img src="botan.png" alt="プール開館情報" width="120">
+    </a>
+    <a href="portal-reserve.html" target="_blank">
+      <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
+    </a>
+    <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
+
+    <a href="https://yuma873.github.io/blush-nimble/index.html"
+       style="display:inline-block; padding:10px 20px; background-color:#f44336; color:white; text-decoration:none; border-radius:5px; font-weight:bold;">
+      🚪 ログアウト
+    </a>
+  </nav>
+
+  <!-- ===== メインコンテンツ ===== -->
+  <main>
+    <section>
+      <header>📰 最新のお知らせ</header>
+      <ul id="news-list"></ul>
+    </section>
+
+    <section>
+      <header>📢 大会関連情報</header>
+      <ul id="event-list"></ul>
+    </section>
+
+    <section class="update-time">最終更新: 2025/8/15 8:17.22</section>
+
+    <button onclick="location.href='portal.html'">ポータルトップへ戻る</button>
+  </main>
+
+  <!-- 🎬 ランダム動画スクリプト -->
+  <script>
+    const videos = ["video1.mp4","video2.mp4","video3.mp4","video5.mp4",
+      "V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4",
+      "V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
+    const randomVideo = videos[Math.floor(Math.random()*videos.length)];
+    document.getElementById("randomVideo").src = randomVideo;
+  </script>
+  <section>
   <header>⏳ 大会カウントダウン (2025年日程／2026年度版登録済み)</header>
   <ul id="countdown-list"></ul>
 </section>
@@ -32,3 +165,43 @@ events.forEach((e) => {
   list.appendChild(li);
 });
 </script>
+
+
+  <!-- 📰 JSONお知らせ読み込みスクリプト -->
+  <script>
+  async function loadNewsAndEvents() {
+    try {
+      const res = await fetch('news.json');
+      const data = await res.json();
+
+      // 最新のお知らせ
+      const newsUl = document.getElementById("news-list");
+      data.news.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item.date ? `${item.date} - ${item.text}` : item.text;
+        newsUl.appendChild(li);
+      });
+
+      // 大会関連情報
+      const eventUl = document.getElementById("event-list");
+      data.events.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item.date ? `${item.date} - ${item.text}` : item.text;
+        eventUl.appendChild(li);
+      });
+
+    } catch(err) {
+      console.error("ニュース・大会情報の読み込みに失敗:", err);
+    }
+  }
+  document.addEventListener("DOMContentLoaded", loadNewsAndEvents);
+  </script>
+
+  <!-- 📰 テロップ -->
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span>🚨 大会に向けて調整を進めましょう ／ 📢 目指せ高校総体進出 ／ 🏊 日々の練習を大切に！</span>
+    </div>
+  </div>
+</body>
+</html>
