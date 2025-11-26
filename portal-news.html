@@ -14,8 +14,6 @@
       display: flex;
       min-height: 100vh;
     }
-
-    /* ===== 左ナビ ===== */
     nav {
       width: 240px;
       background-color: #2c3e50;
@@ -30,13 +28,11 @@
       z-index: 1000;
       box-sizing: border-box;
     }
-
     nav video {
       width: 100%;
       border-radius: 10px;
       margin-bottom: 12px;
     }
-
     nav a {
       display: block;
       color: white;
@@ -49,32 +45,11 @@
       transition: 0.3s;
       font-weight: 500;
     }
+    nav a:hover { background-color: #1abc9c; }
+    nav img { display: block; margin: 8px auto; border-radius: 6px; }
 
-    nav a:hover {
-      background-color: #1abc9c;
-    }
-
-    nav img {
-      display: block;
-      margin: 8px auto;
-      border-radius: 6px;
-    }
-
-    /* ===== メイン部分 ===== */
-    main {
-      flex: 1;
-      padding: 30px;
-      margin-left: 260px;
-      box-sizing: border-box;
-    }
-
-    header {
-      font-size: 1.8em;
-      margin-bottom: 20px;
-      color: #2c3e50;
-      font-weight: bold;
-    }
-
+    main { flex: 1; padding: 30px; margin-left: 260px; box-sizing: border-box; }
+    header { font-size: 1.8em; margin-bottom: 20px; color: #2c3e50; font-weight: bold; }
     section {
       margin-bottom: 40px;
       background: white;
@@ -83,24 +58,9 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       animation: fadeIn 0.4s ease-in-out;
     }
-
-    ul {
-      list-style: disc;
-      padding-left: 25px;
-      line-height: 1.7;
-      font-size: 1.05em;
-    }
-
-    li {
-      margin-bottom: 8px;
-    }
-
-    .update-time {
-      font-size: 0.9em;
-      color: #777;
-      text-align: right;
-    }
-
+    ul { list-style: disc; padding-left: 25px; line-height: 1.7; font-size: 1.05em; }
+    li { margin-bottom: 8px; }
+    .update-time { font-size: 0.9em; color: #777; text-align: right; }
     button {
       padding: 10px 20px;
       font-size: 1em;
@@ -111,69 +71,17 @@
       cursor: pointer;
       transition: 0.3s;
     }
-
-    button:hover {
-      background-color: #16a085;
-    }
-
-    /* ===== カウントダウン ===== */
-    #countdown-list li strong {
-      font-weight: bold;
-    }
-
-    /* ===== スクロールテロップ ===== */
-    .ticker-wrap {
-      width: 100%;
-      overflow: hidden;
-      background-color: #2c3e50;
-      color: white;
-      padding: 8px 0;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      z-index: 9999;
-    }
-
-    .ticker {
-      display: inline-block;
-      white-space: nowrap;
-      animation: tickerScroll 25s linear infinite;
-      padding-left: 100%;
-    }
-
-    @keyframes tickerScroll {
-      from { transform: translateX(0%); }
-      to { transform: translateX(-100%); }
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(10px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-
-    /* ===== スマホ対応 ===== */
-    @media(max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-
-      nav {
-        width: 100%;
-        height: auto;
-        position: relative;
-      }
-
-      main {
-        margin-left: 0;
-        padding: 15px;
-      }
-    }
+    button:hover { background-color: #16a085; }
+    @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
+    @media(max-width:768px){ body{flex-direction:column;} nav{width:100%; height:auto; position:relative;} main{margin-left:0; padding:15px;} }
+    .ticker-wrap { width: 100%; overflow: hidden; background-color: #2c3e50; color: white; padding: 8px 0; position: fixed; bottom: 0; left: 0; z-index: 9999; }
+    .ticker { display: inline-block; white-space: nowrap; animation: tickerScroll 25s linear infinite; padding-left: 100%; }
+    @keyframes tickerScroll { from{transform:translateX(0%);} to{transform:translateX(-100%);} }
   </style>
 </head>
 
 <body>
-
-  <!-- ===== 左ナビ（トップと完全同じ構成） ===== -->
+  <!-- ===== 左ナビ ===== -->
   <nav>
     <video id="randomVideo" autoplay muted loop playsinline></video>
 
@@ -187,11 +95,9 @@
     <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
       <img src="botan.png" alt="プール開館情報" width="120">
     </a>
-
     <a href="portal-reserve.html" target="_blank">
       <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
     </a>
-
     <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
 
     <a href="https://yuma873.github.io/blush-nimble/index.html"
@@ -204,22 +110,12 @@
   <main>
     <section>
       <header>📰 最新のお知らせ</header>
-      <ul>
-        <li>2025/10/30 - 今後、このお知らせは下記URLにまとめられます。</li>
-        <li>https://f.ieyasu.co/sys-portal/login/</li>
-      </ul>
+      <ul id="news-list"></ul>
     </section>
 
     <section>
       <header>📢 大会関連情報</header>
-      <ul>
-       
-      </ul>
-    </section>
-
-    <section>
-      <header>⏳ 大会カウントダウン (2025年日程／2026年度版登録済み)</header>
-      <ul id="countdown-list"></ul>
+      <ul id="event-list"></ul>
     </section>
 
     <section class="update-time">最終更新: 2025/8/15 8:17.22</section>
@@ -229,44 +125,41 @@
 
   <!-- 🎬 ランダム動画スクリプト -->
   <script>
-    const videos = [
-      "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
-      "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
-      "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
-    ];
-    const randomVideo = videos[Math.floor(Math.random() * videos.length)];
+    const videos = ["video1.mp4","video2.mp4","video3.mp4","video5.mp4",
+      "V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4",
+      "V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
+    const randomVideo = videos[Math.floor(Math.random()*videos.length)];
     document.getElementById("randomVideo").src = randomVideo;
   </script>
 
-  <!-- 🕒 カウントダウンスクリプト -->
+  <!-- 📰 JSONお知らせ読み込みスクリプト -->
   <script>
-    const events = [
-      { name: "春季記録会(24-25)", date: "2026-05-24" },
-      { name: "夏季記録会", date: "2026-06-15" },
-      { name: "県高校総体(20-22)", date: "2026-06-20" },
-      { name: "北相地区大会", date: "2026-07-28" },
-      { name: "北相地区新人", date: "2026-09-13" },
-      { name: "県新人(27-28)", date: "2026-09-27" }
-    ];
+  async function loadNewsAndEvents() {
+    try {
+      const res = await fetch('news.json');
+      const data = await res.json();
 
-    const today = new Date();
-    const list = document.getElementById("countdown-list");
+      // 最新のお知らせ
+      const newsUl = document.getElementById("news-list");
+      data.news.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item.date ? `${item.date} - ${item.text}` : item.text;
+        newsUl.appendChild(li);
+      });
 
-    events.forEach((e) => {
-      const d = Math.ceil((new Date(e.date) - today) / (1000 * 60 * 60 * 24));
-      let c = "#666";
-      if (d <= 7) c = "red";
-      else if (d <= 30) c = "orange";
-      else if (d <= 50) c = "goldenrod";
+      // 大会関連情報
+      const eventUl = document.getElementById("event-list");
+      data.events.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item.date ? `${item.date} - ${item.text}` : item.text;
+        eventUl.appendChild(li);
+      });
 
-      const li = document.createElement("li");
-      if (d > 60) {
-        li.innerHTML = `<span style="color:#aaa; font-size:0.9em;">${e.name}：あと ${d}日</span>`;
-      } else {
-        li.innerHTML = `${e.name}：あと <strong style="color:${c}">${d}日</strong>`;
-      }
-      list.appendChild(li);
-    });
+    } catch(err) {
+      console.error("ニュース・大会情報の読み込みに失敗:", err);
+    }
+  }
+  document.addEventListener("DOMContentLoaded", loadNewsAndEvents);
   </script>
 
   <!-- 📰 テロップ -->
@@ -275,6 +168,5 @@
       <span>🚨 大会に向けて調整を進めましょう ／ 📢 目指せ高校総体進出 ／ 🏊 日々の練習を大切に！</span>
     </div>
   </div>
-
 </body>
 </html>
