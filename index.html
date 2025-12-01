@@ -157,24 +157,15 @@ function handleLogin() {
     return;
   }
 
- // 成功時
-loading.style.display = "block";
-loginBtn.disabled = true;
+  // 成功
+  loading.style.display = "block";
+  loginBtn.disabled = true;
 
-// まず5秒後に文章を変更（スピナーはそのまま）
-setTimeout(() => {
-  loading.innerHTML = `
-    <div class="spinner"></div>
-    あと少しでログイン完了します…
-  `;
-}, 5000);
-
-// 10秒後にリダイレクト
-setTimeout(() => {
-  loading.style.display = "none";
-  window.location.href = user.link;
-}, 10000);
-
+  setTimeout(() => {
+    loading.style.display = "none";
+    window.location.href = user.link;
+  }, 10000);
+}
 
 // ページロード時メンテ判定
 window.addEventListener("load", () => {
@@ -188,3 +179,4 @@ document.addEventListener("keydown", (e) => { if (e.key==="Enter") handleLogin()
 </script>
 </body>
 </html>
+こんな感じ?
