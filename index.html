@@ -70,6 +70,8 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
 
   <!-- reCAPTCHA -->
   <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"></div>
+      <div class="warn">認証を完了させてからログインボタンを押してください</div>
+
 
   <button id="login-btn" onclick="handleLogin()">ログイン</button>
 
@@ -82,7 +84,7 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
     ログインしています...*この読み込みは時間がかかる場合があります
   </div>
 </div>
-
+<!-- アクセスカウンター --> <div style="margin-top: 25px; text-align: center;"> <!--タグはここから--> <!--カウンター画像からは配布サイトへリンクが設定されています。また、誤作動、誤表示の原因となりますのでコードの改変、改行は行わないで下さい。 このコメント部分は削除して頂いても結構です。--> <nobr><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td><a href="https://ctr.stylemap.co.jp/"><img src="https://www.f-counter.net/ani1/66/1763895419/" alt="無料アクセスカウンター" border="0" style="margin:0px; padding:0px; border:0px; vertical-align:bottom"></a></td> <td><a href="https://ctr.stylemap.co.jp/"><img src="https://www.f-counter.net/ani2/66/1763895419/" alt="無料アクセスカウンター" border="0" style="margin:0px; padding:0px; border:0px; vertical-align:bottom"></a></td></tr></tbody></table></nobr> <!--ここまで--> </div>
 <button id="admin-login-btn" type="button" aria-label="管理アカウントでログイン">管理アカウントでログイン</button>
 
 <script>
@@ -162,7 +164,7 @@ function handleLogin() {
   setTimeout(() => {
     loading.style.display = "none";
     window.location.href = user.link;
-  }, 1500);
+  }, 10000);
 }
 
 // ページロード時メンテ判定
