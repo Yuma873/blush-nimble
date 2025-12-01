@@ -157,15 +157,24 @@ function handleLogin() {
     return;
   }
 
-  // 成功
-  loading.style.display = "block";
-  loginBtn.disabled = true;
+ // 成功時
+loading.style.display = "block";
+loginBtn.disabled = true;
 
-  setTimeout(() => {
-    loading.style.display = "none";
-    window.location.href = user.link;
-  }, 10000);
-}
+// まず5秒後に文章を変更（スピナーはそのまま）
+setTimeout(() => {
+  loading.innerHTML = `
+    <div class="spinner"></div>
+    あと少しでログイン完了します…
+  `;
+}, 5000);
+
+// 10秒後にリダイレクト
+setTimeout(() => {
+  loading.style.display = "none";
+  window.location.href = user.link;
+}, 10000);
+
 
 // ページロード時メンテ判定
 window.addEventListener("load", () => {
