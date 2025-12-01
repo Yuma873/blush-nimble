@@ -50,17 +50,9 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
 @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
 #admin-login-btn { position:fixed; top:12px; right:12px; padding:6px 12px; font-size:12px; border:none; border-radius:6px; background-color:#d93025; color:white; cursor:pointer; opacity:0.9; transition:background-color 0.3s, opacity 0.3s; z-index:10000; }
 #admin-login-btn:hover { background-color:#a52714; opacity:1; }
-/* OTPモーダル */
-@keyframes modalPop { 0%{transform:scale(0.8);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-#otp-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:10000; animation: fadeIn 0.5s ease-out; }
-#otp-content {
-  background: linear-gradient(135deg, #005bac, #0081cc);
-  color:white; padding:30px 25px; border-radius:12px; max-width:320px; width:90%;
-  text-align:center; box-shadow:0 8px 24px rgba(0,0,0,0.3); animation: modalPop 0.4s ease-out;
-  user-select:none; /* コピー防止 */
-}
-#otp-number { font-size:24px; margin:15px 0; letter-spacing:2px; font-weight:bold; }
 </style>
+<!-- Google reCAPTCHA -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
 
@@ -75,7 +67,12 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
     <label for="showpass">パスワードを表示</label>
     <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
   </div>
+
+  <!-- reCAPTCHA -->
+  <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"></div>
+
   <button id="login-btn" onclick="handleLogin()">ログイン</button>
+
   <div style="text-align:right; margin-top:10px;">
     <a href="system.html" style="color:#005bac; font-weight:bold; text-decoration:none;">サーバー稼働状況 ▶</a>
   </div>
@@ -85,31 +82,8 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
     ログインしています...*この読み込みは時間がかかる場合があります
   </div>
 </div>
-  <!-- アクセスカウンター -->
-<div style="margin-top: 25px; text-align: center;">
-  <!--タグはここから-->
-  <!--カウンター画像からは配布サイトへリンクが設定されています。また、誤作動、誤表示の原因となりますのでコードの改変、改行は行わないで下さい。
-このコメント部分は削除して頂いても結構です。-->
-<nobr><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td><a href="https://ctr.stylemap.co.jp/"><img src="https://www.f-counter.net/ani1/66/1763895419/" alt="無料アクセスカウンター" border="0" style="margin:0px; padding:0px; border:0px; vertical-align:bottom"></a></td>
-<td><a href="https://ctr.stylemap.co.jp/"><img src="https://www.f-counter.net/ani2/66/1763895419/" alt="無料アクセスカウンター" border="0" style="margin:0px; padding:0px; border:0px; vertical-align:bottom"></a></td></tr></tbody></table></nobr>
-
-  <!--ここまで-->
-</div>
-
 
 <button id="admin-login-btn" type="button" aria-label="管理アカウントでログイン">管理アカウントでログイン</button>
-
-<!-- OTPモーダル -->
-<div id="otp-modal">
-  <div id="otp-content">
-    <h3>追加認証</h3>
-    <p>画面に表示された10桁の番号を入力してください</p>
-    <div id="otp-number"></div>
-    <input type="text" id="otp-input" placeholder="番号を入力" style="width:100%; padding:10px; border-radius:6px; border:none; font-size:16px; text-align:center; margin-bottom:10px;" />
-    <div id="otp-error" style="color:#ff8080; font-size:13px; margin-bottom:10px; min-height:18px;"></div>
-    <button onclick="verifyOtp()" style="padding:10px 20px; width:100%; border:none; border-radius:6px; background-color:#00488c; color:white; font-size:16px; cursor:pointer;" onmouseover="this.style.backgroundColor='#003366'" onmouseout="this.style.backgroundColor='#00488c'">認証</button>
-  </div>
-</div>
 
 <script>
 // 管理アカウント
@@ -163,6 +137,13 @@ function handleLogin() {
     return;
   }
 
+  // reCAPTCHAチェック
+  const recaptcha = grecaptcha.getResponse();
+  if (recaptcha.length === 0) {
+    errorMsg.textContent = "reCAPTCHAを完了してください。";
+    return;
+  }
+
   const user = users.find(u => u.name === name && u.password === pass);
   if (!user) {
     attempts--;
@@ -180,7 +161,7 @@ function handleLogin() {
 
   setTimeout(() => {
     loading.style.display = "none";
-    showOtpModal();
+    window.location.href = user.link;
   }, 1500);
 }
 
@@ -193,41 +174,6 @@ window.addEventListener("load", () => {
 
 // Enterでログイン
 document.addEventListener("keydown", (e) => { if (e.key==="Enter") handleLogin(); });
-
-// OTP処理
-let currentOtp = null;
-function showOtpModal() {
-  currentOtp = Math.floor(1000000000 + Math.random() * 9000000000); // 10桁
-  document.getElementById("otp-number").textContent = currentOtp;
-  document.getElementById("otp-modal").style.display = "flex";
-  document.getElementById("otp-input").value = "";
-  document.getElementById("otp-error").textContent = "";
-  document.getElementById("otp-input").focus();
-}
-
-// OTP Enterキー認証（1回だけ設定）
-document.getElementById("otp-input").addEventListener("keydown", function(e){
-  if(e.key==="Enter") verifyOtp();
-});
-
-function verifyOtp() {
-  const input = document.getElementById("otp-input").value.trim();
-  const error = document.getElementById("otp-error");
-  const username = document.getElementById("username").value;
-  const user = users.find(u => u.name === username);
-
-  if(input === currentOtp.toString()) {
-    error.textContent = "";
-    if(user) window.location.href = user.link;
-  } else {
-    error.textContent = "番号が間違っています";
-  }
-}
-
-// コピー・右クリック・選択防止
-const otpNumberDiv = document.getElementById("otp-number");
-["contextmenu","copy","mousedown","selectstart","keydown"].forEach(ev => otpNumberDiv.addEventListener(ev,e=>e.preventDefault()));
-
 </script>
 </body>
 </html>
