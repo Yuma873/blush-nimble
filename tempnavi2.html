@@ -41,7 +41,10 @@
 </head>
 <body>
   
-<div class="notice"> 📢 お知らせ:今年度の水温計の運用は、終了しました。 <br> <b><u>稼働時間: 平日,土曜 8:00~20:00不定期更新、欠測あり</u></b> <br> </div> <h1>気温監視システム（35.406482,139.340873）</h1>
+<div class="notice"> 📢 お知らせ:今年度の水温計の運用は、終了しました。 <br> <b><u>稼働時間: 平日,土曜 8:00~20:00不定期更新、欠測あり</u></b> <br> </div>
+
+<h1>気温監視システム（35.406482,139.340873）</h1>
+
 <div class="card">
   <div class="title">🌡 外気温（屋外）</div>
   <div class="value" id="airTemp">-- ℃</div>
@@ -74,14 +77,15 @@
   const airTemperature = "欠測";
   const wbgtValue = "欠測";
 
-  function generateWaterTemp() {
-    // 基準をランダムに決める（26〜29℃）
-    const base = Math.random() * (29 - 26) + 26;
-    // ±0.1℃の揺れ
-    const delta = Math.random() * 0.2 - 0.1;
-    return Math.min(29, Math.max(26, +(base + delta).toFixed(1)));
-}
+  // 水温の初期値
+  let waterTemp = 27.0;
 
+  // ランダム水温生成（26〜29℃ ±0.1℃）
+  function generateWaterTemp() {
+    const base = Math.random() * (29 - 26) + 26;
+    const delta = Math.random() * 0.2 - 0.1;
+    return +(Math.min(29, Math.max(26, base + delta)).toFixed(1));
+  }
 
   // 営業時間判定: 9:30〜22:00
   function isOpen() {
@@ -89,6 +93,13 @@
     const h = now.getHours();
     const m = now.getMinutes();
     return (h > 9 || (h === 9 && m >= 30)) && h < 22;
+  }
+
+  // 水温更新
+  function updateWaterTemp() {
+    waterTemp = generateWaterTemp();
+    document.getElementById("waterTemp").textContent = waterTemp.toFixed(1);
+    document.getElementById("waterUpdate").textContent = new Date().toLocaleTimeString("ja-JP");
   }
 
   // 混雑度更新
@@ -107,23 +118,24 @@
     addHistory(state);
   }
 
-  // 履歴管理
+  // 履歴追加
   function addHistory(crowdState) {
     const nowStr = new Date().toLocaleString("ja-JP");
     const li = document.createElement("li");
-    li.textContent = `${nowStr} 水温:${format(waterTemp)} ℃ 混雑度:${crowdState}`;
+    li.textContent = `${nowStr} 水温:${waterTemp.toFixed(1)} ℃ 混雑度:${crowdState}`;
 
     const ul = document.getElementById("historyList");
     ul.prepend(li);
 
     let hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
     hist.unshift({ text: li.textContent });
-    hist = hist.slice(0, 10);
+    hist = hist.slice(0, 10); // 最新10件だけ
     localStorage.setItem("ykpHistory", JSON.stringify(hist));
 
     while (ul.children.length > 10) ul.removeChild(ul.lastChild);
   }
 
+  // 履歴読み込み
   function loadHistory() {
     const hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
     const ul = document.getElementById("historyList");
@@ -144,8 +156,7 @@
   loadHistory();
 
   // 自動更新
-  setInterval(updateWaterTemp, 10000); // 水温: 10秒
-  setInterval(updateCrowd, 20000);     // 混雑度: 20秒
+  setInterval(() => { updateWaterTemp(); updateCrowd(); }, 20000); // 20秒ごとに水温・混雑度更新
 </script>
 
 </body>
