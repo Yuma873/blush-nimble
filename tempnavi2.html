@@ -77,15 +77,15 @@
 
 <script>
   // 外気温・内気温は固定表示
-  const airTemperature = "22.6℃";
-  const insideValue = "10℃";
+  const airTemperature = "17.0℃";
+  const insideValue = "29.5℃";
 
   // 水温の初期値
   let waterTemp = 27.0;
 
   // ±0.1℃ の揺らぎ
   function generateWaterTemp() {
-    const delta = Math.random() * 0.2 - 0.1; // -0.1〜+0.1
+    const delta = Math.random() * 0.4 - 0.2; // -0.1〜+0.1
     return +(waterTemp + delta).toFixed(1);
   }
 
