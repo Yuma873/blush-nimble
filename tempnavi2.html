@@ -5,14 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>横浜国際プール サブプール監視</title>
 <style>
-  body { font-family: Arial, sans-serif; background:#f5f5f5; padding:20px; }
-  h1 { text-align:center; margin-bottom:20px; }
-  .card { background:#fff; padding:16px; border-radius:12px; margin-bottom:16px; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
-  .value { font-size:24px; font-weight:bold; }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 { text-align:center; margin-bottom:20px; font-size:26px; }
+  .card {
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.15);
+    padding:16px;
+    margin-bottom:16px;
+  }
+  .title { font-weight:bold; font-size:18px; margin-bottom:8px; }
+  .value { font-size:24px; font-weight:bold; margin-bottom:6px; }
+  .update { color:#666; font-size:13px; }
   .status-good { color: #1abc9c; font-weight: bold; }
   .status-bad  { color: #e74c3c; font-weight: bold; }
   .status-out  { color: #7f8c8d; font-weight: bold; }
-  .history { background:#fff; border-radius:12px; padding:16px; max-height:200px; overflow-y:auto; margin-top:20px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+  .history {
+    background:#fff;
+    border-radius:12px;
+    padding:16px;
+    max-height:200px;
+    overflow-y:auto;
+    margin-top:20px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  }
   .history h2 { margin-top:0; font-size:18px; }
   .history ul { list-style:none; padding-left:0; margin:0; }
   .history li { padding:4px 0; border-bottom:1px solid #eee; }
@@ -20,22 +41,26 @@
 </head>
 <body>
 
-<h1>横浜国際プール サブプール監視パネル</h1>
-
 <div class="card">
-  <div>🌡 外気温（屋外）: <span id="airTemp">--</span> ℃</div>
+  <div class="title">🌡 外気温（屋外）</div>
+  <div class="value" id="airTemp">-- ℃</div>
+  <div class="update">最終更新: --</div>
 </div>
 
 <div class="card">
-  <div>☀ 内気温（室温）: <span id="wbgt">--</span> ℃</div>
+  <div class="title">☀ 内気温（WBGT→室温扱い）</div>
+  <div class="value" id="wbgt">-- ℃</div>
+  <div class="update">最終更新: --</div>
 </div>
 
 <div class="card">
-  <div>💧 サブプール水温: <span id="waterTemp">--</span> ℃</div>
+  <div class="title">💧 サブプール水温</div>
+  <div class="value" id="waterTemp">-- ℃</div>
+  <div class="update" id="waterUpdate">自動更新（10秒ごと）</div>
 </div>
 
 <div class="card">
-  <div>サブプール 混雑度: <span id="crowd">--</span></div>
+  <div>サブプール 混雑度：<span id="crowd">--</span></div>
 </div>
 
 <div class="history">
@@ -95,7 +120,6 @@
     const ul = document.getElementById("historyList");
     ul.prepend(li);
 
-    // ローカルストレージ保存
     let hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
     hist.unshift({ text: li.textContent });
     hist = hist.slice(0, 10);
@@ -115,7 +139,7 @@
     });
   }
 
-  // 初回表示
+  // 初期表示
   document.getElementById("airTemp").textContent = airTemperature;
   document.getElementById("wbgt").textContent = wbgtValue;
 
@@ -123,11 +147,9 @@
   updateCrowd();
   loadHistory();
 
-  // 水温更新: 10秒ごと
-  setInterval(updateWaterTemp, 10000);
-  // 混雑度更新: 20秒ごと
-  setInterval(updateCrowd, 20000);
-
+  // 自動更新
+  setInterval(updateWaterTemp, 10000); // 水温: 10秒
+  setInterval(updateCrowd, 20000);     // 混雑度: 20秒
 </script>
 
 </body>
