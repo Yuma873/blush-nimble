@@ -59,7 +59,7 @@
 <body>
   
 <div class="notice">
-  <p>📢 <strong>お知らせ:</strong> 今年度の営業は30日までです。</p>
+  <p>📢 <strong>お知らせ:</strong> メインプール営業は終了しました。</p>
   <p><strong><u>水温のみがセンサーで自動更新です</u></strong>（サブ 電光掲示板側 1レーン中央）</p>
   <p><strong>外気温・内気温は1日2回、朝及び正午に更新されます。</strong></p>
 </div>
@@ -102,6 +102,8 @@
   // 外気温・内気温は固定表示
   const airTemperature = "17.0℃";
   const insideValue = "29.5℃";
+    const mainTemp = "欠測";
+
 
   // 水温の初期値
   let waterTemp = 27.0;
@@ -193,6 +195,8 @@
   // 初期表示
   document.getElementById("airTemp").textContent = airTemperature;
   document.getElementById("inside").textContent = insideValue;
+    document.getElementById("mainTemp").textContent = mainTemperature;
+
 
   updateWaterTemp();
   updateCrowd();
