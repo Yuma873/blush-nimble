@@ -97,13 +97,16 @@
     return (h > 9 || (h === 9 && m >= 30)) && h < 21;
   }
 
-  // 水温更新
-  function updateWaterTemp() {
-    waterTemp = generateWaterTemp();
-    document.getElementById("waterTemp").textContent = waterTemp.toFixed(1);
-    document.getElementById("waterUpdate").textContent =
-      new Date().toLocaleTimeString("ja-JP");
-  }
+ function updateWaterTemp() {
+  waterTemp = generateWaterTemp();
+  document.getElementById("waterTemp").textContent = waterTemp.toFixed(1);
+  document.getElementById("waterUpdate").textContent =
+    new Date().toLocaleTimeString("ja-JP");
+
+  // ★★ 水温更新のたびに履歴追加 ★★
+  addHistory(fixedCrowdState ?? "--");
+}
+
 
   // 混雑度は「最初の1回だけ」決定
   let fixedCrowdState = null;
@@ -176,7 +179,7 @@
   setInterval(() => {
     updateWaterTemp();
     updateCrowd();
-  }, 20000);
+  }, 3000);
 </script>
 
 </body>
