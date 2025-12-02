@@ -50,13 +50,13 @@
 
 <div class="card">
   <div class="title">🌡 外気温（屋外）</div>
-  <div class="value" id="airTemp">16 ℃</div>
+  <div class="value" id="airTemp">-- ℃</div>
   <div class="update">最終更新: 12/2 12:00</div>
 </div>
 
 <div class="card">
   <div class="title">☀ 内気温</div>
-  <div class="value" id="wbgt">29 ℃</div>
+  <div class="value" id="inside">-- ℃</div>
   <div class="update">最終更新: 12/2 12:00</div>
 </div>
 
@@ -77,8 +77,8 @@
 
 <script>
   // 外気温・内気温は固定表示
-  const airTemperature = "22.6";
-  const wbgtValue = "10";
+  const airTemperature = "22.6℃";
+  const insideValue = "10℃";
 
   // 水温の初期値
   let waterTemp = 27.0;
@@ -166,7 +166,7 @@
 
   // 初期表示
   document.getElementById("airTemp").textContent = airTemperature;
-  document.getElementById("wbgt").textContent = wbgtValue;
+  document.getElementById("inside").textContent = insideValue;
 
   updateWaterTemp();
   updateCrowd();
