@@ -1,178 +1,101 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>横浜国際プール 監視パネル</title>
-  <style>
-    .notice {
-      background: #fff9e6;
-      color: #856404;
-      border-radius: 6px;
-      padding: 6px 12px;
-      margin-bottom: 12px;
-      font-size: 14px;
-      text-align: center;
-    }
-    body {
-      font-family: "Helvetica Neue", Arial, sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 { text-align:center; margin-bottom:20px; font-size:26px; }
-    .card {
-      background:#fff;
-      border-radius:12px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.15);
-      padding:16px;
-      margin-bottom:16px;
-    }
-    .title { font-weight:bold; font-size:18px; margin-bottom:8px; }
-    .value { font-size:24px; font-weight:bold; margin-bottom:6px; }
-    .update { color:#666; font-size:13px; }
-    .result {
-      text-align:center;
-      font-size:22px;
-      font-weight:bold;
-      padding:16px;
-      border-radius:12px;
-      margin-top:20px;
-      background:#e6f2ff;
-      color:#004080;
-      border:2px solid #004080;
-    }
-    .detail {
-      margin-top:12px;
-      padding:12px;
-      border-radius:8px;
-      background:#fafafa;
-      font-size:15px;
-      line-height:1.5;
-      border-left:4px solid #ccc;
-    }
-    .history {
-      background:#fff;
-      border-radius:12px;
-      padding:16px;
-      max-height:200px;
-      overflow-y:auto;
-      margin-top:20px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.1);
-    }
-    .history h2 { margin-top:0; font-size:18px; }
-    .history ul { list-style:none; padding-left:0; margin:0; }
-    .history li { padding:4px 0; border-bottom:1px solid #eee; }
-
-    .status-good { color: #1abc9c; font-weight: bold; }
-.status-bad  { color: #e74c3c; font-weight: bold; }
-.status-out  { color: #7f8c8d; font-weight: bold; }
-
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>横浜国際プール サブプール監視</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#f5f5f5; padding:20px; }
+  h1 { text-align:center; margin-bottom:20px; }
+  .card { background:#fff; padding:16px; border-radius:12px; margin-bottom:16px; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+  .value { font-size:24px; font-weight:bold; }
+  .status-good { color: #1abc9c; font-weight: bold; }
+  .status-bad  { color: #e74c3c; font-weight: bold; }
+  .status-out  { color: #7f8c8d; font-weight: bold; }
+  .history { background:#fff; border-radius:12px; padding:16px; max-height:200px; overflow-y:auto; margin-top:20px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+  .history h2 { margin-top:0; font-size:18px; }
+  .history ul { list-style:none; padding-left:0; margin:0; }
+  .history li { padding:4px 0; border-bottom:1px solid #eee; }
+</style>
 </head>
 <body>
-  <div class="notice">
-    📢 お知らせ: 横浜国際プール サブプール水温監視 <br>
-    <b><u>データ更新は不定期・欠測あり</u></b>
-  </div>
 
-  <h1>横浜国際プール 監視パネル（35.406482,139.340873）</h1>
+<h1>横浜国際プール サブプール監視パネル</h1>
 
-  <div class="card">
-    <div class="title">🌡 外気温（屋外）</div>
-    <div class="value" id="airTemp">-- ℃</div>
-    <div class="update" id="airUpdate">最終更新: --</div>
-  </div>
-
-  <div class="card">
-    <div class="title">💧 サブプール水温</div>
-    <div class="value" id="waterTemp">-- ℃</div>
-    <div class="update" id="waterUpdate">最終更新: --</div>
-  </div>
-
-  <div class="card">
-    <div class="title">☀ 内気温（WBGT→室温扱い）</div>
-    <div class="value" id="wbgt">-- ℃</div>
-    <div class="update" id="wbgtUpdate">最終更新: --</div>
-  </div>
-  <div class="card">
-    <div>サブプール 混雑度：<span id="crowd">--</span></div>
+<div class="card">
+  <div>🌡 外気温（屋外）: <span id="airTemp">--</span> ℃</div>
 </div>
 
+<div class="card">
+  <div>☀ 内気温（室温）: <span id="wbgt">--</span> ℃</div>
+</div>
 
-  <div id="judge" class="result">本日の営業時間</div>
-  <div id="detail" class="detail">営業時間データを読み込み中...</div>
+<div class="card">
+  <div>💧 サブプール水温: <span id="waterTemp">--</span> ℃</div>
+</div>
 
-  <div class="history">
-    <h2>更新履歴</h2>
-    <ul id="historyList"></ul>
-  </div>
+<div class="card">
+  <div>サブプール 混雑度: <span id="crowd">--</span></div>
+</div>
+
+<div class="history">
+  <h2>更新履歴（最新10件）</h2>
+  <ul id="historyList"></ul>
+</div>
 
 <script>
-  // 外気温・WBGT は既存のまま
+  // 外気温・内気温は固定表示
   const airTemperature = "欠測";
   const wbgtValue = "欠測";
-  const codeUpdatedTime = "-";
 
-  // サブプール水温：10秒ごとに 26.0〜29.0 の乱数生成
-  function generateWaterTemp() {
-    const v = Math.random() * (29 - 26) + 26;   // 26〜29
-    return v.toFixed(1); // 小数1桁
-  }
-
-  let waterTemperature = generateWaterTemp();   // 初期値
-
-  // 本日の営業時間（前と同じ）
-  function getTodayBusinessHours() {
-    const d = new Date();
-    const day = d.getDay();
-    const schedule = {
-      0: "9:00〜21:00",
-      1: "9:00〜21:00",
-      2: "休館日",
-      3: "9:00〜21:00",
-      4: "9:00〜21:00",
-      5: "9:00〜21:00",
-      6: "9:00〜21:00"
-    };
-    return schedule[day] || "情報なし";
-  }
+  // 水温初期値
+  let waterTemp = 27.0;
 
   function format(val) {
-    return (val === "欠測" || isNaN(val)) ? String(val) : val + " ℃";
+    return (val === "欠測" || isNaN(val)) ? String(val) : val.toFixed(1);
   }
 
-  function show() {
-    // 水温を更新
-    waterTemperature = generateWaterTemp();
-
-    // 表示更新
-    document.getElementById("airTemp").textContent = format(airTemperature);
-    document.getElementById("airUpdate").textContent = "最終更新: " + codeUpdatedTime;
-
-    document.getElementById("waterTemp").textContent = format(waterTemperature);
-    document.getElementById("waterUpdate").textContent = "自動更新（10秒ごと）";
-
-    document.getElementById("wbgt").textContent = format(wbgtValue);
-    document.getElementById("wbgtUpdate").textContent = "最終更新: " + codeUpdatedTime;
-
-    const hours = getTodayBusinessHours();
-    document.getElementById("judge").textContent = hours;
-    document.getElementById("detail").textContent =
-      "本日の営業時間: " + hours + "（自動判定）";
-
-    addHistory(airTemperature, waterTemperature, wbgtValue, hours);
+  // ±0.1℃ の範囲で変動
+  function updateWaterTemp() {
+    const delta = (Math.random() * 0.2 - 0.1); // -0.1〜+0.1
+    waterTemp = Math.min(29, Math.max(26, +(waterTemp + delta).toFixed(1)));
+    document.getElementById("waterTemp").textContent = format(waterTemp);
   }
 
-  function addHistory(air, water, wbgt, hours) {
+  // 営業時間判定: 9:30〜22:00
+  function isOpen() {
+    const now = new Date();
+    const h = now.getHours();
+    const m = now.getMinutes();
+    return (h > 9 || (h === 9 && m >= 30)) && h < 22;
+  }
+
+  // 混雑度更新
+  function updateCrowd() {
+    const crowdEl = document.getElementById("crowd");
+    let state = "";
+    if (!isOpen()) {
+      state = "時間外";
+      crowdEl.className = "status-out";
+    } else {
+      const states = ["空いている", "混雑"];
+      state = states[Math.floor(Math.random() * states.length)];
+      crowdEl.className = (state === "空いている") ? "status-good" : "status-bad";
+    }
+    crowdEl.textContent = state;
+    addHistory(state);
+  }
+
+  // 履歴管理
+  function addHistory(crowdState) {
     const nowStr = new Date().toLocaleString("ja-JP");
     const li = document.createElement("li");
-    li.textContent =
-      `${nowStr} 外気温:${format(air)} 水温:${format(water)} 内気温:${format(wbgt)} 営業時間:${hours}`;
+    li.textContent = `${nowStr} 水温:${format(waterTemp)} ℃ 混雑度:${crowdState}`;
 
     const ul = document.getElementById("historyList");
     ul.prepend(li);
 
+    // ローカルストレージ保存
     let hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
     hist.unshift({ text: li.textContent });
     hist = hist.slice(0, 10);
@@ -192,48 +115,18 @@
     });
   }
 
-  show();
+  // 初回表示
+  document.getElementById("airTemp").textContent = airTemperature;
+  document.getElementById("wbgt").textContent = wbgtValue;
+
+  updateWaterTemp();
+  updateCrowd();
   loadHistory();
 
-  // 水温だけ 10 秒ごとに更新
-  setInterval(show, 10000);
-
-                      <script>
-// 営業時間判定：9:30〜22:00
-function isOpen() {
-    const now = new Date();
-    const hour = now.getHours();
-    const min = now.getMinutes();
-
-    const afterOpen = hour > 9 || (hour === 9 && min >= 30);
-    const beforeClose = hour < 22;
-
-    return afterOpen && beforeClose;
-}
-
-// 混雑度表示更新（空いている / 混雑 / 時間外）
-function updateCrowd() {
-    const crowdEl = document.getElementById("crowd");
-
-    if (!isOpen()) {
-        crowdEl.textContent = "時間外";
-        crowdEl.className = "status-out";
-        return;
-    }
-
-    const states = ["空いている", "混雑"];
-    const selected = states[Math.floor(Math.random() * states.length)];
-
-    crowdEl.textContent = selected;
-    crowdEl.className = (selected === "空いている") ? "status-good" : "status-bad";
-}
-
-// 初回実行
-updateCrowd();
-
-// 20秒ごとに混雑度更新
-setInterval(updateCrowd, 20000);
-</script>
+  // 水温更新: 10秒ごと
+  setInterval(updateWaterTemp, 10000);
+  // 混雑度更新: 20秒ごと
+  setInterval(updateCrowd, 20000);
 
 </script>
 
