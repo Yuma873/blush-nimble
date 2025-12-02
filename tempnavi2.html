@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>横浜国際プール 監視パネル</title>
+  <style>
+    .notice {
+      background: #fff9e6;
+      color: #856404;
+      border-radius: 6px;
+      padding: 6px 12px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      text-align: center;
+    }
+    body {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { text-align:center; margin-bottom:20px; font-size:26px; }
+    .card {
+      background:#fff;
+      border-radius:12px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.15);
+      padding:16px;
+      margin-bottom:16px;
+    }
+    .title { font-weight:bold; font-size:18px; margin-bottom:8px; }
+    .value { font-size:24px; font-weight:bold; margin-bottom:6px; }
+    .update { color:#666; font-size:13px; }
+    .result {
+      text-align:center;
+      font-size:22px;
+      font-weight:bold;
+      padding:16px;
+      border-radius:12px;
+      margin-top:20px;
+      background:#e6f2ff;
+      color:#004080;
+      border:2px solid #004080;
+    }
+    .detail {
+      margin-top:12px;
+      padding:12px;
+      border-radius:8px;
+      background:#fafafa;
+      font-size:15px;
+      line-height:1.5;
+      border-left:4px solid #ccc;
+    }
+    .history {
+      background:#fff;
+      border-radius:12px;
+      padding:16px;
+      max-height:200px;
+      overflow-y:auto;
+      margin-top:20px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1);
+    }
+    .history h2 { margin-top:0; font-size:18px; }
+    .history ul { list-style:none; padding-left:0; margin:0; }
+    .history li { padding:4px 0; border-bottom:1px solid #eee; }
+  </style>
+</head>
+<body>
+  <div class="notice">
+    📢 お知らせ: 横浜国際プール サブプール水温監視 <br>
+    <b><u>データ更新は不定期・欠測あり</u></b>
+  </div>
+
+  <h1>横浜国際プール 監視パネル（35.406482,139.340873）</h1>
+
+  <div class="card">
+    <div class="title">🌡 外気温（屋外）</div>
+    <div class="value" id="airTemp">-- ℃</div>
+    <div class="update" id="airUpdate">最終更新: --</div>
+  </div>
+
+  <div class="card">
+    <div class="title">💧 サブプール水温</div>
+    <div class="value" id="waterTemp">-- ℃</div>
+    <div class="update" id="waterUpdate">最終更新: --</div>
+  </div>
+
+  <div class="card">
+    <div class="title">☀ 内気温（WBGT→室温扱い）</div>
+    <div class="value" id="wbgt">-- ℃</div>
+    <div class="update" id="wbgtUpdate">最終更新: --</div>
+  </div>
+
+  <div id="judge" class="result">本日の営業時間</div>
+  <div id="detail" class="detail">営業時間データを読み込み中...</div>
+
+  <div class="history">
+    <h2>更新履歴</h2>
+    <ul id="historyList"></ul>
+  </div>
+
+  <script>
+    // ===== データ入力 =====
+    const airTemperature = "欠測";       // 外気温
+    const waterTemperature = "欠測";     // サブプール水温
+    const wbgtValue = "欠測";            // 内気温
+    const codeUpdatedTime = "-";
+
+    // 営業時間を自動生成
+    function getTodayBusinessHours() {
+      const d = new Date();
+      const day = d.getDay();
+
+      // 横浜国際プールの一般的傾向
+      // ※ 正確な営業時間が別途あれば差し替え可能
+      const schedule = {
+        0: "9:00〜21:00",  // 日曜
+        1: "9:00〜21:00",  // 月曜
+        2: "休館日",        // 火曜
+        3: "9:00〜21:00",  // 水曜
+        4: "9:00〜21:00",  // 木曜
+        5: "9:00〜21:00",  // 金曜
+        6: "9:00〜21:00"   // 土曜
+      };
+      return schedule[day] || "情報なし";
+    }
+
+    function format(val) {
+      return (val === "欠測" || isNaN(val)) ? "欠測" : val + " ℃";
+    }
+
+    function show() {
+      document.getElementById("airTemp").textContent = format(airTemperature);
+      document.getElementById("airUpdate").textContent = "最終更新: " + codeUpdatedTime;
+
+      document.getElementById("waterTemp").textContent = format(waterTemperature);
+      document.getElementById("waterUpdate").textContent = "最終更新: " + codeUpdatedTime;
+
+      document.getElementById("wbgt").textContent = format(wbgtValue);
+      document.getElementById("wbgtUpdate").textContent = "最終更新: " + codeUpdatedTime;
+
+      // 営業時間表示
+      const hours = getTodayBusinessHours();
+      document.getElementById("judge").textContent = hours;
+
+      document.getElementById("detail").textContent =
+        "本日の営業時間: " + hours + "（自動判定）";
+
+      addHistory(airTemperature, waterTemperature, wbgtValue, hours);
+    }
+
+    function addHistory(air, water, wbgt, hours) {
+      const nowStr = new Date().toLocaleString("ja-JP");
+      const li = document.createElement("li");
+      li.textContent =
+        `${nowStr} 外気温:${format(air)} 水温:${format(water)} 内気温:${format(wbgt)} 営業時間:${hours}`;
+
+      const ul = document.getElementById("historyList");
+      ul.prepend(li);
+
+      let hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
+      hist.unshift({ text: li.textContent });
+      hist = hist.slice(0, 10);
+
+      localStorage.setItem("ykpHistory", JSON.stringify(hist));
+
+      while (ul.children.length > 10) ul.removeChild(ul.lastChild);
+    }
+
+    function loadHistory() {
+      const hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
+      const ul = document.getElementById("historyList");
+      ul.innerHTML = "";
+      hist.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item.text;
+        ul.appendChild(li);
+      });
+    }
+
+    show();
+    loadHistory();
+    setInterval(show, 30000);
+  </script>
+</body>
+</html>
