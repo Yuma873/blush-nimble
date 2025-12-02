@@ -99,88 +99,96 @@
     <ul id="historyList"></ul>
   </div>
 
-  <script>
-    // ===== データ入力 =====
-    const airTemperature = "欠測";       // 外気温
-    const waterTemperature = "欠測";     // サブプール水温
-    const wbgtValue = "欠測";            // 内気温
-    const codeUpdatedTime = "-";
+<script>
+  // 外気温・WBGT は既存のまま
+  const airTemperature = "欠測";
+  const wbgtValue = "欠測";
+  const codeUpdatedTime = "-";
 
-    // 営業時間を自動生成
-    function getTodayBusinessHours() {
-      const d = new Date();
-      const day = d.getDay();
+  // サブプール水温：10秒ごとに 26.0〜29.0 の乱数生成
+  function generateWaterTemp() {
+    const v = Math.random() * (29 - 26) + 26;   // 26〜29
+    return v.toFixed(1); // 小数1桁
+  }
 
-      // 横浜国際プールの一般的傾向
-      // ※ 正確な営業時間が別途あれば差し替え可能
-      const schedule = {
-        0: "9:00〜21:00",  // 日曜
-        1: "9:00〜21:00",  // 月曜
-        2: "休館日",        // 火曜
-        3: "9:00〜21:00",  // 水曜
-        4: "9:00〜21:00",  // 木曜
-        5: "9:00〜21:00",  // 金曜
-        6: "9:00〜21:00"   // 土曜
-      };
-      return schedule[day] || "情報なし";
-    }
+  let waterTemperature = generateWaterTemp();   // 初期値
 
-    function format(val) {
-      return (val === "欠測" || isNaN(val)) ? "欠測" : val + " ℃";
-    }
+  // 本日の営業時間（前と同じ）
+  function getTodayBusinessHours() {
+    const d = new Date();
+    const day = d.getDay();
+    const schedule = {
+      0: "9:00〜21:00",
+      1: "9:00〜21:00",
+      2: "休館日",
+      3: "9:00〜21:00",
+      4: "9:00〜21:00",
+      5: "9:00〜21:00",
+      6: "9:00〜21:00"
+    };
+    return schedule[day] || "情報なし";
+  }
 
-    function show() {
-      document.getElementById("airTemp").textContent = format(airTemperature);
-      document.getElementById("airUpdate").textContent = "最終更新: " + codeUpdatedTime;
+  function format(val) {
+    return (val === "欠測" || isNaN(val)) ? String(val) : val + " ℃";
+  }
 
-      document.getElementById("waterTemp").textContent = format(waterTemperature);
-      document.getElementById("waterUpdate").textContent = "最終更新: " + codeUpdatedTime;
+  function show() {
+    // 水温を更新
+    waterTemperature = generateWaterTemp();
 
-      document.getElementById("wbgt").textContent = format(wbgtValue);
-      document.getElementById("wbgtUpdate").textContent = "最終更新: " + codeUpdatedTime;
+    // 表示更新
+    document.getElementById("airTemp").textContent = format(airTemperature);
+    document.getElementById("airUpdate").textContent = "最終更新: " + codeUpdatedTime;
 
-      // 営業時間表示
-      const hours = getTodayBusinessHours();
-      document.getElementById("judge").textContent = hours;
+    document.getElementById("waterTemp").textContent = format(waterTemperature);
+    document.getElementById("waterUpdate").textContent = "自動更新（10秒ごと）";
 
-      document.getElementById("detail").textContent =
-        "本日の営業時間: " + hours + "（自動判定）";
+    document.getElementById("wbgt").textContent = format(wbgtValue);
+    document.getElementById("wbgtUpdate").textContent = "最終更新: " + codeUpdatedTime;
 
-      addHistory(airTemperature, waterTemperature, wbgtValue, hours);
-    }
+    const hours = getTodayBusinessHours();
+    document.getElementById("judge").textContent = hours;
+    document.getElementById("detail").textContent =
+      "本日の営業時間: " + hours + "（自動判定）";
 
-    function addHistory(air, water, wbgt, hours) {
-      const nowStr = new Date().toLocaleString("ja-JP");
+    addHistory(airTemperature, waterTemperature, wbgtValue, hours);
+  }
+
+  function addHistory(air, water, wbgt, hours) {
+    const nowStr = new Date().toLocaleString("ja-JP");
+    const li = document.createElement("li");
+    li.textContent =
+      `${nowStr} 外気温:${format(air)} 水温:${format(water)} 内気温:${format(wbgt)} 営業時間:${hours}`;
+
+    const ul = document.getElementById("historyList");
+    ul.prepend(li);
+
+    let hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
+    hist.unshift({ text: li.textContent });
+    hist = hist.slice(0, 10);
+    localStorage.setItem("ykpHistory", JSON.stringify(hist));
+
+    while (ul.children.length > 10) ul.removeChild(ul.lastChild);
+  }
+
+  function loadHistory() {
+    const hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
+    const ul = document.getElementById("historyList");
+    ul.innerHTML = "";
+    hist.forEach(item => {
       const li = document.createElement("li");
-      li.textContent =
-        `${nowStr} 外気温:${format(air)} 水温:${format(water)} 内気温:${format(wbgt)} 営業時間:${hours}`;
+      li.textContent = item.text;
+      ul.appendChild(li);
+    });
+  }
 
-      const ul = document.getElementById("historyList");
-      ul.prepend(li);
+  show();
+  loadHistory();
 
-      let hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
-      hist.unshift({ text: li.textContent });
-      hist = hist.slice(0, 10);
+  // 水温だけ 10 秒ごとに更新
+  setInterval(show, 10000);
+</script>
 
-      localStorage.setItem("ykpHistory", JSON.stringify(hist));
-
-      while (ul.children.length > 10) ul.removeChild(ul.lastChild);
-    }
-
-    function loadHistory() {
-      const hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
-      const ul = document.getElementById("historyList");
-      ul.innerHTML = "";
-      hist.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = item.text;
-        ul.appendChild(li);
-      });
-    }
-
-    show();
-    loadHistory();
-    setInterval(show, 30000);
-  </script>
 </body>
 </html>
