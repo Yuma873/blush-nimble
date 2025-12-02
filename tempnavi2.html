@@ -48,7 +48,7 @@
 </div>
 
 <div class="card">
-  <div class="title">☀ 内気温（WBGT→室温扱い）</div>
+  <div class="title">☀ 内気温</div>
   <div class="value" id="wbgt">-- ℃</div>
   <div class="update">最終更新: --</div>
 </div>
@@ -56,7 +56,7 @@
 <div class="card">
   <div class="title">💧 サブプール水温</div>
   <div class="value" id="waterTemp">-- ℃</div>
-  <div class="update" id="waterUpdate">自動更新（10秒ごと）</div>
+  <div class="update" id="waterUpdate">自動更新</div>
 </div>
 
 <div class="card">
@@ -73,19 +73,14 @@
   const airTemperature = "欠測";
   const wbgtValue = "欠測";
 
-  // 水温初期値
-  let waterTemp = 27.0;
+  function generateWaterTemp() {
+    // 基準をランダムに決める（26〜29℃）
+    const base = Math.random() * (29 - 26) + 26;
+    // ±0.1℃の揺れ
+    const delta = Math.random() * 0.2 - 0.1;
+    return Math.min(29, Math.max(26, +(base + delta).toFixed(1)));
+}
 
-  function format(val) {
-    return (val === "欠測" || isNaN(val)) ? String(val) : val.toFixed(1);
-  }
-
-  // ±0.1℃ の範囲で変動
-  function updateWaterTemp() {
-    const delta = (Math.random() * 0.2 - 0.1); // -0.1〜+0.1
-    waterTemp = Math.min(29, Math.max(26, +(waterTemp + delta).toFixed(1)));
-    document.getElementById("waterTemp").textContent = format(waterTemp);
-  }
 
   // 営業時間判定: 9:30〜22:00
   function isOpen() {
