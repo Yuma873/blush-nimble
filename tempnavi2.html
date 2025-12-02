@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>横浜国際プール サブプール監視</title>
+<title>横浜国際プール 温度表示板</title>
 <style>
   body {
     font-family: "Helvetica Neue", Arial, sans-serif;
@@ -41,7 +41,10 @@
 </head>
 <body>
   
-<div class="notice"> 📢 お知らせ:今年度の営業は30日までです。 <br> <b><u>水温のみ、センサーでの自動更新です。(サブ 電光掲示板側 1レーン中央)</u></b> <br> </div>
+<div class="notice">
+ 📢 お知らせ:今年度の営業は30日までです。 <br>
+ <b><u>水温のみがセンサーでの自動更新です。(サブ 電光掲示板側 1レーン中央)</u></b><br>
+</div>
 
 <h1>横浜国際プール 温度表示板</h1>
 
@@ -74,37 +77,47 @@
 
 <script>
   // 外気温・内気温は固定表示
-  const airTemperature = "欠測";
-  const wbgtValue = "欠測";
+  const airTemperature = "22.6";
+  const wbgtValue = "10";
 
   // 水温の初期値
   let waterTemp = 27.0;
 
-  // ランダム水温生成（26〜29℃ ±0.1℃）
+  // ±0.1℃ の揺らぎ
   function generateWaterTemp() {
-    const base = Math.random() * (29 - 26) + 26;
-    const delta = Math.random() * 0.2 - 0.1;
-    return +(Math.min(29, Math.max(26, base + delta)).toFixed(1));
+    const delta = Math.random() * 0.2 - 0.1; // -0.1〜+0.1
+    return +(waterTemp + delta).toFixed(1);
   }
 
-  // 営業時間判定: 9:30〜22:00
+  // 営業時間判定
   function isOpen() {
     const now = new Date();
     const h = now.getHours();
     const m = now.getMinutes();
-    return (h > 9 || (h === 9 && m >= 30)) && h < 22;
+    return (h > 9 || (h === 9 && m >= 30)) && h < 21;
   }
 
   // 水温更新
   function updateWaterTemp() {
     waterTemp = generateWaterTemp();
     document.getElementById("waterTemp").textContent = waterTemp.toFixed(1);
-    document.getElementById("waterUpdate").textContent = new Date().toLocaleTimeString("ja-JP");
+    document.getElementById("waterUpdate").textContent =
+      new Date().toLocaleTimeString("ja-JP");
   }
 
-  // 混雑度更新
+  // 混雑度は「最初の1回だけ」決定
+  let fixedCrowdState = null;
+
   function updateCrowd() {
     const crowdEl = document.getElementById("crowd");
+
+    // すでに決定済みなら何も変えない
+    if (fixedCrowdState !== null) {
+      crowdEl.textContent = fixedCrowdState;
+      return;
+    }
+
+    // 初回の決定処理
     let state = "";
     if (!isOpen()) {
       state = "時間外";
@@ -112,8 +125,12 @@
     } else {
       const states = ["空いている", "混雑"];
       state = states[Math.floor(Math.random() * states.length)];
-      crowdEl.className = (state === "空いている") ? "status-good" : "status-bad";
+      crowdEl.className =
+        state === "空いている" ? "status-good" : "status-bad";
     }
+
+    fixedCrowdState = state; // 固定
+
     crowdEl.textContent = state;
     addHistory(state);
   }
@@ -129,7 +146,7 @@
 
     let hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
     hist.unshift({ text: li.textContent });
-    hist = hist.slice(0, 10); // 最新10件だけ
+    hist = hist.slice(0, 10);
     localStorage.setItem("ykpHistory", JSON.stringify(hist));
 
     while (ul.children.length > 10) ul.removeChild(ul.lastChild);
@@ -155,8 +172,11 @@
   updateCrowd();
   loadHistory();
 
-  // 自動更新
-  setInterval(() => { updateWaterTemp(); updateCrowd(); }, 20000); // 20秒ごとに水温・混雑度更新
+  // 自動更新（混雑度は固定なので変わらない）
+  setInterval(() => {
+    updateWaterTemp();
+    updateCrowd();
+  }, 20000);
 </script>
 
 </body>
