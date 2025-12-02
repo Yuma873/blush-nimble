@@ -63,6 +63,11 @@
     .history h2 { margin-top:0; font-size:18px; }
     .history ul { list-style:none; padding-left:0; margin:0; }
     .history li { padding:4px 0; border-bottom:1px solid #eee; }
+
+    .status-good { color: #1abc9c; font-weight: bold; }
+.status-bad  { color: #e74c3c; font-weight: bold; }
+.status-out  { color: #7f8c8d; font-weight: bold; }
+
   </style>
 </head>
 <body>
@@ -90,6 +95,10 @@
     <div class="value" id="wbgt">-- ℃</div>
     <div class="update" id="wbgtUpdate">最終更新: --</div>
   </div>
+  <div class="card">
+    <div>サブプール 混雑度：<span id="crowd">--</span></div>
+</div>
+
 
   <div id="judge" class="result">本日の営業時間</div>
   <div id="detail" class="detail">営業時間データを読み込み中...</div>
@@ -188,6 +197,44 @@
 
   // 水温だけ 10 秒ごとに更新
   setInterval(show, 10000);
+
+                      <script>
+// 営業時間判定：9:30〜22:00
+function isOpen() {
+    const now = new Date();
+    const hour = now.getHours();
+    const min = now.getMinutes();
+
+    const afterOpen = hour > 9 || (hour === 9 && min >= 30);
+    const beforeClose = hour < 22;
+
+    return afterOpen && beforeClose;
+}
+
+// 混雑度表示更新（空いている / 混雑 / 時間外）
+function updateCrowd() {
+    const crowdEl = document.getElementById("crowd");
+
+    if (!isOpen()) {
+        crowdEl.textContent = "時間外";
+        crowdEl.className = "status-out";
+        return;
+    }
+
+    const states = ["空いている", "混雑"];
+    const selected = states[Math.floor(Math.random() * states.length)];
+
+    crowdEl.textContent = selected;
+    crowdEl.className = (selected === "空いている") ? "status-good" : "status-bad";
+}
+
+// 初回実行
+updateCrowd();
+
+// 20秒ごとに混雑度更新
+setInterval(updateCrowd, 20000);
+</script>
+
 </script>
 
 </body>
