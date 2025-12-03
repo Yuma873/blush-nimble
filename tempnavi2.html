@@ -228,22 +228,24 @@ document.getElementById("airTemp").textContent = airTemperature;
 document.getElementById("inside").textContent = insideValue;
 document.getElementById("mainTemp").textContent = mainTemp;
 
-// -------------------------------
-// ★ 休館日のチェック
-// -------------------------------
+
+  // ★ 休館日のチェック
 const closedReason = isClosedDay();
 if (closedReason) {
   const notice = document.getElementById("closedNotice");
   notice.style.display = "block";
   notice.textContent = `本日は ${closedReason} 休館です。`;
 
-  document.getElementById("waterTemp").textContent = "--";
+  // カード類を全部非表示
+  document.querySelectorAll('.card').forEach(card => card.style.display = 'none');
+
   document.getElementById("crowd").textContent = "休館";
   document.getElementById("crowd").className = "status-out";
 
   loadHistory();
   throw new Error("休館日のため、自動更新処理を停止します");
 }
+
 
 // 通常時処理
 updateWaterTemp();
