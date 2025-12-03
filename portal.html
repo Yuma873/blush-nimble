@@ -978,6 +978,30 @@ window.addEventListener("load", () => {
   showPopup("ログイン成功しました。最新のお知らせをご確認ください。");
 });
 </script>
+<script>
+  let logoutTimer;
+
+  // ログアウト処理
+  function autoLogout() {
+    alert("操作がないため、自動的にログアウトします。");
+    window.location.href = "index.html"; // ログインページに戻す
+  }
+
+  // タイマーをリセット
+  function resetLogoutTimer() {
+    clearTimeout(logoutTimer);
+    logoutTimer = setTimeout(autoLogout, 2 * 60 * 1000); // 2分
+  }
+
+  // ページロード時にタイマー開始
+  window.addEventListener("load", resetLogoutTimer);
+
+  // マウスやキーボード操作があったらタイマーリセット
+  document.addEventListener("mousemove", resetLogoutTimer);
+  document.addEventListener("keydown", resetLogoutTimer);
+  document.addEventListener("scroll", resetLogoutTimer);
+  document.addEventListener("click", resetLogoutTimer);
+</script>
 
   </body>
 </html>
