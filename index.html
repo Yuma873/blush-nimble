@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ログイン</title>
 <link rel="shortcut icon" href="favicon.png" type="image/png">
+
 <style>
 body {
   margin: 0;
@@ -26,7 +27,10 @@ body {
   animation: fadeIn 0.6s ease-in-out;
   position: relative;
 }
-@keyframes fadeIn { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+@keyframes fadeIn { 
+  from {opacity:0; transform:translateY(-10px);} 
+  to {opacity:1; transform:translateY(0);} 
+}
 h2 { margin-bottom: 20px; text-align: center; color: #005bac; font-size: 24px; }
 label { display: block; margin: 12px 0 6px; color: #333; font-size: 14px; }
 input[type="text"], input[type="password"] {
@@ -38,6 +42,7 @@ input:focus { border-color:#005bac; outline:none; }
 .toggle input { margin-right:5px; }
 .warn { font-size:12px; color:#888; }
 .error-message { color:red; margin-top:10px; text-align:center; font-size:13px; }
+
 button {
   margin-top:20px; width:100%; padding:12px; font-size:16px;
   border:none; background-color:#005bac; color:white; border-radius:6px; cursor:pointer;
@@ -45,71 +50,135 @@ button {
 }
 button:hover:enabled { background-color:#00488c; }
 button:disabled { background-color:#999 !important; cursor:not-allowed; }
+
 .loading { display:none; margin-top:20px; text-align:center; color:#005bac; font-size:14px; }
 .spinner { margin:10px auto; width:30px; height:30px; border:4px solid #ccc; border-top:4px solid #005bac; border-radius:50%; animation:spin 1s linear infinite; }
 @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-#admin-login-btn { position:fixed; top:12px; right:12px; padding:6px 12px; font-size:12px; border:none; border-radius:6px; background-color:#d93025; color:white; cursor:pointer; opacity:0.9; transition:background-color 0.3s, opacity 0.3s; z-index:10000; }
+
+#admin-login-btn { 
+  position:fixed; top:12px; right:12px; padding:6px 12px; 
+  font-size:12px; border:none; border-radius:6px; 
+  background-color:#d93025; color:white; cursor:pointer; opacity:0.9; 
+  transition:background-color 0.3s, opacity 0.3s; z-index:10000; 
+}
 #admin-login-btn:hover { background-color:#a52714; opacity:1; }
 </style>
-<!-- Google reCAPTCHA -->
+
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
+
 <body>
 
 <div class="login-container">
   <h2>ログイン</h2>
+
   <label for="username">ユーザーID</label>
   <input type="text" id="username" placeholder="userID" />
+
   <label for="password">パスワード</label>
   <input type="password" id="password" placeholder="password" />
+
   <div class="toggle">
     <input type="checkbox" id="showpass" onclick="togglePassword()" />
     <label for="showpass">パスワードを表示</label>
     <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
   </div>
 
-  <!-- reCAPTCHA -->
   <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"></div>
-      <div class="warn">認証を完了させてからログインボタンを押してください</div>
-
+  <div class="warn">認証を完了させてからログインボタンを押してください</div>
 
   <button id="login-btn" onclick="handleLogin()">ログイン</button>
 
   <div style="text-align:right; margin-top:10px;">
     <a href="system.html" style="color:#005bac; font-weight:bold; text-decoration:none;">サーバー稼働状況 ▶</a>
   </div>
+
   <div class="error-message" id="error-msg"></div>
+
   <div class="loading" id="loading">
     <div class="spinner"></div>
-   <p> ログインしています...</p>
+    <p>ログインしています...</p>
     <p>*この読み込みは時間がかかる場合があります</p>
   </div>
 </div>
-<!-- アクセスカウンター --> <div style="margin-top: 25px; text-align: center;"> <!--タグはここから--> <!--カウンター画像からは配布サイトへリンクが設定されています。また、誤作動、誤表示の原因となりますのでコードの改変、改行は行わないで下さい。 このコメント部分は削除して頂いても結構です。--> <nobr><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td><a href="https://ctr.stylemap.co.jp/"><img src="https://www.f-counter.net/ani1/66/1763895419/" alt="無料アクセスカウンター" border="0" style="margin:0px; padding:0px; border:0px; vertical-align:bottom"></a></td> <td><a href="https://ctr.stylemap.co.jp/"><img src="https://www.f-counter.net/ani2/66/1763895419/" alt="無料アクセスカウンター" border="0" style="margin:0px; padding:0px; border:0px; vertical-align:bottom"></a></td></tr></tbody></table></nobr> <!--ここまで--> </div>
-<button id="admin-login-btn" type="button" aria-label="管理アカウントでログイン">管理アカウントでログイン</button>
+
+<!-- アクセスカウンター -->
+<div style="margin-top: 25px; text-align: center;">
+  <nobr><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td>
+  <a href="https://ctr.stylemap.co.jp/"><img src="https://www.f-counter.net/ani1/66/1763895419/" alt="アクセスカウンター"></a></td>
+  <td><a href="https://ctr.stylemap.co.jp/"><img src="https://www.f-counter.net/ani2/66/1763895419/" alt="アクセスカウンター"></a>
+  </td></tr></tbody></table></nobr>
+</div>
+
+<button id="admin-login-btn" type="button">管理アカウントでログイン</button>
 
 <script>
-// 管理アカウント
+// 管理アカウント遷移
 document.getElementById("admin-login-btn").addEventListener("click", function() {
   window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
 });
 
-// ユーザー情報
+//---------------------------------
+//   ユーザーデータ
+//---------------------------------
 const users = [
-  { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
+  { name: "oshiki",  password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
   { name: "oshiki  ", password: "102030405060708090009080706050403020101020304050607080900090807060504030201010203040506070809000908070605040302010", link: "https://yuma873.github.io/blush-nimble/portal.html" }
 ];
-const loginLimit = 3;
-let attempts = loginLimit;
-document.getElementById("username").focus();
 
-// パスワード表示切替
+
+//---------------------------------
+//   ログインロック関連（2分）
+//---------------------------------
+const loginLimit = 3;
+const lockDuration = 2 * 60 * 1000; // ★2分ロックに変更済★
+
+function checkLockState() {
+  const lockTime = localStorage.getItem("lockTime");
+  const now = Date.now();
+  if (lockTime && now < Number(lockTime)) return Number(lockTime);
+  return null;
+}
+
+function startCountdown(endTime) {
+  const loginBtn = document.getElementById("login-btn");
+  const errorMsg = document.getElementById("error-msg");
+
+  loginBtn.disabled = true;
+
+  const timer = setInterval(() => {
+    const now = Date.now();
+    const diff = endTime - now;
+
+    if (diff <= 0) {
+      clearInterval(timer);
+      errorMsg.textContent = "";
+      loginBtn.disabled = false;
+      localStorage.removeItem("lockTime");
+      localStorage.removeItem("attempts");
+      return;
+    }
+
+    const min = Math.floor(diff / 60000);
+    const sec = Math.floor((diff % 60000) / 1000);
+
+    errorMsg.textContent = `ログインがロックされています（残り ${min}分${sec}秒）`;
+  }, 1000);
+}
+
+
+//---------------------------------
+//   パスワード表示切替
+//---------------------------------
 function togglePassword() {
   const pass = document.getElementById("password");
   pass.type = document.getElementById("showpass").checked ? "text" : "password";
 }
 
-// メンテナンス時間判定
+
+//---------------------------------
+//   メンテナンス時間
+//---------------------------------
 function isMaintenanceTime() {
   const now = new Date();
   const day = now.getDay();
@@ -117,67 +186,95 @@ function isMaintenanceTime() {
   return day === 2 && hour >= 8 && hour < 15;
 }
 
-// ログイン処理
+
+//---------------------------------
+//   ログイン処理
+//---------------------------------
 function handleLogin() {
   const loginBtn = document.getElementById("login-btn");
   const errorMsg = document.getElementById("error-msg");
+  const loading = document.getElementById("loading");
+
+  const lockEnd = checkLockState();
+  if (lockEnd) {
+    startCountdown(lockEnd);
+    return;
+  }
 
   if (isMaintenanceTime()) {
     errorMsg.textContent = "現在ポータルサイトのメンテナンス時間のため、ログインできません。";
     loginBtn.disabled = true;
     return;
-  } else {
-    loginBtn.disabled = false;
-    errorMsg.textContent = "";
   }
 
   const name = document.getElementById("username").value.trim();
   const pass = document.getElementById("password").value.trim();
-  const loading = document.getElementById("loading");
 
   if (!name || !pass) {
     errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
     return;
   }
 
-  // reCAPTCHAチェック
   const recaptcha = grecaptcha.getResponse();
   if (recaptcha.length === 0) {
     errorMsg.textContent = "reCAPTCHAを完了してください。";
     return;
   }
 
+  let attempts = Number(localStorage.getItem("attempts") ?? loginLimit);
+
   const user = users.find(u => u.name === name && u.password === pass);
   if (!user) {
     attempts--;
-    errorMsg.textContent = `ユーザーIDまたはパスワードが異なります。　ロックまで（残り${attempts}回）`;
+    localStorage.setItem("attempts", attempts);
+
     if (attempts <= 0) {
-      errorMsg.textContent = "ログイン失敗が続いたため、操作をロックしました。";
-      loginBtn.disabled = true;
+      const lockEnd = Date.now() + lockDuration;
+      localStorage.setItem("lockTime", lockEnd);
+
+      errorMsg.textContent = "ログイン失敗が続いたため、2分間ロックされました。";
+      startCountdown(lockEnd);
+      return;
     }
+
+    errorMsg.textContent = `ユーザーIDまたはパスワードが異なります。 ロックまで（残り${attempts}回）`;
     return;
   }
 
-  // 成功
   loading.style.display = "block";
   loginBtn.disabled = true;
 
   setTimeout(() => {
     loading.style.display = "none";
     window.location.href = user.link;
-  }, 30000);
+  }, 3000);
 }
 
-// ページロード時メンテ判定
+
+//---------------------------------
+//   ロード時判定
+//---------------------------------
 window.addEventListener("load", () => {
-  const loginBtn = document.getElementById("login-btn");
-  const errorMsg = document.getElementById("error-msg");
-  if (isMaintenanceTime()) { loginBtn.disabled = true; errorMsg.textContent="現在メンテナンス時間のため、ログインできません。"; }
+  document.getElementById("username").focus();
+
+  const lockEnd = checkLockState();
+  if (lockEnd) startCountdown(lockEnd);
+
+  if (isMaintenanceTime()) {
+    document.getElementById("login-btn").disabled = true;
+    document.getElementById("error-msg").textContent = "現在メンテナンス時間のため、ログインできません。";
+  }
 });
 
-// Enterでログイン
-document.addEventListener("keydown", (e) => { if (e.key==="Enter") handleLogin(); });
+
+//---------------------------------
+//   Enterキーでログイン
+//---------------------------------
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") handleLogin();
+});
 </script>
+
 </body>
 </html>
 ©2025 portal All Rights Reserved
