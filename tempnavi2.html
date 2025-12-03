@@ -10,6 +10,9 @@
     background: #f5f5f5;
     margin: 0;
     padding: 20px;
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
   }
   h1 { text-align:center; margin-bottom:20px; font-size:26px; }
   .card {
@@ -37,9 +40,10 @@
   .history h2 { margin-top:0; font-size:18px; }
   .history ul { list-style:none; padding-left:0; margin:0; }
   .history li { padding:4px 0; border-bottom:1px solid #eee; }
-  .notice {
-  background: #fffbe6;         /* 薄い黄色背景 */
-  border-left: 4px solid #f1c40f;  /* 左側にアクセントライン */
+
+.notice {
+  background: #fffbe6;
+  border-left: 4px solid #f1c40f;
   padding: 12px 16px;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -51,13 +55,25 @@
   font-size: 14px;
 }
 .notice strong {
-  color: #d35400;  /* 重要部分をオレンジ系で強調 */
+  color: #d35400;
 }
 
+#closedNotice {
+  background:#ffecec;
+  border-left:4px solid #e74c3c;
+  padding:12px 16px;
+  margin-bottom:20px;
+  border-radius:8px;
+  font-size:15px;
+  display:none;
+  box-shadow:0 2px 4px rgba(0,0,0,0.1);
+}
 </style>
 </head>
 <body>
-  
+
+<div id="closedNotice"></div>
+
 <div class="notice">
   <p>📢 <strong>お知らせ:</strong> メインプール営業は終了しました。</p>
   <p><strong><u>水温のみがセンサーで自動更新です</u></strong>（サブ 電光掲示板側 1レーン中央）</p>
@@ -77,7 +93,8 @@
   <div class="value" id="inside">-- ℃</div>
   <div class="update">最終更新: 12/3 08:00</div>
 </div>
-  <div class="card">
+
+<div class="card">
   <div class="title">💧 <b><u>メインプール</u></b>水温</div>
   <div class="value" id="mainTemp">-- ℃</div>
   <div class="update">最終更新:9/15 19:00</div>
@@ -99,114 +116,147 @@
 </div>
 
 <script>
-  // 外気温・内気温は固定表示
-  const airTemperature = "13.2℃";
-  const insideValue = "29.8℃";
-    const mainTemp = "今年度終了";
+// -------------------------------
+// 休館日設定
+// -------------------------------
+const CLOSED_DAYS = {
+  "12/5":  "設備点検のため",
+  "12/10": "大会準備のため",
+  "12/20": "年末整備のため"
+};
 
+function isClosedDay() {
+  const now = new Date();
+  const key = `${now.getMonth() + 1}/${now.getDate()}`;
+  return CLOSED_DAYS[key] || null;
+}
 
-  // 水温の初期値
-  let waterTemp = 27.0;
+// -------------------------------
+// 通常データ
+// -------------------------------
+const airTemperature = "13.2℃";
+const insideValue = "29.8℃";
+const mainTemp = "今年度終了";
 
-  // ±0.1℃ の揺らぎ
-  function generateWaterTemp() {
-    const delta = Math.random() * 0.4 - 0.2; // -0.1〜+0.1
-    return +(waterTemp + delta).toFixed(1);
-  }
+let waterTemp = 27.0;
 
-  // 営業時間判定
-  function isOpen() {
-    const now = new Date();
-    const h = now.getHours();
-    const m = now.getMinutes();
-    return (h > 9 || (h === 9 && m >= 30)) && h < 21;
-  }
+// -------------------------------
+// 水温更新
+// -------------------------------
+function generateWaterTemp() {
+  const delta = Math.random() * 0.4 - 0.2; // ±0.2
+  return +(waterTemp + delta).toFixed(1);
+}
 
- function updateWaterTemp() {
+function isOpen() {
+  const now = new Date();
+  const h = now.getHours();
+  const m = now.getMinutes();
+  return (h > 9 || (h === 9 && m >= 30)) && h < 21;
+}
+
+function updateWaterTemp() {
   waterTemp = generateWaterTemp();
   document.getElementById("waterTemp").textContent = waterTemp.toFixed(1);
   document.getElementById("waterUpdate").textContent =
-    new Date().toLocaleTimeString("ja-JP");
-
-  // ★★ 水温更新のたびに履歴追加 ★★
+    new Date().toLocaleTimeString("ja-JP", {hour:"2-digit", minute:"2-digit"});
   addHistory(fixedCrowdState ?? "--");
 }
 
+// -------------------------------
+// 混雑度（初回だけ決定）
+// -------------------------------
+let fixedCrowdState = null;
 
-  // 混雑度は「最初の1回だけ」決定
-  let fixedCrowdState = null;
+function updateCrowd() {
+  const crowdEl = document.getElementById("crowd");
 
-  function updateCrowd() {
-    const crowdEl = document.getElementById("crowd");
-
-    // すでに決定済みなら何も変えない
-    if (fixedCrowdState !== null) {
-      crowdEl.textContent = fixedCrowdState;
-      return;
-    }
-
-    // 初回の決定処理
-    let state = "";
-    if (!isOpen()) {
-      state = "時間外";
-      crowdEl.className = "status-out";
-    } else {
-      const states = ["空いている", "混雑"];
-      state = states[Math.floor(Math.random() * states.length)];
-      crowdEl.className =
-        state === "空いている" ? "status-good" : "status-bad";
-    }
-
-    fixedCrowdState = state; // 固定
-
-    crowdEl.textContent = state;
-    addHistory(state);
+  if (fixedCrowdState !== null) {
+    crowdEl.textContent = fixedCrowdState;
+    return;
   }
 
-  // 履歴追加
-  function addHistory(crowdState) {
-    const nowStr = new Date().toLocaleString("ja-JP");
+  let state = "";
+  if (!isOpen()) {
+    state = "時間外";
+    crowdEl.className = "status-out";
+  } else {
+    const states = ["空いている", "混雑"];
+    state = states[Math.floor(Math.random() * states.length)];
+    crowdEl.className = state === "空いている" ? "status-good" : "status-bad";
+  }
+
+  fixedCrowdState = state;
+  crowdEl.textContent = state;
+  addHistory(state);
+}
+
+// -------------------------------
+// 履歴追加
+// -------------------------------
+function addHistory(crowdState) {
+  const nowStr = new Date().toLocaleString("ja-JP");
+  const li = document.createElement("li");
+  li.textContent = `${nowStr} 水温:${waterTemp.toFixed(1)} ℃ 混雑度:${crowdState}`;
+
+  const ul = document.getElementById("historyList");
+  ul.prepend(li);
+
+  let hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
+  hist.unshift({ text: li.textContent });
+  hist = hist.slice(0, 10);
+  localStorage.setItem("ykpHistory", JSON.stringify(hist));
+
+  while (ul.children.length > 10) ul.removeChild(ul.lastChild);
+}
+
+// 履歴読み込み
+function loadHistory() {
+  const hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
+  const ul = document.getElementById("historyList");
+  ul.innerHTML = "";
+  hist.forEach(item => {
     const li = document.createElement("li");
-    li.textContent = `${nowStr} 水温:${waterTemp.toFixed(1)} ℃ 混雑度:${crowdState}`;
+    li.textContent = item.text;
+    ul.appendChild(li);
+  });
+}
 
-    const ul = document.getElementById("historyList");
-    ul.prepend(li);
+// -------------------------------
+// 初期化
+// -------------------------------
+document.getElementById("airTemp").textContent = airTemperature;
+document.getElementById("inside").textContent = insideValue;
+document.getElementById("mainTemp").textContent = mainTemp;
 
-    let hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
-    hist.unshift({ text: li.textContent });
-    hist = hist.slice(0, 10);
-    localStorage.setItem("ykpHistory", JSON.stringify(hist));
+// -------------------------------
+// ★ 休館日のチェック
+// -------------------------------
+const closedReason = isClosedDay();
+if (closedReason) {
+  const notice = document.getElementById("closedNotice");
+  notice.style.display = "block";
+  notice.textContent = `本日は ${closedReason} 休館です。`;
 
-    while (ul.children.length > 10) ul.removeChild(ul.lastChild);
-  }
+  document.getElementById("waterTemp").textContent = "--";
+  document.getElementById("crowd").textContent = "休館";
+  document.getElementById("crowd").className = "status-out";
 
-  // 履歴読み込み
-  function loadHistory() {
-    const hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
-    const ul = document.getElementById("historyList");
-    ul.innerHTML = "";
-    hist.forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = item.text;
-      ul.appendChild(li);
-    });
-  }
+  loadHistory();
+  throw new Error("休館日のため、自動更新処理を停止します");
+}
 
-  // 初期表示
-  document.getElementById("airTemp").textContent = airTemperature;
-  document.getElementById("inside").textContent = insideValue;
-    document.getElementById("mainTemp").textContent = mainTemp;
+// 通常時処理
+updateWaterTemp();
+updateCrowd();
+loadHistory();
 
-
+// 自動更新
+setInterval(() => {
   updateWaterTemp();
   updateCrowd();
-  loadHistory();
+}, 3000);
 
-  // 自動更新（混雑度は固定なので変わらない）
-  setInterval(() => {
-    updateWaterTemp();
-    updateCrowd();
-  }, 3000);
 </script>
 
 </body>
