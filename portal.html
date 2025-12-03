@@ -157,77 +157,7 @@
     width: 30%;
     height: auto;
   }
-    /* ポップアップ全体 */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px); /* 背景ぼかし */
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-/* ポップアップ内容 */
-.popup-content {
-  background: linear-gradient(135deg, #ffffff, #f0f0f0);
-  padding: 30px 25px;
-  border-radius: 15px;
-  width: 85%;
-  max-width: 450px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  animation: fadeInPopup 0.5s ease;
-  position: relative;
-  font-family: "Segoe UI", Arial, sans-serif;
-  color: #333;
-}
-
-/* ふわっと出るアニメーション */
-@keyframes fadeInPopup {
-  from { opacity: 0; transform: scale(0.9) translateY(-20px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-/* 閉じるボタン */
-.popup-content button {
-  background-color: #1abc9c;
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-  margin-top: 15px;
-}
-
-.popup-content button:hover {
-  background-color: #16a085;
-  transform: scale(1.05);
-}
-
-/* 右上に小さい閉じるアイコンを追加 */
-.popup-content::before {
-  content: '✕';
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 18px;
-  cursor: pointer;
-  color: #666;
-  transition: color 0.2s;
-}
-
-.popup-content::before:hover {
-  color: #333;
-}
-
-
+   
 </style>
 
    <script defer src="https://www.pushcode.jp/dist/js/pushcode.js"></script>
@@ -935,14 +865,7 @@ loadKanagawaRSS();
         >
       </div>
     </div>
- <!-- ポップアップ -->
-<div id="popup" class="popup">
-  <div class="popup-content">
-    <h2>お知らせ</h2>
-    <p id="popup-text">ログイン成功しました。最新のお知らせをご確認ください。</p>
-    <button onclick="closePopup()">閉じる</button>
-  </div>
-</div>
+
     <script>
       document.getElementById("lastUpdated").textContent = new Date(
         document.lastModified
@@ -1002,22 +925,7 @@ loadKanagawaRSS();
   }
 </script>
   
-<script>
-function showPopup(message) {
-  document.getElementById("popup-text").textContent = message;
-  document.getElementById("popup").style.display = "flex";
-}
-
-function closePopup() {
-  document.getElementById("popup").style.display = "none";
-}
-
-// ページを開いたとき自動表示
-window.addEventListener("load", () => {
-  showPopup("操作がない場合にはログアウトされます。");
-});
-</script>
-    <!-- ポップアップ -->
+<!-- ポップアップ（自動ログアウト用） -->
 <div id="popup" class="popup">
   <div class="popup-content">
     <h2>お知らせ</h2>
@@ -1025,37 +933,99 @@ window.addEventListener("load", () => {
     <button id="logoutBtn">ログアウト</button>
   </div>
 </div>
+
+<style>
+/* ポップアップ全体 */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+/* ポップアップ内容 */
+.popup-content {
+  background: linear-gradient(135deg, #ffffff, #f0f0f0);
+  padding: 30px 25px;
+  border-radius: 15px;
+  width: 85%;
+  max-width: 450px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: fadeInPopup 0.5s ease;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #333;
+}
+
+/* アニメーション */
+@keyframes fadeInPopup {
+  from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ログアウトボタン */
+.popup-content button {
+  background-color: #1abc9c;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-top: 15px;
+}
+
+.popup-content button:hover {
+  background-color: #16a085;
+  transform: scale(1.05);
+}
+
+/* 右上の閉じる✕を非表示 */
+.popup-content::before {
+  display: none;
+}
+</style>
+
 <script>
-// ポップアップを表示
+let logoutTimer;
+
+// ポップアップ表示
 function showPopup(message) {
   document.getElementById("popup-text").textContent = message;
   document.getElementById("popup").style.display = "flex";
 }
 
-// ログアウトボタン押下でログインページへ
+// ログアウトボタン
 document.getElementById("logoutBtn").addEventListener("click", () => {
   window.location.href = "index.html"; // ログインページに移動
 });
 
-// 自動ログアウトタイマー
-let logoutTimer;
-
-function resetLogoutTimer() {
-  clearTimeout(logoutTimer);
-  logoutTimer = setTimeout(autoLogout,  15 * 1000); // 2分
-}
-
-// 自動ログアウト時にポップアップ表示
+// 自動ログアウト
 function autoLogout() {
   showPopup("操作がないため、自動的にログアウトされます。");
 }
 
-// ページロード時にタイマー開始
+// タイマーリセット
+function resetLogoutTimer() {
+  clearTimeout(logoutTimer);
+  logoutTimer = setTimeout(autoLogout, 30 * 1000); // 30秒
+}
+
+// ユーザー操作でタイマーリセット
 window.addEventListener("load", resetLogoutTimer);
 document.addEventListener("mousemove", resetLogoutTimer);
 document.addEventListener("keydown", resetLogoutTimer);
 document.addEventListener("scroll", resetLogoutTimer);
 document.addEventListener("click", resetLogoutTimer);
 </script>
+
   </body>
 </html>
