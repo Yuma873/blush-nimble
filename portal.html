@@ -1017,30 +1017,45 @@ window.addEventListener("load", () => {
   showPopup("ログイン成功しました。最新のお知らせをご確認ください。");
 });
 </script>
+    <!-- ポップアップ -->
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h2>お知らせ</h2>
+    <p id="popup-text">操作がないため、自動的にログアウトします。</p>
+    <button id="logoutBtn">ログアウト</button>
+  </div>
+</div>
 <script>
-  let logoutTimer;
+// ポップアップを表示
+function showPopup(message) {
+  document.getElementById("popup-text").textContent = message;
+  document.getElementById("popup").style.display = "flex";
+}
 
-  // ログアウト処理
-  function autoLogout() {
-    alert("操作がないため、自動的にログアウトします。");
-    window.location.href = "index.html"; // ログインページに戻す
-  }
+// ログアウトボタン押下でログインページへ
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  window.location.href = "index.html"; // ログインページに移動
+});
 
-  // タイマーをリセット
-  function resetLogoutTimer() {
-    clearTimeout(logoutTimer);
-    logoutTimer = setTimeout(autoLogout,1 * 60 * 1000); // 2分
-  }
+// 自動ログアウトタイマー
+let logoutTimer;
 
-  // ページロード時にタイマー開始
-  window.addEventListener("load", resetLogoutTimer);
+function resetLogoutTimer() {
+  clearTimeout(logoutTimer);
+  logoutTimer = setTimeout(autoLogout, 1 * 60 * 1000); // 2分
+}
 
-  // マウスやキーボード操作があったらタイマーリセット
-  document.addEventListener("mousemove", resetLogoutTimer);
-  document.addEventListener("keydown", resetLogoutTimer);
-  document.addEventListener("scroll", resetLogoutTimer);
-  document.addEventListener("click", resetLogoutTimer);
+// 自動ログアウト時にポップアップ表示
+function autoLogout() {
+  showPopup("操作がないため、自動的にログアウトします。");
+}
+
+// ページロード時にタイマー開始
+window.addEventListener("load", resetLogoutTimer);
+document.addEventListener("mousemove", resetLogoutTimer);
+document.addEventListener("keydown", resetLogoutTimer);
+document.addEventListener("scroll", resetLogoutTimer);
+document.addEventListener("click", resetLogoutTimer);
 </script>
-
   </body>
 </html>
