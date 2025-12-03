@@ -175,6 +175,38 @@ window.PushCodeInit = function() {
     }
   }
 };
+  /* ポップアップ全体 */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+/* ポップアップ内容 */
+.popup-content {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  animation: fadeInPopup 0.4s ease;
+}
+
+/* ふわっと出るアニメーション */
+@keyframes fadeInPopup {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 </script>
 
   </head>
@@ -863,7 +895,14 @@ loadKanagawaRSS();
         >
       </div>
     </div>
-
+ <!-- ポップアップ -->
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h2>お知らせ</h2>
+    <p id="popup-text">ログイン成功しました。最新のお知らせをご確認ください。</p>
+    <button onclick="closePopup()">閉じる</button>
+  </div>
+</div>
     <script>
       document.getElementById("lastUpdated").textContent = new Date(
         document.lastModified
@@ -922,6 +961,22 @@ loadKanagawaRSS();
     }
   }
 </script>
-   
+  
+<script>
+function showPopup(message) {
+  document.getElementById("popup-text").textContent = message;
+  document.getElementById("popup").style.display = "flex";
+}
+
+function closePopup() {
+  document.getElementById("popup").style.display = "none";
+}
+
+// ページを開いたとき自動表示
+window.addEventListener("load", () => {
+  showPopup("ログイン成功しました。最新のお知らせをご確認ください。");
+});
+</script>
+
   </body>
 </html>
