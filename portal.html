@@ -1014,14 +1014,14 @@ function closePopup() {
 
 // ページを開いたとき自動表示
 window.addEventListener("load", () => {
-  showPopup("ログイン成功しました。最新のお知らせをご確認ください。");
+  showPopup("操作がない場合にはログアウトされます。");
 });
 </script>
     <!-- ポップアップ -->
 <div id="popup" class="popup">
   <div class="popup-content">
     <h2>お知らせ</h2>
-    <p id="popup-text">操作がないため、自動的にログアウトします。</p>
+    <p id="popup-text">操作がないため、自動的にログアウトされます</p>
     <button id="logoutBtn">ログアウト</button>
   </div>
 </div>
@@ -1047,7 +1047,7 @@ function resetLogoutTimer() {
 
 // 自動ログアウト時にポップアップ表示
 function autoLogout() {
-  showPopup("操作がないため、自動的にログアウトします。");
+  showPopup("操作がないため、自動的にログアウトされます。");
 }
 
 // ページロード時にタイマー開始
