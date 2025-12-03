@@ -25,8 +25,6 @@
   .title { font-weight:bold; font-size:18px; margin-bottom:8px; }
   .value { font-size:24px; font-weight:bold; margin-bottom:6px; }
   .update { color:#666; font-size:13px; }
-  .status-good { color: #1abc9c; font-weight: bold; }
-  .status-bad  { color: #e74c3c; font-weight: bold; }
   .status-out  { color: #7f8c8d; font-weight: bold; }
 
   .history {
@@ -38,7 +36,6 @@
     margin-top:20px;
     box-shadow:0 2px 6px rgba(0,0,0,0.1);
   }
-
   .history h2 { margin-top:0; font-size:18px; }
   .history ul { list-style:none; padding-left:0; margin:0; }
   .history li { padding:4px 0; border-bottom:1px solid #eee; }
@@ -82,13 +79,13 @@
 <div class="card">
   <div class="title">🌡 外気温（屋外）</div>
   <div class="value" id="airTemp">-- ℃</div>
-  <div class="update">最終更新: 12/3 08:00</div>
+  <div class="update" id="airUpdate">最終更新: 12/3 08:00</div>
 </div>
 
 <div class="card">
   <div class="title">☀ 内気温</div>
   <div class="value" id="inside">-- ℃</div>
-  <div class="update">最終更新: 12/3 08:00</div>
+  <div class="update" id="insideUpdate">最終更新: 12/3 08:00</div>
 </div>
 
 <div class="card">
@@ -137,13 +134,16 @@ const mainTemp = "今年度終了";
 let waterTemp = 27.0;
 
 // -------------------------------
-// 水温更新
+// ランダム水温生成
 // -------------------------------
 function generateWaterTemp() {
   const delta = Math.random() * 0.4 - 0.2;
   return +(waterTemp + delta).toFixed(1);
 }
 
+// -------------------------------
+// 営業時間判定
+// -------------------------------
 function isOpen() {
   const now = new Date();
   const h = now.getHours();
@@ -151,6 +151,9 @@ function isOpen() {
   return (h > 9 || (h === 9 && m >= 30)) && h < 21;
 }
 
+// -------------------------------
+// 表示更新
+// -------------------------------
 function updateWaterTemp() {
   waterTemp = generateWaterTemp();
   document.getElementById("waterTemp").textContent = waterTemp.toFixed(1);
@@ -160,7 +163,7 @@ function updateWaterTemp() {
 }
 
 // -------------------------------
-// 混雑度（初回のみ）
+// 混雑度
 // -------------------------------
 let fixedCrowdState = null;
 
@@ -218,14 +221,14 @@ function loadHistory() {
 }
 
 // -------------------------------
-// 初期表示
+// 初期値セット
 // -------------------------------
 document.getElementById("airTemp").textContent = airTemperature;
 document.getElementById("inside").textContent = insideValue;
 document.getElementById("mainTemp").textContent = mainTemp;
 
 // -------------------------------
-// ★ 休館日の場合：全カード非表示
+// ★ 休館日の場合：数値をすべて「休館」に変更
 // -------------------------------
 const closedReason = isClosedDay();
 if (closedReason) {
@@ -233,16 +236,27 @@ if (closedReason) {
   notice.style.display = "block";
   notice.textContent = `本日は ${closedReason} 休館です。`;
 
-  // すべての .card（温度・混雑度）を非表示
-  document.querySelectorAll('.card').forEach(card => {
-    card.style.display = 'none';
-  });
+  // 温度類をすべて「休館」に変更
+  document.getElementById("airTemp").textContent = "休館";
+  document.getElementById("inside").textContent = "休館";
+  document.getElementById("mainTemp").textContent = "休館";
+  document.getElementById("waterTemp").textContent = "休館";
 
-  // 履歴も非表示
-  document.getElementById("historyBlock").style.display = "none";
+  // 混雑度も休館
+  const crowdEl = document.getElementById("crowd");
+  crowdEl.textContent = "休館";
+  crowdEl.className = "status-out";
 
+  // 更新時刻も非表示に
+  document.getElementById("airUpdate").textContent = "";
+  document.getElementById("insideUpdate").textContent = "";
+  document.getElementById("waterUpdate").textContent = "";
+
+  // 履歴は表示したまま（必要なら非表示にもできる）
   loadHistory();
-  throw new Error("休館日のため、自動更新処理を停止します");
+
+  // 自動更新停止
+  throw new Error("休館日のため、自動更新停止");
 }
 
 // -------------------------------
