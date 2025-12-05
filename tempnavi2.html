@@ -58,7 +58,7 @@
   padding:12px 16px;
   margin-bottom:20px;
   border-radius:8px;
-  font-size:15px;
+  font-size:25px;
   display:none;
   box-shadow:0 2px 4px rgba(0,0,0,0.1);
 }
@@ -248,10 +248,10 @@ if (closedReason) {
   notice.textContent = `本日は ${closedReason} 休館です。`;
 
   // 温度類をすべて「休館」に変更
-  document.getElementById("airTemp").textContent = "休館";
-  document.getElementById("inside").textContent = "休館";
-  document.getElementById("mainTemp").textContent = "休館";
-  document.getElementById("waterTemp").textContent = "休館";
+  document.getElementById("airTemp").textContent = "--";
+  document.getElementById("inside").textContent = "--";
+  document.getElementById("mainTemp").textContent = "--";
+  document.getElementById("waterTemp").textContent = "--";
 
   // 混雑度も休館
   const crowdEl = document.getElementById("crowd");
