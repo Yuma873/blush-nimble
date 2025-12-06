@@ -72,7 +72,7 @@
 <h1>横浜国際プール 温度表示板</h1>
 <div id="closedNotice"></div>
 <div class="notice">
-  <p>📢 <strong>お知らせ:</strong> 12/6は午後から個人利用が可能です。</p>
+  <p>📢 <strong></strong> </p>
   <p><strong><u>水温のみがセンサーで自動更新です</u></strong>（サブ 電光掲示板側 1レーン中央）</p>
   <p><strong>外気温・内気温は1日2回、朝及び正午に更新されます。</strong></p>
 </div>
@@ -115,8 +115,8 @@
 // 休館設定（日時指定）
 // -------------------------------
 const CLOSED_PERIODS = [
-  { date: "12/6", startHour: 0, startMinute: 0, endHour: 12, endMinute: 0, reason: "午前中は点検のため休館" },
-  { date: "12/7", startHour: 14, startMinute: 0, endHour: 17, endMinute: 30, reason: "大会準備のため午後休館" }
+  { date: "12/6", startHour: 0, startMinute: 0, endHour: 11, endMinute: 0, reason: "午前中は点検のため" },
+  { date: "12/7", startHour: 14, startMinute: 0, endHour: 17, endMinute: 30, reason: "大会準備のため午後" }
 ];
 
 // 現在が休館時間か判定
