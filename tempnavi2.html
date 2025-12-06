@@ -111,6 +111,31 @@
 </div>
 
 <script>
+  // -------------------------------
+// 日付ごとのお知らせ設定
+// -------------------------------
+const NOTICE_DAYS = {
+  "12/6": ["午後から個人利用が可能です。", "サブプールは水温28℃前後です。"],
+  "12/7": ["午前は休館、午後は大会準備のため利用不可", "プールサイドは滑りやすいので注意"]
+};
+
+// 今日の日付キー
+const todayKey = `${new Date().getMonth() + 1}/${new Date().getDate()}`;
+const noticeDiv = document.querySelector(".notice");
+
+// 今日のお知らせがあれば設定
+let todayNotices = NOTICE_DAYS[todayKey] || ["通常利用可能です。"];
+let noticeIndex = 0;
+
+// 最初に表示
+noticeDiv.querySelector("p strong").textContent = todayNotices[noticeIndex];
+
+// 3秒ごとに順番表示
+setInterval(() => {
+  noticeIndex = (noticeIndex + 1) % todayNotices.length;
+  noticeDiv.querySelector("p strong").textContent = todayNotices[noticeIndex];
+}, 3000);
+
 // -------------------------------
 // 休館日設定
 // -------------------------------
