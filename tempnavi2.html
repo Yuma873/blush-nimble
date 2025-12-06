@@ -251,10 +251,10 @@ function addHistory(crowdState) {
 
   let hist = JSON.parse(localStorage.getItem("ykpHistory") || "[]");
   hist.unshift({ text: li.textContent });
-  hist = hist.slice(0, 10);
+  hist = hist.slice(0, 100);
   localStorage.setItem("ykpHistory", JSON.stringify(hist));
 
-  while (ul.children.length > 10) ul.removeChild(ul.lastChild);
+  while (ul.children.length > 100) ul.removeChild(ul.lastChild);
 }
 
 function loadHistory() {
