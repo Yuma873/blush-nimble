@@ -157,35 +157,43 @@
     width: 30%;
     height: auto;
   }
-   <style>
 /* ボタン全体の共通設定 */
 button {
-    background-color: #4CAF50; /* 緑色 */
-    color: white;              /* 文字色 */
-    border: none;              /* 枠線なし */
-    padding: 10px 20px;        /* 内側の余白 */
-    margin: 5px;               /* ボタン間の余白 */
-    border-radius: 5px;        /* 角丸 */
-    cursor: pointer;           /* カーソルを手の形に */
-    font-size: 16px;           /* 文字サイズ */
-    transition: background-color 0.3s, transform 0.2s; /* ホバーアニメ */
+    background: linear-gradient(145deg, #4CAF50, #43A047); /* グラデーション */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    margin: 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2); /* 影で浮いた感じ */
+    transition: all 0.3s ease; /* なめらかなアニメーション */
 }
 
 /* ホバー時の効果 */
 button:hover {
-    background-color: #45a049; /* 少し濃い緑 */
-    transform: scale(1.05);    /* 少し拡大 */
+    transform: translateY(-3px) scale(1.05); /* 少し浮かせる + 拡大 */
+    box-shadow: 0 8px 12px rgba(0,0,0,0.3); /* 影を強める */
+    background: linear-gradient(145deg, #43A047, #388E3C); /* ホバー用グラデ */
 }
 
-/* ボタンを横並びにする */
-button-container {
+/* アクティブ（押しているとき）の効果 */
+button:active {
+    transform: translateY(0) scale(0.98); /* 押した感 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ボタンを横並びにするラッパー */
+.button-container {
     display: flex;
-    flex-wrap: wrap;   /* 幅が足りない場合は次の行に折り返す */
-    gap: 10px;         /* ボタン間の間隔 */
-    justify-content: center; /* 中央寄せ */
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
     margin-top: 20px;
 }
-</style>
+
 
 </style>
 
