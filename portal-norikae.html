@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ポータルサイト - 乗換案内</title>
+  <title>[簡易]ポータルサイト - 乗換案内</title>
   <link rel="shortcut icon" href="favicon4.png" type="image/png">
 
   <style>
@@ -16,53 +16,36 @@
       overflow: auto;
     }
 
-    nav {
-      width: 240px;
-      background-color: #2c3e50;
-      color: white;
-      padding: 10px;
-      box-sizing: border-box;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      overflow-y: auto;
-      z-index: 1000;
-    }
+   /* 左ナビ固定 */
+nav {
+  width: 230px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 10px;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1000;
+}
 
-    nav video {
-      width: 100%;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
+nav video { width: 100%; border-radius: 8px; margin-bottom: 10px; }
+nav a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  margin: 5px 0;
+  background-color: #34495e;
+  border-radius: 6px;
+  text-align: center;
+  transition: 0.3s;
+}
+nav a:hover { background-color: #1abc9c; }
 
-    nav a {
-      display: block;
-      width: 100%;
-      color: white;
-      text-decoration: none;
-      padding: 12px;
-      margin: 6px 0;
-      background-color: #34495e;
-      border-radius: 6px;
-      text-align: center;
-      transition: background-color 0.3s;
-    }
-
-    nav a:hover {
-      background-color: #1abc9c;
-    }
-
-    nav img {
-      display: block;
-      width: 120px;
-      border-radius: 6px;
-      margin: 8px 0;
-    }
+  
 
     main {
       flex: 1;
@@ -168,28 +151,11 @@ iframe {
 
 <body>
   <nav>
-    <video id="randomVideo" autoplay muted loop playsinline></video>
-
-    <a href="portal.html">🏠 トップ</a>
-    <a href="portal-news.html">📰 お知らせ</a>
-    <a href="portal-tool.html">🛠 ツール</a>
-    <a href="portal-renraku.html">📢 掲示板連絡</a>
-    <a href="portal-pdf.html">📁 ファイル一覧</a>
-    <a href="portal-next.html">🏆 次回大会 特設ページ</a>
-
-    <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
-      <img src="botan.png" alt="プール開館情報">
-    </a>
-    <a href="portal-reserve.html" target="_blank">
-      <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約">
-    </a>
-
-    <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
-    <a href="portal-form.html">📝 アンケート</a>
-
-    <a href="https://yuma873.github.io/blush-nimble/index.html"
-       style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">
-      🚪ログアウト
+    <nav>
+  <video id="randomVideo" autoplay loop muted playsinline style="width:60%; border-radius:5px; margin-bottom:10px;"></video>
+  <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
+  <a href="https://yuma873.github.io/blush-nimble/index.html" style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">ログアウト</a>
+</nav>
     </a>
   </nav>
 
@@ -202,20 +168,26 @@ iframe {
 
       <label>出発地:</label>
       <select id="fromSelect" style="width:180px;margin-right:10px;">
+                <option value="23234" data-name="茅ケ崎">茅ケ崎</option>
         <option value="23298" data-name="平塚">平塚</option>
-        <option value="23122" data-name="上溝">上溝</option>
-        <option value="23234" data-name="茅ケ崎">茅ケ崎</option>
-        <option value="23072" data-name="伊勢原">伊勢原</option>
-        <option value="100940" data-name="共済病院前総合公園西">共済病院前総合公園西</option>
+                <option value="23072" data-name="伊勢原">伊勢原</option>
+
+        <option value="23122" data-name="上溝">さがみはらグリーンプール</option>
+        <option value="29631" data-name="北山田(神奈川県)">横浜国際プール</option>
+                <option value="100940" data-name="共済病院前総合公園西">平塚総合公園温水プール</option>
+
       </select>
 
       <label>到着地:</label>
       <select id="toSelect" style="width:180px;">
         <option value="23298" data-name="平塚">平塚</option>
-        <option value="23122" data-name="上溝">上溝</option>
         <option value="23234" data-name="茅ケ崎">茅ケ崎</option>
         <option value="23072" data-name="伊勢原">伊勢原</option>
-        <option value="100940" data-name="共済病院前総合公園西">共済病院前総合公園西</option>
+                <option value="29631" data-name="北山田(神奈川県)">横浜国際プール</option>
+                <option value="23122" data-name="上溝">さがみはらグリーンプール</option>
+                <option value="100940" data-name="共済病院前総合公園西">平塚総合公園温水プール</option>
+
+
       </select>
 
       <br><br>
@@ -239,7 +211,6 @@ iframe {
       <iframe id="transitFrame" src="" loading="lazy"></iframe>
     </div>
 
-    <button onclick="location.href='portal.html'">ポータルトップへ戻る</button>
   </main>
 
   <div class="ticker-wrap">
@@ -275,6 +246,20 @@ iframe {
 
       document.getElementById('transitFrame').src = url;
     }
+    window.addEventListener("load", () => {
+    const now = new Date();
+
+    const yyyy = now.getFullYear();
+    const mm = ("0" + (now.getMonth() + 1)).slice(-2);
+    const dd = ("0" + now.getDate()).slice(-2);
+
+    const hh = ("0" + now.getHours()).slice(-2);
+    const mi = ("0" + now.getMinutes()).slice(-2);
+
+    document.getElementById("date").value = `${yyyy}${mm}${dd}`;
+    document.getElementById("time").value = `${hh}${mi}`;
+  });
+
   </script>
 
 </body>
