@@ -15,8 +15,8 @@
   header { font-size:1.8em; margin-bottom:15px; color:#2c3e50; }
   .iframe-container { width:100%; height:calc(100vh - 220px); border-radius:8px; overflow:hidden; background:white; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
   iframe { width:100%; height:100%; border:none; }
-  .form-box { background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); margin-bottom:20px; }
-  .form-box h3 { margin-top:0; color:#2c3e50; margin-bottom:15px; }
+  .form-box { background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); margin-bottom:20px; transition:0.3s; }
+  .form-box h3 { margin-top:0; color:#2c3e50; margin-bottom:15px; cursor:pointer; }
   .form-grid { display:flex; flex-wrap:wrap; gap:15px; align-items:center; }
   .form-grid > div { flex:1 1 200px; }
   label { display:block; font-weight:bold; margin-bottom:5px; }
@@ -41,9 +41,9 @@
   <main>
     <header>乗換検索</header>
 
-    <div class="form-box">
-      <h3>条件を入力</h3>
-      <div class="form-grid">
+    <div class="form-box" id="formBox">
+      <h3 onclick="toggleForm()">条件を入力 ▼</h3>
+      <div class="form-grid" id="formGrid">
         <div>
           <label>出発地</label>
           <select id="fromSelect">
@@ -96,45 +96,6 @@
         </div>
       </div>
     </div>
-<!-- 変更部分だけ抜粋 -->
-<div class="form-box" id="formBox">
-  <h3>条件を入力</h3>
-  <div class="form-grid" id="formGrid">
-    <!-- フォーム内容はそのまま -->
-  </div>
-</div>
-
-<script>
-function toggleForm(){
-  const formGrid = document.getElementById("formGrid");
-  formGrid.style.display = formGrid.style.display === "none" ? "flex" : "none";
-}
-
-// 検索ボタンに統合
-function loadTransit(){
-  const fromSelect = document.getElementById('fromSelect');
-  const fromCode = fromSelect.value;
-  const fromName = encodeURIComponent(fromSelect.options[fromSelect.selectedIndex].dataset.name);
-
-  const toSelect = document.getElementById('toSelect');
-  const toCode = toSelect.value;
-  const toName = encodeURIComponent(toSelect.options[toSelect.selectedIndex].dataset.name);
-
-  let date = document.getElementById("date").value;
-  let time = document.getElementById("time").value;
-  if(date) date = date.replace(/-/g,'');
-  if(time) time = time.replace(':','');
-
-  const searchType = document.getElementById('searchType').value;
-
-  const url = `https://transit.jre-maas.com/result?from=${fromCode}&to=${toCode}&fromName=${fromName}&toName=${toName}&searchType=${searchType}&realTime=true&date=${date}&time=${time}&isNow=true`;
-
-  document.getElementById('transitFrame').src = url;
-
-  // フォームを折りたたむ
-  toggleForm();
-}
-</script>
 
     <div class="iframe-container">
       <iframe id="transitFrame" src="" loading="lazy"></iframe>
@@ -146,6 +107,7 @@ function loadTransit(){
   </div>
 
 <script>
+  // ランダム動画
   const videos = ["video1.mp4","video2.mp4","video3.mp4","video5.mp4","V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4","V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
   document.getElementById("randomVideo").src = videos[Math.floor(Math.random()*videos.length)];
 
@@ -158,6 +120,18 @@ function loadTransit(){
     to.value = tmpValue; to.selectedIndex = tmpIndex;
   }
 
+  function toggleForm(){
+    const formGrid = document.getElementById("formGrid");
+    const h3 = document.querySelector("#formBox h3");
+    if(formGrid.style.display === "none"){
+      formGrid.style.display = "flex";
+      h3.textContent = "条件を入力 ▼";
+    } else {
+      formGrid.style.display = "none";
+      h3.textContent = "条件を入力 ▲";
+    }
+  }
+
   function loadTransit(){
     const fromSelect = document.getElementById('fromSelect');
     const fromCode = fromSelect.value;
@@ -167,10 +141,8 @@ function loadTransit(){
     const toCode = toSelect.value;
     const toName = encodeURIComponent(toSelect.options[toSelect.selectedIndex].dataset.name);
 
-    let date = document.getElementById("date").value; // YYYY-MM-DD
-    let time = document.getElementById("time").value; // HH:MM
-
-    // YYYYMMDD / HHMM に変換
+    let date = document.getElementById("date").value;
+    let time = document.getElementById("time").value;
     if(date) date = date.replace(/-/g,'');
     if(time) time = time.replace(':','');
 
@@ -179,12 +151,16 @@ function loadTransit(){
     const url = `https://transit.jre-maas.com/result?from=${fromCode}&to=${toCode}&fromName=${fromName}&toName=${toName}&searchType=${searchType}&realTime=true&date=${date}&time=${time}&isNow=true`;
 
     document.getElementById('transitFrame').src = url;
+
+    // フォーム折りたたみ
+    toggleForm();
   }
 
+  // 初期値
   window.addEventListener("load", ()=>{
     const now = new Date();
-    document.getElementById("date").value = now.toISOString().slice(0,10); // YYYY-MM-DD
-    document.getElementById("time").value = now.toTimeString().slice(0,5);   // HH:MM
+    document.getElementById("date").value = now.toISOString().slice(0,10);
+    document.getElementById("time").value = now.toTimeString().slice(0,5);
   });
 </script>
 </body>
