@@ -96,6 +96,45 @@
         </div>
       </div>
     </div>
+<!-- 変更部分だけ抜粋 -->
+<div class="form-box" id="formBox">
+  <h3>条件を入力</h3>
+  <div class="form-grid" id="formGrid">
+    <!-- フォーム内容はそのまま -->
+  </div>
+</div>
+
+<script>
+function toggleForm(){
+  const formGrid = document.getElementById("formGrid");
+  formGrid.style.display = formGrid.style.display === "none" ? "flex" : "none";
+}
+
+// 検索ボタンに統合
+function loadTransit(){
+  const fromSelect = document.getElementById('fromSelect');
+  const fromCode = fromSelect.value;
+  const fromName = encodeURIComponent(fromSelect.options[fromSelect.selectedIndex].dataset.name);
+
+  const toSelect = document.getElementById('toSelect');
+  const toCode = toSelect.value;
+  const toName = encodeURIComponent(toSelect.options[toSelect.selectedIndex].dataset.name);
+
+  let date = document.getElementById("date").value;
+  let time = document.getElementById("time").value;
+  if(date) date = date.replace(/-/g,'');
+  if(time) time = time.replace(':','');
+
+  const searchType = document.getElementById('searchType').value;
+
+  const url = `https://transit.jre-maas.com/result?from=${fromCode}&to=${toCode}&fromName=${fromName}&toName=${toName}&searchType=${searchType}&realTime=true&date=${date}&time=${time}&isNow=true`;
+
+  document.getElementById('transitFrame').src = url;
+
+  // フォームを折りたたむ
+  toggleForm();
+}
+</script>
 
     <div class="iframe-container">
       <iframe id="transitFrame" src="" loading="lazy"></iframe>
