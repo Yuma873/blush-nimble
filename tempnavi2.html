@@ -116,8 +116,15 @@
 // 休館設定（日時指定）
 // -------------------------------
 const CLOSED_PERIODS = [
-  { date: "12/6", startHour: 0, startMinute: 0, endHour: 11, endMinute: 0, reason: "午前中は点検のため" },
-  { date: "12/7", startHour: 14, startMinute: 0, endHour: 17, endMinute: 30, reason: "大会準備のため午後" }
+  { date: "12/20", startHour: 19, startMinute: 30, endHour: 23, endMinute: 59, reason: "大会設営のため" },
+  { date: "12/21", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "大会のため" },
+  { date: "12/26", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "専用利用のため" },
+  { date: "12/27", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "専用利用のため" },
+  { date: "12/28", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "専用利用のため" },
+  { date: "12/29", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "専用利用のため" },
+  { date: "12/30", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "AM専用利用/午後年末年始のため" },
+  { date: "12/31", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "年末年始" },
+
 ];
 
 // 現在が休館時間か判定
@@ -142,8 +149,16 @@ function getClosedReason() {
 // 日付ごとのお知らせ設定
 // -------------------------------
 const NOTICE_DAYS = {
-  "12/6": ["午後から個人利用が可能です。", "サブプールは大会実施後のため水温27℃前後です。"],
-  "12/7": ["午前は休館、午後は大会準備のため利用不可", "プールサイドは滑りやすいので注意"]
+  "12/20": ["大会設営のため19:30から利用できません。"],
+  "12/21": ["大会のため終日利用できません。"],
+    "12/26": ["今年の個人利用期間は終了しました。","年明け1/4より利用可"],
+      "12/27": ["今年の個人利用期間は終了しました。","年明け1/4より利用可"],
+    "12/28": ["今年の個人利用期間は終了しました。","年明け1/4より利用可"],
+    "12/29": ["今年の個人利用期間は終了しました。","年明け1/4より利用可"],
+    "12/30": ["今年の個人利用期間は終了しました。","年明け1/4より利用可"],
+    "12/31": ["今年の個人利用期間は終了しました。","年明け1/4より利用可"]
+
+
 };
 
 // -------------------------------
@@ -153,7 +168,7 @@ const closedReason = getClosedReason();
 const noticeDiv = document.querySelector(".notice");
 let todayKey = `${new Date().getMonth() + 1}/${new Date().getDate()}`;
 
-let todayNotices = NOTICE_DAYS[todayKey] || ["通常利用可能です。"];
+let todayNotices = NOTICE_DAYS[todayKey] || ["通常利用可能です。","混雑状況は変動する場合があります","年末年始休館 12/30~1/3"];
 let noticeIndex = 0;
 
 // 最初に表示
@@ -271,8 +286,8 @@ function loadHistory() {
 // -------------------------------
 // 初期値セット
 // -------------------------------
-document.getElementById("airTemp").textContent = "7.4℃";
-document.getElementById("inside").textContent = "30.1℃";
+document.getElementById("airTemp").textContent = "9.7℃";
+document.getElementById("inside").textContent = "29.1℃";
 document.getElementById("mainTemp").textContent = "今年度終了";
 
 updateWaterTemp();
