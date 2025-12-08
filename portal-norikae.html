@@ -28,6 +28,31 @@
   .ticker { display:inline-block; white-space:nowrap; animation:tickerScroll 25s linear infinite; padding-left:100%; }
   @keyframes tickerScroll { from { transform:translateX(0%); } to { transform:translateX(-100%); } }
   @media(max-width:768px){ main{margin-left:0;padding:15px;} .form-grid{flex-direction:column; gap:10px;} .swap-button{margin-top:0; align-self:flex-start;} .iframe-container{height:60vh;} }
+/* 出発地・到着地セレクト専用 */
+.station-select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-size: 1em;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  cursor: pointer;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><polygon points="0,0 12,0 6,6" fill="%23666"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 12px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.station-select:focus {
+  outline: none;
+  border-color: #1abc9c;
+  box-shadow: 0 0 0 2px rgba(26,188,156,0.2);
+}
 </style>
 </head>
 <body>
@@ -61,6 +86,7 @@
         <div>
           <label>到着地</label>
           <select id="toSelect">
+              <option value="" disabled selected>到着駅を選択</option>
             <option value="23298" data-name="平塚">平塚</option>
             <option value="23234" data-name="茅ケ崎">茅ケ崎</option>
             <option value="23072" data-name="伊勢原">伊勢原</option>
