@@ -16,7 +16,6 @@
       overflow: hidden;
     }
 
-    /* ===== 左ナビ固定 ===== */
     nav {
       width: 240px;
       background-color: #2c3e50;
@@ -65,7 +64,6 @@
       margin: 8px 0;
     }
 
-    /* ===== メインエリア ===== */
     main {
       flex: 1;
       padding: 30px;
@@ -111,7 +109,6 @@
       background-color: #16a085;
     }
 
-    /* ===== テロップ ===== */
     .ticker-wrap {
       width: 100%;
       overflow: hidden;
@@ -136,7 +133,6 @@
       to { transform: translateX(-100%); }
     }
 
-    /* ===== スマホ対応 ===== */
     @media (max-width: 768px) {
       nav {
         position: relative;
@@ -171,10 +167,8 @@
 
 <body>
   <nav>
-    <!-- 🎬 ランダム動画 -->
     <video id="randomVideo" autoplay muted loop playsinline></video>
 
-    <!-- 🏠 メニュー -->
     <a href="portal.html">🏠 トップ</a>
     <a href="portal-news.html">📰 お知らせ</a>
     <a href="portal-tool.html">🛠 ツール</a>
@@ -182,7 +176,6 @@
     <a href="portal-pdf.html">📁 ファイル一覧</a>
     <a href="portal-next.html">🏆 次回大会 特設ページ</a>
 
-    <!-- 📅 予約ボタン -->
     <a href="https://www.r326.com/b/main.aspx?g=MI50b22j293fUk0231" target="_blank">
       <img src="botan.png" alt="プール開館情報">
     </a>
@@ -190,11 +183,9 @@
       <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約">
     </a>
 
-    <!-- その他 -->
     <a href="2025-wintercamp.html">⛺️ 2025年度冬合宿</a>
     <a href="portal-form.html">📝 アンケート</a>
 
-    <!-- 🚪 ログアウト -->
     <a href="https://yuma873.github.io/blush-nimble/index.html"
        style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">
       🚪ログアウト
@@ -203,23 +194,57 @@
 
   <main>
     <header>乗換情報</header>
-    <div class="iframe-container">
-      <iframe
-        src="https://transit.jre-maas.com/?utm_source=jre_official_line&utm_medium=social&utm_campaign=line"
-        loading="lazy"
-        title="transit">
-      </iframe>
+
+    <!-- ===== 乗換検索フォーム ===== -->
+    <div style="background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);margin-bottom:20px;">
+      <h3 style="margin-top:0;color:#2c3e50;">条件を入力</h3>
+
+      <label>出発地:</label>
+      <select id="fromSelect" style="width:180px;margin-right:10px;">
+        <option value="23298" data-name="平塚">平塚</option>
+        <option value="23122" data-name="上溝">上溝</option>
+        <option value="23234" data-name="茅ケ崎">茅ケ崎</option>
+        <option value="23072" data-name="伊勢原">伊勢原</option>
+        <option value="100940" data-name="共済病院前総合公園西">共済病院前総合公園西</option>
+      </select>
+
+      <label>到着地:</label>
+      <select id="toSelect" style="width:180px;">
+        <option value="23298" data-name="平塚">平塚</option>
+        <option value="23122" data-name="上溝">上溝</option>
+        <option value="23234" data-name="茅ケ崎">茅ケ崎</option>
+        <option value="23072" data-name="伊勢原">伊勢原</option>
+        <option value="100940" data-name="共済病院前総合公園西">共済病院前総合公園西</option>
+      </select>
+
+      <br><br>
+
+      <label>日付 (YYYYMMDD):</label>
+      <input type="text" id="date" value="20251208" style="width:120px;margin-right:10px;">
+
+      <label>時間 (HHMM):</label>
+      <input type="text" id="time" value="1725" style="width:80px;"><br><br>
+
+      <label>検索タイプ:</label>
+      <select id="searchType" style="width:120px;">
+        <option value="departure">出発</option>
+        <option value="arrival">到着</option>
+      </select>
+
+      <button onclick="loadTransit()" style="margin-left:20px;">検索する</button>
     </div>
+
+    <div class="iframe-container">
+      <iframe id="transitFrame" src="" loading="lazy"></iframe>
+    </div>
+
     <button onclick="location.href='portal.html'">ポータルトップへ戻る</button>
   </main>
 
   <div class="ticker-wrap">
-    <div class="ticker">
-      .
-    </div>
+    <div class="ticker">.</div>
   </div>
 
-  <!-- 🎥 ランダム動画スクリプト -->
   <script>
     const videos = [
       "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
@@ -228,6 +253,28 @@
     ];
     const randomIndex = Math.floor(Math.random() * videos.length);
     document.getElementById("randomVideo").src = videos[randomIndex];
+
+    function loadTransit() {
+      const fromSelect = document.getElementById('fromSelect');
+      const fromCode = fromSelect.value;
+      const fromName = encodeURIComponent(fromSelect.options[fromSelect.selectedIndex].dataset.name);
+
+      const toSelect = document.getElementById('toSelect');
+      const toCode = toSelect.value;
+      const toName = encodeURIComponent(toSelect.options[toSelect.selectedIndex].dataset.name);
+
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+      const searchType = document.getElementById('searchType').value;
+
+      const url =
+        `https://transit.jre-maas.com/result?from=${fromCode}&to=${toCode}` +
+        `&fromName=${fromName}&toName=${toName}` +
+        `&searchType=${searchType}&realTime=true&date=${date}&time=${time}&isNow=true`;
+
+      document.getElementById('transitFrame').src = url;
+    }
   </script>
+
 </body>
 </html>
