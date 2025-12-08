@@ -6,168 +6,28 @@
 <title>[簡易]ポータルサイト - 乗換案内</title>
 <link rel="shortcut icon" href="favicon4.png" type="image/png">
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    display: flex;
-    background-color: #f5f5f5;
-    min-height: 100vh;
-    overflow: auto;
-  }
-
-  /* 左ナビ固定 */
-  nav {
-    width: 230px;
-    background-color: #2c3e50;
-    color: white;
-    padding: 10px;
-    box-sizing: border-box;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    overflow-y: auto;
-    z-index: 1000;
-  }
-
-  nav video {
-    width: 100%;
-    border-radius: 8px;
-    margin-bottom: 10px;
-  }
-
-  nav a {
-    display: block;
-    color: white;
-    text-decoration: none;
-    padding: 10px;
-    margin: 5px 0;
-    background-color: #34495e;
-    border-radius: 6px;
-    text-align: center;
-    transition: 0.3s;
-  }
-  nav a:hover { background-color: #1abc9c; }
-
-  main {
-    flex: 1;
-    padding: 30px;
-    margin-left: 260px;
-    overflow-y: auto;
-    box-sizing: border-box;
-  }
-
-  header {
-    font-size: 1.8em;
-    margin-bottom: 15px;
-    color: #2c3e50;
-  }
-
-  .iframe-container {
-    width: 100%;
-    height: calc(100vh - 220px);
-    border-radius: 8px;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-
-  iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
-
-  .form-box {
-    background:#fff;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.1);
-    margin-bottom:20px;
-  }
-
-  .form-box h3 {
-    margin-top:0;
-    color:#2c3e50;
-    margin-bottom:15px;
-  }
-
-  .form-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap:15px;
-    align-items: center;
-  }
-
-  .form-grid > div {
-    flex:1 1 200px;
-  }
-
-  label {
-    display:block;
-    font-weight:bold;
-    margin-bottom:5px;
-  }
-
-  select, input {
-    width:100%;
-    padding:8px;
-    border-radius:5px;
-    border:1px solid #ccc;
-    box-sizing:border-box;
-  }
-
-  button {
-    padding:10px 20px;
-    font-size:1em;
-    background-color:#1abc9c;
-    color:white;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-    transition:0.3s;
-  }
-
-  button:hover {
-    background-color:#16a085;
-  }
-
-  .swap-button {
-    align-self: flex-end;
-    padding:8px 12px;
-    margin-top:24px;
-  }
-
-  .ticker-wrap {
-    width: 100%;
-    overflow: hidden;
-    background-color: #2c3e50;
-    color: white;
-    padding: 8px 0;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    z-index: 9999;
-  }
-
-  .ticker {
-    display: inline-block;
-    white-space: nowrap;
-    animation: tickerScroll 25s linear infinite;
-    padding-left: 100%;
-  }
-
-  @keyframes tickerScroll {
-    from { transform: translateX(0%); }
-    to { transform: translateX(-100%); }
-  }
-
-  @media(max-width:768px){
-    main { margin-left:0; padding:15px; }
-    .form-grid { flex-direction: column; gap:10px; }
-    .swap-button { margin-top:0; align-self: flex-start; }
-    .iframe-container { height:60vh; }
-  }
+  body { font-family: Arial, sans-serif; margin:0; display:flex; background:#f5f5f5; min-height:100vh; overflow:auto; }
+  nav { width:230px; background:#2c3e50; color:white; padding:10px; box-sizing:border-box; position:fixed; top:0; left:0; height:100vh; overflow-y:auto; z-index:1000; }
+  nav video { width:100%; border-radius:8px; margin-bottom:10px; }
+  nav a { display:block; color:white; text-decoration:none; padding:10px; margin:5px 0; background:#34495e; border-radius:6px; text-align:center; transition:0.3s; }
+  nav a:hover { background:#1abc9c; }
+  main { flex:1; padding:30px; margin-left:260px; overflow-y:auto; box-sizing:border-box; }
+  header { font-size:1.8em; margin-bottom:15px; color:#2c3e50; }
+  .iframe-container { width:100%; height:calc(100vh - 220px); border-radius:8px; overflow:hidden; background:white; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+  iframe { width:100%; height:100%; border:none; }
+  .form-box { background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); margin-bottom:20px; }
+  .form-box h3 { margin-top:0; color:#2c3e50; margin-bottom:15px; }
+  .form-grid { display:flex; flex-wrap:wrap; gap:15px; align-items:center; }
+  .form-grid > div { flex:1 1 200px; }
+  label { display:block; font-weight:bold; margin-bottom:5px; }
+  select, input { width:100%; padding:8px; border-radius:5px; border:1px solid #ccc; box-sizing:border-box; }
+  button { padding:10px 20px; font-size:1em; background:#1abc9c; color:white; border:none; border-radius:5px; cursor:pointer; transition:0.3s; }
+  button:hover { background:#16a085; }
+  .swap-button { align-self:flex-end; padding:8px 12px; margin-top:24px; }
+  .ticker-wrap { width:100%; overflow:hidden; background:#2c3e50; color:white; padding:8px 0; position:fixed; bottom:0; left:0; z-index:9999; }
+  .ticker { display:inline-block; white-space:nowrap; animation:tickerScroll 25s linear infinite; padding-left:100%; }
+  @keyframes tickerScroll { from { transform:translateX(0%); } to { transform:translateX(-100%); } }
+  @media(max-width:768px){ main{margin-left:0;padding:15px;} .form-grid{flex-direction:column; gap:10px;} .swap-button{margin-top:0; align-self:flex-start;} .iframe-container{height:60vh;} }
 </style>
 </head>
 
@@ -183,7 +43,6 @@
 
     <div class="form-box">
       <h3>条件を入力</h3>
-
       <div class="form-grid">
         <div>
           <label>出発地</label>
@@ -203,7 +62,7 @@
             <option value="23298" data-name="平塚">平塚</option>
             <option value="23234" data-name="茅ケ崎">茅ケ崎</option>
             <option value="23072" data-name="伊勢原">伊勢原</option>
-                        <option value="23122" data-name="上溝">さがみはらグリーンプール</option>
+            <option value="23122" data-name="上溝">さがみはらグリーンプール</option>
             <option value="29631" data-name="北山田(神奈川県)">横浜国際プール</option>
             <option value="100940" data-name="共済病院前総合公園西">平塚総合公園温水プール</option>
           </select>
@@ -214,13 +73,13 @@
         </div>
 
         <div>
-          <label>日付 (YYYYMMDD)</label>
-          <input type="text" id="date">
+          <label>日付</label>
+          <input type="date" id="date">
         </div>
 
         <div>
-          <label>時間 (HHMM)</label>
-          <input type="text" id="time">
+          <label>時間</label>
+          <input type="time" id="time">
         </div>
 
         <div>
@@ -241,62 +100,53 @@
     <div class="iframe-container">
       <iframe id="transitFrame" src="" loading="lazy"></iframe>
     </div>
-
   </main>
 
   <div class="ticker-wrap">
     <div class="ticker">.</div>
   </div>
 
-  <script>
-    const videos = [
-      "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
-      "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
-      "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
-    ];
-    const randomIndex = Math.floor(Math.random() * videos.length);
-    document.getElementById("randomVideo").src = videos[randomIndex];
+<script>
+  const videos = ["video1.mp4","video2.mp4","video3.mp4","video5.mp4","V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4","V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
+  document.getElementById("randomVideo").src = videos[Math.floor(Math.random()*videos.length)];
 
-    function swapStations(){
-      const from = document.getElementById('fromSelect');
-      const to = document.getElementById('toSelect');
-      const tmpValue = from.value;
-      const tmpIndex = from.selectedIndex;
-      from.value = to.value; from.selectedIndex = to.selectedIndex;
-      to.value = tmpValue; to.selectedIndex = tmpIndex;
-    }
+  function swapStations(){
+    const from = document.getElementById('fromSelect');
+    const to = document.getElementById('toSelect');
+    const tmpValue = from.value;
+    const tmpIndex = from.selectedIndex;
+    from.value = to.value; from.selectedIndex = to.selectedIndex;
+    to.value = tmpValue; to.selectedIndex = tmpIndex;
+  }
 
-    function loadTransit(){
-      const fromSelect = document.getElementById('fromSelect');
-      const fromCode = fromSelect.value;
-      const fromName = encodeURIComponent(fromSelect.options[fromSelect.selectedIndex].dataset.name);
+  function loadTransit(){
+    const fromSelect = document.getElementById('fromSelect');
+    const fromCode = fromSelect.value;
+    const fromName = encodeURIComponent(fromSelect.options[fromSelect.selectedIndex].dataset.name);
 
-      const toSelect = document.getElementById('toSelect');
-      const toCode = toSelect.value;
-      const toName = encodeURIComponent(toSelect.options[toSelect.selectedIndex].dataset.name);
+    const toSelect = document.getElementById('toSelect');
+    const toCode = toSelect.value;
+    const toName = encodeURIComponent(toSelect.options[toSelect.selectedIndex].dataset.name);
 
-      const date = document.getElementById('date').value;
-      const time = document.getElementById('time').value;
-      const searchType = document.getElementById('searchType').value;
+    let date = document.getElementById("date").value; // YYYY-MM-DD
+    let time = document.getElementById("time").value; // HH:MM
 
-      const url =
-        `https://transit.jre-maas.com/result?from=${fromCode}&to=${toCode}` +
-        `&fromName=${fromName}&toName=${toName}` +
-        `&searchType=${searchType}&realTime=true&date=${date}&time=${time}&isNow=true`;
+    // YYYYMMDD / HHMM に変換
+    if(date) date = date.replace(/-/g,'');
+    if(time) time = time.replace(':','');
 
-      document.getElementById('transitFrame').src = url;
-    }
+    const searchType = document.getElementById('searchType').value;
 
-    window.addEventListener("load", () => {
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = ("0" + (now.getMonth() + 1)).slice(-2);
-      const dd = ("0" + now.getDate()).slice(-2);
-      const hh = ("0" + now.getHours()).slice(-2);
-      const mi = ("0" + now.getMinutes()).slice(-2);
-      document.getElementById("date").value = `${yyyy}${mm}${dd}`;
-      document.getElementById("time").value = `${hh}${mi}`;
-    });
-  </script>
+    const url = `https://transit.jre-maas.com/result?from=${fromCode}&to=${toCode}&fromName=${fromName}&toName=${toName}&searchType=${searchType}&realTime=true&date=${date}&time=${time}&isNow=true`;
+
+    document.getElementById('transitFrame').src = url;
+  }
+
+  window.addEventListener("load", ()=>{
+    const now = new Date();
+    document.getElementById("date").value = now.toISOString().slice(0,10); // YYYY-MM-DD
+    document.getElementById("time").value = now.toTimeString().slice(0,5);   // HH:MM
+  });
+</script>
 </body>
 </html>
