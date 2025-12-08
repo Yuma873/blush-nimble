@@ -15,7 +15,7 @@
   header { font-size:1.8em; margin-bottom:15px; color:#2c3e50; }
   .iframe-container { width:100%; height:calc(100vh - 220px); border-radius:8px; overflow:hidden; background:white; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
   iframe { width:100%; height:100%; border:none; }
-  .form-box { background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); margin-bottom:20px; transition:0.3s; }
+  .form-box { background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); margin-bottom:20px; }
   .form-box h3 { margin-top:0; color:#2c3e50; margin-bottom:15px; cursor:pointer; }
   .form-grid { display:flex; flex-wrap:wrap; gap:15px; align-items:center; }
   .form-grid > div { flex:1 1 200px; }
@@ -30,7 +30,6 @@
   @media(max-width:768px){ main{margin-left:0;padding:15px;} .form-grid{flex-direction:column; gap:10px;} .swap-button{margin-top:0; align-self:flex-start;} .iframe-container{height:60vh;} }
 </style>
 </head>
-
 <body>
   <nav>
     <video id="randomVideo" autoplay loop muted playsinline></video>
@@ -42,7 +41,7 @@
     <header>乗換検索</header>
 
     <div class="form-box" id="formBox">
-      <h3 onclick="toggleForm()">条件を入力 ▼</h3>
+      <h3 onclick="toggleForm()">条件を入力</h3>
       <div class="form-grid" id="formGrid">
         <div>
           <label>出発地</label>
@@ -53,6 +52,9 @@
             <option value="23122" data-name="上溝">さがみはらグリーンプール</option>
             <option value="29631" data-name="北山田(神奈川県)">横浜国際プール</option>
             <option value="100940" data-name="共済病院前総合公園西">平塚総合公園温水プール</option>
+            <option value="23281" data-name="橋本(神奈川県)">[臨]橋本</option>
+            <option value="23306" data-name="藤野">[臨]藤野</option>
+            <option value="">その他</option>
           </select>
         </div>
 
@@ -65,6 +67,9 @@
             <option value="23122" data-name="上溝">さがみはらグリーンプール</option>
             <option value="29631" data-name="北山田(神奈川県)">横浜国際プール</option>
             <option value="100940" data-name="共済病院前総合公園西">平塚総合公園温水プール</option>
+            <option value="23281" data-name="橋本(神奈川県)">[臨]橋本</option>
+            <option value="23306" data-name="藤野">[臨]藤野</option>
+            <option value="">その他</option>
           </select>
         </div>
 
@@ -102,66 +107,62 @@
     </div>
   </main>
 
-  <div class="ticker-wrap">
-    <div class="ticker">.</div>
-  </div>
+  <div class="ticker-wrap"><div class="ticker">.</div></div>
 
 <script>
-  // ランダム動画
-  const videos = ["video1.mp4","video2.mp4","video3.mp4","video5.mp4","V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4","V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
-  document.getElementById("randomVideo").src = videos[Math.floor(Math.random()*videos.length)];
+const videos = ["video1.mp4","video2.mp4","video3.mp4","video5.mp4","V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4","V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
+document.getElementById("randomVideo").src = videos[Math.floor(Math.random()*videos.length)];
 
-  function swapStations(){
-    const from = document.getElementById('fromSelect');
-    const to = document.getElementById('toSelect');
-    const tmpValue = from.value;
-    const tmpIndex = from.selectedIndex;
-    from.value = to.value; from.selectedIndex = to.selectedIndex;
-    to.value = tmpValue; to.selectedIndex = tmpIndex;
-  }
+function toggleForm(){
+  const formGrid = document.getElementById("formGrid");
+  formGrid.style.display = formGrid.style.display === "none" ? "flex" : "none";
+}
 
-  function toggleForm(){
-    const formGrid = document.getElementById("formGrid");
-    const h3 = document.querySelector("#formBox h3");
-    if(formGrid.style.display === "none"){
-      formGrid.style.display = "flex";
-      h3.textContent = "条件を入力 ▼";
-    } else {
-      formGrid.style.display = "none";
-      h3.textContent = "条件を入力 ▲";
-    }
-  }
+function swapStations(){
+  const from = document.getElementById('fromSelect');
+  const to = document.getElementById('toSelect');
+  const tmpValue = from.value;
+  const tmpIndex = from.selectedIndex;
+  from.value = to.value; from.selectedIndex = to.selectedIndex;
+  to.value = tmpValue; to.selectedIndex = tmpIndex;
+}
 
-  function loadTransit(){
-    const fromSelect = document.getElementById('fromSelect');
-    const fromCode = fromSelect.value;
-    const fromName = encodeURIComponent(fromSelect.options[fromSelect.selectedIndex].dataset.name);
+function loadTransit(){
+  const fromSelect = document.getElementById('fromSelect');
+  const toSelect = document.getElementById('toSelect');
+  const fromCode = fromSelect.value;
+  const toCode = toSelect.value;
 
-    const toSelect = document.getElementById('toSelect');
-    const toCode = toSelect.value;
-    const toName = encodeURIComponent(toSelect.options[toSelect.selectedIndex].dataset.name);
-
-    let date = document.getElementById("date").value;
-    let time = document.getElementById("time").value;
-    if(date) date = date.replace(/-/g,'');
-    if(time) time = time.replace(':','');
-
-    const searchType = document.getElementById('searchType').value;
-
-    const url = `https://transit.jre-maas.com/result?from=${fromCode}&to=${toCode}&fromName=${fromName}&toName=${toName}&searchType=${searchType}&realTime=true&date=${date}&time=${time}&isNow=true`;
-
-    document.getElementById('transitFrame').src = url;
-
-    // フォーム折りたたみ
+  // その他の場合はトップページに遷移
+  if(!fromCode || !toCode){
+    document.getElementById('transitFrame').src = "https://transit.jre-maas.com/";
     toggleForm();
+    return;
   }
 
-  // 初期値
-  window.addEventListener("load", ()=>{
-    const now = new Date();
-    document.getElementById("date").value = now.toISOString().slice(0,10);
-    document.getElementById("time").value = now.toTimeString().slice(0,5);
-  });
+  const fromName = encodeURIComponent(fromSelect.options[fromSelect.selectedIndex].dataset.name);
+  const toName = encodeURIComponent(toSelect.options[toSelect.selectedIndex].dataset.name);
+
+  let date = document.getElementById("date").value;
+  let time = document.getElementById("time").value;
+  if(date) date = date.replace(/-/g,'');
+  if(time) time = time.replace(':','');
+
+  const searchType = document.getElementById('searchType').value;
+
+  const url = `https://transit.jre-maas.com/result?from=${fromCode}&to=${toCode}&fromName=${fromName}&toName=${toName}&searchType=${searchType}&realTime=true&date=${date}&time=${time}&isNow=true`;
+
+  document.getElementById('transitFrame').src = url;
+
+  toggleForm(); // フォームを折りたたむ
+}
+
+// ページロード時に日付と時間をセット
+window.addEventListener("load", ()=>{
+  const now = new Date();
+  document.getElementById("date").value = now.toISOString().slice(0,10); // YYYY-MM-DD
+  document.getElementById("time").value = now.toTimeString().slice(0,5);   // HH:MM
+});
 </script>
 </body>
 </html>
