@@ -1,210 +1,241 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>[簡易]ポータルサイト - 乗換案内</title>
-  <link rel="shortcut icon" href="favicon4.png" type="image/png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[簡易]ポータルサイト - 乗換案内</title>
+<link rel="shortcut icon" href="favicon4.png" type="image/png">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    overflow: auto;
+  }
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      display: flex;
-      background-color: #f5f5f5;
-      min-height: 100vh;
-      overflow: auto;
-    }
+  /* 左ナビ固定 */
+  nav {
+    width: 230px;
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1000;
+  }
 
-   /* 左ナビ固定 */
-nav {
-  width: 230px;
-  background-color: #2c3e50;
-  color: white;
-  padding: 10px;
-  box-sizing: border-box;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  overflow-y: auto;
-  z-index: 1000;
-}
+  nav video {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
 
-nav video { width: 100%; border-radius: 8px; margin-bottom: 10px; }
-nav a {
-  display: block;
-  color: white;
-  text-decoration: none;
-  padding: 10px;
-  margin: 5px 0;
-  background-color: #34495e;
-  border-radius: 6px;
-  text-align: center;
-  transition: 0.3s;
-}
-nav a:hover { background-color: #1abc9c; }
+  nav a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #34495e;
+    border-radius: 6px;
+    text-align: center;
+    transition: 0.3s;
+  }
+  nav a:hover { background-color: #1abc9c; }
 
-  
+  main {
+    flex: 1;
+    padding: 30px;
+    margin-left: 260px;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
 
-    main {
-      flex: 1;
-      padding: 30px;
-      margin-left: 260px;
-      overflow-y: auto;
-      box-sizing: border-box;
-    }
+  header {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+    color: #2c3e50;
+  }
 
-    header {
-      font-size: 1.8em;
-      margin-bottom: 15px;
-      color: #2c3e50;
-    }
+  .iframe-container {
+    width: 100%;
+    height: calc(100vh - 220px);
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
 
-    .iframe-container {
-  width: 100%;
-  height: calc(100vh - 180px); /* ヘッダー・ボタンの高さを引く */
-  border-radius: 8px;
-  overflow: hidden;
-  background: white;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
 
-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
+  .form-box {
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom:20px;
+  }
 
+  .form-box h3 {
+    margin-top:0;
+    color:#2c3e50;
+    margin-bottom:15px;
+  }
 
-    button {
-      padding: 10px 20px;
-      font-size: 1em;
-      background-color: #1abc9c;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 20px;
-      transition: background-color 0.3s;
-    }
+  .form-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap:15px;
+    align-items: center;
+  }
 
-    button:hover {
-      background-color: #16a085;
-    }
+  .form-grid > div {
+    flex:1 1 200px;
+  }
 
-    .ticker-wrap {
-      width: 100%;
-      overflow: hidden;
-      background-color: #2c3e50;
-      color: white;
-      padding: 8px 0;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      z-index: 9999;
-    }
+  label {
+    display:block;
+    font-weight:bold;
+    margin-bottom:5px;
+  }
 
-    .ticker {
-      display: inline-block;
-      white-space: nowrap;
-      animation: tickerScroll 25s linear infinite;
-      padding-left: 100%;
-    }
+  select, input {
+    width:100%;
+    padding:8px;
+    border-radius:5px;
+    border:1px solid #ccc;
+    box-sizing:border-box;
+  }
 
-    @keyframes tickerScroll {
-      from { transform: translateX(0%); }
-      to { transform: translateX(-100%); }
-    }
+  button {
+    padding:10px 20px;
+    font-size:1em;
+    background-color:#1abc9c;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    transition:0.3s;
+  }
 
-    @media (max-width: 768px) {
-      nav {
-        position: relative;
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
+  button:hover {
+    background-color:#16a085;
+  }
 
-      nav video {
-        display: none;
-      }
+  .swap-button {
+    align-self: flex-end;
+    padding:8px 12px;
+    margin-top:24px;
+  }
 
-      nav a {
-        flex: 1 1 40%;
-        margin: 4px;
-        font-size: 0.9em;
-      }
+  .ticker-wrap {
+    width: 100%;
+    overflow: hidden;
+    background-color: #2c3e50;
+    color: white;
+    padding: 8px 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 9999;
+  }
 
-      main {
-        margin-left: 0;
-        padding: 15px;
-      }
+  .ticker {
+    display: inline-block;
+    white-space: nowrap;
+    animation: tickerScroll 25s linear infinite;
+    padding-left: 100%;
+  }
 
-      .iframe-container {
-        height: 65vh;
-      }
-    }
-  </style>
+  @keyframes tickerScroll {
+    from { transform: translateX(0%); }
+    to { transform: translateX(-100%); }
+  }
+
+  @media(max-width:768px){
+    main { margin-left:0; padding:15px; }
+    .form-grid { flex-direction: column; gap:10px; }
+    .swap-button { margin-top:0; align-self: flex-start; }
+    .iframe-container { height:60vh; }
+  }
+</style>
 </head>
 
 <body>
   <nav>
-    <nav>
-  <video id="randomVideo" autoplay loop muted playsinline style="width:60%; border-radius:5px; margin-bottom:10px;"></video>
-  <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
-  <a href="https://yuma873.github.io/blush-nimble/index.html" style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">ログアウト</a>
-</nav>
-    </a>
+    <video id="randomVideo" autoplay loop muted playsinline></video>
+    <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
+    <a href="https://yuma873.github.io/blush-nimble/index.html" style="background-color:#f44336;font-weight:bold;">ログアウト</a>
   </nav>
 
   <main>
-    <header>乗換情報</header>
+    <header>乗換検索</header>
 
-    <!-- ===== 乗換検索フォーム ===== -->
-    <div style="background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);margin-bottom:20px;">
-      <h3 style="margin-top:0;color:#2c3e50;">条件を入力</h3>
+    <div class="form-box">
+      <h3>条件を入力</h3>
 
-      <label>出発地:</label>
-      <select id="fromSelect" style="width:180px;margin-right:10px;">
-                <option value="23234" data-name="茅ケ崎">茅ケ崎</option>
-        <option value="23298" data-name="平塚">平塚</option>
-                <option value="23072" data-name="伊勢原">伊勢原</option>
+      <div class="form-grid">
+        <div>
+          <label>出発地</label>
+          <select id="fromSelect">
+            <option value="23234" data-name="茅ケ崎">茅ケ崎</option>
+            <option value="23298" data-name="平塚">平塚</option>
+            <option value="23072" data-name="伊勢原">伊勢原</option>
+            <option value="23122" data-name="上溝">さがみはらグリーンプール</option>
+            <option value="29631" data-name="北山田(神奈川県)">横浜国際プール</option>
+            <option value="100940" data-name="共済病院前総合公園西">平塚総合公園温水プール</option>
+          </select>
+        </div>
 
-        <option value="23122" data-name="上溝">さがみはらグリーンプール</option>
-        <option value="29631" data-name="北山田(神奈川県)">横浜国際プール</option>
-                <option value="100940" data-name="共済病院前総合公園西">平塚総合公園温水プール</option>
+        <div>
+          <label>到着地</label>
+          <select id="toSelect">
+            <option value="23298" data-name="平塚">平塚</option>
+            <option value="23234" data-name="茅ケ崎">茅ケ崎</option>
+            <option value="23072" data-name="伊勢原">伊勢原</option>
+                        <option value="23122" data-name="上溝">さがみはらグリーンプール</option>
+            <option value="29631" data-name="北山田(神奈川県)">横浜国際プール</option>
+            <option value="100940" data-name="共済病院前総合公園西">平塚総合公園温水プール</option>
+          </select>
+        </div>
 
-      </select>
+        <div>
+          <button class="swap-button" onclick="swapStations()">⇄ 入れ替え</button>
+        </div>
 
-      <label>到着地:</label>
-      <select id="toSelect" style="width:180px;">
-        <option value="23298" data-name="平塚">平塚</option>
-        <option value="23234" data-name="茅ケ崎">茅ケ崎</option>
-        <option value="23072" data-name="伊勢原">伊勢原</option>
-                <option value="29631" data-name="北山田(神奈川県)">横浜国際プール</option>
-                <option value="23122" data-name="上溝">さがみはらグリーンプール</option>
-                <option value="100940" data-name="共済病院前総合公園西">平塚総合公園温水プール</option>
+        <div>
+          <label>日付 (YYYYMMDD)</label>
+          <input type="text" id="date">
+        </div>
 
+        <div>
+          <label>時間 (HHMM)</label>
+          <input type="text" id="time">
+        </div>
 
-      </select>
+        <div>
+          <label>検索タイプ</label>
+          <select id="searchType">
+            <option value="departure">出発</option>
+            <option value="arrival">到着</option>
+          </select>
+        </div>
 
-      <br><br>
-
-      <label>日付 (YYYYMMDD):</label>
-      <input type="text" id="date" value="20251208" style="width:120px;margin-right:10px;">
-
-      <label>時間 (HHMM):</label>
-      <input type="text" id="time" value="1725" style="width:80px;"><br><br>
-
-      <label>検索タイプ:</label>
-      <select id="searchType" style="width:120px;">
-        <option value="departure">出発</option>
-        <option value="arrival">到着</option>
-      </select>
-
-      <button onclick="loadTransit()" style="margin-left:20px;">検索する</button>
+        <div>
+          <label>&nbsp;</label>
+          <button onclick="loadTransit()">検索する</button>
+        </div>
+      </div>
     </div>
 
     <div class="iframe-container">
@@ -226,7 +257,16 @@ iframe {
     const randomIndex = Math.floor(Math.random() * videos.length);
     document.getElementById("randomVideo").src = videos[randomIndex];
 
-    function loadTransit() {
+    function swapStations(){
+      const from = document.getElementById('fromSelect');
+      const to = document.getElementById('toSelect');
+      const tmpValue = from.value;
+      const tmpIndex = from.selectedIndex;
+      from.value = to.value; from.selectedIndex = to.selectedIndex;
+      to.value = tmpValue; to.selectedIndex = tmpIndex;
+    }
+
+    function loadTransit(){
       const fromSelect = document.getElementById('fromSelect');
       const fromCode = fromSelect.value;
       const fromName = encodeURIComponent(fromSelect.options[fromSelect.selectedIndex].dataset.name);
@@ -246,21 +286,17 @@ iframe {
 
       document.getElementById('transitFrame').src = url;
     }
+
     window.addEventListener("load", () => {
-    const now = new Date();
-
-    const yyyy = now.getFullYear();
-    const mm = ("0" + (now.getMonth() + 1)).slice(-2);
-    const dd = ("0" + now.getDate()).slice(-2);
-
-    const hh = ("0" + now.getHours()).slice(-2);
-    const mi = ("0" + now.getMinutes()).slice(-2);
-
-    document.getElementById("date").value = `${yyyy}${mm}${dd}`;
-    document.getElementById("time").value = `${hh}${mi}`;
-  });
-
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = ("0" + (now.getMonth() + 1)).slice(-2);
+      const dd = ("0" + now.getDate()).slice(-2);
+      const hh = ("0" + now.getHours()).slice(-2);
+      const mi = ("0" + now.getMinutes()).slice(-2);
+      document.getElementById("date").value = `${yyyy}${mm}${dd}`;
+      document.getElementById("time").value = `${hh}${mi}`;
+    });
   </script>
-
 </body>
 </html>
