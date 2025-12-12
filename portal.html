@@ -881,58 +881,49 @@ loadKanagawaRSS();
         }
       }
     </script>
-   <script>
-// 効果音
-const notifySound = new Audio("notify.mp3");
-notifySound.volume = 1.0;
-
-// 初回クリックで音声を解放
-window.addEventListener("click", () => {
-  notifySound.play().then(() => {
-    notifySound.pause();
-    notifySound.currentTime = 0;
-  }).catch(() => {});
-}, { once: true });
-
-// 通知許可をリクエスト
-function requestNotificationPermission() {
-  if (Notification.permission === "default") {
-    Notification.requestPermission().then(permission => {
-      if (permission === "granted") {
-        startNotificationLoop();
-      }
-    });
-  } else if (Notification.permission === "granted") {
-    startNotificationLoop();
-  } else {
-    console.log("通知が拒否されています");
+    <script>
+  // 通知許可をリクエスト
+  function requestNotificationPermission() {
+    if (Notification.permission === "default") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          startNotificationLoop();
+        }
+      });
+    } else if (Notification.permission === "granted") {
+      startNotificationLoop();
+    } else {
+      console.log("通知が拒否されています");
+    }
   }
-}
 
-// ループ
-function startNotificationLoop() {
-  showNotification();
-  setInterval(showNotification, 100000);
-}
+  // 1分ごとに通知
+  function startNotificationLoop() {
+    showNotification(); // 最初に1回表示
+    setInterval(showNotification, 100000); // 60000ms = 1分ごと
+  }
 
-// 通知＋音
-function showNotification() {
-  new Notification("ログイン中です", {
-    body: "使用後はログアウトしてください",
-    icon: "favicon.png"
-  });
+  // 通知を表示
+  function showNotification() {
+    new Notification("ログイン中です", {
+      body: "使用後はログアウトしてください",
+      icon: "favicon.png"
+    });
+  }
 
-  // 🔔 効果音
-  notifySound.currentTime = 0;
-  notifySound.play().catch(err => {
-    console.log("音声自動再生がブロック", err);
-  });
-}
-
-// ページロードで許可確認
-window.addEventListener("load", requestNotificationPermission);
+  // ページロード時に通知許可をリクエスト
+  window.addEventListener("load", requestNotificationPermission);
 </script>
-
+<script>
+  function toggleSection() {
+    const content = document.getElementById("toggleContent");
+    if (content.style.display === "none") {
+      content.style.display = "block";   // ← 開く
+    } else {
+      content.style.display = "none";    // ← 閉じる
+    }
+  }
+</script>
   
 <!-- ポップアップ（自動ログアウト用） -->
 <div id="popup" class="popup">
