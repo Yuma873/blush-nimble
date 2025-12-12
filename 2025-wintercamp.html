@@ -1,4 +1,4 @@
-J<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -287,4 +287,22 @@ J<!DOCTYPE html>
 </footer>
 
 </body>
+  <script>
+  (function () {
+    const PASSWORD = "swim2025";   // ← パスワード
+    const KEY = "swim_camp_auth";
+
+    if (localStorage.getItem(KEY) !== "ok") {
+      const input = prompt("このページはパスワードで保護されています。\nパスワードを入力してください。");
+
+      if (input === PASSWORD) {
+        localStorage.setItem(KEY, "ok");
+      } else {
+        alert("パスワードが正しくありません。");
+        document.body.innerHTML = "";
+      }
+    }
+  })();
+</script>
+
 </html>
