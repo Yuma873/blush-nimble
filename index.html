@@ -128,10 +128,10 @@ const users = [
 
 
 //---------------------------------
-//   ログインロック関連（2分）
+//   ログインロック（2分）
 //---------------------------------
 const loginLimit = 3;
-const lockDuration = 2 * 60 * 1000; // ★2分ロックに変更済★
+const lockDuration = 2 * 60 * 1000;
 
 function checkLockState() {
   const lockTime = localStorage.getItem("lockTime");
@@ -246,6 +246,10 @@ function handleLogin() {
 
   setTimeout(() => {
     loading.style.display = "none";
+
+    // 🔔 ログイン成功時に通知＋音
+    showNotification();
+
     window.location.href = user.link;
   }, 3000);
 }
@@ -273,6 +277,49 @@ window.addEventListener("load", () => {
 document.addEventListener("keydown", (e) => {
   if (e.key === "Enter") handleLogin();
 });
+</script>
+
+
+<!-- 🔔 通知 + 効果音 -->
+<script>
+// 効果音
+const notifySound = new Audio("notify.mp3");
+notifySound.volume = 1.0;
+
+// 初回クリックで音声を解放
+window.addEventListener("click", () => {
+  notifySound.play().then(() => {
+    notifySound.pause();
+    notifySound.currentTime = 0;
+  }).catch(() => {});
+}, { once: true });
+
+// 通知の許可
+window.addEventListener("load", () => {
+  if (Notification.permission === "default") {
+    Notification.requestPermission();
+  }
+});
+
+// 通知 + 音
+function showNotification() {
+  if (Notification.permission === "granted") {
+    new Notification("通知が有効です", {
+      body: "reCAPTCHAが有効化しました",
+      icon: "favicon.png"
+    });
+  }
+
+  notifySound.currentTime = 0;
+  notifySound.play().catch(err => {
+    console.log("音声の自動再生がブロックされました", err);
+  });
+}
+  // 🔁 60秒ごとに通知をループ
+setInterval(() => {
+    showNotification();
+}, 60000); // 60,000ミリ秒 = 60秒
+
 </script>
 
 </body>
