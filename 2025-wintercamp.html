@@ -130,6 +130,7 @@ footer {
 <div class="card notice">
 <h2>更新情報</h2>
 <p>※12/15 19:30 更新（変更箇所あり）</p>
+  
 </div>
 
 <div class="card">
@@ -172,7 +173,13 @@ footer {
 <div class="card">
 <h2>合宿詳細</h2>
 <table>
+  
 <tr><th>実施日</th><td>2025年12月24日（水）〜26日（金）〈2泊3日〉</td></tr>
+  <tr>
+  <th>集合まで</th>
+  <td><p id="countdown"></p></td>
+</tr>
+
 <tr>
 <th>場所</th>
 <td>
@@ -182,6 +189,13 @@ footer {
 <a href="https://www.google.com/maps/search/?api=1&query=桐花園" target="_blank">Googleマップで開く</a>
 </td>
 </tr>
+  <tr>
+  <th>天気（藤野）</th>
+  <td>
+    <a href="https://tenki.jp/forecast/3/16/4310/14213/" target="_blank">tenki.jpで確認</a>
+  </td>
+</tr>
+
 <tr><th>引率</th><td>栁澤 渉</td></tr>
 <tr><th>参加生徒</th><td>計18名（1年3名 / 2年5名 / 3年2名 / 4年5名 / 5年3名）</td></tr>
 </table>
@@ -215,7 +229,7 @@ footer {
 <li><label><input type="checkbox" data-id="17"> 雨具</label></li>
 <li><label><input type="checkbox" data-id="18"> 冬休みの課題・勉強道具</label></li>
 <li><label><input type="checkbox" data-id="19"> モバイルバッテリー・充電器</label></li>
-  <li><label><imput type="checkbox" data-id="20">予備のゴーグル、水着、パドルのゴム等</label></li>
+  <li><label><input type="checkbox" data-id="20">予備のゴーグル、水着、パドルのゴム等</label></li>
 </ul>
 </div>
 
@@ -345,6 +359,30 @@ setInterval(applyToday,60000);
   location.href="https://yuma873.github.io/blush-nimble/2025-wintercamp.html";
  }
 })();
+  function updateCountdown() {
+  const countdownEl = document.getElementById('countdown');
+  // 集合日時を指定
+  const eventDate = new Date('2025-12-24T17:15:00');
+  const now = new Date();
+  let diff = eventDate - now;
+
+  if(diff <= 0) {
+    countdownEl.textContent = "集合時間です！";
+    return;
+  }
+
+  const days = Math.floor(diff / (1000*60*60*24));
+  diff -= days * (1000*60*60*24);
+  const hours = Math.floor(diff / (1000*60*60));
+  diff -= hours * (1000*60*60);
+  const minutes = Math.floor(diff / (1000*60));
+
+  countdownEl.textContent = `あと ${days}日 ${hours}時間 ${minutes}分`;
+}
+
+setInterval(updateCountdown, 60000);
+updateCountdown();
+
 </script>
 
 </body>
