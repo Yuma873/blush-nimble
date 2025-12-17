@@ -1,293 +1,242 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2025年度 水泳部 冬季合宿</title>
-  <link rel="icon" href="favicon.png" type="image/png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2025年度 水泳部 冬季合宿</title>
+<link rel="icon" href="favicon.png">
 
-  <style>
-    :root {
-      --main-color: #003c8f;
-      --accent-bg: #f4f6fa;
-      --card-bg: #ffffff;
-      --border: #d0d5dd;
-      --text: #333;
-    }
+<style>
+:root {
+  --main-color: #003c8f;
+  --accent-bg: #f4f6fa;
+  --card-bg: #ffffff;
+  --border: #d0d5dd;
+  --text: #333;
+}
 
-    body {
-      margin: 0;
-      font-family: "Yu Gothic", "Hiragino Sans", sans-serif;
-      background: var(--accent-bg);
-      color: var(--text);
-      line-height: 1.9;
-    }
+body {
+  margin: 0;
+  font-family: "Yu Gothic", "Hiragino Sans", sans-serif;
+  background: var(--accent-bg);
+  color: var(--text);
+  line-height: 1.9;
+}
 
-    header {
-      background: var(--main-color);
-      color: white;
-      padding: 1.8rem 1rem;
-      text-align: center;
-    }
+header {
+  background: var(--main-color);
+  color: white;
+  padding: 1.8rem 1rem;
+  text-align: center;
+}
 
-    header h1 {
-      margin: 0;
-      font-size: 1.9rem;
-      font-weight: 600;
-    }
+header h1 {
+  margin: 0;
+  font-size: 1.9rem;
+}
 
-    .container {
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
 
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1.5rem 1.7rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    }
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
 
-    h2 {
-      border-left: 6px solid var(--main-color);
-      padding-left: 0.6rem;
-      margin-top: 0;
-      margin-bottom: 1rem;
-      font-size: 1.35rem;
-      font-weight: 600;
-      color: var(--main-color);
-    }
+.notice {
+  background: #fff6e5;
+  border-left: 6px solid #f5a623;
+}
 
-    h3 {
-      margin-top: 1.5rem;
-      font-size: 1.15rem;
-      color: #444;
-    }
+h2 {
+  border-left: 6px solid var(--main-color);
+  padding-left: 0.6rem;
+  margin: 0 0 1rem 0;
+  font-size: 1.35rem;
+  color: var(--main-color);
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
+h3 {
+  margin-top: 1.3rem;
+  font-size: 1.15rem;
+}
 
-    table th, table td {
-      border: 1px solid var(--border);
-      padding: 0.7rem;
-    }
+.schedule-time {
+  font-weight: 600;
+  color: var(--main-color);
+}
 
-    table th {
-      background: #eef1f5;
-      width: 30%;
-      font-weight: 600;
-    }
+ul {
+  padding-left: 1.3rem;
+}
 
-    ul {
-      padding-left: 1.3rem;
-      margin: 0.6rem 0 0 0;
-    }
+li {
+  margin-bottom: 0.5rem;
+}
 
-    li {
-      margin-bottom: 0.5rem;
-    }
+input[type="checkbox"] {
+  transform: scale(1.2);
+  margin-right: 0.5rem;
+}
 
-    footer {
-      background: #e8e8e8;
-      text-align: center;
-      padding: 1.3rem;
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #444;
-    }
+.controls button {
+  padding: 0.4rem 0.8rem;
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
 
-    #checklist label {
-      cursor: pointer;
-    }
-
-    input[type="checkbox"] {
-      transform: scale(1.2);
-      margin-right: 0.5rem;
-    }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.6rem;
-      }
-      .card {
-        padding: 1.2rem;
-      }
-      table th {
-        width: 40%;
-      }
-    }
-  </style>
+footer {
+  background: #e8e8e8;
+  text-align: center;
+  padding: 1.3rem;
+  font-size: 0.9rem;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <h1>2025年度 水泳部 冬季合宿</h1>
+<h1>2025年度 水泳部 冬季合宿</h1>
 </header>
 
 <div class="container">
 
-  <div class="card">
-    <h2>合宿概要</h2>
-    <p>2025年度水泳部冬季合宿の概要です。変更した箇所がありますので、必ずご確認ください。</p>
-    <p>※12/15 19:30 更新</p>
-  </div>
+<div class="card notice">
+<h2>更新情報</h2>
+<p>※12/15 19:30 更新</p>
+</div>
 
-  <div class="card">
-    <h2>プレメニュー実施について</h2>
-    <ul>
-      <li>日時：2025/12/14 9:00〜11:30</li>
-      <li>場所：伊勢原スイミングクラブ</li>
-      <li>詳細は Classroom にて案内します。</li>
-    </ul>
-  </div>
+<div class="card">
+<h2>持ち物チェックリスト</h2>
+<p id="progress"></p>
 
-  <div class="card">
-    <h2>合宿の目的</h2>
-    <ul>
-      <li>競技に集中できる環境で、体力・技術・精神面の向上を図る。</li>
-      <li>集団生活を通し、役割理解とチームワークを高める。</li>
-      <li>食事・休養を重視し、競技力向上に必要な生活リズムを習得する。</li>
-    </ul>
-  </div>
+<div class="controls">
+<button onclick="checkAll()">全てチェック</button>
+<button onclick="resetAll()">リセット</button>
+</div>
 
-  <div class="card">
-    <h2>合宿中の留意事項</h2>
-    <ul>
-      <li>時間厳守を徹底し、チームの規律を守ること。</li>
-      <li>体調管理・十分な睡眠・栄養補給を意識すること。</li>
-      <li>学校生活に不要な物は持ち込まないこと。</li>
-      <li>施設利用者へ配慮し、騒がないこと。</li>
-      <li>休憩時間は次の練習のための体力回復を優先すること。</li>
-      <li>限界に挑む姿勢を持ちつつ、怪我・体調悪化を避けること。</li>
-      <li>欠席・遅刻は学校携帯（070-4382-2331）または JOIN で連絡。</li>
-      <li>緊急時は保護者が迎えに来るため、事前に依頼しておくこと。</li>
-    </ul>
-  </div>
+<ul id="checklist">
+<li><label><input type="checkbox" data-id="1"> 水泳用具一式（練習用・レース用水着、キャップ、セーム、タオル）</label></li>
+<li><label><input type="checkbox" data-id="2"> プルブイ</label></li>
+<li><label><input type="checkbox" data-id="3"> パドル</label></li>
+<li><label><input type="checkbox" data-id="4"> フィン</label></li>
+<li><label><input type="checkbox" data-id="5"> サンダル</label></li>
+<li><label><input type="checkbox" data-id="6"> 運動靴（希望者）</label></li>
+<li><label><input type="checkbox" data-id="7"> 着替え・下着</label></li>
+<li><label><input type="checkbox" data-id="8"> 防寒具</label></li>
+<li><label><input type="checkbox" data-id="9"> 保険証のコピー</label></li>
+<li><label><input type="checkbox" data-id="10"> 洗面用具</label></li>
+<li><label><input type="checkbox" data-id="11"> 常備薬</label></li>
+<li><label><input type="checkbox" data-id="12"> 筆記用具</label></li>
+<li><label><input type="checkbox" data-id="13"> しおり</label></li>
+<li><label><input type="checkbox" data-id="14"> 栄養補給食</label></li>
+<li><label><input type="checkbox" data-id="15"> 体温計</label></li>
+<li><label><input type="checkbox" data-id="16"> マスク</label></li>
+<li><label><input type="checkbox" data-id="17"> 雨具</label></li>
+<li><label><input type="checkbox" data-id="18"> 冬休みの課題・勉強道具</label></li>
+<li><label><input type="checkbox" data-id="19"> モバイルバッテリー・充電器</label></li>
+</ul>
+</div>
 
-  <div class="card">
-    <h2>合宿詳細</h2>
-    <table>
-      <tr><th>実施日</th><td>2025年12月24日（水）〜26日（金）〈2泊3日〉</td></tr>
-      <tr>
-        <th>場所</th>
-        <td>桐花園<br>〒252-0181 神奈川県相模原市緑区佐野川1822<br>電話：042-687-2239</td>
-      </tr>
-      <tr><th>引率</th><td>栁澤 渉</td></tr>
-      <tr><th>参加生徒</th><td>計18名（1年3名 / 2年5名 / 3年2名 / 4年5名 / 5年3名）</td></tr>
-    </table>
-  </div>
+<div class="card">
+<h2>合宿スケジュール（2024年度参考）</h2>
 
-  <div class="card">
-    <h2>持ち物チェックリスト</h2>
-    <ul id="checklist">
-      <li><label><input type="checkbox" data-id="item1"> 水泳用具一式（練習用・レース用水着、シリコン・メッシュキャップ、セーム、タオル）</label></li>
-      <li><label><input type="checkbox" data-id="item2"> プルブイ</label></li>
-      <li><label><input type="checkbox" data-id="item3"> パドル</label></li>
-      <li><label><input type="checkbox" data-id="item4"> フィン</label></li>
-      <li><label><input type="checkbox" data-id="item5"> サンダル</label></li>
-      <li><label><input type="checkbox" data-id="item6"> 運動靴(希望者のみ)</label></li>
-      <li><label><input type="checkbox" data-id="item7"> 着替え・下着</label></li>
-      <li><label><input type="checkbox" data-id="item8"> 防寒具</label></li>
-      <li><label><input type="checkbox" data-id="item9"> 保険証のコピー</label></li>
-      <li><label><input type="checkbox" data-id="item10"> 洗面用具</label></li>
-      <li><label><input type="checkbox" data-id="item11"> 常備薬</label></li>
-      <li><label><input type="checkbox" data-id="item12"> 筆記用具</label></li>
-      <li><label><input type="checkbox" data-id="item13"> しおり</label></li>
-      <li><label><input type="checkbox" data-id="item14"> 栄養補給食</label></li>
-      <li><label><input type="checkbox" data-id="item15"> 体温計</label></li>
-      <li><label><input type="checkbox" data-id="item16"> マスク</label></li>
-      <li><label><input type="checkbox" data-id="item17"> 雨具</label></li>
-      <li><label><input type="checkbox" data-id="item18"> 冬休みの課題・勉強道具</label></li>
-      <li><label><input type="checkbox" data-id="item19"> モバイルバッテリー・充電器</label></li>
-    </ul>
+<h3>【1日目】12/24（火）</h3>
+<ul>
+<li><span class="schedule-time">17:15</span> 橋本集合 → <span class="schedule-time">17:26</span> 出発</li>
+<li><span class="schedule-time">17:37</span> 八王子着 → <span class="schedule-time">17:49</span> 発</li>
+<li><span class="schedule-time">18:11</span> 藤野着 → バス移動</li>
+<li><span class="schedule-time">18:30</span> 桐花園着・部屋確認</li>
+<li><span class="schedule-time">19:00〜19:50</span> プール練習①</li>
+<li><span class="schedule-time">20:00〜21:00</span> 夕食、MTG</li>
+<li><span class="schedule-time">21:00〜22:00</span> 入浴</li>
+<li><span class="schedule-time">22:30</span> 就寝</li>
+</ul>
 
-    <script>
-      document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
-        const id = cb.getAttribute("data-id");
-        const saved = localStorage.getItem(id);
-        if (saved === "true") cb.checked = true;
+<h3>【2日目】12/25（水）</h3>
+<ul>
+<li><span class="schedule-time">6:15</span> 起床</li>
+<li><span class="schedule-time">6:45〜8:15</span> プール練習②</li>
+<li><span class="schedule-time">8:30〜9:30</span> 朝食</li>
+<li><span class="schedule-time">11:00〜12:30</span> プール練習③</li>
+<li><span class="schedule-time">13:00〜14:00</span> 昼食</li>
+<li><span class="schedule-time">15:30〜17:00</span> プール練習④</li>
+<li><span class="schedule-time">17:30〜19:00</span> 夕食</li>
+<li><span class="schedule-time">21:00〜22:00</span> 入浴</li>
+<li><span class="schedule-time">22:30</span> 就寝</li>
+</ul>
 
-        cb.addEventListener("change", () => {
-          localStorage.setItem(id, cb.checked);
-        });
-      });
-    </script>
-  </div>
-
-  <div class="card">
-    <h2>合宿スケジュール（2024年度参考）</h2>
-
-    <h3>【1日目】12/24（火）</h3>
-    <ul>
-      <li>17:15　橋本集合 → 17:26 出発</li>
-      <li>17:37　八王子着 → 17:49 発</li>
-      <li>18:11　藤野着 → バス移動</li>
-      <li>18:30　桐花園着・部屋確認</li>
-      <li>19:00〜19:50　プール練習①</li>
-      <li>20:00〜21:00　夕食、MTG</li>
-      <li>21:00~22:00　入浴</li>
-      <li>22:30　就寝</li>
-    </ul>
-
-    <h3>【2日目】12/25（水）</h3>
-    <ul>
-      <li>6:15　起床</li>
-      <li>6:45〜8:15　プール練習②</li>
-      <li>8:30~9:30　朝食</li>
-      <li>11:00〜12:30　プール練習③</li>
-      <li>13:00〜14:00　昼食</li>
-      <li>15:30〜17:00　プール練習④</li>
-      <li>17:30~19:00　夕食</li>
-      <li>21:00~22:00　入浴</li>
-      <li>22:30　就寝</li>
-    </ul>
-
-    <h3>【3日目】12/26（木）</h3>
-    <ul>
-      <li>6:00　起床</li>
-      <li>6:30~7:30　朝食</li>
-      <li>8:30〜10:00　プール練習⑤（タイムトライアル）</li>
-      <li>11:00　チェックアウト → 藤野駅へ</li>
-      <li>11:27　藤野発 → 高尾 → 八王子解散</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <h2>緊急連絡先</h2>
-    <table>
-      <tr><th>学校携帯</th><td>070-4382-2331</td></tr>
-      <tr>
-        <th>病院</th>
-        <td>相模原赤十字病院<br>〒252-0181 神奈川県相模原市緑区小渕1656-1<br>電話：042-687-2229</td>
-      </tr>
-    </table>
-  </div>
+<h3>【3日目】12/26（木）</h3>
+<ul>
+<li><span class="schedule-time">6:00</span> 起床</li>
+<li><span class="schedule-time">6:30〜7:30</span> 朝食</li>
+<li><span class="schedule-time">8:30〜10:00</span> プール練習⑤（タイムトライアル）</li>
+<li><span class="schedule-time">11:00</span> チェックアウト → 藤野駅へ</li>
+<li><span class="schedule-time">11:27</span> 藤野発 → 高尾 → 八王子解散</li>
+</ul>
+</div>
 
 </div>
 
 <footer>
-  自修館中等教育学校 水泳部｜〒259-1185 神奈川県伊勢原市見附島411｜Tel 0463-97-2100
+自修館中等教育学校 水泳部
 </footer>
 
 <script>
+const boxes = document.querySelectorAll('#checklist input');
+const progress = document.getElementById('progress');
+
+function updateProgress() {
+  const checked = [...boxes].filter(b => b.checked).length;
+  progress.textContent = `持ち物チェック：${checked} / ${boxes.length}`;
+  boxes.forEach(b => localStorage.setItem(b.dataset.id, b.checked));
+}
+
+boxes.forEach(b => {
+  if (localStorage.getItem(b.dataset.id) === "true") b.checked = true;
+  b.addEventListener("change", updateProgress);
+});
+updateProgress();
+
+function checkAll() {
+  boxes.forEach(b => b.checked = true);
+  updateProgress();
+}
+
+function resetAll() {
+  if (!confirm("全てリセットしますか？")) return;
+  boxes.forEach(b => {
+    b.checked = false;
+    localStorage.removeItem(b.dataset.id);
+  });
+  updateProgress();
+}
+</script>
+
+<script>
+/* 日付パスワード（YYYYMMDD） */
 (function () {
-  const PASSWORD = "swim2025";
-  const REDIRECT_URL = "https://yuma873.github.io/blush-nimble/toppage.html";
+  const d = new Date();
+  const password =
+    d.getFullYear().toString() +
+    String(d.getMonth() + 1).padStart(2, "0") +
+    String(d.getDate()).padStart(2, "0");
 
   const input = prompt(
-    "このページはパスワードで保護されています。\nパスワードを入力してください。"
+    "このページはパスワードで保護されています。パスワードを入力してください。"
   );
 
-  if (input !== PASSWORD) {
-    alert("パスワードが正しくありません。トップページに戻ります。");
-    location.href = REDIRECT_URL;
+  if (input !== password) {
+    alert("パスワードが正しくありません。");
+    location.href = "https://yuma873.github.io/blush-nimble/toppage.html";
   }
 })();
 </script>
