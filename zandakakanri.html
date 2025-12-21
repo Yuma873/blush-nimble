@@ -1,281 +1,314 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>交通系ICカード管理</title>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交通系ICカード管理</title>
 
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: #f4f4f9;
-      }
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f9;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+input, button {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  font-size: 16px;
+}
+button {
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+button.delete { background: #e74c3c; }
+button.edit { background: #3498db; }
+.small-btn {
+  width: auto;
+  padding: 5px 10px;
+  margin-right: 5px;
+}
+li {
+  background: #f0f0f0;
+  margin: 6px 0;
+  padding: 10px;
+  border-radius: 4px;
+}
+hr { margin: 20px 0; }
+</style>
+</head>
 
-      .container {
-        width: 60%;
-        margin: 0 auto;
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      }
+<body>
+<div class="container">
+<h1>交通系ICカード管理</h1>
 
-      h1,
-      h2,
-      h3 {
-        color: #333;
-      }
+<h2>残高管理</h2>
+<input type="number" id="balanceInput" placeholder="残高">
+<button id="saveBalance">残高保存</button>
 
-      input[type="number"],
-      input[type="text"],
-      input[type="date"] {
-        padding: 8px;
-        margin: 6px 0;
-        width: calc(100% - 20px);
-        font-size: 16px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-      }
+<input type="number" id="chargeAmount" placeholder="チャージ額">
+<button id="chargeBalance">チャージ</button>
+<button id="resetBalance" class="delete">残高リセット</button>
 
-      button {
-        padding: 10px 15px;
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        margin: 5px 3px;
-      }
+<h3>現在の残高：¥<span id="balanceDisplay">0</span></h3>
 
-      button:hover {
-        background-color: #45a049;
-      }
+<hr>
 
-      button.delete {
-        background-color: #e74c3c;
-      }
+<h2>使用履歴入力</h2>
+<input type="date" id="date">
+<input type="text" id="departure" placeholder="出発駅">
+<input type="text" id="arrival" placeholder="到着駅">
+<input type="text" id="route" placeholder="路線名（自動／手動可）">
+<input type="text" id="company" placeholder="会社名（自動／手動可）">
+<input type="number" id="fare" placeholder="運賃（自動／手動可）">
 
-      button.delete:hover {
-        background-color: #c0392b;
-      }
+<button id="saveHistory">保存</button>
 
-      ul {
-        list-style-type: none;
-        padding: 0;
-      }
+<hr>
 
-      li {
-        padding: 10px;
-        margin: 5px 0;
-        background-color: #f0f0f0;
-        border-radius: 4px;
-      }
+<h2>使用履歴</h2>
+<ul id="historyList"></ul>
 
-      hr {
-        margin: 20px 0;
-      }
-    </style>
-  </head>
+<hr>
 
-  <body>
-    <div class="container">
-      <h1>交通系ICカード管理</h1>
+<h2>CSV操作</h2>
+<button id="exportCSV">CSVエクスポート</button>
+<input type="file" id="importCSV" accept=".csv">
 
-      <!-- 残高 -->
-      <h2>現在の残高</h2>
-      <input type="number" id="balance" placeholder="残高を入力" min="0" />
-      <button id="saveBalance">残高保存</button>
-      <br />
-      <input type="number" id="chargeAmount" placeholder="チャージ額" min="0" />
-      <button id="chargeBalance">チャージ</button>
-      <button id="resetBalance" class="delete">残高リセット</button>
+</div>
 
-      <h3>現在の残高：¥<span id="balanceDisplay">0</span></h3>
+<script>
+/* ===== 区間データ（これまで出た分すべて） ===== */
+const routeData = {
+  "茅ケ崎⇔横浜": {
+    fare: 506,
+    route: "東海道線",
+    company: "JR東日本"
+  },
+  "茅ケ崎⇔上溝": {
+    fare: 506,
+    route: "東海道線-相模線",
+    company: "JR東日本"
+  },
+  "茅ケ崎⇔関内": {
+    fare: 594,
+    route: "東海道線-根岸線",
+    company: "JR東日本"
+  },
+  "茅ケ崎⇔厚木": {
+    fare: 242,
+    route: "相模線",
+    company: "JR東日本"
+  },
+  "茅ケ崎⇔橋本": {
+    fare: 594,
+    route: "相模線-横浜線",
+    company: "JR東日本"
+  },
+  "橋本⇔八王子": {
+    fare: 178,
+    route: "横浜線",
+    company: "JR東日本"
+  },
+  "八王子⇔藤野": {
+    fare: 330,
+    route: "中央本線",
+    company: "JR東日本"
+  },
+  "厚木⇔伊勢原": {
+    fare: 199,
+    route: "小田急小田原線",
+    company: "小田急電鉄"
+  },
+  "茅ケ崎⇔日本大通り": {
+    fare: 730,
+    route: "東海道線-根岸線-みなとみらい線",
+    company: "JR東日本-横浜高速鉄道"
+  },
+  "横浜⇔北山田": {
+    fare: 335,
+    route: "横浜市営地下鉄ブルーライン-グリーンライン",
+    company: "横浜市交通局"
+  },
+  "横浜⇔日吉": {
+    fare: 227,
+    route: "東海道線-東急東横線",
+    company: "JR東日本-東急"
+  },
+  "日吉⇔北山田": {
+    fare: 242,
+    route: "横浜市営地下鉄グリーンライン",
+    company: "横浜市交通局"
+  },
+  "茅ケ崎⇔共済病院前総合公園西": {
+    fare: 210,
+    route: "神奈中バス",
+    company: "神奈川中央交通"
+  }
+};
 
-      <hr />
+let editIndex = null;
 
-      <!-- 履歴入力 -->
-      <h2>使用履歴の追加</h2>
-      <input type="date" id="transactionDate" />
-      <input type="text" id="departureStation" placeholder="出発駅" />
-      <input type="text" id="arrivalStation" placeholder="到着駅" />
-      <input type="text" id="routeName" placeholder="路線名" />
-      <input type="text" id="railCompany" placeholder="会社" />
-      <input type="number" id="fare" placeholder="運賃（自動）" readonly />
-      <button id="saveTransaction">履歴追加</button>
+/* ===== 保存・読込 ===== */
+function saveData(balance, history) {
+  localStorage.setItem("balance", balance);
+  localStorage.setItem("history", JSON.stringify(history));
+}
 
-      <hr />
+function loadData() {
+  const balance = localStorage.getItem("balance") || 0;
+  const history = JSON.parse(localStorage.getItem("history")) || [];
+  balanceDisplay.textContent = balance;
 
-      <!-- 履歴表示 -->
-      <h2>使用履歴</h2>
-      <ul id="historyList"></ul>
-      <button id="clearHistory" class="delete">履歴を全て削除</button>
+  historyList.innerHTML = "";
+  history.forEach((h, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      ${h.date}｜${h.departure}⇔${h.arrival}
+      ｜¥${h.fare}<br>
+      ${h.route}｜${h.company}<br>
+      <button class="small-btn edit" onclick="editHistory(${i})">編集</button>
+      <button class="small-btn delete" onclick="deleteHistory(${i})">削除</button>
+    `;
+    historyList.appendChild(li);
+  });
+}
 
-      <hr />
+window.onload = loadData;
 
-      <!-- CSV -->
-      <h2>CSV操作</h2>
-      <button id="exportCSV">CSVエクスポート</button>
-      <input type="file" id="importCSV" accept=".csv" />
-    </div>
+/* ===== 自動入力 ===== */
+function autoFill() {
+  const key = `${departure.value}⇔${arrival.value}`;
+  if (routeData[key]) {
+    fare.value = routeData[key].fare;
+    route.value = routeData[key].route;
+    company.value = routeData[key].company;
+  }
+}
+departure.oninput = autoFill;
+arrival.oninput = autoFill;
 
-    <script>
-      /* 運賃データ */
-      const fareData = {
-        "茅ケ崎⇔横浜": 506,
-        "茅ケ崎⇔上溝": 506,
-        "茅ケ崎⇔関内": 594,
-        "茅ケ崎⇔厚木": 242,
-        "茅ケ崎⇔橋本": 594,
-        "橋本⇔八王子": 178,
-        "八王子⇔藤野": 330,
-        "厚木⇔伊勢原": 199,
-        "茅ケ崎⇔日本大通り": 730,
-        "横浜⇔北山田": 335,
-        "横浜⇔日吉": 227,
-        "日吉⇔北山田": 242,
-        "茅ケ崎⇔共済病院前総合公園西": 210,
-      };
+/* ===== 履歴保存 ===== */
+saveHistory.onclick = () => {
+  if (!date.value || !fare.value) return alert("入力不足");
 
-      window.onload = loadData;
+  let balance = parseInt(localStorage.getItem("balance") || 0);
+  const history = JSON.parse(localStorage.getItem("history")) || [];
+  const cost = parseInt(fare.value);
 
-      function saveData(balance, history) {
-        localStorage.setItem("balance", balance);
-        localStorage.setItem("history", JSON.stringify(history));
-      }
+  if (editIndex === null) {
+    if (balance < cost) return alert("残高不足");
+    balance -= cost;
+    history.push({
+      date: date.value,
+      departure: departure.value,
+      arrival: arrival.value,
+      route: route.value,
+      company: company.value,
+      fare: cost
+    });
+  } else {
+    history[editIndex] = {
+      date: date.value,
+      departure: departure.value,
+      arrival: arrival.value,
+      route: route.value,
+      company: company.value,
+      fare: cost
+    };
+    editIndex = null;
+  }
 
-      function loadData() {
-        const balance = localStorage.getItem("balance") || 0;
-        const history = JSON.parse(localStorage.getItem("history")) || [];
+  saveData(balance, history);
+  loadData();
+};
 
-        document.getElementById("balanceDisplay").textContent = balance;
+/* ===== 編集 ===== */
+function editHistory(i) {
+  const h = JSON.parse(localStorage.getItem("history"))[i];
+  date.value = h.date;
+  departure.value = h.departure;
+  arrival.value = h.arrival;
+  route.value = h.route;
+  company.value = h.company;
+  fare.value = h.fare;
+  editIndex = i;
+}
 
-        const list = document.getElementById("historyList");
-        list.innerHTML = "";
-        history.forEach((item) => {
-          const li = document.createElement("li");
-          li.textContent = `${item.date}｜${item.departureStation} ⇔ ${item.arrivalStation}｜¥${item.fare}（${item.routeName}・${item.railCompany}）`;
-          list.appendChild(li);
-        });
-      }
+/* ===== 削除 ===== */
+function deleteHistory(i) {
+  const history = JSON.parse(localStorage.getItem("history"));
+  history.splice(i, 1);
+  saveData(localStorage.getItem("balance") || 0, history);
+  loadData();
+}
 
-      /* 残高操作 */
-      document.getElementById("saveBalance").onclick = () => {
-        const b = document.getElementById("balance").value;
-        if (b >= 0) saveData(b, JSON.parse(localStorage.getItem("history")) || []);
-        loadData();
-      };
+/* ===== 残高 ===== */
+saveBalance.onclick = () => {
+  saveData(balanceInput.value, JSON.parse(localStorage.getItem("history")) || []);
+  loadData();
+};
 
-      document.getElementById("chargeBalance").onclick = () => {
-        const c = parseInt(document.getElementById("chargeAmount").value);
-        if (c > 0) {
-          const b = parseInt(localStorage.getItem("balance") || 0) + c;
-          saveData(b, JSON.parse(localStorage.getItem("history")) || []);
-          document.getElementById("chargeAmount").value = "";
-          loadData();
-        }
-      };
+chargeBalance.onclick = () => {
+  let b = parseInt(localStorage.getItem("balance") || 0);
+  b += parseInt(chargeAmount.value || 0);
+  saveData(b, JSON.parse(localStorage.getItem("history")) || []);
+  loadData();
+};
 
-      document.getElementById("resetBalance").onclick = () => {
-        saveData(0, JSON.parse(localStorage.getItem("history")) || []);
-        loadData();
-      };
+resetBalance.onclick = () => {
+  saveData(0, JSON.parse(localStorage.getItem("history")) || []);
+  loadData();
+};
 
-      /* 運賃自動 */
-      function updateFare() {
-        const d = departureStation.value;
-        const a = arrivalStation.value;
-        fare.value = fareData[`${d}⇔${a}`] || "";
-      }
+/* ===== CSV ===== */
+exportCSV.onclick = () => {
+  const balance = localStorage.getItem("balance") || 0;
+  const history = JSON.parse(localStorage.getItem("history")) || [];
+  let csv = `#BALANCE,${balance}\n日付,出発駅,到着駅,路線,会社,運賃\n`;
+  history.forEach(h => {
+    csv += `${h.date},${h.departure},${h.arrival},${h.route},${h.company},${h.fare}\n`;
+  });
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "ic_card_data.csv";
+  a.click();
+};
 
-      departureStation.oninput = updateFare;
-      arrivalStation.oninput = updateFare;
-
-      /* 履歴追加 */
-      document.getElementById("saveTransaction").onclick = () => {
-        const date = transactionDate.value;
-        const fareValue = parseInt(fare.value);
-        if (!date || !fareValue) return alert("入力不足");
-
-        let balance = parseInt(localStorage.getItem("balance") || 0);
-        if (balance < fareValue) return alert("残高不足");
-
-        balance -= fareValue;
-
-        const history = JSON.parse(localStorage.getItem("history")) || [];
-        history.push({
-          date,
-          departureStation: departureStation.value,
-          arrivalStation: arrivalStation.value,
-          routeName: routeName.value,
-          railCompany: railCompany.value,
-          fare: fareValue,
-        });
-
-        saveData(balance, history);
-        loadData();
-      };
-
-      document.getElementById("clearHistory").onclick = () => {
-        saveData(localStorage.getItem("balance") || 0, []);
-        loadData();
-      };
-
-      /* CSVエクスポート（残高＋履歴） */
-      document.getElementById("exportCSV").onclick = () => {
-        const balance = localStorage.getItem("balance") || 0;
-        const history = JSON.parse(localStorage.getItem("history")) || [];
-
-        let csv = `#BALANCE,${balance}\n`;
-        csv += "日付,出発駅,到着駅,路線名,会社,運賃\n";
-
-        history.forEach((h) => {
-          csv += `${h.date},${h.departureStation},${h.arrivalStation},${h.routeName},${h.railCompany},${h.fare}\n`;
-        });
-
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "ic_card_data.csv";
-        a.click();
-      };
-
-      /* CSVインポート */
-      document.getElementById("importCSV").onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          const lines = reader.result.trim().split("\n");
-          let balance = 0;
-          let start = 2;
-
-          if (lines[0].startsWith("#BALANCE")) {
-            balance = parseInt(lines[0].split(",")[1]) || 0;
-          }
-
-          const history = [];
-          for (let i = start; i < lines.length; i++) {
-            const [date, d, a, r, c, f] = lines[i].split(",");
-            history.push({
-              date,
-              departureStation: d,
-              arrivalStation: a,
-              routeName: r,
-              railCompany: c,
-              fare: parseInt(f),
-            });
-          }
-
-          saveData(balance, history);
-          loadData();
-          alert("CSVをインポートしました");
-        };
-        reader.readAsText(file, "UTF-8");
-      };
-    </script>
-  </body>
+importCSV.onchange = e => {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const lines = reader.result.trim().split("\n");
+    const balance = parseInt(lines[0].split(",")[1]) || 0;
+    const history = [];
+    for (let i = 2; i < lines.length; i++) {
+      const [d, dep, arr, r, c, f] = lines[i].split(",");
+      history.push({
+        date: d,
+        departure: dep,
+        arrival: arr,
+        route: r,
+        company: c,
+        fare: parseInt(f)
+      });
+    }
+    saveData(balance, history);
+    loadData();
+  };
+  reader.readAsText(e.target.files[0], "UTF-8");
+};
+</script>
+</body>
 </html>
