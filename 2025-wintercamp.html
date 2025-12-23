@@ -134,6 +134,8 @@ footer {
 <p>12/23 7:30 更新</p>
   <p>12/24 8:00現在、少雨ですが実施いたします。集合時間に遅れないようにお願いします。</p>
   <p>当日モードが有効になっています。ぜひご活用ください。</p>
+    <p>当日のためパスワードは無効化しております。</p>
+
   
 </div>
 
@@ -367,7 +369,7 @@ function applyToday(){
 }
 setInterval(applyToday,60000);
 
-/* 日付パスワード */
+/* 日付パスワードを無効化中
 (function(){
  const d=new Date();
  const pw=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
@@ -376,6 +378,7 @@ setInterval(applyToday,60000);
   location.href="https://yuma873.github.io/blush-nimble/2025-wintercamp.html";
  }
 })();
+*/
   function updateCountdown() {
   const countdownEl = document.getElementById('countdown');
   // 集合日時を指定
