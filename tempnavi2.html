@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>横浜国際プール 温度表示板</title>
 <style>
+  .smilego-wrapper {
+  transform: scale(3);      /* ← 好きな倍率に */
+  transform-origin: top center;
+  margin: 30px auto;
+  display: flex;
+  justify-content: center;
+}
+
   body {
     font-family: "Helvetica Neue", Arial, sans-serif;
     background: #f5f5f5;
@@ -298,6 +306,8 @@ setInterval(() => {
 
 
 </script>
-<script src="https://app.smilego.jp/smilego_bnr/v1/smilego.min.js?mk=2c217a95779c&sid=1524"></script>
+<div class="smilego-wrapper">
+  <script src="https://app.smilego.jp/smilego_bnr/v1/smilego.min.js?mk=2c217a95779c&sid=1524"></script>
+</div>
 </body>
 </html>
