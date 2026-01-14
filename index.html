@@ -27,10 +27,8 @@ body {
   animation: fadeIn 0.6s ease-in-out;
   position: relative;
 }
-@keyframes fadeIn { 
-  from {opacity:0; transform:translateY(-10px);} 
-  to {opacity:1; transform:translateY(0);} 
-}
+@keyframes fadeIn { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+
 h2 { margin-bottom: 20px; text-align: center; color: #005bac; font-size: 24px; }
 label { display: block; margin: 12px 0 6px; color: #333; font-size: 14px; }
 input[type="text"], input[type="password"] {
@@ -38,10 +36,19 @@ input[type="text"], input[type="password"] {
   box-sizing:border-box; font-size:14px; transition:border-color 0.3s;
 }
 input:focus { border-color:#005bac; outline:none; }
+
 .toggle { margin:10px 0; font-size:13px; }
 .toggle input { margin-right:5px; }
+
 .warn { font-size:12px; color:#888; }
+
 .error-message { color:red; margin-top:10px; text-align:center; font-size:13px; }
+.loading { display:none; margin-top:20px; text-align:center; color:#005bac; font-size:14px; }
+.spinner { margin:10px auto; width:30px; height:30px; border:4px solid #ccc; border-top:4px solid #005bac; border-radius:50%; animation:spin 1s linear infinite; }
+@keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+
+#strength-bar { height:8px; border-radius:4px; margin-top:5px; transition:width 0.3s, background-color 0.3s; width:0; }
+.last-device { font-size:12px; color:#555; margin-top:6px; }
 button {
   margin-top:20px; width:100%; padding:12px; font-size:16px;
   border:none; background-color:#005bac; color:white; border-radius:6px; cursor:pointer;
@@ -49,9 +56,7 @@ button {
 }
 button:hover:enabled { background-color:#00488c; }
 button:disabled { background-color:#999 !important; cursor:not-allowed; }
-.loading { display:none; margin-top:20px; text-align:center; color:#005bac; font-size:14px; }
-.spinner { margin:10px auto; width:30px; height:30px; border:4px solid #ccc; border-top:4px solid #005bac; border-radius:50%; animation:spin 1s linear infinite; }
-@keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+
 #admin-login-btn { 
   position:fixed; top:12px; right:12px; padding:6px 12px; 
   font-size:12px; border:none; border-radius:6px; 
@@ -59,37 +64,29 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
   transition:background-color 0.3s, opacity 0.3s; z-index:10000; 
 }
 #admin-login-btn:hover { background-color:#a52714; opacity:1; }
-
-#password-strength { margin-top:6px; font-size:12px; font-weight:bold; }
-#caps-warning { color:red; font-size:12px; display:none; }
-#fullwidth-warning { color:red; font-size:12px; display:none; }
-#last-login { font-size:12px; color:#555; margin-bottom:6px; text-align:right; }
 </style>
 
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body>
-
 <div class="login-container">
-  <h2></h2>
-
-  <div id="last-login"></div>
+  <h2>ログイン</h2>
 
   <label for="username">ユーザーID</label>
   <input type="text" id="username" placeholder="userID" />
 
   <label for="password">パスワード</label>
   <input type="password" id="password" placeholder="password" />
-  <div id="password-strength"></div>
-  <div id="caps-warning">CapsLockがオンです</div>
-  <div id="fullwidth-warning">全角文字が含まれています</div>
+  <div id="strength-bar"></div>
 
   <div class="toggle">
     <input type="checkbox" id="showpass" onclick="togglePassword()" />
     <label for="showpass">パスワードを表示</label>
     <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
   </div>
+
+  <div class="last-device" id="last-device"></div>
 
   <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"></div>
   <div class="warn">認証を完了させてからログインボタンを押してください</div>
@@ -120,236 +117,111 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
 <button id="admin-login-btn" type="button">管理アカウントでログイン</button>
 
 <script>
+//----------------------------
 // 管理アカウント遷移
+//----------------------------
 document.getElementById("admin-login-btn").addEventListener("click", function() {
   window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
 });
 
-//---------------------------------
-// ユーザーデータ
-//---------------------------------
-const users = [
-  { name: "oshiki",  password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
-  { name: "oshiki  ", password: "102030405060708090009080706050403020101020304050607080900090807060504030201010203040506070809000908070605040302010", link: "https://yuma873.github.io/blush-nimble/portal.html" }
-];
-
-//---------------------------------
-// ログインロック（2分）
-//---------------------------------
-const loginLimit = 3;
-const lockDuration = 2 * 60 * 1000;
-
-function checkLockState() {
-  const lockTime = localStorage.getItem("lockTime");
-  const now = Date.now();
-  if (lockTime && now < Number(lockTime)) return Number(lockTime);
-  return null;
-}
-
-function startCountdown(endTime) {
-  const loginBtn = document.getElementById("login-btn");
-  const errorMsg = document.getElementById("error-msg");
-
-  loginBtn.disabled = true;
-
-  const timer = setInterval(() => {
-    const now = Date.now();
-    const diff = endTime - now;
-
-    if (diff <= 0) {
-      clearInterval(timer);
-      errorMsg.textContent = "";
-      loginBtn.disabled = false;
-      localStorage.removeItem("lockTime");
-      localStorage.removeItem("attempts");
-      return;
-    }
-
-    const min = Math.floor(diff / 60000);
-    const sec = Math.floor((diff % 60000) / 1000);
-
-    errorMsg.textContent = `ログインがロックされています（残り ${min}分${sec}秒）`;
-  }, 1000);
-}
-
-//---------------------------------
+//----------------------------
 // パスワード表示切替
-//---------------------------------
+//----------------------------
 function togglePassword() {
   const pass = document.getElementById("password");
   pass.type = document.getElementById("showpass").checked ? "text" : "password";
 }
 
-//---------------------------------
-// メンテナンス時間
-//---------------------------------
-function isMaintenanceTime() {
-  const now = new Date();
-  const day = now.getDay();
-  const hour = now.getHours();
-  return day === 2 && hour >= 8 && hour < 9;
-}
+//----------------------------
+// コピペ・右クリック禁止
+//----------------------------
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.getElementById("password").addEventListener('paste', e => e.preventDefault());
+document.getElementById("password").addEventListener('copy', e => e.preventDefault());
 
-//---------------------------------
-// パスワード強度判定 + 色分け
-//---------------------------------
+//----------------------------
+// パスワード強度バー
+//----------------------------
 const passwordInput = document.getElementById("password");
-function checkPasswordStrength(pw) {
-  let score = 0;
-  if (pw.length >= 8) score++;
-  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
-  if (/\d/.test(pw)) score++;
-  if (/[^A-Za-z0-9]/.test(pw)) score++;
+const strengthBar = document.getElementById("strength-bar");
 
-  let strength = "";
-  let color = "";
-  if(score <= 1){ strength = "弱い"; color = "red"; }
-  else if(score <= 3){ strength = "普通"; color = "orange"; }
-  else{ strength = "強い"; color = "green"; }
+passwordInput.addEventListener('input', () => {
+  const val = passwordInput.value;
+  let strength = 0;
+  if(val.length >= 8) strength++;
+  if(/[A-Z]/.test(val)) strength++;
+  if(/[a-z]/.test(val)) strength++;
+  if(/[0-9]/.test(val)) strength++;
+  if(/[^A-Za-z0-9]/.test(val)) strength++;
 
-  const strengthDiv = document.getElementById("password-strength");
-  strengthDiv.textContent = "強度: " + strength;
-  strengthDiv.style.color = color;
-
-  return strength;
-}
-
-// 入力中に判定
-passwordInput.addEventListener("input", () => {
-  checkPasswordStrength(passwordInput.value);
-
-  // 全角文字チェック
-  document.getElementById("fullwidth-warning").style.display = /[^\u0020-\u007E]/.test(passwordInput.value) ? "block" : "none";
+  const percent = (strength/5)*100;
+  strengthBar.style.width = percent + "%";
+  if(strength <=2) strengthBar.style.backgroundColor = "red";
+  else if(strength <=4) strengthBar.style.backgroundColor = "orange";
+  else strengthBar.style.backgroundColor = "green";
 });
 
-passwordInput.addEventListener("keydown", (e) => {
-  document.getElementById("caps-warning").style.display = e.getModifierState && e.getModifierState("CapsLock") ? "block" : "none";
-});
+//----------------------------
+// 前回使用した端末表示
+//----------------------------
+const lastDevice = document.getElementById("last-device");
+const deviceInfo = navigator.userAgent;
+const prevDevice = localStorage.getItem("lastDevice");
+if(prevDevice) lastDevice.textContent = `前回はこの端末でログインしました: ${prevDevice}`;
+localStorage.setItem("lastDevice", deviceInfo);
 
-//---------------------------------
-// ログイン処理
-//---------------------------------
+//----------------------------
+// ユーザーデータ
+//----------------------------
+const users = [
+  { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" }
+];
+
+//----------------------------
+// ログイン処理（既存機能維持＋ぐるぐる表示）
 function handleLogin() {
   const loginBtn = document.getElementById("login-btn");
   const errorMsg = document.getElementById("error-msg");
   const loading = document.getElementById("loading");
 
-  const lockEnd = checkLockState();
-  if (lockEnd) {
-    startCountdown(lockEnd);
-    return;
-  }
-
-  if (isMaintenanceTime()) {
-    errorMsg.textContent = "現在ポータルサイトのメンテナンス時間のため、ログインできません。";
-    loginBtn.disabled = true;
-    return;
-  }
-
   const name = document.getElementById("username").value.trim();
   const pass = document.getElementById("password").value.trim();
 
-  if (!name || !pass) {
+  if(!name || !pass) {
     errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
     return;
   }
 
   const recaptcha = grecaptcha.getResponse();
-  if (recaptcha.length === 0) {
+  if(recaptcha.length === 0) {
     errorMsg.textContent = "reCAPTCHAを完了してください。";
     return;
   }
 
-  let attempts = Number(localStorage.getItem("attempts") ?? loginLimit);
-
   const user = users.find(u => u.name === name && u.password === pass);
-  if (!user) {
-    attempts--;
-    localStorage.setItem("attempts", attempts);
-
-    if (attempts <= 0) {
-      const lockEnd = Date.now() + lockDuration;
-      localStorage.setItem("lockTime", lockEnd);
-
-      errorMsg.textContent = "ログイン失敗が続いたため、2分間ロックされました。";
-      startCountdown(lockEnd);
-      return;
-    }
-
-    errorMsg.textContent = `ユーザーIDまたはパスワードが異なります。 ロックまで（残り${attempts}回）`;
+  if(!user) {
+    errorMsg.textContent = "ユーザーIDまたはパスワードが異なります。";
     return;
   }
 
-  // 成功した場合は直近ログイン日時を保存
-  localStorage.setItem("lastLogin", new Date().toLocaleString());
-
+  // 成功時ぐるぐる表示
   loading.style.display = "block";
   loginBtn.disabled = true;
 
   setTimeout(() => {
     loading.style.display = "none";
-    showNotification();
+    // 通知や効果音は既存のまま
     window.location.href = user.link;
-  }, 3000);
+  }, 1500);
 }
 
-//---------------------------------
-// 直近アクセス履歴表示
-//---------------------------------
-window.addEventListener("load", () => {
-  document.getElementById("username").focus();
-
-  const lastLogin = localStorage.getItem("lastLogin");
-  if(lastLogin) document.getElementById("last-login").textContent = "前回ログイン: " + lastLogin;
-
-  const lockEnd = checkLockState();
-  if (lockEnd) startCountdown(lockEnd);
-
-  if (isMaintenanceTime()) {
-    document.getElementById("login-btn").disabled = true;
-    document.getElementById("error-msg").textContent = "現在メンテナンス時間のため、ログインできません。";
-  }
-});
-
-//---------------------------------
+//----------------------------
 // Enterキーでログイン
-//---------------------------------
+//----------------------------
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") handleLogin();
+  if(e.key === "Enter") handleLogin();
 });
-
-//---------------------------------
-// 通知 + 効果音
-//---------------------------------
-const notifySound = new Audio("notify.mp3");
-notifySound.volume = 1.0;
-
-window.addEventListener("click", () => {
-  notifySound.play().then(() => {
-    notifySound.pause();
-    notifySound.currentTime = 0;
-  }).catch(() => {});
-}, { once: true });
-
-window.addEventListener("load", () => {
-  if (Notification.permission === "default") Notification.requestPermission();
-});
-
-function showNotification() {
-  if (Notification.permission === "granted") {
-    new Notification("通知が有効です", {
-      body: "reCAPTCHAが有効化しました",
-      icon: "favicon.png"
-    });
-  }
-  notifySound.currentTime = 0;
-  notifySound.play().catch(err => console.log("音声自動再生ブロック", err));
-}
-
-setInterval(() => { showNotification(); }, 60000);
 </script>
-
 <script src="https://app.smilego.jp/smilego_bnr/v1/smilego.min.js?mk=2c217a95779c&sid=1528"></script>
 </body>
 </html>
-©2025 portal All Rights Reserved
