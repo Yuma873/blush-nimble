@@ -9,7 +9,55 @@
 
 
     <link rel="stylesheet" href="portal-style.css" />
-   <style>
+  <div class="view-controls">
+  <button id="modeToggle" title="表示モード切替">🌙</button>
+  <button id="liteToggle" title="軽量表示">🪶</button>
+</div>
+<div class="offline-banner">
+  現在オフラインです
+</div>
+
+    <style>
+      /* 操作ボタン */
+.view-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.view-controls button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+/* ダークモード */
+body[data-mode="dark"] {
+  background: #1e1e1e;
+  color: #eaeaea;
+}
+
+/* 軽量表示 */
+body[data-lite="true"] img,
+body[data-lite="true"] iframe,
+body[data-lite="true"] video {
+  display: none !important;
+}
+
+/* オフライン表示 */
+.offline-banner {
+  display: none;
+  background: #ffe0e0;
+  color: #a00000;
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 6px;
+}
+
+body.offline .offline-banner {
+  display: block;
+}
+
   /* 全体の基本設定 */
   body {
     font-family: Arial, sans-serif;
@@ -1034,6 +1082,40 @@ document.addEventListener("scroll", resetLogoutTimer);
 document.addEventListener("click", resetLogoutTimer);
 </script>
 <script src="https://app.smilego.jp/smilego_bnr/v1/smilego.min.js?mk=2c217a95779c&sid=1528"></script>
-   
+   <script>
+  const modeBtn = document.getElementById("modeToggle");
+  const liteBtn = document.getElementById("liteToggle");
+
+  /* 初期状態復元 */
+  const savedMode = localStorage.getItem("mode");
+  const savedLite = localStorage.getItem("lite");
+
+  if (savedMode) document.body.dataset.mode = savedMode;
+  if (savedLite === "true") document.body.dataset.lite = "true";
+
+  /* 表示モード切替 */
+  modeBtn.addEventListener("click", () => {
+    const mode = document.body.dataset.mode === "dark" ? "light" : "dark";
+    document.body.dataset.mode = mode;
+    localStorage.setItem("mode", mode);
+  });
+
+  /* 軽量表示切替 */
+  liteBtn.addEventListener("click", () => {
+    const isLite = document.body.dataset.lite === "true";
+    document.body.dataset.lite = isLite ? "false" : "true";
+    localStorage.setItem("lite", !isLite);
+  });
+
+  /* オフライン検知 */
+  function updateOnlineStatus() {
+    document.body.classList.toggle("offline", !navigator.onLine);
+  }
+
+  window.addEventListener("online", updateOnlineStatus);
+  window.addEventListener("offline", updateOnlineStatus);
+  updateOnlineStatus();
+</script>
+
   </body>
 </html>
