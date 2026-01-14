@@ -126,7 +126,7 @@ document.getElementById("admin-login-btn").addEventListener("click", function() 
 });
 
 //---------------------------------
-//   ユーザーデータ
+// ユーザーデータ
 //---------------------------------
 const users = [
   { name: "oshiki",  password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
@@ -191,8 +191,9 @@ function isMaintenanceTime() {
 }
 
 //---------------------------------
-// パスワード強度判定
+// パスワード強度判定 + 色分け
 //---------------------------------
+const passwordInput = document.getElementById("password");
 function checkPasswordStrength(pw) {
   let score = 0;
   if (pw.length >= 8) score++;
@@ -200,17 +201,22 @@ function checkPasswordStrength(pw) {
   if (/\d/.test(pw)) score++;
   if (/[^A-Za-z0-9]/.test(pw)) score++;
 
-  if(score <= 1) return "弱い";
-  if(score === 2 || score === 3) return "普通";
-  return "強い";
+  let strength = "";
+  let color = "";
+  if(score <= 1){ strength = "弱い"; color = "red"; }
+  else if(score <= 3){ strength = "普通"; color = "orange"; }
+  else{ strength = "強い"; color = "green"; }
+
+  const strengthDiv = document.getElementById("password-strength");
+  strengthDiv.textContent = "強度: " + strength;
+  strengthDiv.style.color = color;
+
+  return strength;
 }
 
-//---------------------------------
-// 入力ミス警告
-//---------------------------------
-const passwordInput = document.getElementById("password");
+// 入力中に判定
 passwordInput.addEventListener("input", () => {
-  document.getElementById("password-strength").textContent = "強度: " + checkPasswordStrength(passwordInput.value);
+  checkPasswordStrength(passwordInput.value);
 
   // 全角文字チェック
   document.getElementById("fullwidth-warning").style.display = /[^\u0020-\u007E]/.test(passwordInput.value) ? "block" : "none";
@@ -282,10 +288,7 @@ function handleLogin() {
 
   setTimeout(() => {
     loading.style.display = "none";
-
-    // 🔔 ログイン成功時に通知＋音
     showNotification();
-
     window.location.href = user.link;
   }, 3000);
 }
