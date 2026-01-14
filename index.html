@@ -83,7 +83,6 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
 .loading p { margin-top:10px; font-size:16px; text-align:center; }
 
 @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-
 </style>
 
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -91,7 +90,7 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
 
 <body>
 <div class="login-container">
-  <h2>ログイン</h2>
+  <h2></h2>
 
   <label for="username">ユーザーID</label>
   <input type="text" id="username" placeholder="userID" />
@@ -106,12 +105,12 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
     <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
   </div>
 
-  <div class="last-device" id="last-device"></div>
+  <div class="last-device" id="last-device">前回ログイン情報はありません</div>
 
   <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"></div>
   <div class="warn">認証を完了させてからログインボタンを押してください</div>
 
-  <button id="login-btn" onclick="handleLogin()">ログイン</button>
+  <button id="login-btn">ログイン</button>
 
   <div style="text-align:right; margin-top:10px;">
     <a href="system.html" style="color:#005bac; font-weight:bold; text-decoration:none;">サーバー稼働状況 ▶</a>
@@ -138,34 +137,25 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
 <button id="admin-login-btn" type="button">管理アカウントでログイン</button>
 
 <script>
-//----------------------------
 // 管理アカウント遷移
-//----------------------------
 document.getElementById("admin-login-btn").addEventListener("click", function() {
   window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
 });
 
-//----------------------------
 // パスワード表示切替
-//----------------------------
 function togglePassword() {
   const pass = document.getElementById("password");
   pass.type = document.getElementById("showpass").checked ? "text" : "password";
 }
 
-//----------------------------
-// コピペ・右クリック禁止
-//----------------------------
+// 右クリック・コピペ禁止
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.getElementById("password").addEventListener('paste', e => e.preventDefault());
 document.getElementById("password").addEventListener('copy', e => e.preventDefault());
 
-//----------------------------
 // パスワード強度バー
-//----------------------------
 const passwordInput = document.getElementById("password");
 const strengthBar = document.getElementById("strength-bar");
-
 passwordInput.addEventListener('input', () => {
   const val = passwordInput.value;
   let strength = 0;
@@ -174,7 +164,6 @@ passwordInput.addEventListener('input', () => {
   if(/[a-z]/.test(val)) strength++;
   if(/[0-9]/.test(val)) strength++;
   if(/[^A-Za-z0-9]/.test(val)) strength++;
-
   const percent = (strength/5)*100;
   strengthBar.style.width = percent + "%";
   if(strength <=2) strengthBar.style.backgroundColor = "red";
@@ -182,29 +171,22 @@ passwordInput.addEventListener('input', () => {
   else strengthBar.style.backgroundColor = "green";
 });
 
-//----------------------------
-// 前回使用した端末＋日時表示
-//----------------------------
+// 前回使用した端末＋日時＋位置情報表示
 const lastDevice = document.getElementById("last-device");
-const deviceInfo = navigator.userAgent;
 const prevInfo = localStorage.getItem("lastDeviceInfo");
 if(prevInfo){
   lastDevice.textContent = `前回ログイン端末: ${prevInfo}`;
-} else {
-  lastDevice.textContent = "前回ログイン情報はありません";
 }
 
-//----------------------------
 // ユーザーデータ
-//----------------------------
 const users = [
   { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" }
 ];
 
-//----------------------------
-// ログイン処理（既存機能維持＋ポップアップぐるぐる）
-//----------------------------
-function handleLogin() {
+// ログイン処理
+document.getElementById("login-btn").addEventListener("click", handleLogin);
+
+function handleLogin(){
   const loginBtn = document.getElementById("login-btn");
   const errorMsg = document.getElementById("error-msg");
   const loading = document.getElementById("loading");
@@ -212,46 +194,56 @@ function handleLogin() {
   const name = document.getElementById("username").value.trim();
   const pass = document.getElementById("password").value.trim();
 
-  if(!name || !pass) {
+  if(!name || !pass){
     errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
     return;
   }
 
   const recaptcha = grecaptcha.getResponse();
-  if(recaptcha.length === 0) {
+  if(recaptcha.length === 0){
     errorMsg.textContent = "reCAPTCHAを完了してください。";
     return;
   }
 
   const user = users.find(u => u.name === name && u.password === pass);
-  if(!user) {
+  if(!user){
     errorMsg.textContent = "ユーザーIDまたはパスワードが異なります。";
     return;
   }
 
-  // 成功時ぐるぐる表示（ポップアップ）
+  // 成功時ぐるぐる表示
   loading.style.display = "flex";
   loginBtn.disabled = true;
 
-  // 今回の端末情報＋日時を保存
+  // 端末情報＋日時
+  const deviceInfo = navigator.userAgent;
   const now = new Date();
-  const currentInfo = `${deviceInfo} - ${now.toLocaleString()}`;
-  localStorage.setItem("lastDeviceInfo", currentInfo);
+  let infoText = `${deviceInfo} - ${now.toLocaleString()}`;
 
-  setTimeout(() => {
+  // 位置情報取得
+  if ("geolocation" in navigator){
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        infoText += ` - 緯度: ${pos.coords.latitude.toFixed(4)}, 経度: ${pos.coords.longitude.toFixed(4)}`;
+        localStorage.setItem("lastDeviceInfo", infoText);
+      },
+      ()=>{ localStorage.setItem("lastDeviceInfo", infoText); }
+    );
+  } else {
+    localStorage.setItem("lastDeviceInfo", infoText);
+  }
+
+  setTimeout(()=>{
     loading.style.display = "none";
     window.location.href = user.link;
   }, 1500);
 }
 
-//----------------------------
 // Enterキーでログイン
-//----------------------------
 document.addEventListener("keydown", (e) => {
   if(e.key === "Enter") handleLogin();
 });
 </script>
-
 <script src="https://app.smilego.jp/smilego_bnr/v1/smilego.min.js?mk=2c217a95779c&sid=1528"></script>
 </body>
 </html>
