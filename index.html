@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -43,7 +42,6 @@ input:focus { border-color:#005bac; outline:none; }
 .toggle input { margin-right:5px; }
 .warn { font-size:12px; color:#888; }
 .error-message { color:red; margin-top:10px; text-align:center; font-size:13px; }
-
 button {
   margin-top:20px; width:100%; padding:12px; font-size:16px;
   border:none; background-color:#005bac; color:white; border-radius:6px; cursor:pointer;
@@ -51,11 +49,9 @@ button {
 }
 button:hover:enabled { background-color:#00488c; }
 button:disabled { background-color:#999 !important; cursor:not-allowed; }
-
 .loading { display:none; margin-top:20px; text-align:center; color:#005bac; font-size:14px; }
 .spinner { margin:10px auto; width:30px; height:30px; border:4px solid #ccc; border-top:4px solid #005bac; border-radius:50%; animation:spin 1s linear infinite; }
 @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-
 #admin-login-btn { 
   position:fixed; top:12px; right:12px; padding:6px 12px; 
   font-size:12px; border:none; border-radius:6px; 
@@ -63,6 +59,11 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
   transition:background-color 0.3s, opacity 0.3s; z-index:10000; 
 }
 #admin-login-btn:hover { background-color:#a52714; opacity:1; }
+
+#password-strength { margin-top:6px; font-size:12px; font-weight:bold; }
+#caps-warning { color:red; font-size:12px; display:none; }
+#fullwidth-warning { color:red; font-size:12px; display:none; }
+#last-login { font-size:12px; color:#555; margin-bottom:6px; text-align:right; }
 </style>
 
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -71,13 +72,18 @@ button:disabled { background-color:#999 !important; cursor:not-allowed; }
 <body>
 
 <div class="login-container">
-  <h2></h2>
+  <h2>ポータルログイン</h2>
+
+  <div id="last-login"></div>
 
   <label for="username">ユーザーID</label>
   <input type="text" id="username" placeholder="userID" />
 
   <label for="password">パスワード</label>
   <input type="password" id="password" placeholder="password" />
+  <div id="password-strength"></div>
+  <div id="caps-warning">CapsLockがオンです</div>
+  <div id="fullwidth-warning">全角文字が含まれています</div>
 
   <div class="toggle">
     <input type="checkbox" id="showpass" onclick="togglePassword()" />
@@ -127,9 +133,8 @@ const users = [
   { name: "oshiki  ", password: "102030405060708090009080706050403020101020304050607080900090807060504030201010203040506070809000908070605040302010", link: "https://yuma873.github.io/blush-nimble/portal.html" }
 ];
 
-
 //---------------------------------
-//   ログインロック（2分）
+// ログインロック（2分）
 //---------------------------------
 const loginLimit = 3;
 const lockDuration = 2 * 60 * 1000;
@@ -167,18 +172,16 @@ function startCountdown(endTime) {
   }, 1000);
 }
 
-
 //---------------------------------
-//   パスワード表示切替
+// パスワード表示切替
 //---------------------------------
 function togglePassword() {
   const pass = document.getElementById("password");
   pass.type = document.getElementById("showpass").checked ? "text" : "password";
 }
 
-
 //---------------------------------
-//   メンテナンス時間
+// メンテナンス時間
 //---------------------------------
 function isMaintenanceTime() {
   const now = new Date();
@@ -187,9 +190,38 @@ function isMaintenanceTime() {
   return day === 2 && hour >= 8 && hour < 9;
 }
 
+//---------------------------------
+// パスワード強度判定
+//---------------------------------
+function checkPasswordStrength(pw) {
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+  if (/\d/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+  if(score <= 1) return "弱い";
+  if(score === 2 || score === 3) return "普通";
+  return "強い";
+}
 
 //---------------------------------
-//   ログイン処理
+// 入力ミス警告
+//---------------------------------
+const passwordInput = document.getElementById("password");
+passwordInput.addEventListener("input", () => {
+  document.getElementById("password-strength").textContent = "強度: " + checkPasswordStrength(passwordInput.value);
+
+  // 全角文字チェック
+  document.getElementById("fullwidth-warning").style.display = /[^\u0020-\u007E]/.test(passwordInput.value) ? "block" : "none";
+});
+
+passwordInput.addEventListener("keydown", (e) => {
+  document.getElementById("caps-warning").style.display = e.getModifierState && e.getModifierState("CapsLock") ? "block" : "none";
+});
+
+//---------------------------------
+// ログイン処理
 //---------------------------------
 function handleLogin() {
   const loginBtn = document.getElementById("login-btn");
@@ -242,6 +274,9 @@ function handleLogin() {
     return;
   }
 
+  // 成功した場合は直近ログイン日時を保存
+  localStorage.setItem("lastLogin", new Date().toLocaleString());
+
   loading.style.display = "block";
   loginBtn.disabled = true;
 
@@ -255,12 +290,14 @@ function handleLogin() {
   }, 3000);
 }
 
-
 //---------------------------------
-//   ロード時判定
+// 直近アクセス履歴表示
 //---------------------------------
 window.addEventListener("load", () => {
   document.getElementById("username").focus();
+
+  const lastLogin = localStorage.getItem("lastLogin");
+  if(lastLogin) document.getElementById("last-login").textContent = "前回ログイン: " + lastLogin;
 
   const lockEnd = checkLockState();
   if (lockEnd) startCountdown(lockEnd);
@@ -271,23 +308,19 @@ window.addEventListener("load", () => {
   }
 });
 
-
 //---------------------------------
-//   Enterキーでログイン
+// Enterキーでログイン
 //---------------------------------
 document.addEventListener("keydown", (e) => {
   if (e.key === "Enter") handleLogin();
 });
-</script>
 
-
-<!-- 🔔 通知 + 効果音 -->
-<script>
-// 効果音
+//---------------------------------
+// 通知 + 効果音
+//---------------------------------
 const notifySound = new Audio("notify.mp3");
 notifySound.volume = 1.0;
 
-// 初回クリックで音声を解放
 window.addEventListener("click", () => {
   notifySound.play().then(() => {
     notifySound.pause();
@@ -295,14 +328,10 @@ window.addEventListener("click", () => {
   }).catch(() => {});
 }, { once: true });
 
-// 通知の許可
 window.addEventListener("load", () => {
-  if (Notification.permission === "default") {
-    Notification.requestPermission();
-  }
+  if (Notification.permission === "default") Notification.requestPermission();
 });
 
-// 通知 + 音
 function showNotification() {
   if (Notification.permission === "granted") {
     new Notification("通知が有効です", {
@@ -310,18 +339,13 @@ function showNotification() {
       icon: "favicon.png"
     });
   }
-
   notifySound.currentTime = 0;
-  notifySound.play().catch(err => {
-    console.log("音声の自動再生がブロックされました", err);
-  });
+  notifySound.play().catch(err => console.log("音声自動再生ブロック", err));
 }
-  // 🔁 60秒ごとに通知をループ
-setInterval(() => {
-    showNotification();
-}, 60000); // 60,000ミリ秒 = 60秒
 
+setInterval(() => { showNotification(); }, 60000);
 </script>
+
 <script src="https://app.smilego.jp/smilego_bnr/v1/smilego.min.js?mk=2c217a95779c&sid=1528"></script>
 </body>
 </html>
