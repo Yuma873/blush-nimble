@@ -17,7 +17,6 @@ body {
   justify-content: center;
   flex-direction: column;
 }
-
 .login-container {
   background: white;
   padding: 40px 30px;
@@ -26,76 +25,69 @@ body {
   max-width: 380px;
   width: 100%;
   animation: fadeIn 0.6s ease-in-out;
+  position: relative;
 }
-
 @keyframes fadeIn {
-  from { opacity:0; transform:translateY(-10px); }
-  to { opacity:1; transform:translateY(0); }
+  from {opacity:0; transform:translateY(-10px);}
+  to {opacity:1; transform:translateY(0);}
 }
-
 h2 {
   margin-bottom: 20px;
   text-align: center;
   color: #005bac;
   font-size: 24px;
 }
-
 label {
   display: block;
   margin: 12px 0 6px;
   color: #333;
   font-size: 14px;
 }
-
-input[type="text"],
-input[type="password"] {
+input[type="text"], input[type="password"] {
   width:100%;
   padding:10px;
   border:1px solid #ccc;
   border-radius:6px;
   box-sizing:border-box;
   font-size:14px;
+  transition:border-color 0.3s;
 }
-
 input:focus {
   border-color:#005bac;
   outline:none;
 }
-
 .toggle {
   margin:10px 0;
   font-size:13px;
 }
-
+.toggle input {
+  margin-right:5px;
+}
 .warn {
   font-size:12px;
   color:#888;
 }
-
 .error-message {
   color:red;
   margin-top:10px;
   text-align:center;
   font-size:13px;
 }
-
 #strength-bar {
   height:8px;
   border-radius:4px;
   margin-top:5px;
-  width:0;
   transition:width 0.3s, background-color 0.3s;
+  width:0;
 }
-
 .last-device {
   font-size:12px;
   color:#555;
-  margin-top:8px;
+  margin-top:6px;
   padding:6px;
   background:#f0f0f0;
   border-radius:6px;
 }
-
 button {
   margin-top:20px;
   width:100%;
@@ -106,11 +98,15 @@ button {
   color:white;
   border-radius:6px;
   cursor:pointer;
+  transition: background-color 0.3s;
 }
-
-button:hover { background-color:#00488c; }
-button:disabled { background-color:#999; }
-
+button:hover:enabled {
+  background-color:#00488c;
+}
+button:disabled {
+  background-color:#999 !important;
+  cursor:not-allowed;
+}
 #admin-login-btn {
   position:fixed;
   top:12px;
@@ -122,25 +118,30 @@ button:disabled { background-color:#999; }
   background-color:#d93025;
   color:white;
   cursor:pointer;
+  opacity:0.9;
+  transition:background-color 0.3s, opacity 0.3s;
   z-index:10000;
+}
+#admin-login-btn:hover {
+  background-color:#a52714;
+  opacity:1;
 }
 
 /* ログイン中ポップアップ */
 .loading {
   display:none;
-  position:fixed;
+  position: fixed;
   top:0;
   left:0;
   width:100%;
   height:100%;
-  background:rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.5);
   justify-content:center;
   align-items:center;
-  flex-direction:column;
-  z-index:9999;
+  z-index: 9999;
+  flex-direction: column;
   color:white;
 }
-
 .loading .spinner {
   width:50px;
   height:50px;
@@ -149,10 +150,14 @@ button:disabled { background-color:#999; }
   border-radius:50%;
   animation: spin 1s linear infinite;
 }
-
+.loading p {
+  margin-top:10px;
+  font-size:16px;
+  text-align:center;
+}
 @keyframes spin {
-  0% { transform:rotate(0deg); }
-  100% { transform:rotate(360deg); }
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
 }
 </style>
 
@@ -162,84 +167,164 @@ button:disabled { background-color:#999; }
 <body>
 
 <div class="login-container">
-  <h2>ログイン</h2>
+  <h2></h2>
 
-  <label>ユーザーID</label>
-  <input type="text" id="username">
+  <label for="username">ユーザーID</label>
+  <input type="text" id="username" placeholder="userID" />
 
-  <label>パスワード</label>
-  <input type="password" id="password">
+  <label for="password">パスワード</label>
+  <input type="password" id="password" placeholder="password" />
   <div id="strength-bar"></div>
 
   <div class="toggle">
-    <input type="checkbox" onclick="togglePassword()"> パスワードを表示
+    <input type="checkbox" id="showpass" onclick="togglePassword()" />
+    <label for="showpass">パスワードを表示</label>
+    <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
   </div>
 
   <div class="last-device" id="last-device">前回ログイン情報はありません</div>
 
   <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"></div>
+  <div class="warn">認証を完了させてからログインボタンを押してください</div>
 
   <button id="login-btn">ログイン</button>
+
+  <div style="text-align:right; margin-top:10px;">
+    <a href="system.html" style="color:#005bac; font-weight:bold; text-decoration:none;">サーバー稼働状況 ▶</a>
+  </div>
+
   <div class="error-message" id="error-msg"></div>
 </div>
 
 <div class="loading" id="loading">
   <div class="spinner"></div>
   <p>ログインしています...</p>
+  <p>*この読み込みは時間がかかる場合があります</p>
 </div>
 
-<button id="admin-login-btn" onclick="location.href='kanri.html'">管理アカウント</button>
+<div style="margin-top: 25px; text-align: center;">
+<nobr>
+<table border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>
+<a href="https://ctr.stylemap.co.jp/">
+<img src="https://www.f-counter.net/ani1/66/1763895419/" alt="アクセスカウンター">
+</a>
+</td>
+<td>
+<a href="https://ctr.stylemap.co.jp/">
+<img src="https://www.f-counter.net/ani2/66/1763895419/" alt="アクセスカウンター">
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+</nobr>
+</div>
+
+<button id="admin-login-btn" type="button">管理アカウントでログイン</button>
 
 <script>
-function togglePassword(){
-  const p = document.getElementById("password");
-  p.type = p.type === "password" ? "text" : "password";
-}
-
-document.addEventListener("contextmenu", e => e.preventDefault());
-document.getElementById("password").addEventListener("paste", e => e.preventDefault());
-
-const bar = document.getElementById("strength-bar");
-document.getElementById("password").addEventListener("input", e => {
-  let s = 0;
-  const v = e.target.value;
-  if(v.length>=8) s++;
-  if(/[A-Z]/.test(v)) s++;
-  if(/[a-z]/.test(v)) s++;
-  if(/[0-9]/.test(v)) s++;
-  if(/[^A-Za-z0-9]/.test(v)) s++;
-  bar.style.width = (s/5*100)+"%";
-  bar.style.background = s<=2?"red":s<=4?"orange":"green";
+document.getElementById("admin-login-btn").addEventListener("click", function() {
+  window.location.href = "https://yuma873.github.io/blush-nimble/kanri.html";
 });
 
-const last = localStorage.getItem("lastDeviceInfo");
-if(last) document.getElementById("last-device").textContent = "前回: "+last;
+function togglePassword() {
+  const pass = document.getElementById("password");
+  pass.type = document.getElementById("showpass").checked ? "text" : "password";
+}
 
-const users = [{name:"oshiki",password:"Oshiki",link:"portal.html"}];
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.getElementById("password").addEventListener('paste', e => e.preventDefault());
+document.getElementById("password").addEventListener('copy', e => e.preventDefault());
 
-document.getElementById("login-btn").onclick = () => {
-  const u = username.value.trim();
-  const p = password.value.trim();
-  if(!u||!p) return errorMsg.textContent="未入力です";
+const passwordInput = document.getElementById("password");
+const strengthBar = document.getElementById("strength-bar");
+passwordInput.addEventListener('input', () => {
+  const val = passwordInput.value;
+  let strength = 0;
+  if(val.length >= 8) strength++;
+  if(/[A-Z]/.test(val)) strength++;
+  if(/[a-z]/.test(val)) strength++;
+  if(/[0-9]/.test(val)) strength++;
+  if(/[^A-Za-z0-9]/.test(val)) strength++;
+  const percent = (strength / 5) * 100;
+  strengthBar.style.width = percent + "%";
+  if(strength <= 2) strengthBar.style.backgroundColor = "red";
+  else if(strength <= 4) strengthBar.style.backgroundColor = "orange";
+  else strengthBar.style.backgroundColor = "green";
+});
 
-  if(grecaptcha.getResponse().length===0)
-    return errorMsg.textContent="reCAPTCHAを完了してください";
+const lastDevice = document.getElementById("last-device");
+const prevInfo = localStorage.getItem("lastDeviceInfo");
+if (prevInfo) {
+  lastDevice.textContent = `前回ログイン端末: ${prevInfo}`;
+}
 
-  const user = users.find(x=>x.name===u && x.password===p);
-  if(!user) return errorMsg.textContent="認証失敗";
+const users = [
+  { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" }
+];
 
-  loading.style.display="flex";
+document.getElementById("login-btn").addEventListener("click", handleLogin);
 
-  let info = navigator.userAgent+" / "+new Date().toLocaleString();
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(pos=>{
-      info += ` / ${pos.coords.latitude.toFixed(3)},${pos.coords.longitude.toFixed(3)}`;
-      localStorage.setItem("lastDeviceInfo",info);
-    },()=>localStorage.setItem("lastDeviceInfo",info));
+function handleLogin() {
+  const loginBtn = document.getElementById("login-btn");
+  const errorMsg = document.getElementById("error-msg");
+  const loading = document.getElementById("loading");
+
+  const name = document.getElementById("username").value.trim();
+  const pass = document.getElementById("password").value.trim();
+
+  if (!name || !pass) {
+    errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
+    return;
   }
 
-  setTimeout(()=>location.href=user.link,1500);
-};
+  const recaptcha = grecaptcha.getResponse();
+  if (recaptcha.length === 0) {
+    errorMsg.textContent = "reCAPTCHAを完了してください。";
+    return;
+  }
+
+  const user = users.find(u => u.name === name && u.password === pass);
+  if (!user) {
+    errorMsg.textContent = "ユーザーIDまたはパスワードが異なります。";
+    return;
+  }
+
+  loading.style.display = "flex";
+  loginBtn.disabled = true;
+
+  const deviceInfo = navigator.userAgent;
+  const now = new Date();
+  let infoText = `${deviceInfo} - ${now.toLocaleString()}`;
+
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        infoText += ` - 緯度: ${pos.coords.latitude.toFixed(4)}, 経度: ${pos.coords.longitude.toFixed(4)}`;
+        localStorage.setItem("lastDeviceInfo", infoText);
+      },
+      () => {
+        localStorage.setItem("lastDeviceInfo", infoText);
+      }
+    );
+  } else {
+    localStorage.setItem("lastDeviceInfo", infoText);
+  }
+
+  setTimeout(() => {
+    loading.style.display = "none";
+    window.location.href = user.link;
+  }, 1500);
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") handleLogin();
+});
 </script>
+
+<script src="https://app.smilego.jp/smilego_bnr/v1/smilego.min.js?mk=2c217a95779c&sid=1528"></script>
 </body>
 </html>
