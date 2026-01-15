@@ -253,42 +253,23 @@ document.addEventListener('contextmenu', e => e.preventDefault());
 document.getElementById("password").addEventListener('paste', e => e.preventDefault());
 document.getElementById("password").addEventListener('copy', e => e.preventDefault());
 
+const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 const strengthBar = document.getElementById("strength-bar");
-passwordInput.addEventListener('input', () => {
-  const val = passwordInput.value;
-  let strength = 0;
-  if(val.length >= 8) strength++;
-  if(/[A-Z]/.test(val)) strength++;
-  if(/[a-z]/.test(val)) strength++;
-  if(/[0-9]/.test(val)) strength++;
-  if(/[^A-Za-z0-9]/.test(val)) strength++;
-  const percent = (strength / 5) * 100;
-  strengthBar.style.width = percent + "%";
-  if(strength <= 2) strengthBar.style.backgroundColor = "red";
-  else if(strength <= 4) strengthBar.style.backgroundColor = "orange";
-  else strengthBar.style.backgroundColor = "green";
-});
-
 const lastDevice = document.getElementById("last-device");
 const lastLoginDt = document.getElementById("last-login-dt");
-const prevInfo = localStorage.getItem("lastDeviceInfo");
-if (prevInfo) {
-  lastDevice.textContent = `前回ログイン端末: ${prevInfo}`;
-}
-
-const users = [
-  { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
-  { name: "osk", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal-tool.html" },
-  { name: "Jsuwkmlsi917Iwk19072", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/toppage.html" }
-];
-
 const loginBtn = document.getElementById("login-btn");
 const errorMsg = document.getElementById("error-msg");
 const lockMsg = document.getElementById("lock-msg");
 const countdownMsg = document.getElementById("countdown-msg");
 const capsWarn = document.getElementById("caps-warning");
 const loading = document.getElementById("loading");
+
+const users = [
+  { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
+  { name: "osk", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal-tool.html" },
+  { name: "Jsuwkmlsi917Iwk19072", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/toppage.html" }
+];
 
 let failCount = Number(localStorage.getItem("failCount")) || 0;
 let lockUntil = Number(localStorage.getItem("lockUntil")) || 0;
@@ -313,11 +294,22 @@ function getLockTime(fails) {
 /* ===== ロックチェック ===== */
 function checkLock() {
   const now = Date.now();
+
+  // 過去のロックが切れていたら解除
+  if (lockUntil && now >= lockUntil) {
+    lockUntil = 0;
+    localStorage.removeItem("lockUntil");
+    failCount = 0;
+    localStorage.removeItem("failCount");
+  }
+
   if (isMaintenance()) {
     loginBtn.disabled = true;
     lockMsg.textContent = "現在メンテナンス中です（木曜14:00〜15:00）";
+    countdownMsg.textContent = "";
     return true;
   }
+
   if (lockUntil && now < lockUntil) {
     loginBtn.disabled = true;
     const remain = Math.ceil((lockUntil - now) / 1000);
@@ -343,7 +335,6 @@ function startCountdown() {
       loginBtn.disabled = false;
       countdownMsg.textContent = "";
       lockMsg.textContent = "";
-      localStorage.removeItem("lockUntil");
       return;
     }
     const remain = Math.ceil((lockUntil - now) / 1000);
@@ -354,6 +345,22 @@ function startCountdown() {
 /* ===== CapsLock警告 ===== */
 passwordInput.addEventListener("keyup", (e) => {
   capsWarn.style.display = e.getModifierState("CapsLock") ? "block" : "none";
+});
+
+/* ===== パスワード強度 ===== */
+passwordInput.addEventListener('input', () => {
+  const val = passwordInput.value;
+  let strength = 0;
+  if(val.length >= 8) strength++;
+  if(/[A-Z]/.test(val)) strength++;
+  if(/[a-z]/.test(val)) strength++;
+  if(/[0-9]/.test(val)) strength++;
+  if(/[^A-Za-z0-9]/.test(val)) strength++;
+  const percent = (strength / 5) * 100;
+  strengthBar.style.width = percent + "%";
+  if(strength <= 2) strengthBar.style.backgroundColor = "red";
+  else if(strength <= 4) strengthBar.style.backgroundColor = "orange";
+  else strengthBar.style.backgroundColor = "green";
 });
 
 /* ===== ログイン処理 ===== */
