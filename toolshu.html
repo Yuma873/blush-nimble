@@ -127,6 +127,26 @@
         }
       }
     </script>
+    <script>
+  // ページ全体用ログイン
+  const pageCorrectID = "oshiki";
+  const pageCorrectPassword = "Oshiki";
+
+  // ページ読み込み時に実行
+  window.onload = function () {
+    const userID = prompt("【閲覧制限】ログインIDを入力してください:");
+    const userPassword = prompt("【閲覧制限】パスワードを入力してください:");
+
+    if (userID !== pageCorrectID || userPassword !== pageCorrectPassword) {
+      alert("ログインに失敗しました。トップページへ戻ります。");
+      // ページを見せない
+      document.body.innerHTML = "";
+      // もしくは別ページへ飛ばす場合
+      // window.location.href = "https://example.com";
+    }
+  };
+</script>
+
   </head>
 
   <body>
