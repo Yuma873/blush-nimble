@@ -4,13 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ツール ポータルページ</title>
-      <link rel="shortcut icon" href="favicon3.png" type="image/png">
-
+    <link rel="shortcut icon" href="favicon3.png" type="image/png" />
 
     <!-- PushCode（遅延読み込み） -->
     <script defer src="https://www.pushcode.jp/dist/js/pushcode.js"></script>
     <script>
-      // PushCode に渡す初期化関数（pushcode.js 側が遅延で呼ぶ想定）
       window.PushCodeInit = function () {
         try {
           if (PushCode && PushCode.isSupport()) {
@@ -37,6 +35,9 @@
         padding: 0;
         background-color: #f9f9f9;
         color: #333;
+
+        /* ★ 全体ログインが通るまで表示しない */
+        display: none;
       }
 
       header {
@@ -65,11 +66,6 @@
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         display: flex;
         align-items: center;
-      }
-
-      .section .emoji {
-        font-size: 60px;
-        margin-right: 20px;
       }
 
       .section img {
@@ -112,7 +108,7 @@
     </style>
 
     <script>
-      // 簡易ログイン（prompt） — いつものまま残しました
+      /* 各リンク用ログイン */
       const correctID = "oshiki";
       const correctPassword = "Oshiki";
 
@@ -120,33 +116,31 @@
         const userID = prompt("ログインIDを入力してください:");
         const userPassword = prompt("パスワードを入力してください:");
         if (userID === correctID && userPassword === correctPassword) {
-          // GitHub Pages の公開ページへ遷移
           window.location.href = link;
         } else {
           alert("ログインIDまたはパスワードが間違っています。");
         }
       }
     </script>
+
     <script>
-  // ページ全体用ログイン
-  const pageCorrectID = "oshiki";
-  const pageCorrectPassword = "Oshiki";
+      /* ページ全体用ログイン */
+      const pageCorrectID = "oshiki";
+      const pageCorrectPassword = "Oshiki";
 
-  // ページ読み込み時に実行
-  window.onload = function () {
-    const userID = prompt("【閲覧制限】ログインIDを入力してください:");
-    const userPassword = prompt("【閲覧制限】パスワードを入力してください:");
+      window.onload = function () {
+        const userID = prompt("【閲覧制限】ログインIDを入力してください:");
+        const userPassword = prompt("【閲覧制限】パスワードを入力してください:");
 
-    if (userID !== pageCorrectID || userPassword !== pageCorrectPassword) {
-      alert("ログインに失敗しました。トップページへ戻ります。");
-      // ページを見せない
-      document.body.innerHTML = "";
-      // もしくは別ページへ飛ばす場合
-      // window.location.href = "https://example.com";
-    }
-  };
-</script>
-
+        if (userID === pageCorrectID && userPassword === pageCorrectPassword) {
+          /* ★ 成功したら初めて表示 */
+          document.body.style.display = "block";
+        } else {
+          alert("ログインに失敗しました。");
+          document.body.innerHTML = "";
+        }
+      };
+    </script>
   </head>
 
   <body>
@@ -156,9 +150,7 @@
     </header>
 
     <main>
-      <!-- Section 1 -->
       <div class="section">
-        <!-- 画像のまま残すか絵文字にしたいか好みで変更できます -->
         <img
           src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
           alt="2025年度水泳部合宿"
@@ -167,7 +159,6 @@
           <h2>2025年度水泳部冬合宿</h2>
           <p>2025年度の冬季合宿に関する詳細情報はこちらをご覧ください。</p>
           <p>掲載期間:2026/1/1まで</p>
-          <!-- GitHub → GitHub Pages 形式に変更 -->
           <a
             href="https://yuma873.github.io/blush-nimble/2025-wintercamp.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
@@ -176,7 +167,6 @@
         </div>
       </div>
 
-      <!-- Section 2 -->
       <div class="section">
         <img
           src="https://thumb.photo-ac.com/e7/e715a1438b5978fb407fbe2757fe185c_t.jpeg"
@@ -185,7 +175,7 @@
         <div class="section-content">
           <h2>大会一覧</h2>
           <p>今後の大会スケジュールを確認できます。</p>
-          <p>掲載期間:当面の間　　最終更新:1/14</p>
+          <p>掲載期間:当面の間　最終更新:1/14</p>
           <a
             href="https://yuma873.github.io/blush-nimble/taikaiichiran.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
@@ -194,7 +184,6 @@
         </div>
       </div>
 
-      <!-- Section 3 -->
       <div class="section">
         <img
           src="https://thumb.photo-ac.com/e7/e715a1438b5978fb407fbe2757fe185c_t.jpeg"
@@ -203,7 +192,7 @@
         <div class="section-content">
           <h2>次回大会</h2>
           <p>次回開催される大会の日時、場所、詳細情報はこちらです。</p>
-          <p>掲載期間:当面の間　　最終更新:1/14</p>
+          <p>掲載期間:当面の間　最終更新:1/14</p>
           <a
             href="https://yuma873.github.io/blush-nimble/jikaitaikai.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
@@ -212,7 +201,6 @@
         </div>
       </div>
 
-      <!-- Section 4 -->
       <div class="section">
         <img
           src="https://cdn.mainichi.jp/vol1/2016/07/17/20160717k0000e040114000p/6.jpg?1"
@@ -221,7 +209,7 @@
         <div class="section-content">
           <h2>残高管理</h2>
           <p>主に交通費など、残高の管理情報が確認できます。</p>
-          <p>掲載期間:当面の間　　最終更新:1/14</p>
+          <p>掲載期間:当面の間　最終更新:1/14</p>
           <a
             href="https://yuma873.github.io/blush-nimble/zandakakanri.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
@@ -230,7 +218,6 @@
         </div>
       </div>
 
-      <!-- Section 5 -->
       <div class="section">
         <img
           src="https://t4.ftcdn.net/jpg/00/83/86/63/360_F_83866376_1bnVFhX0uPIfuZ1ZSYlfhCsIlHOVPt6G.jpg"
@@ -239,7 +226,7 @@
         <div class="section-content">
           <h2>水泳記録管理システム</h2>
           <p>個人の記録管理はこちらから行えます。</p>
-          <p>掲載期間:当面の間　　最終更新:1/14</p>
+          <p>掲載期間:当面の間　最終更新:1/14</p>
           <a
             href="https://yuma873.github.io/blush-nimble/kiroku.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
@@ -248,7 +235,6 @@
         </div>
       </div>
 
-      <!-- Section 6 -->
       <div class="section">
         <img
           src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRa0vlej9ZaIfIkfiNS_yv1JPk8qd30ZV8lkA&s"
@@ -257,7 +243,7 @@
         <div class="section-content">
           <h2>ミーティング記録</h2>
           <p>部内ミーティングの議事録や内容はこちらにまとめています。</p>
-          <p>掲載期間:当面の間　　最終更新:1/14</p>
+          <p>掲載期間:当面の間　最終更新:1/14</p>
           <a
             href="https://yuma873.github.io/blush-nimble/bukatuMTG.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
@@ -266,7 +252,6 @@
         </div>
       </div>
 
-      <!-- Section 7 -->
       <div class="section">
         <img
           src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvVnp9yaNnu_r7HlMhjSaKhKiWyAVW-dapRw&s"
@@ -275,7 +260,7 @@
         <div class="section-content">
           <h2>日程</h2>
           <p>練習の最新日程をご確認ください。</p>
-          <p>掲載期間:当面の間　　最終更新:1/14</p>
+          <p>掲載期間:当面の間　最終更新:1/14</p>
           <a
             href="https://yuma873.github.io/blush-nimble/bukatunittei.html"
             onclick="event.preventDefault(); verifyLogin(this.href);"
@@ -286,4 +271,3 @@
     </main>
   </body>
 </html>
-
