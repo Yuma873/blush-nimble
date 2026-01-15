@@ -297,7 +297,7 @@ function isMaintenance() {
   const day = now.getDay(); // 木曜 = 4
   const hour = now.getHours();
   const minute = now.getMinutes();
-  return day === 4 && hour === 15 && minute >= 0 && minute < 60;
+  return day === 4 && hour === 16 && minute >= 0 && minute < 60;
 }
 
 /* ===== ロック時間判定（段階式） ===== */
@@ -322,7 +322,7 @@ function checkLock() {
 
   if (isMaintenance()) {
     loginBtn.disabled = true;
-    lockMsg.textContent = "現在メンテナンス中です（木曜14:00〜15:00）";
+    lockMsg.textContent = "現在メンテナンス中です";
     countdownMsg.textContent = "";
     return true;
   }
