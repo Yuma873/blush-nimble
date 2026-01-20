@@ -69,11 +69,12 @@
     color: #2c3e50;
   }
 
+  /* details（カテゴリごとの折りたたみ） */
   details {
     margin-bottom: 15px;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   }
 
   summary {
@@ -85,6 +86,7 @@
     user-select: none;
     display: flex;
     align-items: center;
+    transition: filter 0.2s;
   }
 
   summary::before {
@@ -98,12 +100,17 @@
     transform: rotate(90deg);
   }
 
-  details:nth-child(1) summary { background-color: #3498db; } /* 市区町村 */
-  details:nth-child(2) summary { background-color: #2ecc71; } /* プール */
-  details:nth-child(3) summary { background-color: #e67e22; } /* スケジュール */
-  details:nth-child(4) summary { background-color: #9b59b6; } /* 天気 */
-  details:nth-child(5) summary { background-color: #e74c3c; } /* 健康 */
-  details:nth-child(6) summary { background-color: #f1c40f; color:#2c3e50;} /* その他 */
+  /* カテゴリごとの落ち着いた色 */
+  details:nth-child(1) summary { background-color: #5dade2; } /* 市区町村 */
+  details:nth-child(2) summary { background-color: #58d68d; } /* プール */
+  details:nth-child(3) summary { background-color: #f5b041; } /* スケジュール */
+  details:nth-child(4) summary { background-color: #af7ac5; } /* 天気 */
+  details:nth-child(5) summary { background-color: #ec7063; } /* 健康 */
+  details:nth-child(6) summary { background-color: #f4d03f; color:#2c3e50;} /* その他 */
+
+  summary:hover {
+    filter: brightness(0.9);
+  }
 
   details ul {
     background-color: #fff;
@@ -137,7 +144,10 @@
     cursor: pointer;
     margin-top: 20px;
     font-weight: bold;
+    transition: background-color 0.3s;
   }
+
+  button:hover { background-color: #2e86c1; }
 
   /* 下部テロップ */
   .ticker-wrap {
@@ -164,21 +174,35 @@
     from { transform: translateX(0%); }
     to { transform: translateX(-100%); }
   }
+
+  /* スマホ対応 */
+  @media (max-width: 600px) {
+    body { flex-direction: column; }
+    nav {
+      position: relative;
+      width: 100%;
+      height: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+    nav a { flex: 1 1 40%; margin: 5px; text-align: center; }
+    main { margin-left: 0; padding: 20px; height: auto; }
+    nav video { display: none; }
+  }
+
 </style>
 </head>
 
 <body>
   <nav>
-    <!-- ランダム動画 -->
     <video id="randomVideo" autoplay muted loop playsinline></video>
 
-    <!-- ナビ項目 -->
     <a href="toppage.html">🏠 トップ</a>
     <a href="portal-reserve.html" target="_blank">
       <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
     </a>
-    <a href="https://yuma873.github.io/blush-nimble/index.html"
-       style="background-color:#f44336; font-weight:bold;">🚪 ログアウト</a>
+    <a href="https://yuma873.github.io/blush-nimble/index.html" style="background-color:#f44336; font-weight:bold;">🚪 ログアウト</a>
   </nav>
 
   <main>
@@ -242,7 +266,7 @@
 
   <div class="ticker-wrap">
     <div class="ticker">
-      <span></span>
+      🚨 雷の兆候がある際は活動を控えて ／ 📢 随時Classroomにも投稿しています
     </div>
   </div>
 
