@@ -7,6 +7,50 @@
   <link rel="shortcut icon" href="favicon2.png" type="image/png" />
 
   <style>
+    /* ===== 起動時広告（小さめ） ===== */
+.ad-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20000;
+}
+
+.ad-box {
+  position: relative;
+  width: 90%;
+  max-width: 500px;   /* ← 大きさ制限 */
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  padding: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+.ad-box img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.ad-close {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
     body {
       font-family: "Segoe UI", Arial, sans-serif;
       margin: 0;
@@ -129,6 +173,14 @@
 </head>
 
 <body>
+  <!-- ===== 起動時広告 ===== -->
+<div class="ad-overlay" id="startupAd">
+  <div class="ad-box">
+    <button class="ad-close" onclick="closeAd()">×</button>
+    <img src="ad.jpg" alt="お知らせ">
+  </div>
+</div>
+
 
 <!-- ===== 左ナビ ===== -->
 <nav>
@@ -215,6 +267,12 @@
         : `${e.name}：あと <strong style="color:${color}">${d}日</strong>`;
     list.appendChild(li);
   });
+  <script>
+  function closeAd() {
+    document.getElementById("startupAd").style.display = "none";
+  }
+</script>
+
 </script>
 
 <!-- 📰 テロップ -->
