@@ -278,7 +278,19 @@
 </div>
 
   <script>
-  function closeAd() {
+  <script>
+  // ページの内容が全部読み込まれたら実行
+  window.addEventListener("DOMContentLoaded", function() {
+    const startupAd = document.getElementById("startupAd");
+    const adCloseBtn = startupAd.querySelector(".ad-close");
+
+    adCloseBtn.addEventListener("click", function() {
+      startupAd.style.display = "none";  // 広告非表示
+    });
+  });
+</script>
+
+    function closeAd() {
     document.getElementById("startupAd").style.display = "none";
   }
 </script>
