@@ -83,13 +83,13 @@
 <div class="card">
   <div class="title">🌡 外気温（屋外）</div>
   <div class="value" id="airTemp">-- ℃</div>
-  <div class="update" id="airUpdate">最終更新: 1/7 08:00</div>
+  <div class="update" id="airUpdate">最終更新: 2/14 08:00</div>
 </div>
 
 <div class="card">
   <div class="title">☀ 内気温</div>
   <div class="value" id="inside">-- ℃</div>
-  <div class="update" id="insideUpdate">最終更新: 1/7 08:00</div>
+  <div class="update" id="insideUpdate">最終更新: 2/14 08:00</div>
 </div>
 
 <div class="card">
@@ -119,14 +119,11 @@
 // -------------------------------
 const CLOSED_PERIODS = [
   
-  { date: "1/11", startHour: 0, startMinute: 0, endHour: 15, endMinute: 30, reason: "専用利用のため" },
-  { date: "1/16", startHour: 19, startMinute: 30, endHour: 23, endMinute: 59, reason: "大会設営のため" },
-  { date: "1/17", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "大会のため" },
-  { date: "1/18", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "大会のため" },
-    { date: "1/23", startHour: 19, startMinute: 30, endHour: 23, endMinute: 59, reason: "大会設営のため" },
-   { date: "1/24", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "大会のため" },
-  { date: "1/25", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "大会のため" },
-  { date: "1/27", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "所定日" },
+  { date: "2/14", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "大会のため" },
+  { date: "2/15", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "大会のため" },
+  { date: "2/21", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "大会のため" },
+  { date: "2/22", startHour: 0, startMinute: 0, endHour: 23, endMinute: 59, reason: "大会のため" },
+    
 
 ];
 
@@ -166,7 +163,7 @@ const closedReason = getClosedReason();
 const noticeDiv = document.querySelector(".notice");
 let todayKey = `${new Date().getMonth() + 1}/${new Date().getDate()}`;
 
-let todayNotices = NOTICE_DAYS[todayKey] || ["通常利用可能です。","混雑状況は変動する場合があります","ご予約はお早めに"];
+let todayNotices = NOTICE_DAYS[todayKey] || ["通常利用可能です。","混雑状況は変動する場合があります","3月分予約受付中"];
 let noticeIndex = 0;
 
 // 最初に表示
@@ -284,7 +281,7 @@ function loadHistory() {
 // -------------------------------
 // 初期値セット
 // -------------------------------
-document.getElementById("airTemp").textContent = "4.9℃";
+document.getElementById("airTemp").textContent = "3.5℃";
 document.getElementById("inside").textContent = "29.3℃";
 document.getElementById("mainTemp").textContent = "今年度終了";
 
