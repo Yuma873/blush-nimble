@@ -1,267 +1,292 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ポータルサイト - 連絡</title>
-<link rel="shortcut icon" href="favicon4.png" type="image/png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ポータルサイト - 掲示板連絡</title>
+  <link rel="shortcut icon" href="favicon3.png" type="image/png" />
 
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    display: flex;
-    background-color: #f5f5f5;
-    min-height: 100vh;
-  }
+  <style>
+    /* ===== 起動時広告（小さめ） ===== */
+.ad-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20000;
+}
 
-  /* ===== 左ナビ ===== */
-  nav {
-    width: 220px;
-    background-color: #2c3e50;
-    color: white;
-    padding: 10px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    overflow-y: auto;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.3);
-    z-index: 1000;
-  }
+.ad-box {
+  position: relative;
+  width: 90%;
+  max-width: 500px;   /* ← 大きさ制限 */
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  padding: 10px;
+  animation: fadeIn 0.3s ease;
+}
 
-  nav video {
-    width: 100%;
-    max-height: 150px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    object-fit: cover;
-  }
+.ad-box img {
+  width: 100%;
+  border-radius: 8px;
+}
 
-  nav a {
-    display: block;
-    color: white;
-    text-decoration: none;
-    padding: 12px;
-    margin: 6px 0;
-    background-color: #34495e;
-    border-radius: 6px;
-    transition: background-color 0.3s;
-    text-align: left;
-  }
-  nav a:hover { background-color: #1abc9c; }
+.ad-close {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-  nav img { display: block; margin: 8px auto; }
-
-  /* ===== main ===== */
-  main {
-    flex: 1;
-    padding: 30px;
-    margin-left: 240px; 
-    overflow-y: auto;
-    height: 100vh;
-    box-sizing: border-box;
-  }
-
-  header {
-    font-size: 1.8em;
-    margin-bottom: 20px;
-    color: #2c3e50;
-  }
-
-  /* ===== 掲示板カード ===== */
-  .board {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .board-item {
-    background: #fff;
-    border-left: 6px solid #3498db;
-    border-radius: 12px;
-    padding: 15px 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform 0.2s;
-  }
-  .board-item:hover { transform: translateY(-3px); }
-
-  .board-item .date {
-    color: #2c3e50;
-    font-weight: bold;
-    font-size: 0.9em;
-    margin-bottom: 6px;
-  }
-
-  .board-item .content {
-    font-size: 1.1em;
-    color: #34495e;
-    line-height: 1.6;
-  }
-
-  /* ===== カウントダウン ===== */
-  #countdown-list {
-    list-style: none;
-    padding-left: 0;
-    margin-top: 15px;
-  }
-  #countdown-list li {
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
-    font-size: 1.05em;
-  }
-
-  #countdown-list li strong { font-weight: bold; }
-
-  /* ===== ボタン ===== */
-  button {
-    padding: 12px 24px;
-    font-size: 1em;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 20px;
-    font-weight: bold;
-    transition: background-color 0.3s;
-  }
-  button:hover { background-color: #2980b9; }
-
-  /* ===== 下テロップ ===== */
-  .ticker-wrap {
-    width: 100%;
-    overflow: hidden;
-    background-color: #2c3e50;
-    color: white;
-    padding: 8px 0;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    z-index: 9999;
-  }
-  .ticker {
-    display: inline-block;
-    white-space: nowrap;
-    animation: tickerScroll 25s linear infinite;
-    padding-left: 100%;
-  }
-  @keyframes tickerScroll {
-    from { transform: translateX(0%); }
-    to { transform: translateX(-100%); }
-  }
-
-  /* ===== スマホ対応 ===== */
-  @media (max-width: 600px) {
-    body { flex-direction: column; }
-    nav {
-      position: relative;
-      width: 100%;
-      height: auto;
-      box-shadow: none;
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
       display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
+      min-height: 100vh;
     }
-    nav a { flex: 1 1 40%; margin: 5px; text-align: center; }
-    main { margin-left: 0; padding: 20px; height: auto; }
-    nav video { display: none; }
-  }
-</style>
+    nav {
+      width: 240px;
+      background-color: #2c3e50;
+      color: white;
+      padding: 15px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+      box-sizing: border-box;
+    }
+    nav video {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    nav a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 12px;
+      margin: 6px 0;
+      background-color: #34495e;
+      border-radius: 6px;
+      text-align: center;
+      transition: 0.3s;
+      font-weight: 500;
+    }
+    nav a:hover { background-color: #1abc9c; }
+    nav img { display: block; margin: 8px auto; border-radius: 6px; }
+
+    main {
+      flex: 1;
+      padding: 30px;
+      margin-left: 260px;
+      box-sizing: border-box;
+    }
+    header {
+      font-size: 1.6em;
+      margin-bottom: 15px;
+      color: #2c3e50;
+      font-weight: bold;
+    }
+    section {
+      margin-bottom: 40px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    .update-time {
+      font-size: 0.9em;
+      color: #777;
+      text-align: right;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #1abc9c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover { background-color: #16a085; }
+
+    iframe {
+      width: 100%;
+      height: 780px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px #ddd;
+    }
+
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    @media(max-width:768px){
+      body { flex-direction:column; }
+      nav { width:100%; height:auto; position:relative; }
+      main { margin-left:0; padding:15px; }
+    }
+
+    .ticker-wrap {
+      width: 100%;
+      overflow: hidden;
+      background-color: #2c3e50;
+      color: white;
+      padding: 8px 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      z-index: 9999;
+    }
+    .ticker {
+      display: inline-block;
+      white-space: nowrap;
+      animation: tickerScroll 25s linear infinite;
+      padding-left: 100%;
+    }
+    @keyframes tickerScroll {
+      from { transform:translateX(0%); }
+      to { transform:translateX(-100%); }
+    }
+  </style>
 </head>
 
 <body>
-  <nav>
-    <video id="randomVideo" autoplay muted loop playsinline></video>
-
-    <a href="portal.html">🏠 トップ</a>
-    <a href="portal-news.html">📰 お知らせ</a>
-    <a href="portal-tool.html">🛠 ツール</a>
-    <a href="portal-renraku.html">📢 掲示板連絡</a>
-    <a href="portal-pdf.html">📁 ファイル一覧</a>
-    <a href="portal-next.html">🏆 次回大会 特設ページ</a>
-
-    <a href="portal-reserve.html" target="_blank">
-      <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
-    </a>
-
-    <a href="https://yuma873.github.io/blush-nimble/index.html"
-       style="background-color:#f44336; font-weight:bold;">🚪ログアウト</a>
-  </nav>
-
-  <main>
-    <header>📢 掲示板連絡</header>
-
-    <section class="board">
-      <div class="board-item">
-        <div class="date">2025/08/24</div>
-        <div class="content">
-          <b>9/23 市選手権大会について</b><br>
-          集合…未定<br>
-          時刻…9:30開場 13:30終了(予定)<br>
-          持ち物…水着、飲み物、(軽食)、タオル等<br>
-          服装…ユニフォームまたは制服<br>
-          備考…特設ページは
-          <a href="portal-20250923.html" target="_blank">こちら</a>
-        </div>
-      </div>
-
-      <div class="board-item">
-        <div class="date">2025/08/10</div>
-        <div class="content">
-          <b>8/22 プール練習について</b><br>
-          【8月23日（土）の練習】<br>
-          プールに集合し、ミーティングを行います。理科室ではありません。<br>
-          内容は以下のとおりです：<br>
-          ①（1・2年生）新人戦について<br>
-          ②（前期生）9月の伊勢原市の大会について<br>
-          ③（3～5年生）9月6日（土）について<br>
-          ミーティング終了後に練習を開始します。
-        </div>
-      </div>
-
-      <div class="board-item">
-        <div class="date">2025/08/10</div>
-        <div class="content">
-          <b>8/13 [希望制]横国特別練習について</b><br>
-          集合…北山田駅前<br>
-          時刻…9:15集合 12:00解散(予定)<br>
-          持ち物…水着、飲み物、(軽食)、タオル、入場料(350円)<br>
-          服装…私服<br>
-          備考…希望者は8/9までにLINEで。現在2名が希望中。
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <header>⏳ 大会カウントダウン</header>
-      <ul id="countdown-list"></ul>
-    </section>
-
-    <button onclick="location.href='portal.html'">ポータルトップへ戻る</button>
-  </main>
-
-  <div class="ticker-wrap">
-    <div class="ticker">
-      🚨 雷の兆候がある際は活動を控えて ／ 📢 随時Classroomにも投稿しています
-    </div>
+  <!-- ===== 起動時広告 ===== -->
+<div class="ad-overlay" id="startupAd">
+  <div class="ad-box">
+    <button class="ad-close" onclick="closeAd()">×</button>
+    <img src="ad.jpg" alt="お知らせ">
   </div>
+</div>
 
-  <!-- ランダム動画スクリプト -->
-  <script>
-    const videos = ["video1.mp4","video2.mp4","video3.mp4","video5.mp4","V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4","V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
-    document.getElementById("randomVideo").src = videos[Math.floor(Math.random() * videos.length)];
-  </script>
 
-  <!-- カウントダウン -->
+<!-- ===== 左ナビ ===== -->
+<nav>
+  <video id="randomVideo" autoplay muted loop playsinline></video>
+
+  <a href="portal.html">🏠 トップ</a>
+  <a href="portal-news.html">📰 お知らせ</a>
+  <a href="portal-tool.html">🛠 ツール</a>
+  <a href="portal-renraku.html">📢 掲示板連絡</a>
+  <a href="portal-pdf.html">📁 ファイル一覧</a>
+  <a href="portal-next.html">🏆 次回大会 特設ページ</a>
+
+  <a href="portal-reserve.html" target="_blank">
+    <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
+  </a>
+
+  <a href="https://yuma873.github.io/blush-nimble/index.html"
+     style="display:inline-block; padding:10px 20px; background-color:#f44336; color:white; text-decoration:none; border-radius:5px; font-weight:bold;">
+    🚪 ログアウト
+  </a>
+</nav>
+
+<!-- ===== メイン ===== -->
+<main>
+
+  <section>
+    <header>📢 掲示板連絡</header>
+    <iframe
+      src="https://fs.lck-cloud.com/u17540/%E6%8E%B2%E7%A4%BA%E6%9D%BF%E9%80%A3%E7%B5%A1/"
+      loading="lazy">
+    </iframe>
+  </section>
+
+ 
+
+  <section class="update-time">
+    最終更新: 2025/8/15 8:17.22
+  </section>
+
+  <button onclick="location.href='portal.html'">ポータルトップへ戻る</button>
+</main>
+
+<!-- 🎬 ランダム動画 -->
+<script>
+  const videos = [
+    "video1.mp4","video2.mp4","video3.mp4","video5.mp4",
+    "V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4",
+    "V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"
+  ];
+  document.getElementById("randomVideo").src =
+    videos[Math.floor(Math.random() * videos.length)];
+</script>
+
+<!-- ⏳ カウントダウン -->
+<script>
+  const events = [
+    { name: "春季記録会(24-25)", date: "2026-05-24" },
+    { name: "夏季記録会", date: "2026-06-15" },
+    { name: "県高校総体(20-22)", date: "2026-06-20" },
+    { name: "北相地区大会", date: "2026-07-28" },
+    { name: "北相地区新人", date: "2026-09-13" },
+    { name: "県新人(27-28)", date: "2026-09-27" }
+  ];
+
+  const today = new Date();
+  const list = document.getElementById("countdown-list");
+
+  events.forEach(e => {
+    const d = Math.ceil((new Date(e.date) - today) / (1000*60*60*24));
+    let color = "#666";
+    if (d <= 7) color = "red";
+    else if (d <= 30) color = "orange";
+    else if (d <= 50) color = "goldenrod";
+
+    const li = document.createElement("li");
+    li.innerHTML =
+      d > 60
+        ? `<span style="color:#aaa;">${e.name}：あと ${d}日</span>`
+        : `${e.name}：あと <strong style="color:${color}">${d}日</strong>`;
+    list.appendChild(li);
+  });
+
+</script>
+
+<!-- 📰 テロップ -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    🚨 雷の兆候がある際は活動を控えて ／ 📢 随時Classroomでも更新中   </div>
+</div>
+
   <script>
-    const events = [
-      { name: "春季記録会(24-25)", date: "2026-05-24" },
-      { name: "夏季記録会", date: "2026-06-15" },
-      { name: "県高校総体(20-22)", date: "2026-06-20" },
-      { name: "北相地区大会", date: "2026-07-28" },
-      { name: "北相地区新人", date: "2026-09-13" },
-      { name: "県
+  // ページの内容が全部読み込まれたら実行
+  window.addEventListener("DOMContentLoaded", function() {
+    const startupAd = document.getElementById("startupAd");
+    const adCloseBtn = startupAd.querySelector(".ad-close");
+
+    adCloseBtn.addEventListener("click", function() {
+      startupAd.style.display = "none";
+    });
+  });
+
+  function closeAd() {
+    document.getElementById("startupAd").style.display = "none";
+  }
+</script>
+
+</body>
+<script src="https://app.smilego.jp/smilego_bnr/v1/smilego.min.js?mk=2c217a95779c&sid=1528"></script>
+</html>
