@@ -234,36 +234,7 @@
     videos[Math.floor(Math.random() * videos.length)];
 </script>
 
-<!-- ⏳ カウントダウン -->
-<script>
-  const events = [
-    { name: "春季記録会(24-25)", date: "2026-05-24" },
-    { name: "夏季記録会", date: "2026-06-15" },
-    { name: "県高校総体(20-22)", date: "2026-06-20" },
-    { name: "北相地区大会", date: "2026-07-28" },
-    { name: "北相地区新人", date: "2026-09-13" },
-    { name: "県新人(27-28)", date: "2026-09-27" }
-  ];
 
-  const today = new Date();
-  const list = document.getElementById("countdown-list");
-
-  events.forEach(e => {
-    const d = Math.ceil((new Date(e.date) - today) / (1000*60*60*24));
-    let color = "#666";
-    if (d <= 7) color = "red";
-    else if (d <= 30) color = "orange";
-    else if (d <= 50) color = "goldenrod";
-
-    const li = document.createElement("li");
-    li.innerHTML =
-      d > 60
-        ? `<span style="color:#aaa;">${e.name}：あと ${d}日</span>`
-        : `${e.name}：あと <strong style="color:${color}">${d}日</strong>`;
-    list.appendChild(li);
-  });
-
-</script>
 
 <!-- 📰 テロップ -->
 <div class="ticker-wrap">
