@@ -2,14 +2,14 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>スクールバス発車案内</title>
+<title>スクールバス発車案内（登校便）</title>
 <style>
-body {
+body{
   margin:0;
   font-family:"Segoe UI","Hiragino Kaku Gothic ProN",sans-serif;
   background:#eef2f7;
 }
-.header {
+.header{
   background:#1e3a8a;
   color:white;
   padding:20px 40px;
@@ -17,183 +17,174 @@ body {
   display:flex;
   justify-content:space-between;
 }
-.notice {
-  background:#facc15;
-  color:#1e293b;
-  padding:10px 40px;
-  font-size:18px;
-}
-.main-card {
+.main-card{
   background:white;
   margin:20px 30px;
   padding:20px;
   border-radius:18px;
   box-shadow:0 8px 25px rgba(0,0,0,0.08);
 }
-.bus, .otherBus {
+.bus{
   border-radius:16px;
   color:white;
-  position:relative;
   padding:20px;
   margin-bottom:12px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
 }
-.bus .info, .otherBus .info {
+.bus .info{
   display:flex;
   flex-direction:column;
 }
-.bus .time, .otherBus .time { font-weight:bold; }
-.bus .dest, .otherBus .dest { font-weight:600; margin-top:6px; }
-.bus .car, .otherBus .car { margin-top:10px; display:inline-block; padding:6px 14px; border-radius:8px; font-size:20px; }
-.bus .stops, .otherBus .stops { display:inline-block; margin-left:10px; background:#f87171; color:white; padding:4px 8px; border-radius:6px; font-size:16px; }
-.bus .eta, .otherBus .eta { display:inline-block; margin-left:10px; font-size:18px; background:#fbbf24; color:#1e293b; padding:4px 8px; border-radius:6px; }
-
-.alert { animation: blink 1s infinite; }
-@keyframes blink { 50% { opacity:0.3; } }
-
-#nextBuses { display:flex; flex-direction:column; }
-.next-small {
-  padding:16px;
-  margin-top:8px;
-  border-radius:14px;
-  font-size:22px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  color:white;
+.bus .stops{
+  margin-top:6px;
+  background:#ef4444;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:14px;
 }
-.other-list { margin-top:20px; }
-.other-list-title { font-size:20px; margin-bottom:8px; }
+.bus .eta{
+  background:#fbbf24;
+  color:#1e293b;
+  padding:6px 10px;
+  border-radius:6px;
+  font-size:16px;
+}
+.bus .note{
+  margin-top:4px;
+  background:#f97316;
+  padding:4px 6px;
+  border-radius:6px;
+  font-size:14px;
+}
+
+.next-small{
+  border-radius:14px;
+  color:white;
+  padding:14px;
+  margin-top:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.next-small .info{display:flex;flex-direction:column;}
+.next-small .stops{margin-top:4px;background:#ef4444;padding:2px 6px;border-radius:6px;font-size:12px;}
+.next-small .eta{background:#fbbf24;color:#1e293b;padding:2px 6px;border-radius:6px;font-size:14px;}
+.next-small .note{margin-top:2px;background:#f97316;padding:2px 4px;border-radius:6px;font-size:12px;}
+
+.alert{
+  animation:blink 1s infinite;
+}
+@keyframes blink{
+  50%{opacity:0.3;}
+}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div>スクールバス発車案内</div>
+  <div>スクールバス発車案内（登校便）</div>
   <div id="clock"></div>
 </div>
 
-<div class="notice" id="notice">2/26から、乗車証の提示が必須となります。</div>
-
 <div class="main-card">
-  <div id="dateDisplay" style="font-size:20px; margin-bottom:12px;"></div>
+  <div id="dateDisplay" style="margin-bottom:10px;"></div>
   <div id="nextBuses"></div>
-  <div class="other-list">
-    <div class="other-list-title">運休 / 臨時便</div>
-    <div id="otherBuses"></div>
-  </div>
 </div>
 
 <script>
-// 固定時刻表（平塚→学校）＋到着時刻予想（分）＋ステータス
-// status: "ok"=通常, "cancel"=運休, "extra"=臨時便
-let scheduleTemplate = [
-  {time:"6:50", car:"10号車", stops:true, note:"後期生専用", eta:25, status:"ok"},
-  {time:"7:15", car:"1号車", stops:true, eta:25, status:"ok"},
-  {time:"7:25", car:"2号車", stops:true, eta:25, status:"ok"},
-  {time:"7:30", car:"4号車", stops:false, eta:20, status:"ok"},
-  {time:"7:35", car:"7号車", stops:false, eta:20, status:"ok"},
-  {time:"7:40", car:"8号車", stops:false, eta:20, status:"ok"},
-  {time:"7:45", car:"9号車", stops:true, eta:25, status:"cancel"},
-  {time:"7:50", car:"3号車", stops:false, eta:20, status:"ok"}
+// 固定時刻表（平塚→学校）＋到着時刻予想（分）＋途中停留所＋備考＋ステータス
+let scheduleTemplate=[
+ {time:"6:50",car:"10号車",stops:["崇善","西友","ブックオフ","大住"],eta:25,status:"ok", note:"後期生専用"},
+ {time:"7:15",car:"1号車",stops:["崇善","西友","ブックオフ","大住"],eta:30,status:"ok", note:"通常便"},
+ {time:"7:25",car:"2号車",stops:["崇善","西友","ブックオフ"],eta:40,status:"extra", note:"臨時便"},
+ {time:"7:30",car:"4号車",stops:[],eta:40,status:"ok", note:"直行"},
+ {time:"7:35",car:"7号車",stops:[],eta:35,status:"ok", note:"直行"},
+ {time:"7:40",car:"8号車",stops:[],eta:30,status:"ok", note:"直行"},
+ {time:"7:45",car:"9号車",stops:["崇善","西友","ブックオフ","大住"],eta:35,status:"cancel", note:"運休"},
+ {time:"7:50",car:"3号車",stops:[],eta:35,status:"ok", note:"直行"}
 ];
 
-function getScheduleForToday(){
-  const today = new Date();
-  today.setSeconds(0);
-  today.setMilliseconds(0);
-  return scheduleTemplate.map(item=>({...item, date: new Date(today)}));
+function getScheduleForDate(date){
+  return scheduleTemplate.map(b=>({...b,date:new Date(date)}));
 }
 
-let schedule = getScheduleForToday();
+let schedule=getScheduleForDate(new Date());
 
 function updateBoard(){
-  const now = new Date();
-  document.getElementById("clock").textContent = now.toLocaleTimeString();
-  document.getElementById("dateDisplay").textContent = now.toLocaleDateString();
+  const now=new Date();
+  document.getElementById("clock").textContent=now.toLocaleTimeString();
+  document.getElementById("dateDisplay").textContent=now.toLocaleDateString();
 
-  const future = schedule.filter(b=>{
-    const [h,m] = b.time.split(":").map(Number);
-    const bTime = new Date(b.date); bTime.setHours(h); bTime.setMinutes(m);
-    return bTime >= now || b.status!=="ok";
+  let future=schedule.filter(b=>{
+    const [h,m]=b.time.split(":").map(Number);
+    const bt=new Date(b.date);
+    bt.setHours(h);
+    bt.setMinutes(m);
+    return bt>=now; // 発車後は消える
   });
 
-  const nextContainer = document.getElementById("nextBuses");
-  nextContainer.innerHTML="";
-  const otherContainer = document.getElementById("otherBuses");
-  otherContainer.innerHTML="";
+  if(future.length===0){
+    const nextDay=new Date();
+    nextDay.setDate(now.getDate()+1);
+    schedule=getScheduleForDate(nextDay);
+    future=schedule;
+  }
 
-  // 先発・次発・次々発を抽出
-  const mainDisplay = future.filter(b=>b.status==="ok").slice(0,3);
+  const container=document.getElementById("nextBuses");
+  container.innerHTML="";
 
-  mainDisplay.forEach((b,index)=>{
-    const busBox = document.createElement("div");
-    const [h,m] = b.time.split(":").map(Number);
-    const bTime = new Date(b.date); bTime.setHours(h); bTime.setMinutes(m);
-    const arrival = new Date(bTime.getTime() + b.eta*60000); // 到着時刻
-    const arrivalStr = arrival.getHours().toString().padStart(2,'0') + ":" + arrival.getMinutes().toString().padStart(2,'0');
-    const diff = (bTime - now)/60000;
+  future.slice(0,3).forEach((b,index)=>{
+    const [h,m]=b.time.split(":").map(Number);
+    const bt=new Date(b.date);
+    bt.setHours(h);
+    bt.setMinutes(m);
 
-    if(diff <=1) busBox.classList.add("alert");
+    const arrival=new Date(bt.getTime()+b.eta*60000);
+    const arrivalStr=
+      arrival.getHours().toString().padStart(2,'0')+":"+
+      arrival.getMinutes().toString().padStart(2,'0');
+
+    const diff=(bt-now)/60000;
+
+    let box=document.createElement("div");
 
     if(index===0){
-      busBox.className="bus";
-      busBox.style.background="#16a34a";
-      busBox.innerHTML=`
-        <div class="info">
-          <div class="time" style="font-size:50px;">${b.time}</div>
-          <div class="dest" style="font-size:28px;">学校行き ${b.note?b.note:""}</div>
-          <span class="car">${b.car}</span>
-          ${b.stops?'<span class="stops">途中停車</span>':''}
-        </div>
-        <span class="eta">到着 ${arrivalStr}</span>
-      `;
-    } else {
-      busBox.className="next-small";
-      busBox.style.background = index===1 ? "#2563eb" : "#1d4ed8";
-      busBox.innerHTML=`
-        <div class="info">
-          <div class="time" style="font-size:30px;">${b.time}</div>
-          <div class="dest" style="font-size:22px;">学校行き ${b.note?b.note:""}</div>
-          <span class="car">${b.car}</span>
-          ${b.stops?'<span class="stops">途中停車</span>':''}
-        </div>
-        <span class="eta">到着 ${arrivalStr}</span>
-      `;
+      box.className="bus";
+      box.style.background=
+        b.status==="cancel"?"#dc2626":
+        b.status==="extra"?"#f59e0b":"#16a34a";
+    }else{
+      box.className="next-small";
+      box.style.background=
+        b.status==="cancel"?"#dc2626":
+        b.status==="extra"?"#f59e0b":"#2563eb";
     }
-    nextContainer.appendChild(busBox);
-  });
 
-  // 運休・臨時便は下に一覧表示
-  schedule.forEach(b=>{
-    if(b.status!=="ok"){
-      const busBox = document.createElement("div");
-      busBox.className="otherBus";
-      busBox.style.background = b.status==="cancel" ? "#dc2626" : "#f59e0b";
-      const [h,m] = b.time.split(":").map(Number);
-      const bTime = new Date(b.date); bTime.setHours(h); bTime.setMinutes(m);
-      const arrival = new Date(bTime.getTime() + b.eta*60000);
-      const arrivalStr = arrival.getHours().toString().padStart(2,'0') + ":" + arrival.getMinutes().toString().padStart(2,'0');
+    if(diff<=1) box.classList.add("alert");
 
-      busBox.innerHTML=`
-        <div class="info">
-          <div class="time">${b.time}</div>
-          <div class="dest">${b.status==="cancel"?"運休":"臨時便"} ${b.note?b.note:""}</div>
-          <span class="car">${b.car}</span>
-          ${b.stops?'<span class="stops">途中停車</span>':''}
-        </div>
-        <span class="eta">到着 ${arrivalStr}</span>
-      `;
-      otherContainer.appendChild(busBox);
-    }
+    const stopsHTML=(b.stops && b.stops.length>0)?`<div class="stops">途中停留所: ${b.stops.join(", ")}</div>`:"";
+    const noteHTML=b.note?`<div class="note">備考: ${b.note}</div>`:"";
+
+    box.innerHTML=`
+      <div class="info">
+        <div style="font-size:${index===0?'50px':'28px'};font-weight:bold;">${b.time}</div>
+        <div>${b.status==="cancel"?"運休":
+               b.status==="extra"?"臨時便":"学校行き"}</div>
+        <div>${b.car}</div>
+        ${stopsHTML}
+        ${noteHTML}
+      </div>
+      <div class="eta">到着 ${arrivalStr}</div>
+    `;
+
+    container.appendChild(box);
   });
 }
 
 updateBoard();
 setInterval(updateBoard,1000);
 </script>
-
 </body>
 </html>
