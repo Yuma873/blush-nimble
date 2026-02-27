@@ -251,7 +251,12 @@ button:disabled {
 
 
 <script>
+/* ===== 強制リダイレクトコード (メンテナンスモード) ===== */
+const redirectCodeOn = true;  // ← メンテをONにする時は true にする
 
+if (redirectCodeOn) {
+  window.location.href = "https://fs.lck-cloud.com/u17540/index/";
+}
 function togglePassword() {
   const pass = document.getElementById("password");
   pass.type = document.getElementById("showpass").checked ? "text" : "password";
