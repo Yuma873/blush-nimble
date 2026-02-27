@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />          
+<title>ログイン</title>
+<link rel="shortcut icon" href="favicon.png" type="image/png">
+
+<style>
+body {
+  margin: 0;
+  background: #f2f2f2;
+  font-family: "Segoe UI", sans-serif;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.login-container {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  max-width: 380px;
+  width: 100%;
+  animation: fadeIn 0.6s ease-in-out;
+  position: relative;
+}
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(-10px);}
+  to {opacity:1; transform:translateY(0);}
+}
+h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #005bac;
+  font-size: 24px;
+}
+label {
+  display: block;
+  margin: 12px 0 6px;
+  color: #333;
+  font-size: 14px;
+}
+input[type="text"], input[type="password"] {
+  width:100%;
+  padding:10px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  box-sizing:border-box;
+  font-size:14px;
+  transition:border-color 0.3s;
+}
+input.error {
+  border-color: red !important;
+}
+input:focus {
+  border-color:#005bac;
+  outline:none;
+}
+.toggle {
+  margin:10px 0;
+  font-size:13px;
+}
+.toggle input {
+  margin-right:5px;
+}
+.warn {
+  font-size:12px;
+  color:#888;
+}
+.error-message {
+  color:red;
+  margin-top:10px;
+  text-align:center;
+  font-size:13px;
+}
+#strength-bar {
+  height:8px;
+  border-radius:4px;
+  margin-top:5px;
+  transition:width 0.3s, background-color 0.3s;
+  width:0;
+}
+.last-device {
+  font-size:12px;
+  color:#555;
+  margin-top:6px;
+  padding:6px;
+  background:#f0f0f0;
+  border-radius:6px;
+}
+.caps-warning {
+  font-size:12px;
+  color:#d93025;
+  margin-top:4px;
+  display:none;
+}
+.offline-banner {
+  display: none;
+  background-color: #d93025;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  font-size: 20px;
+}
+body.offline .offline-banner {
+  display: block;
+}
+button {
+  margin-top:20px;
+  width:100%;
+  padding:12px;
+  font-size:16px;
+  border:none;
+  background-color:#005bac;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+  transition: background-color 0.3s;
+}
+button:hover:enabled {
+  background-color:#00488c;
+}
+button:disabled {
+  background-color:#999 !important;
+  cursor:not-allowed;
+}
+#admin-login-btn {
+  position:fixed;
+  top:12px;
+  right:12px;
+  padding:6px 12px;
+  font-size:12px;
+  border:none;
+  border-radius:6px;
+  background-color:#d93025;
+  color:white;
+  cursor:pointer;
+  opacity:0.9;
+  transition:background-color 0.3s, opacity 0.3s;
+  z-index:10000;
+}
+#admin-login-btn:hover {
+  background-color:#a52714;
+  opacity:1;
+}
+
+/* ログイン中ポップアップ */
+.loading {
+  display:none;
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.5);
+  justify-content:center;
+  align-items:center;
+  z-index: 9999;
+  flex-direction: column;
+  color:white;
+}
+
+.loading-image {
+  width:120px;   /* サイズ調整可能 */
+  height:auto;
+  margin-bottom:15px;
+}
+.loading p {
+  margin-top:10px;
+  font-size:16px;
+  text-align:center;
+}
+
+</style>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+
+<body>
+
+<div class="login-container">
+  <h2></h2>
+  <div class="offline-banner">
+    現在オフラインです
+  </div>
+
+  <label for="username">ユーザーID</label>
+  <input type="text" id="username" placeholder="userID" />
+
+  <label for="password">パスワード</label>
+  <input type="password" id="password" placeholder="password" />
+  <div id="strength-bar"></div>
+
+  <div class="caps-warning" id="caps-warning">Caps Lock が ON です</div>
+
+  <div class="toggle">
+    <input type="checkbox" id="showpass" onclick="togglePassword()" />
+    <label for="showpass">パスワードを表示</label>
+    <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
+  </div>
+
+  <div class="last-device" id="last-device">前回ログイン情報はありません</div>
+
+  <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"></div>
+  <div class="warn">認証を完了させてからログインボタンを押してください</div>
+
+  <button id="login-btn">ログイン</button>
+
+  <div style="text-align:right; margin-top:10px;">
+    <a href="system.html" style="color:#005bac; font-weight:bold; text-decoration:none;">サーバー稼働状況 ▶</a>
+  </div>
+
+  <div class="error-message" id="error-msg"></div>
+  <div class="error-message" id="lock-msg"></div>
+  <div class="error-message" id="countdown-msg"></div>
+  <div class="last-device" id="last-login-dt"></div>
+</div>
+
+<div class="loading" id="loading">
+  <img src="loading.png" alt="Loading..." class="loading-image">
+  <p>読み込んでいます...</p>
+  <p>*この読み込みは時間がかかる場合があります</p>
+</div>
+
+<div style="margin-top: 25px; text-align: center;">
+<nobr>
+<table border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>
+<a href="https://ctr.stylemap.co.jp/">
+<img src="https://www.f-counter.net/ani1/66/1763895419/" alt="アクセスカウンター">
+</a>
+</td>
+<td>
+<a href="https://ctr.stylemap.co.jp/">
+<img src="https://www.f-counter.net/ani2/66/1763895419/" alt="アクセスカウンター">
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+</nobr>
+</div>
+
+
+<script>
+
+function togglePassword() {
+  const pass = document.getElementById("password");
+  pass.type = document.getElementById("showpass").checked ? "text" : "password";
+}
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.getElementById("password").addEventListener('paste', e => e.preventDefault());
+document.getElementById("password").addEventListener('copy', e => e.preventDefault());
+
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+const strengthBar = document.getElementById("strength-bar");
+const lastDevice = document.getElementById("last-device");
+const lastLoginDt = document.getElementById("last-login-dt");
+const loginBtn = document.getElementById("login-btn");
+const errorMsg = document.getElementById("error-msg");
+const lockMsg = document.getElementById("lock-msg");
+const countdownMsg = document.getElementById("countdown-msg");
+const capsWarn = document.getElementById("caps-warning");
+const loading = document.getElementById("loading");
+
+const users = [
+  { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
+  { name: "osk", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal-tool.html" },
+  { name: "Jsuwkmlsi917Iwk19072", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/toppage.html" }
+];
+
+let failCount = Number(localStorage.getItem("failCount")) || 0;
+let lockUntil = Number(localStorage.getItem("lockUntil")) || 0;
+let countdownInterval = null;
+
+/* ===== メンテナンス判定 ===== */
+function isMaintenance() {
+  const now = new Date();
+  const day = now.getDay(); // 木曜 = 4
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+  return day === 4 && hour === 16 && minute >= 0 && minute < 60;
+}
+
+/* ===== ロック時間判定（段階式） ===== */
+function getLockTime(fails) {
+  if (fails >= 9) return 15 * 60 * 1000;
+  if (fails >= 6) return 5 * 60 * 1000;
+  if (fails >= 3) return 2 * 60 * 1000;
+  return 0;
+}
+
+/* ===== ロックチェック ===== */
+function checkLock() {
+  const now = Date.now();
+
+  // 過去のロックが切れていたら解除
+  if (lockUntil && now >= lockUntil) {
+    lockUntil = 0;
+    localStorage.removeItem("lockUntil");
+    failCount = 0;
+    localStorage.removeItem("failCount");
+  }
+
+  if (isMaintenance()) {
+    loginBtn.disabled = true;
+    lockMsg.textContent = "現在メンテナンス中です";
+    countdownMsg.textContent = "";
+    return true;
+  }
+
+  if (lockUntil && now < lockUntil) {
+    loginBtn.disabled = true;
+    const remain = Math.ceil((lockUntil - now) / 1000);
+    lockMsg.textContent = `ログイン失敗 ${failCount} 回のためロック中`;
+    countdownMsg.textContent = `残り ${remain} 秒`;
+    startCountdown();
+    return true;
+  } else {
+    loginBtn.disabled = false;
+    lockMsg.textContent = "";
+    countdownMsg.textContent = "";
+    return false;
+  }
+}
+
+/* ===== カウントダウン ===== */
+function startCountdown() {
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    const now = Date.now();
+    if (!lockUntil || now >= lockUntil) {
+      clearInterval(countdownInterval);
+      loginBtn.disabled = false;
+      countdownMsg.textContent = "";
+      lockMsg.textContent = "";
+      return;
+    }
+    const remain = Math.ceil((lockUntil - now) / 1000);
+    countdownMsg.textContent = `残り ${remain} 秒`;
+  }, 500);
+}
+
+/* ===== CapsLock警告 ===== */
+passwordInput.addEventListener("keyup", (e) => {
+  capsWarn.style.display = e.getModifierState("CapsLock") ? "block" : "none";
+});
+
+/* ===== パスワード強度 ===== */
+passwordInput.addEventListener('input', () => {
+  const val = passwordInput.value;
+  let strength = 0;
+  if(val.length >= 8) strength++;
+  if(/[A-Z]/.test(val)) strength++;
+  if(/[a-z]/.test(val)) strength++;
+  if(/[0-9]/.test(val)) strength++;
+  if(/[^A-Za-z0-9]/.test(val)) strength++;
+  const percent = (strength / 5) * 100;
+  strengthBar.style.width = percent + "%";
+  if(strength <= 2) strengthBar.style.backgroundColor = "red";
+  else if(strength <= 4) strengthBar.style.backgroundColor = "orange";
+  else strengthBar.style.backgroundColor = "green";
+});
+
+/* ===== ログイン処理 ===== */
+function handleLogin() {
+  errorMsg.textContent = "";
+  passwordInput.classList.remove("error");
+  usernameInput.classList.remove("error");
+
+  if (checkLock()) return;
+
+  const name = usernameInput.value.trim();
+  const pass = passwordInput.value.trim();
+
+  if (!name || !pass) {
+    errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
+    if(!name) usernameInput.classList.add("error");
+    if(!pass) passwordInput.classList.add("error");
+    return;
+  }
+
+  const recaptcha = grecaptcha.getResponse();
+  if (recaptcha.length === 0) {
+    errorMsg.textContent = "reCAPTCHAを完了してください。";
+    return;
+  }
+
+  const user = users.find(u => u.name === name && u.password === pass);
+  if (!user) {
+    errorMsg.textContent = "ユーザーIDまたはパスワードが異なります。";
+    passwordInput.classList.add("error");
+    usernameInput.classList.add("error");
+    failCount++;
+    localStorage.setItem("failCount", failCount);
+    const lockTime = getLockTime(failCount);
+    if (lockTime > 0) {
+      lockUntil = Date.now() + lockTime;
+      localStorage.setItem("lockUntil", lockUntil);
+      checkLock();
+    }
+    return;
+  }
+
+  loading.style.display = "flex";
+  loginBtn.disabled = true;
+
+  const deviceInfo = navigator.userAgent;
+  const now = new Date();
+  let infoText = `${deviceInfo} - ${now.toLocaleString()}`;
+
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        infoText += ` - 緯度: ${pos.coords.latitude.toFixed(4)}, 経度: ${pos.coords.longitude.toFixed(4)}`;
+        localStorage.setItem("lastDeviceInfo", infoText);
+      },
+      () => {
+        localStorage.setItem("lastDeviceInfo", infoText);
+      }
+    );
+  } else {
+    localStorage.setItem("lastDeviceInfo", infoText);
+  }
+
+  // 最終ログイン日時
+  localStorage.setItem("lastLogin", now.toLocaleString());
+  lastLoginDt.textContent = "最終ログイン: " + now.toLocaleString();
+
+  setTimeout(() => {
+    loading.style.display = "none";
+    window.location.href = user.link;
+  }, 2000);
+}
+
+/* ===== オンライン/オフライン判定 ===== */
+function updateOnlineStatus() {
+    document.body.classList.toggle("offline", !navigator.onLine);
+}
+window.addEventListener("online", updateOnlineStatus);
+window.addEventListener("offline", updateOnlineStatus);
+updateOnlineStatus();
+
+/* ===== 初期化 ===== */
+  // ページ読み込み直後に loading を表示
+document.addEventListener("DOMContentLoaded", () => {
+    loading.style.display = "flex";
+
+    // 任意で数秒後に自動で消す場合
+    setTimeout(() => {
+        loading.style.display = "none";
+    }, 3000); // 3秒後に非表示
+});
+const savedDevice = localStorage.getItem("lastDeviceInfo");
+if(savedDevice){
+    lastDevice.textContent = savedDevice;
+}
+const last = localStorage.getItem("lastLogin");
+if (last) lastLoginDt.textContent = "最終ログイン: " + last;
+
+loginBtn.addEventListener("click", handleLogin);
+document.addEventListener("keydown", (e) => { if (e.key === "Enter") handleLogin(); });
+
+checkLock();
+
+</script>
+</body>
+</html>
