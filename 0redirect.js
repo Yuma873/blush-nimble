@@ -5,3 +5,4 @@ if (redirectCodeOn) {
   window.location.href = "https://fs.lck-cloud.com/u17540/index/";
 }
 
+*/
