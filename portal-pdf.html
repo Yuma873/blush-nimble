@@ -35,12 +35,7 @@
       z-index: 10;
     }
 
-    nav video {
-      width: 100%;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-
+    
     nav a {
       display: block;
       width: 100%;
@@ -176,11 +171,7 @@
         justify-content: center;
       }
 
-      nav video {
-        width: 100%;
-        max-width: 400px;
-        margin: 5px auto;
-      }
+     
 
       main {
         margin-left: 0;
@@ -253,15 +244,7 @@
   </div>
 
   <script>
-    // ===== ランダム動画 =====
-    const videos = [
-      "video1.mp4", "video2.mp4", "video3.mp4", "video5.mp4",
-      "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
-      "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
-    ];
-    const randomIndex = Math.floor(Math.random() * videos.length);
-    document.getElementById("randomVideo").src = videos[randomIndex];
-
+   
     // ===== PDF切り替え =====
     const pdfSelector = document.getElementById('pdfSelector');
     const pdfViewer = document.getElementById('pdfViewer');
