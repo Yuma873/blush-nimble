@@ -1,477 +1,1127 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />          
-<title>ログイン</title>
-  <script src="0redirect.js"></script>
-<link rel="shortcut icon" href="favicon-log.png" type="image/png">
-<style>
-body {
-  margin: 0;
-  background: #f2f2f2;
-  font-family: "Segoe UI", sans-serif;
-  height: 100vh;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ポータルサイト - トップ</title>
+      <script src="0redirect.js"></script>
+
+    <link rel="shortcut icon" href="favicon2.png" type="image/png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+
+
+    <link rel="stylesheet" href="portal-style.css" />
+  
+
+    <style>
+      /* 操作ボタン */
+.view-controls {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  gap: 8px;
 }
 
-.login-container {
-  background: white;
-  padding: 40px 30px;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  max-width: 380px;
-  width: 100%;
-  animation: fadeIn 0.6s ease-in-out;
-  position: relative;
+.view-controls button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
 }
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(-10px);}
-  to {opacity:1; transform:translateY(0);}
+
+/* ダークモード */
+body[data-mode="dark"] {
+  background: #1e1e1e;
+  color: #eaeaea;
 }
-h2 {
-  margin-bottom: 20px;
-  text-align: center;
-  color: #005bac;
-  font-size: 24px;
+
+/* 軽量表示 */
+body[data-lite="true"] img,
+body[data-lite="true"] iframe,
+body[data-lite="true"] video {
+  display: none !important;
 }
-label {
-  display: block;
-  margin: 12px 0 6px;
-  color: #333;
-  font-size: 14px;
-}
-input[type="text"], input[type="password"] {
-  width:100%;
-  padding:10px;
-  border:1px solid #ccc;
-  border-radius:6px;
-  box-sizing:border-box;
-  font-size:14px;
-  transition:border-color 0.3s;
-}
-input.error {
-  border-color: red !important;
-}
-input:focus {
-  border-color:#005bac;
-  outline:none;
-}
-.toggle {
-  margin:10px 0;
-  font-size:13px;
-}
-.toggle input {
-  margin-right:5px;
-}
-.warn {
-  font-size:12px;
-  color:#888;
-}
-.error-message {
-  color:red;
-  margin-top:10px;
-  text-align:center;
-  font-size:13px;
-}
-#strength-bar {
-  height:8px;
-  border-radius:4px;
-  margin-top:5px;
-  transition:width 0.3s, background-color 0.3s;
-  width:0;
-}
-.last-device {
-  font-size:12px;
-  color:#555;
-  margin-top:6px;
-  padding:6px;
-  background:#f0f0f0;
-  border-radius:6px;
-}
-.caps-warning {
-  font-size:12px;
-  color:#d93025;
-  margin-top:4px;
-  display:none;
-}
+
+/* オフライン表示 */
 .offline-banner {
   display: none;
-  background-color: #d93025;
-  color: white;
-  padding: 15px;
+  background: #ffe0e0;
+  color: #a00000;
   text-align: center;
-  border-radius: 15px;
-  margin-bottom: 30px;
-  font-size: 20px;
+  font-size: 0.9rem;
+  padding: 6px;
 }
+
 body.offline .offline-banner {
   display: block;
 }
+
+  /* 全体の基本設定 */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    background-color: #f5f5f5;
+  }
+
+  /* 左ナビ（PCでは固定） */
+  nav {
+    position: fixed;         /* 画面左に固定 */
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100vh;           /* 画面の高さいっぱい */
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px;
+    overflow-y: auto;        /* メニューが長い場合はスクロール */
+    box-sizing: border-box;  /* パディングを幅に含める */
+    box-shadow: 2px 0 8px rgba(0,0,0,0.3); /* 見やすくする影 */
+    z-index: 1000;
+  }
+
+  nav a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px;
+    margin: 8px 0;
+    background-color: #34495e;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+  }
+  nav a:hover {
+    background-color: #1abc9c;
+  }
+
+  /* main部分（ナビの幅分左に余白） */
+  main {
+    flex: 1;
+    padding: 30px;
+    padding-bottom: 50px; /* テロップと重ならないように追加 */
+    margin-left: 240px; /* nav幅より少し余裕を持たせる */
+  }
+
+  header {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+    color: #2c3e50;
+  }
+  section {
+    margin-bottom: 40px;
+  }
+  ul {
+    list-style: disc;
+    padding-left: 20px;
+  }
+  .update-time {
+    font-size: 0.9em;
+    color: #888;
+  }
+  input[type="text"] {
+    padding: 6px;
+    width: 80%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  iframe {
+    border: none;
+    width: 100%;
+    height: 400px;
+    margin-top: 10px;
+  }
+
+  /* スマホ対応 */
+  @media screen and (max-width: 600px) {
+    body {
+      flex-direction: column;
+    }
+    nav {
+      position: relative; /* スクロールと一緒に動く */
+      width: 100%;
+      height: auto;
+      box-shadow: none; /* スマホでは影なし */
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+    nav a {
+      flex: 1 1 40%;
+      margin: 5px;
+      text-align: center;
+    }
+    main {
+      margin-left: 0; /* 左余白を消す */
+      padding: 20px;
+    }
+  }
+
+  /* スクロールテロップスタイル */
+  .ticker-wrap {
+    width: 100%;
+    overflow: hidden;
+    background-color: #2c3e50;
+    color: white;
+    padding: 8px 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 9999;
+  }
+  .ticker {
+    display: inline-block;
+    white-space: nowrap;
+    animation: tickerScroll 25s linear infinite;
+    padding-left: 100%;
+  }
+  @keyframes tickerScroll {
+    from { transform: translateX(0%); }
+    to { transform: translateX(-100%); }
+  }
+
+  .topix-section {
+    background-color: #ff4444;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+  }
+
+  .blinking-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    animation: blinker 1s linear infinite;
+    text-align: center;
+  }
+  @keyframes blinker {
+    50% { opacity: 0; }
+  }
+
+  /* ランダム動画表示用 */
+  video {
+    width: 30%;
+    height: auto;
+  }
+/* ボタン全体の共通設定 */
 button {
-  margin-top:20px;
-  width:100%;
-  padding:12px;
-  font-size:16px;
-  border:none;
-  background-color:#005bac;
-  color:white;
-  border-radius:6px;
-  cursor:pointer;
-  transition: background-color 0.3s;
-}
-button:hover:enabled {
-  background-color:#00488c;
-}
-button:disabled {
-  background-color:#999 !important;
-  cursor:not-allowed;
-}
-#admin-login-btn {
-  position:fixed;
-  top:12px;
-  right:12px;
-  padding:6px 12px;
-  font-size:12px;
-  border:none;
-  border-radius:6px;
-  background-color:#d93025;
-  color:white;
-  cursor:pointer;
-  opacity:0.9;
-  transition:background-color 0.3s, opacity 0.3s;
-  z-index:10000;
-}
-#admin-login-btn:hover {
-  background-color:#a52714;
-  opacity:1;
+    background: linear-gradient(145deg, #4CAF50, #43A047); /* グラデーション */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    margin: 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2); /* 影で浮いた感じ */
+    transition: all 0.3s ease; /* なめらかなアニメーション */
 }
 
-/* ログイン中ポップアップ */
-.loading {
-  display:none;
-  position: fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background: rgba(0,0,0,0.5);
-  justify-content:center;
-  align-items:center;
-  z-index: 9999;
-  flex-direction: column;
-  color:white;
+/* ホバー時の効果 */
+button:hover {
+    transform: translateY(-3px) scale(1.05); /* 少し浮かせる + 拡大 */
+    box-shadow: 0 8px 12px rgba(0,0,0,0.3); /* 影を強める */
+    background: linear-gradient(145deg, #43A047, #388E3C); /* ホバー用グラデ */
 }
 
-.loading-image {
-  width:90px;   /* サイズ調整可能 */
-  height:auto;
-  margin-bottom:15px;
+/* アクティブ（押しているとき）の効果 */
+button:active {
+    transform: translateY(0) scale(0.98); /* 押した感 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
-.loading p {
-  margin-top:10px;
-  font-size:16px;
-  text-align:center;
+
+/* ボタンを横並びにするラッパー */
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+
+</style>
+
+   <script defer src="https://www.pushcode.jp/dist/js/pushcode.js"></script>
+<script>
+window.PushCodeInit = function() {
+  try {
+    if (PushCode && PushCode.isSupport()) {
+      PushCode.init({ domainToken: '6d20f79ae2615a8ced22db9f79bb01abfbbbe2fb5a2f558f1269ee6b21b3ce15', userid: '', serviceWorkerPath: '/blush-nimble/pushcode_sw.js', scopePath: '/blush-nimble/' });
+      PushCode.components.openSubscribeDialog();
+    }
+  }
+  catch (err) {
+    console.error(err);
+    if (PushCode) {
+      PushCode.sendError(err);
+    }
+  }
+};
+ 
+</script>
+
+  </head>
+  <body>
+    <nav>
+    
+      
+      
+      <video
+  id="randomVideo"
+  autoplay
+  loop
+  muted
+  playsinline
+  style="width: 100%; border-radius: 5px; margin-bottom: 10px;"
+></video>
+
+<script>
+  // 動画ファイル名のリスト
+  const videos = [
+    "video1.mp4", "video2.mp4", "video3.mp4",  "video5.mp4",
+    "V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4", "V5.mp4",
+    "V6.mp4", "V7.mp4", "V8.mp4", "V9.mp4", "V10.mp4"
+  ];
+
+  // ランダムに1つ選ぶ
+  const randomIndex = Math.floor(Math.random() * videos.length);
+  const randomVideo = videos[randomIndex];
+
+  // <video>タグに反映
+  const videoElement = document.getElementById("randomVideo");
+  videoElement.src = randomVideo;
+</script>
+  <a href="portal.html">🏠 トップ</a>
+      <a href="portal-news.html">📰 お知らせ</a>
+            <a href="portal-renraku.html">📢 掲示板連絡</a>
+      <a href="portal-tool.html">🛠 ツール</a>
+      <a href="portal-calendar.html">🗓️ カレンダー</a>
+            <a href="portal-umekomi.html">🌀 予定一覧</a>
+      <a href="portal-pdf.html">📁ファイル一覧</a>
+      <a href="portal-next.html">🏆次回大会 特設ページ</a>
+      <a href="portal-reserve.html" target="_blank"><img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120"></a>
+<a href="https://yuma873.github.io/blush-nimble/index.html" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">🚪ログアウト</a>
+    </nav>
+
+    <main>
+<div class="view-controls">
+  <button id="modeToggle" title="表示モード切替">🌙</button>
+  <button id="liteToggle" title="軽量表示">🪶</button>
+</div>
+<div class="offline-banner">
+  現在オフラインです
+</div>
+      <section class="topix-section">
+  <header>🌀 TOPIX(クリックでページに遷移します)</header>
+  <ul id="rss-news-list"></ul>
+        <a href="system.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
+    読み込み不能時はこちらもご確認ください ▶
+  </a>
+</section>
+
+<style>
+  #rss-news-list {
+    list-style: none;
+    padding-left: 0;
+    color: white;
+  }
+  #rss-news-list li {
+    margin-bottom: 6px;
+  }
+  #rss-news-list a {
+    color: white;
+    text-decoration: none;
+  }
+  #rss-news-list a:hover {
+    text-decoration: underline;
+  }
+  video {
+  width: 30%;
+  height: auto;
 }
 
 </style>
 
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-</head>
+<script>
+  async function fetchNHKTopix() {
+    const url = 'https://www3.nhk.or.jp/rss/news/cat0.xml';
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const text = await resp.text();
+      const xml = new DOMParser().parseFromString(text, 'application/xml');
+      const items = xml.querySelectorAll('item');
+      const listEl = document.getElementById('rss-news-list');
+      listEl.innerHTML = '';
+      Array.from(items).slice(0, 5).forEach(it => {
+        const title = it.querySelector('title')?.textContent || '';
+        const link = it.querySelector('link')?.textContent || '#';
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="${link}" target="_blank">${title}</a>`;
+        listEl.appendChild(li);
+      });
+    } catch (e) {
+      console.error('RSS取得失敗:', e);
+      const listEl = document.getElementById('rss-news-list');
+      listEl.innerHTML = '<li>ニュース取得できませんでした</li>';
+    }
+  }
 
-<body>
-
-<div class="login-container">
-  <h2></h2>
-  <div class="offline-banner">
-    現在オフラインです
-  </div>
-
-  <label for="username">ユーザーID</label>
-  <input type="text" id="username" placeholder="userID" />
-
-  <label for="password">パスワード</label>
-  <input type="password" id="password" placeholder="password" />
-  <div id="strength-bar"></div>
-
-  <div class="caps-warning" id="caps-warning">Caps Lock が ON です</div>
-
-  <div class="toggle">
-    <input type="checkbox" id="showpass" onclick="togglePassword()" />
-    <label for="showpass">パスワードを表示</label>
-    <div class="warn">※共用のパソコン等ではチェックを入れないでください。</div>
-  </div>
-
-  <div class="last-device" id="last-device">前回ログイン情報はありません</div>
-
-  <div class="g-recaptcha" data-sitekey="6Lc8t_grAAAAAFDGM9M6R1weWRC47R1m-JMwVJ8g"></div>
-  <div class="warn">認証を完了させてからログインボタンを押してください</div>
-
-  <button id="login-btn">ログイン</button>
-
-  <div style="text-align:right; margin-top:10px;">
-    <a href="system.html" style="color:#005bac; font-weight:bold; text-decoration:none;">サーバー稼働状況 ▶</a>
-  </div>
-
-  <div class="error-message" id="error-msg"></div>
-  <div class="error-message" id="lock-msg"></div>
-  <div class="error-message" id="countdown-msg"></div>
-  <div class="last-device" id="last-login-dt"></div>
+  document.addEventListener('DOMContentLoaded', fetchNHKTopix);
+</script>
+<div class="button-container">
+    <button onclick="location.href='portal-form.html'">アンケート</button>
+    <button onclick="location.href='jikaitaikai.html'">種目登録</button>
+    <button onclick="location.href='kiroku.html'">記録登録</button>
+    <button onclick="location.href='portal-tenki.html'">天気情報</button>
+    <button onclick="location.href='portal-norikae.html'">電車情報</button>
+    <button onclick="location.href='tempnavi2.html'">横浜国際気温表示板</button>
+    <button onclick="location.href='toolshu.html'">ツールポータル</button>
 </div>
 
-<div class="loading" id="loading">
-  <img src="loading.png" alt="Loading..." class="loading-image">
-  <p>読込中...</p>
+<!-- 新しい行にするために別の div で囲む -->
+<div class="button-container">
+    <button onclick="location.href='https://airrsv.net/portal-reserve/calendar'">プール予約</button>
+      <button onclick="window.open('https://yuma873.github.io/blush-nimble/portal-konzatsu.html', '_blank')">全施設混雑状況一覧</button>
+    <button onclick="window.open('https://smilego.jp/9c9e300', '_blank')">混雑状況(横浜サブ)</button>
+    <button onclick="window.open('https://smilego.jp/22dac1c', '_blank')">混雑状況(横浜メイン)</button>
+    <button onclick="window.open('https://smilego.jp/6616bc5', '_blank')">混雑状況(相模原)</button>
+    <button onclick="window.open('https://smilego.jp/7df5d90', '_blank')">混雑状況(平塚)</button>
 </div>
 
-<div style="margin-top: 25px; text-align: center;">
-<nobr>
-<table border="0" cellspacing="0" cellpadding="0">
-<tbody>
-<tr>
-<td>
-<a href="https://ctr.stylemap.co.jp/">
-<img src="https://www.f-counter.net/ani1/66/1763895419/" alt="アクセスカウンター">
-</a>
-</td>
-<td>
-<a href="https://ctr.stylemap.co.jp/">
-<img src="https://www.f-counter.net/ani2/66/1763895419/" alt="アクセスカウンター">
-</a>
-</td>
-</tr>
-</tbody>
-</table>
-</nobr>
-</div>
+
+
+
+      <section>
+  <header>🆕 新着情報</header>
+  <ul id="top-news-list"></ul>
+<a href="portal-news.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
+    詳しくはこちら ▶
+  </a>
+<script>
+async function loadTopNews() {
+  try {
+    const res = await fetch('news-top.json');
+    const data = await res.json();
+    const list = document.getElementById('top-news-list');
+    list.innerHTML = '';
+    data.news.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item.date ? `${item.date} - ${item.text}` : item.text;
+      list.appendChild(li);
+    });
+  } catch (err) {
+    console.error('トップページ新着情報の読み込みに失敗:', err);
+    document.getElementById('top-news-list').innerHTML = '<li>情報を取得できませんでした</li>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadTopNews);
+</script>
+
+      <section>
+        <header>📌 サイトのご案内</header>
+        <ul>
+          <li>最新のお知らせ、大会情報、連絡を一括で確認できます。</li>
+          <li>スマートフォンでも見やすい構成です。</li>
+          <li>随時このサイトは更新されます。大変申し訳ありませんが、自動リロード機能により定期的にリロードされるためメモリ消費量が上昇する場合があります。その場合には一度ログイン画面に戻ったうえで他サイトに移るようお願い致します。</li>
+        </ul>
+      </section>
+
+       <section>
+        <header>🛠️ サイト更新・メンテ状況</header>
+        <ul>
+                    <li>2026/01/05 - メンテナンス・サイト更新状況は上部新着情報ページに集約されました。</li>
+        </ul>
+<a href="system.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
+    サーバー稼働状況 ▶
+  </a>
+         <ul>
+          <li>＜メンテナンス日について＞</li>
+          <li>基本、毎週火曜 22:00~23:00の間となります。</li>
+          <li>緊急のメンテナンスや、臨時メンテナンスの場合は以下に表示します。</li>
+           <li><b><u><span style="color: red;">定期メンテナンス 火曜22:00~23:00</span></u></b></li>
+        </ul>
+        <p class="update-time">最終更新: <span id="lastUpdated"></span></p>
+      </section>
+
+
+     
+
+      <section>
+        <header>🔍 ページ内検索</header>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="キーワードで検索..."
+          onkeyup="searchInPage()"
+        />
+      </section>
+
+      <section>
+        <header>📅 カレンダー</header>
+        <iframe
+          src="https://calendar.google.com/calendar/embed?src=mk79b6tlc7iif9of4d5vblbjckvjbjel%40import.calendar.google.com&ctz=Asia%2FTokyo"
+        ></iframe>
+      </section>
+
+<section>
+  <header
+    style="cursor: pointer; background-color: #2c3e50; color: white; padding: 8px;"
+    onclick="toggleSection()"
+  >
+    🌤 今後の天気[練習の参考に]▼
+  </header>
+
+  <div id="toggleContent" style="display: none; border: 1px solid #ccc; padding: 10px">
+    <iframe
+      src="https://ritska.com/clock/clock-5x4c.html?AREA_CODE=46106&COLORSET=0&CLOCK24H=1&COLON_BLINK=1&ZEROPAD=1&DEBUG=0"
+      width="100%"
+      height="180"
+      style="border: none"
+      title="天気と時計"
+      loading="lazy"
+    ></iframe>
+
+   
+
+      <!-- 伊勢原市 -->
+      <div id="booked-widget-h13bs0hdj6q" style="margin-bottom: 20px">
+        <a href="https://booked.jp/weather/isehara-270586">伊勢原市</a>
+      </div>
+      <script type="text/javascript">
+        (function () {
+          const widgetUrl = encodeURIComponent(location.href);
+          async function fetchWidgetData() {
+            let WUrl =
+              "https://weather-widget.booked.net/api/template?&cityId=270586&id=sidebar1&langId=16&iconPack=grd_fill&rand_id=h13bs0hdj6q";
+            WUrl += "&ref=" + widgetUrl;
+            let response = await fetch(WUrl);
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (data.patternHTML) {
+              document.getElementById("booked-widget-h13bs0hdj6q").innerHTML = data.patternHTML;
+            }
+          }
+          fetchWidgetData();
+        })();
+      </script>
+
+     
+
+      <iframe
+        src="https://embed.windy.com/embed2.html?lat=35.38&lon=139.25&detailLat=35.38&detailLon=139.25&width=650&height=450&zoom=10&level=surface&overlay=rain&product=radar"
+        width="100%"
+        height="400"
+        style="border: none"
+        title="Windyレーダー"
+        loading="lazy"
+      ></iframe>
+     <iframe
+      src="https://yuma873.github.io/blush-nimble/portal-norikae.html"
+      width="100%"
+      height="600"
+      style="border: none"
+      title="乗換案内"
+      loading="lazy"
+    ></iframe>
+    </section>
+
 
 
 <script>
+async function loadKanagawaRSS() {
+  const url = "https://www.pref.kanagawa.jp/emergency/index.rdf";
+  try {
+    // AllOrigins経由でCORS回避
+    const response = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(url));
+    const data = await response.json();
 
-function togglePassword() {
-  const pass = document.getElementById("password");
-  pass.type = document.getElementById("showpass").checked ? "text" : "password";
-}
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(data.contents, "application/xml");
 
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.getElementById("password").addEventListener('paste', e => e.preventDefault());
-document.getElementById("password").addEventListener('copy', e => e.preventDefault());
+    const items = xml.querySelectorAll("item");
+    const list = document.getElementById("kanagawa-rss");
+    list.innerHTML = "";
 
-const usernameInput = document.getElementById("username");
-const passwordInput = document.getElementById("password");
-const strengthBar = document.getElementById("strength-bar");
-const lastDevice = document.getElementById("last-device");
-const lastLoginDt = document.getElementById("last-login-dt");
-const loginBtn = document.getElementById("login-btn");
-const errorMsg = document.getElementById("error-msg");
-const lockMsg = document.getElementById("lock-msg");
-const countdownMsg = document.getElementById("countdown-msg");
-const capsWarn = document.getElementById("caps-warning");
-const loading = document.getElementById("loading");
+    items.forEach((item, i) => {
+      if (i >= 5) return; // 最新5件だけ
+      const title = item.querySelector("title")?.textContent;
+      const link = item.querySelector("link")?.textContent;
 
-const users = [
-  { name: "oshiki", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal.html" },
-  { name: "osk", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/portal-tool.html" },
-  { name: "Jsuwkmlsi917Iwk19072", password: "Oshiki", link: "https://yuma873.github.io/blush-nimble/toppage.html" }
-];
-
-let failCount = Number(localStorage.getItem("failCount")) || 0;
-let lockUntil = Number(localStorage.getItem("lockUntil")) || 0;
-let countdownInterval = null;
-
-/* ===== メンテナンス判定 ===== */
-function isMaintenance() {
-  const now = new Date();
-  const day = now.getDay(); // 木曜 = 4
-  const hour = now.getHours();
-  const minute = now.getMinutes();
-  return day === 4 && hour === 16 && minute >= 0 && minute < 60;
-}
-
-/* ===== ロック時間判定（段階式） ===== */
-function getLockTime(fails) {
-  if (fails >= 9) return 15 * 60 * 1000;
-  if (fails >= 6) return 5 * 60 * 1000;
-  if (fails >= 3) return 2 * 60 * 1000;
-  return 0;
-}
-
-/* ===== ロックチェック ===== */
-function checkLock() {
-  const now = Date.now();
-
-  // 過去のロックが切れていたら解除
-  if (lockUntil && now >= lockUntil) {
-    lockUntil = 0;
-    localStorage.removeItem("lockUntil");
-    failCount = 0;
-    localStorage.removeItem("failCount");
-  }
-
-  if (isMaintenance()) {
-    loginBtn.disabled = true;
-    lockMsg.textContent = "現在メンテナンス中です";
-    countdownMsg.textContent = "";
-    return true;
-  }
-
-  if (lockUntil && now < lockUntil) {
-    loginBtn.disabled = true;
-    const remain = Math.ceil((lockUntil - now) / 1000);
-    lockMsg.textContent = `ログイン失敗 ${failCount} 回のためロック中`;
-    countdownMsg.textContent = `残り ${remain} 秒`;
-    startCountdown();
-    return true;
-  } else {
-    loginBtn.disabled = false;
-    lockMsg.textContent = "";
-    countdownMsg.textContent = "";
-    return false;
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="${link}" target="_blank">${title}</a>`;
+      list.appendChild(li);
+    });
+  } catch (e) {
+    console.error(e);
+    document.getElementById("kanagawa-rss").innerHTML = "<li>情報を取得できませんでした</li>";
   }
 }
 
-/* ===== カウントダウン ===== */
-function startCountdown() {
-  clearInterval(countdownInterval);
-  countdownInterval = setInterval(() => {
-    const now = Date.now();
-    if (!lockUntil || now >= lockUntil) {
-      clearInterval(countdownInterval);
-      loginBtn.disabled = false;
-      countdownMsg.textContent = "";
-      lockMsg.textContent = "";
-      return;
-    }
-    const remain = Math.ceil((lockUntil - now) / 1000);
-    countdownMsg.textContent = `残り ${remain} 秒`;
-  }, 500);
-}
-
-/* ===== CapsLock警告 ===== */
-passwordInput.addEventListener("keyup", (e) => {
-  capsWarn.style.display = e.getModifierState("CapsLock") ? "block" : "none";
-});
-
-/* ===== パスワード強度 ===== */
-passwordInput.addEventListener('input', () => {
-  const val = passwordInput.value;
-  let strength = 0;
-  if(val.length >= 8) strength++;
-  if(/[A-Z]/.test(val)) strength++;
-  if(/[a-z]/.test(val)) strength++;
-  if(/[0-9]/.test(val)) strength++;
-  if(/[^A-Za-z0-9]/.test(val)) strength++;
-  const percent = (strength / 5) * 100;
-  strengthBar.style.width = percent + "%";
-  if(strength <= 2) strengthBar.style.backgroundColor = "red";
-  else if(strength <= 4) strengthBar.style.backgroundColor = "orange";
-  else strengthBar.style.backgroundColor = "green";
-});
-
-/* ===== ログイン処理 ===== */
-function handleLogin() {
-  errorMsg.textContent = "";
-  passwordInput.classList.remove("error");
-  usernameInput.classList.remove("error");
-
-  if (checkLock()) return;
-
-  const name = usernameInput.value.trim();
-  const pass = passwordInput.value.trim();
-
-  if (!name || !pass) {
-    errorMsg.textContent = "ユーザー名とパスワードを入力してください。";
-    if(!name) usernameInput.classList.add("error");
-    if(!pass) passwordInput.classList.add("error");
-    return;
-  }
-
-  const recaptcha = grecaptcha.getResponse();
-  if (recaptcha.length === 0) {
-    errorMsg.textContent = "reCAPTCHAを完了してください。";
-    return;
-  }
-
-  const user = users.find(u => u.name === name && u.password === pass);
-  if (!user) {
-    errorMsg.textContent = "ユーザーIDまたはパスワードが異なります。";
-    passwordInput.classList.add("error");
-    usernameInput.classList.add("error");
-    failCount++;
-    localStorage.setItem("failCount", failCount);
-    const lockTime = getLockTime(failCount);
-    if (lockTime > 0) {
-      lockUntil = Date.now() + lockTime;
-      localStorage.setItem("lockUntil", lockUntil);
-      checkLock();
-    }
-    return;
-  }
-
-  loading.style.display = "flex";
-  loginBtn.disabled = true;
-
-  const deviceInfo = navigator.userAgent;
-  const now = new Date();
-  let infoText = `${deviceInfo} - ${now.toLocaleString()}`;
-
-  if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        infoText += ` - 緯度: ${pos.coords.latitude.toFixed(4)}, 経度: ${pos.coords.longitude.toFixed(4)}`;
-        localStorage.setItem("lastDeviceInfo", infoText);
-      },
-      () => {
-        localStorage.setItem("lastDeviceInfo", infoText);
-      }
-    );
-  } else {
-    localStorage.setItem("lastDeviceInfo", infoText);
-  }
-
-  // 最終ログイン日時
-  localStorage.setItem("lastLogin", now.toLocaleString());
-  lastLoginDt.textContent = "最終ログイン: " + now.toLocaleString();
-
-  setTimeout(() => {
-    loading.style.display = "none";
-    window.location.href = user.link;
-  }, 2000);
-}
-
-/* ===== オンライン/オフライン判定 ===== */
-function updateOnlineStatus() {
-    document.body.classList.toggle("offline", !navigator.onLine);
-}
-window.addEventListener("online", updateOnlineStatus);
-window.addEventListener("offline", updateOnlineStatus);
-updateOnlineStatus();
-
-/* ===== 初期化 ===== */
-  // ページ読み込み直後に loading を表示
-document.addEventListener("DOMContentLoaded", () => {
-    loading.style.display = "flex";
-
-    // 任意で数秒後に自動で消す場合
-    setTimeout(() => {
-        loading.style.display = "none";
-    }, 10000); // 10秒後に非表示
-});
-const savedDevice = localStorage.getItem("lastDeviceInfo");
-if(savedDevice){
-    lastDevice.textContent = savedDevice;
-}
-const last = localStorage.getItem("lastLogin");
-if (last) lastLoginDt.textContent = "最終ログイン: " + last;
-
-loginBtn.addEventListener("click", handleLogin);
-document.addEventListener("keydown", (e) => { if (e.key === "Enter") handleLogin(); });
-
-checkLock();
-
+loadKanagawaRSS();
 </script>
-</body>
+  
+  </div>
+</section>
+
+      <section>
+        <header>📊 稼働状況</header>
+        <style>
+          .status-list {
+            list-style: none;
+            padding-left: 0;
+          }
+          .status-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          }
+          .status-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+          }
+          .status-ok {
+            color: green;
+          }
+          .status-warning {
+            color: orange;
+          }
+          .status-error {
+            color: red;
+          }
+        </style>
+        <ul class="status-list">
+          <li class="status-item">
+            <img
+              src="https://twemoji.maxcdn.com/v/latest/72x72/1f324.png"
+              class="status-icon"
+              alt="sun behind cloud"
+            />
+            <span
+              ><strong>トップページ：</strong>
+              <span class="status-ok">正常稼働中</span></span
+            >
+          </li>
+          <li class="status-item">
+            <img
+              src="https://twemoji.maxcdn.com/v/latest/72x72/1f4c5.png"
+              class="status-icon"
+              alt="calendar"
+            />
+            <span
+              ><strong>天気情報：</strong>
+              <span class="status-ok">正常稼働中</span></span
+            >
+          </li>
+          <li class="status-item">
+            <img
+              src="https://twemoji.maxcdn.com/v/latest/72x72/1f4e5.png"
+              class="status-icon"
+              alt="inbox tray"
+            />
+            <span
+              ><strong>ファイル：</strong>
+              <span class="status-ok"
+                >現在、リンク順次登録中です。通常通り利用可能です。</span
+              ></span
+            >
+          </li>
+          <li class="status-item">
+            <img
+              src="https://twemoji.maxcdn.com/v/latest/72x72/1f6ab.png"
+              class="status-icon"
+              alt="prohibited"
+            />
+            <span
+              ><strong>お知らせ・掲示板情報：</strong>
+              <span class="status-ok">正常稼働中</span></span
+            >
+          </li>
+          <li class="status-item">
+            <img
+              src="https://twemoji.maxcdn.com/v/latest/72x72/1f6ab.png"
+              class="status-icon"
+              alt="prohibited"
+            />
+            <span
+              ><strong>その他：</strong>
+              <span class="status-ok"
+                >概ね正常稼働中</span
+              ></span
+            >
+            
+          </li>
+        </ul>
+        <div style="text-align: right; margin-top: 10px;">
+  <a href="system.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
+    詳細画面へ ▶
+  </a>
+</div>
+
+      </section>
+
+      <!-- ポータルサイトの任意の場所にこのセクションを貼ってね -->
+      <section class="swim-world-records">
+        <h2>🏆 長水路・世界記録（男女種目）</h2>
+        <div id="world-record-box">
+          <p><strong>種目：</strong><span id="wr-event">読み込み中…</span></p>
+          <p><strong>記録：</strong><span id="wr-time">-</span></p>
+          <p><strong>選手：</strong><span id="wr-athlete">-</span></p>
+          <p><strong>国籍：</strong><span id="wr-nation">-</span></p>
+          <p><strong>樹立日：</strong><span id="wr-date">-</span></p>
+          <p><strong>大会：</strong><span id="wr-meet">-</span></p>
+        </div>
+      </section>
+
+      <style>
+        .swim-world-records {
+          background-color: #ffffff;
+          border-left: 5px solid #1abc9c;
+          padding: 1rem;
+          margin: 1rem 0;
+          border-radius: 10px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+          font-family: "Yu Gothic", "ヒラギノ角ゴ Pro", Meiryo, sans-serif;
+        }
+        #world-record-box {
+          font-size: 0.9rem;
+          color: #2c3e50;
+        }
+      </style>
+
+      <script>
+        const worldRecords = [
+          // 男子
+          {
+            event: "男子 50m 自由形",
+            time: "20.91",
+            athlete: "César Cielo",
+            nation: "ブラジル",
+            date: "2009年12月18日",
+            meet: "世界選手権（ローマ）",
+          },
+          {
+            event: "男子 100m 自由形",
+            time: "46.86",
+            athlete: "David Popovici",
+            nation: "ルーマニア",
+            date: "2022年8月13日",
+            meet: "ヨーロッパ選手権（ローマ）",
+          },
+          {
+            event: "男子 200m 自由形",
+            time: "1:42.00",
+            athlete: "Paul Biedermann",
+            nation: "ドイツ",
+            date: "2009年7月28日",
+            meet: "世界選手権（ローマ）",
+          },
+          {
+            event: "男子 100m 背泳ぎ",
+            time: "51.60",
+            athlete: "Thomas Ceccon",
+            nation: "イタリア",
+            date: "2022年6月15日",
+            meet: "欧州選手権（ローマ）",
+          },
+          {
+            event: "男子 100m 平泳ぎ",
+            time: "56.88",
+            athlete: "Adam Peaty",
+            nation: "イギリス",
+            date: "2019年7月21日",
+            meet: "世界選手権（光州）",
+          },
+          {
+            event: "男子 100m バタフライ",
+            time: "49.45",
+            athlete: "Caeleb Dressel",
+            nation: "アメリカ",
+            date: "2021年6月19日",
+            meet: "世界選手権（ブダペスト）",
+          },
+          {
+            event: "男子 200m 個人メドレー",
+            time: "1:54.00",
+            athlete: "Michael Phelps",
+            nation: "アメリカ",
+            date: "2011年7月31日",
+            meet: "世界選手権（上海）",
+          },
+          // 女子
+          {
+            event: "女子 50m 自由形",
+            time: "23.61",
+            athlete: "Sarah Sjöström",
+            nation: "スウェーデン",
+            date: "2023年5月21日",
+            meet: "世界選手権（福岡）",
+          },
+          {
+            event: "女子 100m 自由形",
+            time: "51.71",
+            athlete: "Sarah Sjöström",
+            nation: "スウェーデン",
+            date: "2017年7月23日",
+            meet: "世界選手権（ブダペスト）",
+          },
+          {
+            event: "女子 200m 自由形",
+            time: "1:52.98",
+            athlete: "Li Bingjie",
+            nation: "中国",
+            date: "2023年7月27日",
+            meet: "世界選手権（福岡）",
+          },
+          {
+            event: "女子 100m 背泳ぎ",
+            time: "57.26",
+            athlete: "Regan Smith",
+            nation: "アメリカ",
+            date: "2019年7月28日",
+            meet: "世界選手権（光州）",
+          },
+          {
+            event: "女子 100m 平泳ぎ",
+            time: "1:04.13",
+            athlete: "Ruta Meilutyte",
+            nation: "リトアニア",
+            date: "2013年7月29日",
+            meet: "世界選手権（バルセロナ）",
+          },
+          {
+            event: "女子 100m バタフライ",
+            time: "55.48",
+            athlete: "Sarah Sjöström",
+            nation: "スウェーデン",
+            date: "2016年8月7日",
+            meet: "リオ五輪",
+          },
+          {
+            event: "女子 200m 個人メドレー",
+            time: "2:06.12",
+            athlete: "Katinka Hosszú",
+            nation: "ハンガリー",
+            date: "2015年8月9日",
+            meet: "世界選手権（カザン）",
+          },
+        ];
+
+        let wrIndex = 0;
+
+        function updateWR() {
+          const r = worldRecords[wrIndex];
+          document.getElementById("wr-event").textContent = r.event;
+          document.getElementById("wr-time").textContent = r.time + "秒";
+          document.getElementById("wr-athlete").textContent = r.athlete;
+          document.getElementById("wr-nation").textContent = r.nation;
+          document.getElementById("wr-date").textContent = r.date;
+          document.getElementById("wr-meet").textContent = r.meet;
+          wrIndex = (wrIndex + 1) % worldRecords.length;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          updateWR();
+          setInterval(updateWR, 10000);
+        });
+      </script>
+      <section
+        style="
+          max-width: 600px;
+          margin: 40px auto;
+          padding: 20px;
+          background: linear-gradient(135deg, #1abc9c, #16a085);
+          border-radius: 12px;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+          color: white;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        "
+      >
+        <header
+          style="
+            font-size: 1.8em;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+          "
+        >
+          💬 今日の名言
+        </header>
+        <p
+          id="daily-quote"
+          style="
+            font-style: italic;
+            font-size: 1.3em;
+            line-height: 1.6;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+          "
+        >
+          <!-- 名言ここに入る -->
+        </p>
+      </section>
+
+      <script>
+        const quotes = [
+         "マイケル・フェルプス: “限界なんてない。夢を大きく持てば持つほど、遠くまで行ける。”",
+"マイケル・フェルプス: “最高になりたいなら、他の人がやらないことをやらなければならない。”",
+"マイケル・フェルプス: “不可能なんてない。できないと言われても、想像力があれば可能になる。”",
+"イアン・ソープ: “水泳から離れたところで楽しむことを忘れないように。”",
+"イアン・ソープ: “負けるのは2位になることじゃない。全力を出し切らずにレースを終えることだ。”",
+"ケイティ・レデッキー: “私はただ、自分がなれる最高のスイマーになりたいだけ。”",
+"ケイティ・レデッキー: “シンプルに考え、自分のベストを出すために必要なことに集中する。”",
+"ライアン・ロクテ: “本気でトレーニングに向き合わないなら、本気で最高を目指しているとは言えない。”",
+"ダラ・トーレス: “年齢はただの数字。自分が年を取ったと思ったときに初めて年を取るの。”",
+"ダラ・トーレス: “夢に年齢制限なんてない。”",
+"マーク・スピッツ: “準備を怠れば、失敗する準備をしているのと同じだ。”",
+"マーク・スピッツ: “記録は破られるためにある。”",
+"ミッシー・フランクリン: “いつも笑顔でいること。それが私の強さの源。”",
+"ミッシー・フランクリン: “努力すれば夢は現実になると水泳が教えてくれた。”",
+"アレクサンダー・ポポフ: “一貫性こそが速さへの近道だ。”",
+"ナタリー・コフリン: “小さな改良を積み重ねれば、大きな変化になる。”",
+"ケイト・キャンベル: “プレッシャーは、それだけ自分が準備してきた証。”",
+"カイル・チャルマーズ: “レースは最後の一ストロークまで終わらない。”",
+
+"北島康介: “チョー気持ちいい。”",
+"北島康介: “なんも言えねぇ。”",
+"池江璃花子: “水泳ができることが幸せです。”",
+"萩野公介: “挑戦し続けることに意味がある。”",
+"瀬戸大也: “最後まで諦めない泳ぎをする。”",
+"入江陵介: “積み重ねは必ず自信になる。”",
+        ];
+
+        const today = new Date();
+        const day = today.getDate();
+        const index = (day - 1) % quotes.length;
+
+        document.getElementById("daily-quote").textContent = quotes[index];
+    
+      </script>
+
+    
+    </main>
+    <!-- アクセスカウンター -->
+<!--カウンター画像からは配布サイトへリンクが設定されています。また、誤作動、誤表示の原因となりますのでコードの改変、改行は行わないで下さい。
+このコメント部分は削除して頂いても結構です。-->
+<nobr><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td><a href="https://ctr.stylemap.co.jp/"><img src="https://www.f-counter.net/ani1/66/1763895419/" alt="無料アクセスカウンター" border="0" style="margin:0px; padding:0px; border:0px; vertical-align:bottom"></a></td>
+<td><a href="https://ctr.stylemap.co.jp/"><img src="https://www.f-counter.net/ani2/66/1763895419/" alt="無料アクセスカウンター" border="0" style="margin:0px; padding:0px; border:0px; vertical-align:bottom"></a></td></tr></tbody></table></nobr>
+<!-- アクセスカウンターここまで -->
+
+
+    <!-- テロップ表示部分 -->
+    <div class="ticker-wrap">
+      <div class="ticker">
+        <span
+>🚨伊勢原スイミングクラブの3月申込みを検討中です  ／ 📢 次回の部活は2/28 陸トレ (SB <b><u>17:10</u></b>)</span        >
+      </div>
+    </div>
+
+    <script>
+      document.getElementById("lastUpdated").textContent = new Date(
+        document.lastModified
+      ).toLocaleString();
+
+      function searchInPage() {
+        const input = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const bodyText = document.body.innerText.toLowerCase();
+        if (!bodyText.includes(input)) {
+          alert("該当するキーワードは見つかりませんでした。");
+        }
+      }
+    </script>
+    <script>
+  // 通知許可をリクエスト
+  function requestNotificationPermission() {
+    if (Notification.permission === "default") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          startNotificationLoop();
+        }
+      });
+    } else if (Notification.permission === "granted") {
+      startNotificationLoop();
+    } else {
+      console.log("通知が拒否されています");
+    }
+  }
+
+  // 1分ごとに通知
+  function startNotificationLoop() {
+    showNotification(); // 最初に1回表示
+    setInterval(showNotification, 100000); // 60000ms = 1分ごと
+  }
+
+  // 通知を表示
+  function showNotification() {
+    new Notification("ログイン中です", {
+      body: "使用後はログアウトしてください",
+      icon: "favicon.png"
+    });
+  }
+
+  // ページロード時に通知許可をリクエスト
+  window.addEventListener("load", requestNotificationPermission);
+</script>
+<script>
+  function toggleSection() {
+    const content = document.getElementById("toggleContent");
+    if (content.style.display === "none") {
+      content.style.display = "block";   // ← 開く
+    } else {
+      content.style.display = "none";    // ← 閉じる
+    }
+  }
+</script>
+  
+<!-- ポップアップ（自動ログアウト用） -->
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <p id="popup-text">操作がないため、自動的にログアウトされました。</p>
+    <button id="logoutBtn">ログインページへ</button>
+  </div>
+</div>
+
+<style>
+/* ポップアップ全体 */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(15px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+/* ポップアップ内容 */
+.popup-content {
+  background: linear-gradient(135deg, #ffffff, #f0f0f0);
+  padding: 30px 25px;
+  border-radius: 15px;
+  width: 85%;
+  max-width: 450px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: fadeInPopup 0.5s ease;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #333;
+}
+
+/* アニメーション */
+@keyframes fadeInPopup {
+  from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ログアウトボタン */
+.popup-content button {
+  background-color: #1abc9c;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-top: 15px;
+}
+
+.popup-content button:hover {
+  background-color: #16a085;
+  transform: scale(1.05);
+}
+
+/* 右上の閉じる✕を非表示 */
+.popup-content::before {
+  display: none;
+}
+</style>
+
+<script>
+let logoutTimer;
+
+// ポップアップ表示
+function showPopup(message) {
+  document.getElementById("popup-text").textContent = message;
+  document.getElementById("popup").style.display = "flex";
+}
+
+// ログアウトボタン
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  window.location.href = "index.html"; // ログインページに移動
+});
+
+// 自動ログアウト
+function autoLogout() {
+  showPopup("操作がないため、自動的にログアウトされます。");
+}
+
+// タイマーリセット
+function resetLogoutTimer() {
+  clearTimeout(logoutTimer);
+  logoutTimer = setTimeout(autoLogout, 60 * 1000); // 30秒
+}
+
+// ユーザー操作でタイマーリセット
+window.addEventListener("load", resetLogoutTimer);
+document.addEventListener("mousemove", resetLogoutTimer);
+document.addEventListener("keydown", resetLogoutTimer);
+document.addEventListener("scroll", resetLogoutTimer);
+document.addEventListener("click", resetLogoutTimer);
+</script>
+<script src="https://app.smilego.jp/smilego_bnr/v1/smilego.min.js?mk=2c217a95779c&sid=1528"></script>
+   <script>
+  const modeBtn = document.getElementById("modeToggle");
+  const liteBtn = document.getElementById("liteToggle");
+
+  /* 初期状態復元 */
+  const savedMode = localStorage.getItem("mode");
+  const savedLite = localStorage.getItem("lite");
+
+  if (savedMode) document.body.dataset.mode = savedMode;
+  if (savedLite === "true") document.body.dataset.lite = "true";
+
+  /* 表示モード切替 */
+  modeBtn.addEventListener("click", () => {
+    const mode = document.body.dataset.mode === "dark" ? "light" : "dark";
+    document.body.dataset.mode = mode;
+    localStorage.setItem("mode", mode);
+  });
+
+  /* 軽量表示切替 */
+  liteBtn.addEventListener("click", () => {
+    const isLite = document.body.dataset.lite === "true";
+    document.body.dataset.lite = isLite ? "false" : "true";
+    localStorage.setItem("lite", !isLite);
+  });
+
+  /* オフライン検知 */
+  function updateOnlineStatus() {
+    document.body.classList.toggle("offline", !navigator.onLine);
+  }
+
+  window.addEventListener("online", updateOnlineStatus);
+  window.addEventListener("offline", updateOnlineStatus);
+  updateOnlineStatus();
+</script>
+
+  </body>
 </html>
+
+これのデザインを改善したい
