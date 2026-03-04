@@ -11,213 +11,236 @@
 
 
     <link rel="stylesheet" href="portal-style.css" />
-  <style>
-body {
-  margin: 0;
-  background: #f2f2f2;
-  font-family: "Segoe UI", sans-serif;
-  height: 100vh;
+  
+
+    <style>
+      /* 操作ボタン */
+.view-controls {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  gap: 8px;
 }
 
-.login-container {
-  background: #ffffff;
-  padding: 40px 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  max-width: 400px;
-  width: 100%;
-  animation: fadeIn 0.5s ease-in-out;
-  position: relative;
+.view-controls button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
 }
 
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(-10px);}
-  to {opacity:1; transform:translateY(0);}
+/* ダークモード */
+body[data-mode="dark"] {
+  background: #1e1e1e;
+  color: #eaeaea;
 }
 
-h2 {
-  margin-bottom: 25px;
-  text-align: center;
-  color: #005bac;
-  font-size: 24px;
-  font-weight: 600;
+/* 軽量表示 */
+body[data-lite="true"] img,
+body[data-lite="true"] iframe,
+body[data-lite="true"] video {
+  display: none !important;
 }
 
-label {
-  display: block;
-  margin: 10px 0 5px;
-  color: #333;
-  font-size: 14px;
-}
-
-input[type="text"], input[type="password"] {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  box-sizing: border-box;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-input:focus {
-  border-color: #005bac;
-  box-shadow: 0 0 5px rgba(0, 91, 172, 0.5);
-  outline: none;
-}
-
-input.error {
-  border-color: red !important;
-}
-
-.toggle {
-  margin: 12px 0 0;
-  font-size: 13px;
-}
-
-.toggle input {
-  margin-right: 5px;
-}
-
-.warn {
-  font-size: 12px;
-  color: #666;
-  margin-top: 4px;
-}
-
-.error-message {
-  color: red;
-  margin-top: 12px;
-  text-align: center;
-  font-size: 13px;
-}
-
-#strength-bar {
-  height: 8px;
-  border-radius: 4px;
-  margin-top: 5px;
-  transition: width 0.3s, background-color 0.3s;
-  width: 0;
-}
-
-.last-device {
-  font-size: 12px;
-  color: #555;
-  margin-top: 10px;
-  padding: 8px;
-  background: #f9f9f9;
-  border-radius: 6px;
-  word-break: break-word;
-}
-
-.caps-warning {
-  font-size: 12px;
-  color: #d93025;
-  margin-top: 6px;
-  display: none;
-}
-
+/* オフライン表示 */
 .offline-banner {
   display: none;
-  background-color: #d93025;
-  color: white;
-  padding: 12px 15px;
+  background: #ffe0e0;
+  color: #a00000;
   text-align: center;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 16px;
+  font-size: 0.9rem;
+  padding: 6px;
 }
 
 body.offline .offline-banner {
   display: block;
 }
 
+  /* 全体の基本設定 */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    background-color: #f5f5f5;
+  }
+
+  /* 左ナビ（PCでは固定） */
+  nav {
+    position: fixed;         /* 画面左に固定 */
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100vh;           /* 画面の高さいっぱい */
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px;
+    overflow-y: auto;        /* メニューが長い場合はスクロール */
+    box-sizing: border-box;  /* パディングを幅に含める */
+    box-shadow: 2px 0 8px rgba(0,0,0,0.3); /* 見やすくする影 */
+    z-index: 1000;
+  }
+
+  nav a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px;
+    margin: 8px 0;
+    background-color: #34495e;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+  }
+  nav a:hover {
+    background-color: #1abc9c;
+  }
+
+  /* main部分（ナビの幅分左に余白） */
+  main {
+    flex: 1;
+    padding: 30px;
+    padding-bottom: 50px; /* テロップと重ならないように追加 */
+    margin-left: 240px; /* nav幅より少し余裕を持たせる */
+  }
+
+  header {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+    color: #2c3e50;
+  }
+  section {
+    margin-bottom: 40px;
+  }
+  ul {
+    list-style: disc;
+    padding-left: 20px;
+  }
+  .update-time {
+    font-size: 0.9em;
+    color: #888;
+  }
+  input[type="text"] {
+    padding: 6px;
+    width: 80%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  iframe {
+    border: none;
+    width: 100%;
+    height: 400px;
+    margin-top: 10px;
+  }
+
+  /* スマホ対応 */
+  @media screen and (max-width: 600px) {
+    body {
+      flex-direction: column;
+    }
+    nav {
+      position: relative; /* スクロールと一緒に動く */
+      width: 100%;
+      height: auto;
+      box-shadow: none; /* スマホでは影なし */
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+    nav a {
+      flex: 1 1 40%;
+      margin: 5px;
+      text-align: center;
+    }
+    main {
+      margin-left: 0; /* 左余白を消す */
+      padding: 20px;
+    }
+  }
+
+  /* スクロールテロップスタイル */
+  .ticker-wrap {
+    width: 100%;
+    overflow: hidden;
+    background-color: #2c3e50;
+    color: white;
+    padding: 8px 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 9999;
+  }
+  .ticker {
+    display: inline-block;
+    white-space: nowrap;
+    animation: tickerScroll 25s linear infinite;
+    padding-left: 100%;
+  }
+  @keyframes tickerScroll {
+    from { transform: translateX(0%); }
+    to { transform: translateX(-100%); }
+  }
+
+  .topix-section {
+    background-color: #ff4444;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+  }
+
+  .blinking-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    animation: blinker 1s linear infinite;
+    text-align: center;
+  }
+  @keyframes blinker {
+    50% { opacity: 0; }
+  }
+
+  /* ランダム動画表示用 */
+  video {
+    width: 30%;
+    height: auto;
+  }
+/* ボタン全体の共通設定 */
 button {
-  margin-top: 20px;
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
-  border: none;
-  background-color: #005bac;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+    background: linear-gradient(145deg, #4CAF50, #43A047); /* グラデーション */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    margin: 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2); /* 影で浮いた感じ */
+    transition: all 0.3s ease; /* なめらかなアニメーション */
 }
 
-button:hover:enabled {
-  background-color: #00488c;
+/* ホバー時の効果 */
+button:hover {
+    transform: translateY(-3px) scale(1.05); /* 少し浮かせる + 拡大 */
+    box-shadow: 0 8px 12px rgba(0,0,0,0.3); /* 影を強める */
+    background: linear-gradient(145deg, #43A047, #388E3C); /* ホバー用グラデ */
 }
 
-button:disabled {
-  background-color: #999 !important;
-  cursor: not-allowed;
+/* アクティブ（押しているとき）の効果 */
+button:active {
+    transform: translateY(0) scale(0.98); /* 押した感 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* 管理者ログインボタン（左ナビ固定はそのまま） */
-#admin-login-btn {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  padding: 6px 12px;
-  font-size: 12px;
-  border: none;
-  border-radius: 6px;
-  background-color: #d93025;
-  color: white;
-  cursor: pointer;
-  opacity: 0.9;
-  transition: background-color 0.3s, opacity 0.3s;
-  z-index: 10000;
+/* ボタンを横並びにするラッパー */
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
 }
 
-#admin-login-btn:hover {
-  background-color: #a52714;
-  opacity: 1;
-}
 
-/* ログイン中ポップアップ */
-.loading {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  flex-direction: column;
-  color: white;
-}
-
-.loading-image {
-  width: 90px;
-  height: auto;
-  margin-bottom: 15px;
-}
-
-.loading p {
-  margin-top: 10px;
-  font-size: 16px;
-  text-align: center;
-}
-
-/* アクセスカウンター配置 */
-.login-container + div {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.login-container + div table {
-  margin: 0 auto;
-}
 </style>
+
    <script defer src="https://www.pushcode.jp/dist/js/pushcode.js"></script>
 <script>
 window.PushCodeInit = function() {
@@ -1100,3 +1123,5 @@ document.addEventListener("click", resetLogoutTimer);
 
   </body>
 </html>
+
+これのデザインを改善したい
