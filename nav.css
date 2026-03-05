@@ -1,0 +1,57 @@
+/* ===============================
+   Sidebar Navigation
+================================= */
+
+.sidebar {
+  width: 240px;
+  background-color: #1f2937;
+  color: white;
+  padding: 20px 15px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+.sidebar video {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.sidebar a {
+  display: block;
+  color: #d1d5db;
+  text-decoration: none;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  background-color: #111827;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+.sidebar a:hover {
+  background-color: #2563eb;
+  color: white;
+}
+
+.sidebar img {
+  display: block;
+  margin: 12px auto;
+  border-radius: 8px;
+}
+
+.sidebar .logout {
+  margin-top: 20px;
+  background-color: #dc2626;
+  font-weight: 600;
+}
+
+.sidebar .logout:hover {
+  background-color: #b91c1c;
+}
