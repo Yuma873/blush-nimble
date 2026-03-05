@@ -89,6 +89,65 @@ button:hover {
 /* ===============================
    07. TOPIX
 ================================= */
+      /* ===============================
+   TOPIX Card UI
+================================= */
+
+.topix-section {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.topix-header {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-accent);
+}
+
+#rss-news-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.topix-item {
+  padding: 12px 14px;
+  border-radius: 8px;
+  transition: 0.2s ease;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 10px;
+  background: #fafafa;
+}
+
+.topix-item:hover {
+  background: #eef2ff;
+  border-color: var(--color-accent);
+  transform: translateX(4px);
+}
+
+.topix-item a {
+  text-decoration: none;
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 500;
+  display: block;
+}
+
+.topix-meta {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: 4px;
+}
+
+/* スマホ */
+@media (max-width: 768px) {
+  .topix-item {
+    padding: 10px;
+  }
+}
 /* ===============================
    08. Forms
 ================================= */
@@ -205,12 +264,9 @@ fetch("nav.html")
 <div class="offline-banner">
   現在オフラインです
 </div>
-      <section class="topix-section">
-  <header>🌀 TOPIX(クリックでページに遷移します)</header>
+     <section class="topix-section">
+  <div class="topix-header">🌀 TOPIX</div>
   <ul id="rss-news-list"></ul>
-        <a href="system.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
-    読み込み不能時はこちらもご確認ください ▶
-  </a>
 </section>
 
 <style>
@@ -238,30 +294,38 @@ fetch("nav.html")
 
 <script>
   async function fetchNHKTopix() {
-    const url = 'https://www3.nhk.or.jp/rss/news/cat0.xml';
-    try {
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      const text = await resp.text();
-      const xml = new DOMParser().parseFromString(text, 'application/xml');
-      const items = xml.querySelectorAll('item');
-      const listEl = document.getElementById('rss-news-list');
-      listEl.innerHTML = '';
-      Array.from(items).slice(0, 5).forEach(it => {
-        const title = it.querySelector('title')?.textContent || '';
-        const link = it.querySelector('link')?.textContent || '#';
-        const li = document.createElement('li');
-        li.innerHTML = `<a href="${link}" target="_blank">${title}</a>`;
-        listEl.appendChild(li);
-      });
-    } catch (e) {
-      console.error('RSS取得失敗:', e);
-      const listEl = document.getElementById('rss-news-list');
-      listEl.innerHTML = '<li>ニュース取得できませんでした</li>';
-    }
-  }
+  const url = 'https://www3.nhk.or.jp/rss/news/cat0.xml';
+  try {
+    const resp = await fetch(url);
+    const text = await resp.text();
+    const xml = new DOMParser().parseFromString(text, 'application/xml');
+    const items = xml.querySelectorAll('item');
+    const listEl = document.getElementById('rss-news-list');
+    listEl.innerHTML = '';
 
-  document.addEventListener('DOMContentLoaded', fetchNHKTopix);
+    Array.from(items).slice(0, 5).forEach(it => {
+      const title = it.querySelector('title')?.textContent || '';
+      const link = it.querySelector('link')?.textContent || '#';
+      const pubDate = it.querySelector('pubDate')?.textContent || '';
+
+      const li = document.createElement('li');
+      li.className = 'topix-item';
+
+      li.innerHTML = `
+        <a href="${link}" target="_blank">
+          ${title}
+          <div class="topix-meta">${pubDate}</div>
+        </a>
+      `;
+
+      listEl.appendChild(li);
+    });
+
+  } catch (e) {
+    document.getElementById('rss-news-list').innerHTML =
+      '<li class="topix-item">ニュースを取得できませんでした</li>';
+  }
+}
 </script>
 <div class="button-container">
     <button onclick="location.href='portal-form.html'">アンケート</button>
