@@ -217,10 +217,27 @@ input[type="text"] {
   position: fixed;
   bottom: 0;
   width: 100%;
+  overflow: hidden;
   background: #111827;
   color: white;
+  font-size: 14px;
+  white-space: nowrap;
   padding: 6px 0;
-  font-size: 13px;
+}
+
+.ticker {
+  display: inline-block;
+  padding-left: 100%;
+  animation: tickerMove 20s linear infinite;
+}
+
+.ticker span {
+  margin-right: 50px;
+}
+
+@keyframes tickerMove {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
 
 /* ===============================
@@ -927,10 +944,17 @@ loadKanagawaRSS();
     <div class="ticker-wrap">
       <div class="ticker">
         <span
->🚨伊勢原スイミングクラブの3月申込みを検討中です  ／ 📢 次回の部活は2/28 陸トレ (SB <b><u>17:10</u></b>)</span        >
+>  ／ 📢 次回の部活は2/28 陸トレ (SB <b><u>17:10</u></b>)</span        >
       </div>
     </div>
-
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker">
+    <!-- 動的にニュースやテキストをここに追加 -->
+    <span>🏊‍♂️ 最新のお知らせ: 3/29 ｲｾｽｲの入力はお早めに!</span>
+    <span>📰 次回情報: 3/7 13:30~16:45 (SB 17:10)</span>
+    <span>⚠️ 注意: 天候により練習変更の可能性あり</span>
+  </div>
+</div>
     <script>
       document.getElementById("lastUpdated").textContent = new Date(
         document.lastModified
