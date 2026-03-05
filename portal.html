@@ -107,11 +107,7 @@ button:hover {
   border-bottom: 2px solid var(--color-accent);
 }
 
-#rss-news-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+
 
 .topix-item {
   padding: 12px 14px;
@@ -269,34 +265,14 @@ fetch("nav.html")
   <ul id="rss-news-list"></ul>
 </section>
 
-<style>
-  #rss-news-list {
-    list-style: none;
-    padding-left: 0;
-    color: black;
-  }
-  #rss-news-list li {
-    margin-bottom: 6px;
-  }
-  #rss-news-list a {
-    color: white;
-    text-decoration: none;
-  }
-  #rss-news-list a:hover {
-    text-decoration: underline;
-  }
-  video {
-  width: 30%;
-  height: auto;
-}
 
-</style>
 
 <script>
   async function fetchNHKTopix() {
   const url = 'https://www3.nhk.or.jp/rss/news/cat0.xml';
   try {
     const resp = await fetch(url);
+    document.addEventListener("DOMContentLoaded", fetchNHKTopix);
     const text = await resp.text();
     const xml = new DOMParser().parseFromString(text, 'application/xml');
     const items = xml.querySelectorAll('item');
