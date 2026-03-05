@@ -56,6 +56,7 @@ main {
 
 /* ===============================
    04. Navigation
+      */
 
 /* ===============================
    05. Card UI
@@ -268,40 +269,47 @@ fetch("nav.html")
 
 
 <script>
-  async function fetchNHKTopix() {
-  const url = 'https://www3.nhk.or.jp/rss/news/cat0.xml';
+async function fetchNHKTopix() {
+  const url = "https://www3.nhk.or.jp/rss/news/cat0.xml";
+
   try {
-    const resp = await fetch(url);
-    document.addEventListener("DOMContentLoaded", fetchNHKTopix);
-    const text = await resp.text();
-    const xml = new DOMParser().parseFromString(text, 'application/xml');
-    const items = xml.querySelectorAll('item');
-    const listEl = document.getElementById('rss-news-list');
-    listEl.innerHTML = '';
+    // CORS回避
+    const response = await fetch(
+      "https://api.allorigins.win/get?url=" + encodeURIComponent(url)
+    );
 
-    Array.from(items).slice(0, 5).forEach(it => {
-      const title = it.querySelector('title')?.textContent || '';
-      const link = it.querySelector('link')?.textContent || '#';
-      const pubDate = it.querySelector('pubDate')?.textContent || '';
+    const data = await response.json();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(data.contents, "application/xml");
 
-      const li = document.createElement('li');
-      li.className = 'topix-item';
+    const items = xml.querySelectorAll("item");
+    const listEl = document.getElementById("rss-news-list");
+    listEl.innerHTML = "";
+
+    Array.from(items).slice(0, 5).forEach((it) => {
+      const title = it.querySelector("title")?.textContent || "";
+      const link = it.querySelector("link")?.textContent || "#";
+      const pubDate = it.querySelector("pubDate")?.textContent || "";
+
+      const li = document.createElement("li");
+      li.className = "topix-item";
 
       li.innerHTML = `
         <a href="${link}" target="_blank">
           ${title}
-          <div class="topix-meta">${pubDate}</div>
+          <div class="topix-meta">${new Date(pubDate).toLocaleString()}</div>
         </a>
       `;
 
       listEl.appendChild(li);
     });
-
   } catch (e) {
-    document.getElementById('rss-news-list').innerHTML =
+    document.getElementById("rss-news-list").innerHTML =
       '<li class="topix-item">ニュースを取得できませんでした</li>';
   }
 }
+
+document.addEventListener("DOMContentLoaded", fetchNHKTopix);
 </script>
 <div class="button-container">
     <button onclick="location.href='portal-form.html'">アンケート</button>
