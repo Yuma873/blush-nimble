@@ -310,6 +310,10 @@ button:enabled {
 
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
+
+    function closeAd(){
+  document.getElementById("startupAd").style.display="none";
+}
 const videos = ["video1.mp4","video2.mp4","video3.mp4","video5.mp4","V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4","V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
 const videoElem = document.getElementById("randomVideo");
 videoElem.src = videos[Math.floor(Math.random() * videos.length)];
