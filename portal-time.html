@@ -17,19 +17,27 @@ background:#eef2f6;
 header{
 background:#1e73be;
 color:white;
-padding:15px;
+padding:18px;
+font-size:20px;
+font-weight:bold;
 }
 
 .container{
-padding:20px;
+padding:25px;
+max-width:1200px;
+margin:auto;
 }
 
 .card{
 background:white;
 padding:20px;
-margin-bottom:20px;
-border-radius:10px;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
+margin-bottom:25px;
+border-radius:12px;
+box-shadow:0 3px 8px rgba(0,0,0,0.08);
+}
+
+h3{
+margin-top:0;
 }
 
 table{
@@ -37,36 +45,58 @@ width:100%;
 border-collapse:collapse;
 }
 
+th{
+background:#f0f4f8;
+}
+
 th,td{
-padding:8px;
+padding:10px;
 border-bottom:1px solid #ddd;
+text-align:center;
 }
 
 input,select{
-padding:6px;
-margin:4px;
+padding:7px;
+margin:5px;
+border-radius:6px;
+border:1px solid #ccc;
 }
 
 button{
-padding:6px 10px;
+padding:7px 12px;
 border:none;
 background:#1e73be;
 color:white;
-border-radius:5px;
+border-radius:6px;
 cursor:pointer;
 }
 
+button:hover{
+opacity:0.85;
+}
+
 .stats{
-display:flex;
-gap:20px;
-flex-wrap:wrap;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:15px;
 }
 
 .stat{
 background:#f4f6f9;
-padding:10px;
-border-radius:6px;
+padding:15px;
+border-radius:8px;
+font-size:18px;
+text-align:center;
 }
+
+.stat b{
+display:block;
+font-size:24px;
+margin-top:5px;
+}
+
+.goalGood{color:green;font-weight:bold;}
+.goalBad{color:red;}
 
 </style>
 </head>
@@ -74,7 +104,7 @@ border-radius:6px;
 <body>
 
 <header>
-<h2>Swim Record Dashboard</h2>
+Swim Record Dashboard
 </header>
 
 <div class="container">
@@ -122,6 +152,8 @@ border-radius:6px;
 
 <button onclick="saveGoal()">保存</button>
 
+<table id="goalTable"></table>
+
 </div>
 
 
@@ -152,15 +184,6 @@ border-radius:6px;
 
 </div>
 
-
-<div class="card">
-<h3>成長率</h3>
-
-<canvas id="improveChart"></canvas>
-
-</div>
-
-
 </div>
 
 
@@ -168,28 +191,35 @@ border-radius:6px;
 
 let records=[]
 let chart
-let improveChart
 let goals={}
 let editIndex=null
 
 const finaBase={
 "自由形50m":21.04,
 "自由形100m":46.86,
+"自由形200m":102,
+"背泳ぎ100m":51.6,
 "平泳ぎ100m":56.88,
 "バタフライ100m":49.45
 }
 
+const eventOrder=[
+"自由形50m","自由形100m","自由形200m","自由形400m","自由形800m","自由形1500m",
+"背泳ぎ50m","背泳ぎ100m","背泳ぎ200m",
+"平泳ぎ50m","平泳ぎ100m","平泳ぎ200m",
+"バタフライ50m","バタフライ100m","バタフライ200m",
+"個人メドレー200m","個人メドレー400m"
+]
+
 function save(){
-
 localStorage.setItem("swimRecords",JSON.stringify(records))
-localStorage.setItem("goals",JSON.stringify(goals))
-
+localStorage.setItem("swimGoals",JSON.stringify(goals))
 }
 
 function load(){
 
 let r=localStorage.getItem("swimRecords")
-let g=localStorage.getItem("goals")
+let g=localStorage.getItem("swimGoals")
 
 if(r) records=JSON.parse(r)
 if(g) goals=JSON.parse(g)
@@ -203,13 +233,21 @@ function timeToSec(t){
 if(!t) return 0
 
 if(t.includes(":")){
-
 let p=t.split(":")
 return parseFloat(p[0])*60+parseFloat(p[1])
-
 }
 
 return parseFloat(t)
+
+}
+
+function secToTime(s){
+
+let m=Math.floor(s/60)
+let sec=(s%60).toFixed(2)
+
+if(m>0) return m+":"+sec
+return sec
 
 }
 
@@ -237,14 +275,10 @@ time:time.value
 }
 
 if(editIndex!=null){
-
 records[editIndex]=r
 editIndex=null
-
 }else{
-
 records.push(r)
-
 }
 
 save()
@@ -270,14 +304,17 @@ editIndex=i
 function deleteRecord(i){
 
 records.splice(i,1)
+
 save()
 render()
 
 }
 
+
 document.getElementById("csvUpload").addEventListener("change",e=>{
 
 let file=e.target.files[0]
+
 let reader=new FileReader()
 
 reader.onload=()=>{
@@ -312,14 +349,13 @@ reader.readAsText(file)
 
 })
 
+
 function downloadCSV(){
 
 let csv="date,meet,venue,course,event,time\n"
 
 records.forEach(r=>{
-
 csv+=`${r.date},${r.meet},${r.venue},${r.course},${r.event},${r.time}\n`
-
 })
 
 let blob=new Blob([csv])
@@ -327,17 +363,24 @@ let blob=new Blob([csv])
 let a=document.createElement("a")
 
 a.href=URL.createObjectURL(blob)
+
 a.download="swim_records.csv"
+
 a.click()
 
 }
 
+
 function saveGoal(){
 
 goals[goalEvent.value]=goalTime.value
+
 save()
+render()
 
 }
+
+
 
 function renderDashboard(){
 
@@ -345,19 +388,19 @@ let races=records.length
 
 let meets=new Set(records.map(r=>r.meet)).size
 
-let bestUpdate=records.length
-
 let latest=records.sort((a,b)=>new Date(b.date)-new Date(a.date))[0]
 
 document.getElementById("stats").innerHTML=`
 
-<div class="stat">レース数 ${races}</div>
-<div class="stat">大会数 ${meets}</div>
-<div class="stat">最新 ${latest?latest.event+" "+latest.time:"-"}</div>
+<div class="stat">レース数<b>${races}</b></div>
+<div class="stat">大会数<b>${meets}</b></div>
+<div class="stat">最新<b>${latest?latest.time:"-"}</b></div>
 
 `
 
 }
+
+
 
 function renderTable(){
 
@@ -392,6 +435,8 @@ t.innerHTML+=`
 
 }
 
+
+
 function renderBest(){
 
 let best={}
@@ -403,54 +448,98 @@ let key=r.event+"_"+r.course
 let sec=timeToSec(r.time)
 
 if(!best[key]||sec<best[key].sec){
-
 best[key]={time:r.time,sec:sec}
-
 }
 
 })
 
-let t=document.getElementById("bestTable")
-
-t.innerHTML="<tr><th>種目</th><th>水路</th><th>ベスト</th></tr>"
+let rows=[]
 
 for(let k in best){
 
 let p=k.split("_")
 
+rows.push({
+event:p[0],
+course:p[1],
+time:best[k].time
+})
+
+}
+
+rows.sort((a,b)=>eventOrder.indexOf(a.event)-eventOrder.indexOf(b.event))
+
+let t=document.getElementById("bestTable")
+
+t.innerHTML="<tr><th>種目</th><th>水路</th><th>ベスト</th></tr>"
+
+rows.forEach(r=>{
 t.innerHTML+=`
 <tr>
-<td>${p[0]}</td>
-<td>${p[1]}</td>
-<td>${best[k].time}</td>
+<td>${r.event}</td>
+<td>${r.course}</td>
+<td>${r.time}</td>
+</tr>
+`
+})
+
+}
+
+
+
+function renderGoals(){
+
+let html=""
+
+for(let event in goals){
+
+let goal=goals[event]
+
+let eventRecords=records.filter(r=>r.event===event)
+
+if(eventRecords.length===0){
+
+html+=`
+<tr>
+<td>${event}</td>
+<td>${goal}</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+`
+continue
+}
+
+let bestSec=Math.min(...eventRecords.map(r=>timeToSec(r.time)))
+
+let goalSec=timeToSec(goal)
+
+let remain=(bestSec-goalSec).toFixed(2)
+
+let rate=((goalSec/bestSec)*100).toFixed(1)
+
+let color=bestSec<=goalSec?"goalGood":"goalBad"
+
+html+=`
+<tr>
+<td>${event}</td>
+<td>${goal}</td>
+<td>${secToTime(bestSec)}</td>
+<td class="${color}">${remain}</td>
+<td>${rate}%</td>
 </tr>
 `
 
 }
 
-}
+document.getElementById("goalTable").innerHTML=
 
-function buildEventFilter(){
-
-let events=[...new Set(records.map(r=>r.event))]
-
-let sel=document.getElementById("eventFilter")
-
-sel.innerHTML='<option value="all">すべて</option>'
-
-events.forEach(e=>{
-
-let o=document.createElement("option")
-o.value=e
-o.text=e
-
-sel.add(o)
-
-})
-
-sel.onchange=render
+"<tr><th>種目</th><th>目標</th><th>ベスト</th><th>残り秒</th><th>達成率</th></tr>"+html
 
 }
+
+
 
 function renderGraph(){
 
@@ -461,12 +550,9 @@ let sel=document.getElementById("graphEvent")
 sel.innerHTML=""
 
 events.forEach(e=>{
-
 let o=document.createElement("option")
 o.text=e
-
 sel.add(o)
-
 })
 
 sel.onchange=drawGraph
@@ -474,6 +560,8 @@ sel.onchange=drawGraph
 drawGraph()
 
 }
+
+
 
 function drawGraph(){
 
@@ -487,8 +575,6 @@ let labels=data.map(r=>r.date)
 
 let times=data.map(r=>timeToSec(r.time))
 
-let best=Math.min(...times)
-
 if(chart) chart.destroy()
 
 chart=new Chart(document.getElementById("chart"),{
@@ -498,58 +584,30 @@ type:"line",
 data:{
 labels:labels,
 datasets:[
-{label:"タイム",data:times},
-{label:"ベスト",data:labels.map(()=>best),borderDash:[5,5]}
+{
+label:"タイム",
+data:times
+}
 ]
 }
 
 })
 
-drawImprove(data)
-
 }
 
-function drawImprove(data){
 
-let times=data.map(r=>timeToSec(r.time))
-
-let labels=data.map(r=>r.date)
-
-let diff=[]
-
-for(let i=1;i<times.length;i++){
-
-diff.push(times[i-1]-times[i])
-
-}
-
-if(improveChart) improveChart.destroy()
-
-improveChart=new Chart(document.getElementById("improveChart"),{
-
-type:"bar",
-
-data:{
-labels:labels.slice(1),
-datasets:[{
-label:"改善秒",
-data:diff
-}]
-}
-
-})
-
-}
 
 function render(){
 
 renderDashboard()
-buildEventFilter()
 renderTable()
 renderBest()
+renderGoals()
 renderGraph()
 
 }
+
+
 
 load()
 
