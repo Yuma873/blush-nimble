@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Swim Records</title>
+<title>Swim Record Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -10,8 +10,8 @@
 
 body{
 font-family:Arial;
-background:#eef2f6;
 margin:0;
+background:#eef2f6;
 }
 
 header{
@@ -44,7 +44,7 @@ border-bottom:1px solid #ddd;
 
 input,select{
 padding:6px;
-margin-right:6px;
+margin:4px;
 }
 
 button{
@@ -56,19 +56,36 @@ border-radius:5px;
 cursor:pointer;
 }
 
+.stats{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.stat{
+background:#f4f6f9;
+padding:10px;
+border-radius:6px;
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-<h2>Swim Record Manager</h2>
+<h2>Swim Record Dashboard</h2>
 </header>
 
 <div class="container">
 
 <div class="card">
+<h3>ダッシュボード</h3>
+<div class="stats" id="stats"></div>
+</div>
 
+
+<div class="card">
 <h3>記録入力</h3>
 
 <input id="date" type="date">
@@ -80,64 +97,69 @@ cursor:pointer;
 <option>長水路</option>
 </select>
 
-<input id="event" placeholder="種目 (例: 自由形100m)">
-<input id="time" placeholder="タイム (例: 1:15.12)">
+<input id="event" placeholder="種目 (例 自由形100m)">
+<input id="time" placeholder="タイム">
 
-<button onclick="addRecord()">追加</button>
+<button onclick="addRecord()">保存</button>
 
 </div>
 
 
 <div class="card">
-
 <h3>CSV</h3>
 
 <input type="file" id="csvUpload">
-
 <button onclick="downloadCSV()">CSVダウンロード</button>
 
 </div>
 
 
 <div class="card">
+<h3>目標タイム</h3>
 
+<input id="goalEvent" placeholder="種目">
+<input id="goalTime" placeholder="目標タイム">
+
+<button onclick="saveGoal()">保存</button>
+
+</div>
+
+
+<div class="card">
 <h3>記録一覧</h3>
 
-<table id="recordsTable">
+<select id="eventFilter">
+<option value="all">すべて</option>
+</select>
 
-<tr>
-<th>日付</th>
-<th>大会</th>
-<th>会場</th>
-<th>水路</th>
-<th>種目</th>
-<th>タイム</th>
-<th>操作</th>
-</tr>
-
-</table>
+<table id="recordsTable"></table>
 
 </div>
 
 
 <div class="card">
-
 <h3>ベストタイム</h3>
-
 <table id="bestTable"></table>
-
 </div>
 
 
 <div class="card">
-
-<h3>タイム推移</h3>
+<h3>記録推移</h3>
 
 <select id="graphEvent"></select>
 
 <canvas id="chart"></canvas>
 
 </div>
+
+
+<div class="card">
+<h3>成長率</h3>
+
+<canvas id="improveChart"></canvas>
+
+</div>
+
 
 </div>
 
@@ -146,26 +168,60 @@ cursor:pointer;
 
 let records=[]
 let chart
+let improveChart
+let goals={}
 let editIndex=null
 
+const finaBase={
+"自由形50m":21.04,
+"自由形100m":46.86,
+"平泳ぎ100m":56.88,
+"バタフライ100m":49.45
+}
 
 function save(){
 
 localStorage.setItem("swimRecords",JSON.stringify(records))
+localStorage.setItem("goals",JSON.stringify(goals))
 
 }
 
 function load(){
 
-let data=localStorage.getItem("swimRecords")
+let r=localStorage.getItem("swimRecords")
+let g=localStorage.getItem("goals")
 
-if(data){
+if(r) records=JSON.parse(r)
+if(g) goals=JSON.parse(g)
 
-records=JSON.parse(data)
+render()
 
 }
 
-render()
+function timeToSec(t){
+
+if(!t) return 0
+
+if(t.includes(":")){
+
+let p=t.split(":")
+return parseFloat(p[0])*60+parseFloat(p[1])
+
+}
+
+return parseFloat(t)
+
+}
+
+function finaPoint(event,time){
+
+let base=finaBase[event]
+
+if(!base) return "-"
+
+let sec=timeToSec(time)
+
+return Math.round(1000*Math.pow(base/sec,3))
 
 }
 
@@ -180,7 +236,7 @@ event:event.value,
 time:time.value
 }
 
-if(editIndex!==null){
+if(editIndex!=null){
 
 records[editIndex]=r
 editIndex=null
@@ -192,18 +248,7 @@ records.push(r)
 }
 
 save()
-clearForm()
 render()
-
-}
-
-function clearForm(){
-
-date.value=""
-meet.value=""
-venue.value=""
-event.value=""
-time.value=""
 
 }
 
@@ -225,47 +270,117 @@ editIndex=i
 function deleteRecord(i){
 
 records.splice(i,1)
+save()
+render()
+
+}
+
+document.getElementById("csvUpload").addEventListener("change",e=>{
+
+let file=e.target.files[0]
+let reader=new FileReader()
+
+reader.onload=()=>{
+
+let rows=reader.result.split("\n")
+
+rows.shift()
+
+rows.forEach(r=>{
+
+let c=r.split(",")
+
+if(c.length<6)return
+
+records.push({
+date:c[0],
+meet:c[1],
+venue:c[2],
+course:c[3],
+event:c[4],
+time:c[5]
+})
+
+})
 
 save()
 render()
 
 }
 
+reader.readAsText(file)
 
-function render(){
+})
 
-renderTable()
-renderBest()
-renderGraph()
+function downloadCSV(){
+
+let csv="date,meet,venue,course,event,time\n"
+
+records.forEach(r=>{
+
+csv+=`${r.date},${r.meet},${r.venue},${r.course},${r.event},${r.time}\n`
+
+})
+
+let blob=new Blob([csv])
+
+let a=document.createElement("a")
+
+a.href=URL.createObjectURL(blob)
+a.download="swim_records.csv"
+a.click()
+
+}
+
+function saveGoal(){
+
+goals[goalEvent.value]=goalTime.value
+save()
+
+}
+
+function renderDashboard(){
+
+let races=records.length
+
+let meets=new Set(records.map(r=>r.meet)).size
+
+let bestUpdate=records.length
+
+let latest=records.sort((a,b)=>new Date(b.date)-new Date(a.date))[0]
+
+document.getElementById("stats").innerHTML=`
+
+<div class="stat">レース数 ${races}</div>
+<div class="stat">大会数 ${meets}</div>
+<div class="stat">最新 ${latest?latest.event+" "+latest.time:"-"}</div>
+
+`
 
 }
 
 function renderTable(){
 
+let filter=document.getElementById("eventFilter").value
+
+let list=records.filter(r=>{
+if(filter==="all") return true
+return r.event===filter
+})
+
 let t=document.getElementById("recordsTable")
 
-t.innerHTML=`
-<tr>
-<th>日付</th>
-<th>大会</th>
-<th>会場</th>
-<th>水路</th>
-<th>種目</th>
-<th>タイム</th>
-<th>操作</th>
-</tr>
-`
+t.innerHTML="<tr><th>日付</th><th>大会</th><th>種目</th><th>タイム</th><th>FINA</th><th></th></tr>"
 
-records.forEach((r,i)=>{
+list.forEach((r,i)=>{
 
 t.innerHTML+=`
 <tr>
 <td>${r.date}</td>
 <td>${r.meet}</td>
-<td>${r.venue}</td>
-<td>${r.course}</td>
 <td>${r.event}</td>
 <td>${r.time}</td>
+<td>${finaPoint(r.event,r.time)}</td>
 <td>
 <button onclick="editRecord(${i})">編集</button>
 <button onclick="deleteRecord(${i})">削除</button>
@@ -274,20 +389,6 @@ t.innerHTML+=`
 `
 
 })
-
-}
-
-function timeToSec(t){
-
-if(t.includes(":")){
-
-let p=t.split(":")
-
-return parseFloat(p[0])*60+parseFloat(p[1])
-
-}
-
-return parseFloat(t)
 
 }
 
@@ -329,69 +430,27 @@ t.innerHTML+=`
 
 }
 
-document.getElementById("csvUpload").addEventListener("change",e=>{
+function buildEventFilter(){
 
-let file=e.target.files[0]
+let events=[...new Set(records.map(r=>r.event))]
 
-let reader=new FileReader()
+let sel=document.getElementById("eventFilter")
 
-reader.onload=()=>{
+sel.innerHTML='<option value="all">すべて</option>'
 
-let rows=reader.result.split("\n")
+events.forEach(e=>{
 
-rows.shift()
+let o=document.createElement("option")
+o.value=e
+o.text=e
 
-rows.forEach(r=>{
-
-let c=r.split(",")
-
-if(c.length<6)return
-
-records.push({
-
-date:c[0],
-meet:c[1],
-venue:c[2],
-course:c[3],
-event:c[4],
-time:c[5]
+sel.add(o)
 
 })
 
-})
-
-save()
-render()
+sel.onchange=render
 
 }
-
-reader.readAsText(file)
-
-})
-
-
-function downloadCSV(){
-
-let csv="date,meet,venue,course,event,time\n"
-
-records.forEach(r=>{
-
-csv+=`${r.date},${r.meet},${r.venue},${r.course},${r.event},${r.time}\n`
-
-})
-
-let blob=new Blob([csv])
-
-let a=document.createElement("a")
-
-a.href=URL.createObjectURL(blob)
-
-a.download="swim_records.csv"
-
-a.click()
-
-}
-
 
 function renderGraph(){
 
@@ -428,6 +487,8 @@ let labels=data.map(r=>r.date)
 
 let times=data.map(r=>timeToSec(r.time))
 
+let best=Math.min(...times)
+
 if(chart) chart.destroy()
 
 chart=new Chart(document.getElementById("chart"),{
@@ -436,9 +497,43 @@ type:"line",
 
 data:{
 labels:labels,
+datasets:[
+{label:"タイム",data:times},
+{label:"ベスト",data:labels.map(()=>best),borderDash:[5,5]}
+]
+}
+
+})
+
+drawImprove(data)
+
+}
+
+function drawImprove(data){
+
+let times=data.map(r=>timeToSec(r.time))
+
+let labels=data.map(r=>r.date)
+
+let diff=[]
+
+for(let i=1;i<times.length;i++){
+
+diff.push(times[i-1]-times[i])
+
+}
+
+if(improveChart) improveChart.destroy()
+
+improveChart=new Chart(document.getElementById("improveChart"),{
+
+type:"bar",
+
+data:{
+labels:labels.slice(1),
 datasets:[{
-label:ev,
-data:times
+label:"改善秒",
+data:diff
 }]
 }
 
@@ -446,6 +541,15 @@ data:times
 
 }
 
+function render(){
+
+renderDashboard()
+buildEventFilter()
+renderTable()
+renderBest()
+renderGraph()
+
+}
 
 load()
 
