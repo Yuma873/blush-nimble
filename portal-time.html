@@ -4,70 +4,24 @@
 <meta charset="UTF-8">
 <title>Swim Records</title>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-.sidebar {
-  width: 240px;
-  background-color: #2c3e50;
-  color: white;
-  padding: 15px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  overflow-y: auto;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-  z-index: 1000;
-  box-sizing: border-box;
-}
 
-.sidebar video {
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 12px;
-}
-
-.sidebar a {
-  display: block;
-  color: white;
-  text-decoration: none;
-  padding: 12px;
-  margin: 6px 0;
-  background-color: #34495e;
-  border-radius: 6px;
-  text-align: center;
-  transition: 0.3s;
-  font-weight: 500;
-}
-
-.sidebar a:hover {
-  background-color: #1abc9c;
-}
-    sidebar img { display: block; margin: 8px auto; border-radius: 6px; }
-
-.sidebar .logout {
-  margin-top: 20px;
-  background-color: #dc2626;
-  font-weight: 600;
-}
-
-.sidebar .logout:hover {
-  background-color: #b91c1c;
-}
-      
 body{
 font-family:Arial;
-background:#f4f6f9;
+background:#eef2f6;
 margin:0;
-padding:30px;
 }
 
-h1{
-text-align:center;
+header{
+background:#1e73be;
+color:white;
+padding:15px;
 }
 
 .container{
-max-width:1000px;
-margin:auto;
+padding:20px;
 }
 
 .card{
@@ -86,97 +40,71 @@ border-collapse:collapse;
 th,td{
 padding:8px;
 border-bottom:1px solid #ddd;
-text-align:left;
+}
+
+input,select{
+padding:6px;
+margin-right:6px;
 }
 
 button{
-padding:8px 14px;
+padding:6px 10px;
 border:none;
-background:#007bff;
+background:#1e73be;
 color:white;
-border-radius:6px;
+border-radius:5px;
 cursor:pointer;
-}
-
-select{
-padding:6px;
 }
 
 </style>
 </head>
-<nav class="sidebar">
-  <video id="randomVideo" autoplay muted loop playsinline></video>
 
-  <a href="portal.html">🏠 トップ</a>
-  <a href="portal-news.html">📰 お知らせ</a>
-  <a href="portal-tool.html">🛠 ツール</a>
-  <a href="portal-renraku.html">📢 掲示板連絡</a>
-  <a href="portal-pdf.html">📁 ファイル一覧</a>
-  <a href="portal-next.html">🏆 次回大会 特設ページ</a>
-
-  <a href="portal-reserve.html" target="_blank">
-    <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
-  </a>
-
-  <a href="https://yuma873.github.io/blush-nimble/index.html" class="logout">
-    🚪 ログアウト
-  </a>
-</nav>
 <body>
+
+<header>
+<h2>Swim Record Manager</h2>
+</header>
 
 <div class="container">
 
-<h1>Swim Record Manager</h1>
-
 <div class="card">
 
-<h3>CSVインポート</h3>
+<h3>記録入力</h3>
 
-<input type="file" id="csvFile">
+<input id="date" type="date">
+<input id="meet" placeholder="大会名">
+<input id="venue" placeholder="会場">
 
-</div>
-
-<div class="card">
-
-<h3>フィルター</h3>
-
-<select id="strokeFilter">
-<option value="all">すべて</option>
-<option>自由形</option>
-<option>平泳ぎ</option>
-<option>バタフライ</option>
-<option>背泳ぎ</option>
-<option>個人メドレー</option>
-</select>
-
-<select id="courseFilter">
-<option value="all">すべて</option>
-<option>長水路</option>
+<select id="course">
 <option>短水路</option>
+<option>長水路</option>
 </select>
 
-<button onclick="applyFilter()">適用</button>
+<input id="event" placeholder="種目 (例: 自由形100m)">
+<input id="time" placeholder="タイム (例: 1:15.12)">
+
+<button onclick="addRecord()">追加</button>
 
 </div>
+
 
 <div class="card">
 
-<h3>ベストタイム</h3>
+<h3>CSV</h3>
 
-<table id="bestTable">
-<tr>
-<th>種目</th>
-<th>ベスト</th>
-</tr>
-</table>
+<input type="file" id="csvUpload">
+
+<button onclick="downloadCSV()">CSVダウンロード</button>
 
 </div>
+
 
 <div class="card">
 
 <h3>記録一覧</h3>
 
 <table id="recordsTable">
+
 <tr>
 <th>日付</th>
 <th>大会</th>
@@ -184,95 +112,139 @@ padding:6px;
 <th>水路</th>
 <th>種目</th>
 <th>タイム</th>
+<th>操作</th>
 </tr>
+
 </table>
 
 </div>
 
+
+<div class="card">
+
+<h3>ベストタイム</h3>
+
+<table id="bestTable"></table>
+
 </div>
+
+
+<div class="card">
+
+<h3>タイム推移</h3>
+
+<select id="graphEvent"></select>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+</div>
+
 
 <script>
 
-let records=[];
+let records=[]
+let chart
+let editIndex=null
 
-function saveData(){
+
+function save(){
 
 localStorage.setItem("swimRecords",JSON.stringify(records))
 
 }
 
-function loadData(){
+function load(){
 
 let data=localStorage.getItem("swimRecords")
 
 if(data){
+
 records=JSON.parse(data)
-render()
-}
 
 }
-
-document.getElementById("csvFile").addEventListener("change",function(e){
-
-let file=e.target.files[0]
-
-let reader=new FileReader()
-
-reader.onload=function(){
-
-parseCSV(reader.result)
-
-}
-
-reader.readAsText(file)
-
-})
-
-function parseCSV(text){
-
-let rows=text.split("\n")
-
-rows.shift()
-
-rows.forEach(r=>{
-
-let cols=r.split(",")
-
-if(cols.length<6)return
-
-records.push({
-
-date:cols[0],
-meet:cols[1],
-venue:cols[2],
-course:cols[3],
-event:cols[4],
-time:cols[5]
-
-})
-
-})
-
-saveData()
 
 render()
 
 }
 
-function applyFilter(){
+function addRecord(){
 
+let r={
+date:date.value,
+meet:meet.value,
+venue:venue.value,
+course:course.value,
+event:event.value,
+time:time.value
+}
+
+if(editIndex!==null){
+
+records[editIndex]=r
+editIndex=null
+
+}else{
+
+records.push(r)
+
+}
+
+save()
+clearForm()
 render()
 
 }
+
+function clearForm(){
+
+date.value=""
+meet.value=""
+venue.value=""
+event.value=""
+time.value=""
+
+}
+
+function editRecord(i){
+
+let r=records[i]
+
+date.value=r.date
+meet.value=r.meet
+venue.value=r.venue
+course.value=r.course
+event.value=r.event
+time.value=r.time
+
+editIndex=i
+
+}
+
+function deleteRecord(i){
+
+records.splice(i,1)
+
+save()
+render()
+
+}
+
 
 function render(){
 
-let stroke=document.getElementById("strokeFilter").value
-let course=document.getElementById("courseFilter").value
+renderTable()
+renderBest()
+renderGraph()
 
-let table=document.getElementById("recordsTable")
+}
 
-table.innerHTML=`
+function renderTable(){
+
+let t=document.getElementById("recordsTable")
+
+t.innerHTML=`
 <tr>
 <th>日付</th>
 <th>大会</th>
@@ -280,21 +252,13 @@ table.innerHTML=`
 <th>水路</th>
 <th>種目</th>
 <th>タイム</th>
+<th>操作</th>
 </tr>
 `
 
-let filtered=records.filter(r=>{
+records.forEach((r,i)=>{
 
-if(stroke!="all" && !r.event.includes(stroke)) return false
-if(course!="all" && r.course!=course) return false
-
-return true
-
-})
-
-filtered.forEach(r=>{
-
-table.innerHTML+=`
+t.innerHTML+=`
 <tr>
 <td>${r.date}</td>
 <td>${r.meet}</td>
@@ -302,52 +266,62 @@ table.innerHTML+=`
 <td>${r.course}</td>
 <td>${r.event}</td>
 <td>${r.time}</td>
+<td>
+<button onclick="editRecord(${i})">編集</button>
+<button onclick="deleteRecord(${i})">削除</button>
+</td>
 </tr>
 `
 
 })
-
-calcBest(filtered)
 
 }
 
 function timeToSec(t){
 
 if(t.includes(":")){
+
 let p=t.split(":")
+
 return parseFloat(p[0])*60+parseFloat(p[1])
+
 }
 
 return parseFloat(t)
 
 }
 
-function calcBest(list){
+function renderBest(){
 
 let best={}
 
-list.forEach(r=>{
+records.forEach(r=>{
+
+let key=r.event+"_"+r.course
 
 let sec=timeToSec(r.time)
 
-if(!best[r.event] || sec<best[r.event].sec){
+if(!best[key]||sec<best[key].sec){
 
-best[r.event]={sec:sec,time:r.time}
+best[key]={time:r.time,sec:sec}
 
 }
 
 })
 
-let table=document.getElementById("bestTable")
+let t=document.getElementById("bestTable")
 
-table.innerHTML="<tr><th>種目</th><th>ベスト</th></tr>"
+t.innerHTML="<tr><th>種目</th><th>水路</th><th>ベスト</th></tr>"
 
-for(let e in best){
+for(let k in best){
 
-table.innerHTML+=`
+let p=k.split("_")
+
+t.innerHTML+=`
 <tr>
-<td>${e}</td>
-<td>${best[e].time}</td>
+<td>${p[0]}</td>
+<td>${p[1]}</td>
+<td>${best[k].time}</td>
 </tr>
 `
 
@@ -355,7 +329,125 @@ table.innerHTML+=`
 
 }
 
-loadData()
+document.getElementById("csvUpload").addEventListener("change",e=>{
+
+let file=e.target.files[0]
+
+let reader=new FileReader()
+
+reader.onload=()=>{
+
+let rows=reader.result.split("\n")
+
+rows.shift()
+
+rows.forEach(r=>{
+
+let c=r.split(",")
+
+if(c.length<6)return
+
+records.push({
+
+date:c[0],
+meet:c[1],
+venue:c[2],
+course:c[3],
+event:c[4],
+time:c[5]
+
+})
+
+})
+
+save()
+render()
+
+}
+
+reader.readAsText(file)
+
+})
+
+
+function downloadCSV(){
+
+let csv="date,meet,venue,course,event,time\n"
+
+records.forEach(r=>{
+
+csv+=`${r.date},${r.meet},${r.venue},${r.course},${r.event},${r.time}\n`
+
+})
+
+let blob=new Blob([csv])
+
+let a=document.createElement("a")
+
+a.href=URL.createObjectURL(blob)
+
+a.download="swim_records.csv"
+
+a.click()
+
+}
+
+
+function renderGraph(){
+
+let events=[...new Set(records.map(r=>r.event))]
+
+let sel=document.getElementById("graphEvent")
+
+sel.innerHTML=""
+
+events.forEach(e=>{
+
+let o=document.createElement("option")
+o.text=e
+
+sel.add(o)
+
+})
+
+sel.onchange=drawGraph
+
+drawGraph()
+
+}
+
+function drawGraph(){
+
+let ev=document.getElementById("graphEvent").value
+
+let data=records.filter(r=>r.event==ev)
+
+data.sort((a,b)=>new Date(a.date)-new Date(b.date))
+
+let labels=data.map(r=>r.date)
+
+let times=data.map(r=>timeToSec(r.time))
+
+if(chart) chart.destroy()
+
+chart=new Chart(document.getElementById("chart"),{
+
+type:"line",
+
+data:{
+labels:labels,
+datasets:[{
+label:ev,
+data:times
+}]
+}
+
+})
+
+}
+
+
+load()
 
 </script>
 
