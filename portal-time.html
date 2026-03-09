@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Swim Records</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+margin:0;
+padding:30px;
+}
+
+h1{
+text-align:center;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+}
+
+.card{
+background:white;
+padding:20px;
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:8px;
+border-bottom:1px solid #ddd;
+text-align:left;
+}
+
+button{
+padding:8px 14px;
+border:none;
+background:#007bff;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+select{
+padding:6px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Swim Record Manager</h1>
+
+<div class="card">
+
+<h3>CSVインポート</h3>
+
+<input type="file" id="csvFile">
+
+</div>
+
+<div class="card">
+
+<h3>フィルター</h3>
+
+<select id="strokeFilter">
+<option value="all">すべて</option>
+<option>自由形</option>
+<option>平泳ぎ</option>
+<option>バタフライ</option>
+<option>背泳ぎ</option>
+<option>個人メドレー</option>
+</select>
+
+<select id="courseFilter">
+<option value="all">すべて</option>
+<option>長水路</option>
+<option>短水路</option>
+</select>
+
+<button onclick="applyFilter()">適用</button>
+
+</div>
+
+<div class="card">
+
+<h3>ベストタイム</h3>
+
+<table id="bestTable">
+<tr>
+<th>種目</th>
+<th>ベスト</th>
+</tr>
+</table>
+
+</div>
+
+<div class="card">
+
+<h3>記録一覧</h3>
+
+<table id="recordsTable">
+<tr>
+<th>日付</th>
+<th>大会</th>
+<th>会場</th>
+<th>水路</th>
+<th>種目</th>
+<th>タイム</th>
+</tr>
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+let records=[];
+
+function saveData(){
+
+localStorage.setItem("swimRecords",JSON.stringify(records))
+
+}
+
+function loadData(){
+
+let data=localStorage.getItem("swimRecords")
+
+if(data){
+records=JSON.parse(data)
+render()
+}
+
+}
+
+document.getElementById("csvFile").addEventListener("change",function(e){
+
+let file=e.target.files[0]
+
+let reader=new FileReader()
+
+reader.onload=function(){
+
+parseCSV(reader.result)
+
+}
+
+reader.readAsText(file)
+
+})
+
+function parseCSV(text){
+
+let rows=text.split("\n")
+
+rows.shift()
+
+rows.forEach(r=>{
+
+let cols=r.split(",")
+
+if(cols.length<6)return
+
+records.push({
+
+date:cols[0],
+meet:cols[1],
+venue:cols[2],
+course:cols[3],
+event:cols[4],
+time:cols[5]
+
+})
+
+})
+
+saveData()
+
+render()
+
+}
+
+function applyFilter(){
+
+render()
+
+}
+
+function render(){
+
+let stroke=document.getElementById("strokeFilter").value
+let course=document.getElementById("courseFilter").value
+
+let table=document.getElementById("recordsTable")
+
+table.innerHTML=`
+<tr>
+<th>日付</th>
+<th>大会</th>
+<th>会場</th>
+<th>水路</th>
+<th>種目</th>
+<th>タイム</th>
+</tr>
+`
+
+let filtered=records.filter(r=>{
+
+if(stroke!="all" && !r.event.includes(stroke)) return false
+if(course!="all" && r.course!=course) return false
+
+return true
+
+})
+
+filtered.forEach(r=>{
+
+table.innerHTML+=`
+<tr>
+<td>${r.date}</td>
+<td>${r.meet}</td>
+<td>${r.venue}</td>
+<td>${r.course}</td>
+<td>${r.event}</td>
+<td>${r.time}</td>
+</tr>
+`
+
+})
+
+calcBest(filtered)
+
+}
+
+function timeToSec(t){
+
+if(t.includes(":")){
+let p=t.split(":")
+return parseFloat(p[0])*60+parseFloat(p[1])
+}
+
+return parseFloat(t)
+
+}
+
+function calcBest(list){
+
+let best={}
+
+list.forEach(r=>{
+
+let sec=timeToSec(r.time)
+
+if(!best[r.event] || sec<best[r.event].sec){
+
+best[r.event]={sec:sec,time:r.time}
+
+}
+
+})
+
+let table=document.getElementById("bestTable")
+
+table.innerHTML="<tr><th>種目</th><th>ベスト</th></tr>"
+
+for(let e in best){
+
+table.innerHTML+=`
+<tr>
+<td>${e}</td>
+<td>${best[e].time}</td>
+</tr>
+`
+
+}
+
+}
+
+loadData()
+
+</script>
+
+</body>
+</html>
