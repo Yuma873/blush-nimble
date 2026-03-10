@@ -1,149 +1,179 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Swim Record Dashboard</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Swim Records</title>
 
 <style>
-
-body{
-font-family:Arial;
-margin:0;
-background:#eef2f6;
+.sidebar {
+  width: 240px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 15px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  z-index: 1000;
+  box-sizing: border-box;
 }
 
+.sidebar video {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.sidebar a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 12px;
+  margin: 6px 0;
+  background-color: #34495e;
+  border-radius: 6px;
+  text-align: center;
+  transition: 0.3s;
+  font-weight: 500;
+}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+.sidebar a:hover {
+  background-color: #1abc9c;
+}
+    sidebar img { display: block; margin: 8px auto; border-radius: 6px; }
+
+.sidebar .logout {
+  margin-top: 20px;
+  background-color: #dc2626;
+  font-weight: 600;
+}
+<style>
+
+.sidebar .logout:hover {
+  background-color: #b91c1c;
+}
+      
+body{
+font-family:Arial;
+background:#f4f6f9;
+background:#eef2f6;
+margin:0;
+padding:30px;
+}
+
+h1{
+text-align:center;
 header{
-background:#2c3e50;
+background:#1e73be;
 color:white;
-padding:16px;
-font-size:22px;
+padding:15px;
 }
 
 .container{
-max-width:1200px;
+max-width:1000px;
 margin:auto;
 padding:20px;
 }
 
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px;
-}
-
 .card{
-background:white;
-padding:18px;
-border-radius:10px;
-box-shadow:0 3px 8px rgba(0,0,0,0.1);
-}
-
-h3{
-margin-top:0;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-}
-
+@@ -86,278 +40,416 @@
 th,td{
 padding:8px;
 border-bottom:1px solid #ddd;
-text-align:center;
+text-align:left;
 }
 
 input,select{
 padding:6px;
-margin:3px;
+margin-right:6px;
 }
 
 button{
-padding:6px 12px;
-background:#1abc9c;
-color:white;
+padding:8px 14px;
+padding:6px 10px;
 border:none;
+background:#007bff;
+background:#1e73be;
+color:white;
 border-radius:6px;
+border-radius:5px;
 cursor:pointer;
 }
 
-button:hover{
-background:#16a085;
-}
-
-.progress{
-
-background:#ddd;
-border-radius:10px;
-height:16px;
-
-}
-
-.progressBar{
-
-background:#1abc9c;
-height:16px;
-border-radius:10px;
-
-}
-
-.stats{
-
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-gap:15px;
-
-}
-
-.stat{
-
-background:#f4f6f9;
-padding:15px;
-border-radius:8px;
-text-align:center;
-
-}
-
-.stat b{
-
-font-size:22px;
-display:block;
-
+select{
+padding:6px;
 }
 
 </style>
-
 </head>
+<nav class="sidebar">
+  <video id="randomVideo" autoplay muted loop playsinline></video>
 
+  <a href="portal.html">🏠 トップ</a>
+  <a href="portal-news.html">📰 お知らせ</a>
+  <a href="portal-tool.html">🛠 ツール</a>
+  <a href="portal-renraku.html">📢 掲示板連絡</a>
+  <a href="portal-pdf.html">📁 ファイル一覧</a>
+  <a href="portal-next.html">🏆 次回大会 特設ページ</a>
 
+  <a href="portal-reserve.html" target="_blank">
+    <img src="https://reserva.be/reserva/images/btn_reserve_2.png" alt="プール予約" width="120">
+  </a>
+
+  <a href="https://yuma873.github.io/blush-nimble/index.html" class="logout">
+    🚪 ログアウト
+  </a>
+</nav>
 <body>
-
-<header>
-競泳記録ダッシュボード
-</header>
 
 <div class="container">
 
+<h1>Swim Record Manager</h1>
 
 <div class="card">
 
+<h3>CSVインポート</h3>
+<body>
+
+<input type="file" id="csvFile">
+<header>
+<h2>Swim Record Manager</h2>
+</header>
+
+</div>
+<div class="container">
+
+<div class="card">
+
+<h3>フィルター</h3>
 <h3>記録入力</h3>
 
+<select id="strokeFilter">
+<option value="all">すべて</option>
+<option>自由形</option>
+<option>平泳ぎ</option>
+<option>バタフライ</option>
+<option>背泳ぎ</option>
+<option>個人メドレー</option>
+</select>
+<input id="date" type="date">
 <input id="meet" placeholder="大会名">
+<input id="venue" placeholder="会場">
 
-<select id="event"></select>
-
-<select id="course">
+<select id="courseFilter">
+<option value="all">すべて</option>
 <option>長水路</option>
+<select id="course">
 <option>短水路</option>
+<option>長水路</option>
 </select>
 
-<input id="time" placeholder="タイム">
-<input id="date" type="date">
+<button onclick="applyFilter()">適用</button>
+<input id="event" placeholder="種目 (例: 自由形100m)">
+<input id="time" placeholder="タイム (例: 1:15.12)">
 
 <button onclick="addRecord()">追加</button>
 
@@ -152,42 +182,39 @@ display:block;
 
 <div class="card">
 
-<h3>ダッシュボード</h3>
+<h3>ベストタイム</h3>
+<h3>CSV</h3>
 
-<div class="stats" id="stats"></div>
+<table id="bestTable">
+<tr>
+<th>種目</th>
+<th>ベスト</th>
+</tr>
+</table>
+<input type="file" id="csvUpload">
 
-</div>
-
-
-<div class="grid">
-
-<div class="card">
-
-<h3>記録推移グラフ</h3>
-
-<select id="graphEvent" onchange="drawGraph()"></select>
-
-<canvas id="chart"></canvas>
+<button onclick="downloadCSV()">CSVダウンロード</button>
 
 </div>
 
 
 <div class="card">
 
-<h3>目標達成グラフ</h3>
+<h3>記録一覧</h3>
 
-<canvas id="goalChart"></canvas>
+<table id="recordsTable">
 
-</div>
+<tr>
+<th>日付</th>
+<th>大会</th>
+<th>会場</th>
+<th>水路</th>
+<th>種目</th>
+<th>タイム</th>
+<th>操作</th>
+</tr>
 
-</div>
-
-
-<div class="card">
-
-<h3>目標達成率</h3>
-
-<table id="goalTable"></table>
+</table>
 
 </div>
 
@@ -201,45 +228,210 @@ display:block;
 </div>
 
 
+<div class="card">
+
+<h3>タイム推移</h3>
+
+<select id="graphEvent"></select>
+
+<canvas id="chart"></canvas>
+
 </div>
 
+</div>
 
 
 <script>
 
-const events=[
-
-"50m自由形","100m自由形","200m自由形","400m自由形",
-"50m背泳ぎ","100m背泳ぎ","200m背泳ぎ",
-"50m平泳ぎ","100m平泳ぎ","200m平泳ぎ",
-"50mバタフライ","100mバタフライ","200mバタフライ",
-"200m個人メドレー","400m個人メドレー"
-
-]
-
-let records=JSON.parse(localStorage.getItem("records")||"[]")
-let goals=JSON.parse(localStorage.getItem("goals")||"{}")
-
+let records=[];
+let records=[]
 let chart
-let goalChart
+let editIndex=null
 
+function saveData(){
 
 function save(){
 
-localStorage.setItem("records",JSON.stringify(records))
-localStorage.setItem("goals",JSON.stringify(goals))
+localStorage.setItem("swimRecords",JSON.stringify(records))
+
+}
+
+function loadData(){
+function load(){
+
+let data=localStorage.getItem("swimRecords")
+
+if(data){
+
+records=JSON.parse(data)
+render()
+}
+
+}
+
+document.getElementById("csvFile").addEventListener("change",function(e){
+
+let file=e.target.files[0]
+
+let reader=new FileReader()
+render()
+
+reader.onload=function(){
+}
+
+parseCSV(reader.result)
+function addRecord(){
+
+let r={
+date:date.value,
+meet:meet.value,
+venue:venue.value,
+course:course.value,
+event:event.value,
+time:time.value
+}
+
+reader.readAsText(file)
+if(editIndex!==null){
+
+})
+records[editIndex]=r
+editIndex=null
+
+function parseCSV(text){
+}else{
+
+let rows=text.split("\n")
+records.push(r)
+
+rows.shift()
+}
+
+rows.forEach(r=>{
+save()
+clearForm()
+render()
+
+let cols=r.split(",")
+}
+
+if(cols.length<6)return
+function clearForm(){
+
+records.push({
+date.value=""
+meet.value=""
+venue.value=""
+event.value=""
+time.value=""
+
+date:cols[0],
+meet:cols[1],
+venue:cols[2],
+course:cols[3],
+event:cols[4],
+time:cols[5]
+}
+
+})
+function editRecord(i){
+
+})
+let r=records[i]
+
+saveData()
+date.value=r.date
+meet.value=r.meet
+venue.value=r.venue
+course.value=r.course
+event.value=r.event
+time.value=r.time
+
+render()
+editIndex=i
+
+}
+
+function applyFilter(){
+function deleteRecord(i){
+
+records.splice(i,1)
+
+save()
+render()
 
 }
 
 
-function timeToSec(t){
+function render(){
 
-if(!t)return 0
+let stroke=document.getElementById("strokeFilter").value
+let course=document.getElementById("courseFilter").value
+renderTable()
+renderBest()
+renderGraph()
+
+}
+
+let table=document.getElementById("recordsTable")
+function renderTable(){
+
+table.innerHTML=`
+let t=document.getElementById("recordsTable")
+
+t.innerHTML=`
+<tr>
+<th>日付</th>
+<th>大会</th>
+<th>会場</th>
+<th>水路</th>
+<th>種目</th>
+<th>タイム</th>
+<th>操作</th>
+</tr>
+`
+
+let filtered=records.filter(r=>{
+
+if(stroke!="all" && !r.event.includes(stroke)) return false
+if(course!="all" && r.course!=course) return false
+
+return true
+
+})
+
+filtered.forEach(r=>{
+records.forEach((r,i)=>{
+
+table.innerHTML+=`
+t.innerHTML+=`
+<tr>
+<td>${r.date}</td>
+<td>${r.meet}</td>
+<td>${r.venue}</td>
+<td>${r.course}</td>
+<td>${r.event}</td>
+<td>${r.time}</td>
+<td>
+<button onclick="editRecord(${i})">編集</button>
+<button onclick="deleteRecord(${i})">削除</button>
+</td>
+</tr>
+`
+
+})
+
+calcBest(filtered)
+
+}
+
+function timeToSec(t){
 
 if(t.includes(":")){
 
 let p=t.split(":")
-return p[0]*60+parseFloat(p[1])
+
+return parseFloat(p[0])*60+parseFloat(p[1])
 
 }
 
@@ -247,216 +439,166 @@ return parseFloat(t)
 
 }
 
+function calcBest(list){
+function renderBest(){
 
-function secToTime(sec){
+let best={}
 
-let m=Math.floor(sec/60)
+list.forEach(r=>{
+records.forEach(r=>{
 
-let s=(sec%60).toFixed(2)
+let key=r.event+"_"+r.course
 
-if(m==0)return s
+let sec=timeToSec(r.time)
 
-return m+":"+s.padStart(5,"0")
+if(!best[r.event] || sec<best[r.event].sec){
+if(!best[key]||sec<best[key].sec){
+
+best[r.event]={sec:sec,time:r.time}
+best[key]={time:r.time,sec:sec}
 
 }
 
+})
 
+let table=document.getElementById("bestTable")
+let t=document.getElementById("bestTable")
 
-function addRecord(){
+table.innerHTML="<tr><th>種目</th><th>ベスト</th></tr>"
+t.innerHTML="<tr><th>種目</th><th>水路</th><th>ベスト</th></tr>"
+
+for(let e in best){
+for(let k in best){
+
+table.innerHTML+=`
+let p=k.split("_")
+
+t.innerHTML+=`
+<tr>
+<td>${e}</td>
+<td>${best[e].time}</td>
+<td>${p[0]}</td>
+<td>${p[1]}</td>
+<td>${best[k].time}</td>
+</tr>
+`
+
+}
+
+}
+
+loadData()
+document.getElementById("csvUpload").addEventListener("change",e=>{
+
+let file=e.target.files[0]
+
+let reader=new FileReader()
+
+reader.onload=()=>{
+
+let rows=reader.result.split("\n")
+
+rows.shift()
+
+rows.forEach(r=>{
+
+let c=r.split(",")
+
+if(c.length<6)return
 
 records.push({
 
-event:event.value,
-course:course.value,
-time:time.value,
-date:date.value,
-meet:meet.value
+date:c[0],
+meet:c[1],
+venue:c[2],
+course:c[3],
+event:c[4],
+time:c[5]
+
+})
 
 })
 
 save()
-
 render()
 
 }
 
+reader.readAsText(file)
+
+})
 
 
-function renderDashboard(){
+function downloadCSV(){
 
-let total=records.length
-
-let best=records.length?
-
-Math.min(...records.map(r=>timeToSec(r.time))):null
-
-stats.innerHTML=
-
-`
-<div class="stat">記録数<b>${total}</b></div>
-<div class="stat">最速<b>${best?secToTime(best):"-"}</b></div>
-`
-
-}
-
-
-
-function renderBest(){
-
-let map={}
+let csv="date,meet,venue,course,event,time\n"
 
 records.forEach(r=>{
 
-let sec=timeToSec(r.time)
-
-if(!map[r.event]||sec<map[r.event]){
-
-map[r.event]=sec
-
-}
+csv+=`${r.date},${r.meet},${r.venue},${r.course},${r.event},${r.time}\n`
 
 })
 
-let html="<tr><th>種目</th><th>ベスト</th></tr>"
+let blob=new Blob([csv])
 
-Object.keys(map).forEach(e=>{
+let a=document.createElement("a")
 
-html+=`
+a.href=URL.createObjectURL(blob)
 
-<tr>
+a.download="swim_records.csv"
 
-<td>${e}</td>
-<td>${secToTime(map[e])}</td>
+a.click()
 
-</tr>
+}
 
-`
+
+function renderGraph(){
+
+let events=[...new Set(records.map(r=>r.event))]
+
+let sel=document.getElementById("graphEvent")
+
+sel.innerHTML=""
+
+events.forEach(e=>{
+
+let o=document.createElement("option")
+o.text=e
+
+sel.add(o)
 
 })
 
-bestTable.innerHTML=html
+sel.onchange=drawGraph
+
+drawGraph()
 
 }
-
-
-
-function renderGoals(){
-
-let html="<tr><th>種目</th><th>達成率</th></tr>"
-
-let labels=[]
-let data=[]
-
-Object.keys(goals).forEach(e=>{
-
-let goal=timeToSec(goals[e])
-
-let list=records.filter(r=>r.event==e)
-
-if(!list.length)return
-
-let best=Math.min(...list.map(r=>timeToSec(r.time)))
-
-let rate=(goal/best)*100
-
-labels.push(e)
-
-data.push(rate.toFixed(1))
-
-html+=`
-
-<tr>
-
-<td>${e}</td>
-
-<td>
-
-<div class="progress">
-
-<div class="progressBar" style="width:${rate}%"></div>
-
-</div>
-
-${rate.toFixed(1)}%
-
-</td>
-
-</tr>
-
-`
-
-})
-
-goalTable.innerHTML=html
-
-drawGoalChart(labels,data)
-
-}
-
-
-
-function drawGoalChart(labels,data){
-
-if(goalChart)goalChart.destroy()
-
-goalChart=new Chart(goalChartCanvas,{
-
-type:"bar",
-
-data:{
-
-labels:labels,
-
-datasets:[{
-
-label:"達成率",
-
-data:data
-
-}]
-
-}
-
-})
-
-}
-
-
 
 function drawGraph(){
 
-let ev=graphEvent.value
+let ev=document.getElementById("graphEvent").value
 
-let data=records
+let data=records.filter(r=>r.event==ev)
 
-.filter(r=>r.event==ev)
-
-.sort((a,b)=>new Date(a.date)-new Date(b.date))
-
-if(!data.length)return
+data.sort((a,b)=>new Date(a.date)-new Date(b.date))
 
 let labels=data.map(r=>r.date)
 
 let times=data.map(r=>timeToSec(r.time))
 
-if(chart)chart.destroy()
+if(chart) chart.destroy()
 
-chart=new Chart(chartCanvas,{
+chart=new Chart(document.getElementById("chart"),{
 
 type:"line",
 
 data:{
-
 labels:labels,
-
 datasets:[{
-
-label:"タイム",
-
+label:ev,
 data:times
-
 }]
-
 }
 
 })
@@ -464,30 +606,7 @@ data:times
 }
 
 
-
-function init(){
-
-events.forEach(e=>{
-
-event.add(new Option(e,e))
-graphEvent.add(new Option(e,e))
-
-})
-
-render()
-
-}
-
-function render(){
-
-renderDashboard()
-renderBest()
-renderGoals()
-drawGraph()
-
-}
-
-init()
+load()
 
 </script>
 
