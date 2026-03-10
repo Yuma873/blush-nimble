@@ -3,37 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>競泳記録ダッシュボード</title>
+
+<title>Swim Record Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
 body{
-font-family:sans-serif;
+font-family:Arial;
 margin:0;
-background:#f4f6f8;
+background:#eef2f6;
 }
 
 header{
 background:#2c3e50;
 color:white;
-padding:15px;
-font-size:20px;
+padding:16px;
+font-size:22px;
 }
 
 .container{
-max-width:1100px;
+max-width:1200px;
 margin:auto;
 padding:20px;
 }
 
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
 .card{
 background:white;
-padding:15px;
-margin-bottom:20px;
-border-radius:8px;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
+padding:18px;
+border-radius:10px;
+box-shadow:0 3px 8px rgba(0,0,0,0.1);
+}
+
+h3{
+margin-top:0;
 }
 
 table{
@@ -42,21 +52,22 @@ border-collapse:collapse;
 }
 
 th,td{
+padding:8px;
 border-bottom:1px solid #ddd;
-padding:6px;
 text-align:center;
 }
 
-input,select,button{
+input,select{
 padding:6px;
 margin:3px;
 }
 
 button{
+padding:6px 12px;
 background:#1abc9c;
 color:white;
 border:none;
-border-radius:4px;
+border-radius:6px;
 cursor:pointer;
 }
 
@@ -64,14 +75,59 @@ button:hover{
 background:#16a085;
 }
 
+.progress{
+
+background:#ddd;
+border-radius:10px;
+height:16px;
+
+}
+
+.progressBar{
+
+background:#1abc9c;
+height:16px;
+border-radius:10px;
+
+}
+
+.stats{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+gap:15px;
+
+}
+
+.stat{
+
+background:#f4f6f9;
+padding:15px;
+border-radius:8px;
+text-align:center;
+
+}
+
+.stat b{
+
+font-size:22px;
+display:block;
+
+}
+
 </style>
+
 </head>
+
 
 <body>
 
-<header>競泳記録ダッシュボード</header>
+<header>
+競泳記録ダッシュボード
+</header>
 
 <div class="container">
+
 
 <div class="card">
 
@@ -79,39 +135,14 @@ background:#16a085;
 
 <input id="meet" placeholder="大会名">
 
-<select id="event">
-
-<option>50m自由形</option>
-<option>100m自由形</option>
-<option>200m自由形</option>
-<option>400m自由形</option>
-
-<option>50m背泳ぎ</option>
-<option>100m背泳ぎ</option>
-<option>200m背泳ぎ</option>
-
-<option>50m平泳ぎ</option>
-<option>100m平泳ぎ</option>
-<option>200m平泳ぎ</option>
-
-<option>50mバタフライ</option>
-<option>100mバタフライ</option>
-<option>200mバタフライ</option>
-
-<option>200m個人メドレー</option>
-<option>400m個人メドレー</option>
-
-</select>
+<select id="event"></select>
 
 <select id="course">
-
-<option value="LCM">長水路</option>
-<option value="SCM">短水路</option>
-
+<option>長水路</option>
+<option>短水路</option>
 </select>
 
-<input id="time" placeholder="タイム 例 1:02.35">
-
+<input id="time" placeholder="タイム">
 <input id="date" type="date">
 
 <button onclick="addRecord()">追加</button>
@@ -123,18 +154,40 @@ background:#16a085;
 
 <h3>ダッシュボード</h3>
 
-<div id="dashboard"></div>
+<div class="stats" id="stats"></div>
+
+</div>
+
+
+<div class="grid">
+
+<div class="card">
+
+<h3>記録推移グラフ</h3>
+
+<select id="graphEvent" onchange="drawGraph()"></select>
+
+<canvas id="chart"></canvas>
 
 </div>
 
 
 <div class="card">
 
-<h3>記録グラフ</h3>
+<h3>目標達成グラフ</h3>
 
-<select id="graphEvent" onchange="renderGraph()"></select>
+<canvas id="goalChart"></canvas>
 
-<canvas id="chartCanvas"></canvas>
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>目標達成率</h3>
+
+<table id="goalTable"></table>
 
 </div>
 
@@ -148,41 +201,8 @@ background:#16a085;
 </div>
 
 
-<div class="card">
-
-<h3>記録一覧</h3>
-
-<table id="recordTable"></table>
-
 </div>
 
-
-<div class="card">
-
-<h3>目標タイム</h3>
-
-<select id="goalEvent"></select>
-
-<input id="goalTime" placeholder="目標タイム">
-
-<button onclick="saveGoal()">保存</button>
-
-<table id="goalTable"></table>
-
-</div>
-
-
-<div class="card">
-
-<h3>CSV</h3>
-
-<button onclick="downloadCSV()">CSVダウンロード</button>
-
-<input type="file" onchange="uploadCSV(event)">
-
-</div>
-
-</div>
 
 
 <script>
@@ -190,39 +210,27 @@ background:#16a085;
 const events=[
 
 "50m自由形","100m自由形","200m自由形","400m自由形",
-
 "50m背泳ぎ","100m背泳ぎ","200m背泳ぎ",
-
 "50m平泳ぎ","100m平泳ぎ","200m平泳ぎ",
-
 "50mバタフライ","100mバタフライ","200mバタフライ",
-
 "200m個人メドレー","400m個人メドレー"
 
 ]
 
-const finaBase={
-
-"50m自由形":21.04,
-"100m自由形":46.86,
-"200m自由形":102,
-"100m背泳ぎ":51.6,
-"100m平泳ぎ":56.88,
-"100mバタフライ":49.45
-
-}
-
-let records=JSON.parse(localStorage.getItem("swimRecords")||"[]")
-let goals=JSON.parse(localStorage.getItem("swimGoals")||"{}")
+let records=JSON.parse(localStorage.getItem("records")||"[]")
+let goals=JSON.parse(localStorage.getItem("goals")||"{}")
 
 let chart
+let goalChart
+
 
 function save(){
 
-localStorage.setItem("swimRecords",JSON.stringify(records))
-localStorage.setItem("swimGoals",JSON.stringify(goals))
+localStorage.setItem("records",JSON.stringify(records))
+localStorage.setItem("goals",JSON.stringify(goals))
 
 }
+
 
 function timeToSec(t){
 
@@ -231,14 +239,14 @@ if(!t)return 0
 if(t.includes(":")){
 
 let p=t.split(":")
-
-return parseFloat(p[0])*60+parseFloat(p[1])
+return p[0]*60+parseFloat(p[1])
 
 }
 
 return parseFloat(t)
 
 }
+
 
 function secToTime(sec){
 
@@ -252,52 +260,19 @@ return m+":"+s.padStart(5,"0")
 
 }
 
-function finaPoint(event,time){
 
-let base=finaBase[event]
-
-if(!base)return "-"
-
-let sec=timeToSec(time)
-
-return Math.round(1000*Math.pow(base/sec,3))
-
-}
-
-
-function checkBest(newRec){
-
-let list=records.filter(r=>r.event==newRec.event)
-
-if(list.length<=1)return
-
-let oldBest=Math.min(...list.slice(0,-1).map(r=>timeToSec(r.time)))
-
-let newTime=timeToSec(newRec.time)
-
-if(newTime<oldBest){
-
-alert("ベスト更新！")
-
-}
-
-}
 
 function addRecord(){
 
-let r={
+records.push({
 
-meet:meet.value,
 event:event.value,
 course:course.value,
 time:time.value,
-date:date.value
+date:date.value,
+meet:meet.value
 
-}
-
-records.push(r)
-
-checkBest(r)
+})
 
 save()
 
@@ -305,33 +280,6 @@ render()
 
 }
 
-function deleteRecord(i){
-
-records.splice(i,1)
-
-save()
-
-render()
-
-}
-
-function editRecord(i){
-
-let r=records[i]
-
-meet.value=r.meet
-event.value=r.event
-course.value=r.course
-time.value=r.time
-date.value=r.date
-
-records.splice(i,1)
-
-save()
-
-render()
-
-}
 
 
 function renderDashboard(){
@@ -342,48 +290,15 @@ let best=records.length?
 
 Math.min(...records.map(r=>timeToSec(r.time))):null
 
-dashboard.innerHTML=
-
-"記録数："+total+"<br>"+
-
-"最速タイム："+(best?secToTime(best):"-")
-
-}
-
-
-function renderTable(){
-
-let html="<tr><th>日付</th><th>大会</th><th>種目</th><th>コース</th><th>タイム</th><th>FINA</th><th></th></tr>"
-
-records.forEach((r,i)=>{
-
-html+=`
-
-<tr>
-
-<td>${r.date}</td>
-<td>${r.meet}</td>
-<td>${r.event}</td>
-<td>${r.course}</td>
-<td>${r.time}</td>
-<td>${finaPoint(r.event,r.time)}</td>
-
-<td>
-
-<button onclick="editRecord(${i})">編集</button>
-<button onclick="deleteRecord(${i})">削除</button>
-
-</td>
-
-</tr>
+stats.innerHTML=
 
 `
-
-})
-
-recordTable.innerHTML=html
+<div class="stat">記録数<b>${total}</b></div>
+<div class="stat">最速<b>${best?secToTime(best):"-"}</b></div>
+`
 
 }
+
 
 
 function renderBest(){
@@ -392,31 +307,26 @@ let map={}
 
 records.forEach(r=>{
 
-let key=r.event+"_"+r.course
-
 let sec=timeToSec(r.time)
 
-if(!map[key]||sec<map[key]){
+if(!map[r.event]||sec<map[r.event]){
 
-map[key]=sec
+map[r.event]=sec
 
 }
 
 })
 
-let html="<tr><th>種目</th><th>水路</th><th>ベスト</th></tr>"
+let html="<tr><th>種目</th><th>ベスト</th></tr>"
 
-Object.keys(map).forEach(k=>{
-
-let [event,course]=k.split("_")
+Object.keys(map).forEach(e=>{
 
 html+=`
 
 <tr>
 
-<td>${event}</td>
-<td>${course}</td>
-<td>${secToTime(map[k])}</td>
+<td>${e}</td>
+<td>${secToTime(map[e])}</td>
 
 </tr>
 
@@ -429,9 +339,13 @@ bestTable.innerHTML=html
 }
 
 
+
 function renderGoals(){
 
-let html="<tr><th>種目</th><th>目標</th><th>ベスト</th><th>残り秒</th><th>達成率</th></tr>"
+let html="<tr><th>種目</th><th>達成率</th></tr>"
+
+let labels=[]
+let data=[]
 
 Object.keys(goals).forEach(e=>{
 
@@ -443,19 +357,29 @@ if(!list.length)return
 
 let best=Math.min(...list.map(r=>timeToSec(r.time)))
 
-let remain=(best-goal).toFixed(2)
+let rate=(goal/best)*100
 
-let rate=((goal/best)*100).toFixed(1)
+labels.push(e)
+
+data.push(rate.toFixed(1))
 
 html+=`
 
 <tr>
 
 <td>${e}</td>
-<td>${goals[e]}</td>
-<td>${secToTime(best)}</td>
-<td>${remain}</td>
-<td>${rate}%</td>
+
+<td>
+
+<div class="progress">
+
+<div class="progressBar" style="width:${rate}%"></div>
+
+</div>
+
+${rate.toFixed(1)}%
+
+</td>
 
 </tr>
 
@@ -465,10 +389,41 @@ html+=`
 
 goalTable.innerHTML=html
 
+drawGoalChart(labels,data)
+
 }
 
 
-function renderGraph(){
+
+function drawGoalChart(labels,data){
+
+if(goalChart)goalChart.destroy()
+
+goalChart=new Chart(goalChartCanvas,{
+
+type:"bar",
+
+data:{
+
+labels:labels,
+
+datasets:[{
+
+label:"達成率",
+
+data:data
+
+}]
+
+}
+
+})
+
+}
+
+
+
+function drawGraph(){
 
 let ev=graphEvent.value
 
@@ -484,10 +439,6 @@ let labels=data.map(r=>r.date)
 
 let times=data.map(r=>timeToSec(r.time))
 
-let goalSec=timeToSec(goals[ev])
-
-let goalLine=labels.map(()=>goalSec)
-
 if(chart)chart.destroy()
 
 chart=new Chart(chartCanvas,{
@@ -498,24 +449,13 @@ data:{
 
 labels:labels,
 
-datasets:[
-
-{
+datasets:[{
 
 label:"タイム",
+
 data:times
 
-},
-
-{
-
-label:"目標",
-data:goalLine,
-borderDash:[5,5]
-
-}
-
-]
+}]
 
 }
 
@@ -524,112 +464,30 @@ borderDash:[5,5]
 }
 
 
-function saveGoal(){
 
-goals[goalEvent.value]=goalTime.value
-
-save()
-
-render()
-
-}
-
-
-function downloadCSV(){
-
-let rows=["date,meet,event,course,time"]
-
-records.forEach(r=>{
-
-rows.push(`${r.date},${r.meet},${r.event},${r.course},${r.time}`)
-
-})
-
-let blob=new Blob([rows.join("\n")])
-
-let a=document.createElement("a")
-
-a.href=URL.createObjectURL(blob)
-
-a.download="swim_records.csv"
-
-a.click()
-
-}
-
-
-function uploadCSV(e){
-
-let file=e.target.files[0]
-
-let reader=new FileReader()
-
-reader.onload=function(){
-
-let rows=reader.result.split("\n").slice(1)
-
-rows.forEach(r=>{
-
-let c=r.split(",")
-
-if(c.length<5)return
-
-records.push({
-
-date:c[0],
-meet:c[1],
-event:c[2],
-course:c[3],
-time:c[4]
-
-})
-
-})
-
-save()
-
-render()
-
-}
-
-reader.readAsText(file)
-
-}
-
-
-function initSelect(){
+function init(){
 
 events.forEach(e=>{
 
-let o1=document.createElement("option")
-o1.text=e
-graphEvent.add(o1)
-
-let o2=document.createElement("option")
-o2.text=e
-goalEvent.add(o2)
+event.add(new Option(e,e))
+graphEvent.add(new Option(e,e))
 
 })
+
+render()
 
 }
 
 function render(){
 
 renderDashboard()
-
-renderTable()
-
 renderBest()
-
 renderGoals()
-
-renderGraph()
+drawGraph()
 
 }
 
-initSelect()
-
-render()
+init()
 
 </script>
 
