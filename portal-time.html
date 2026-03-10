@@ -5,595 +5,553 @@
 <title>Swim Record Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body{
-  font-family: Arial, sans-serif;
-  margin:0;
-  background:#eef2f6;
-  color:#222;
-}
-header{
-  background:#1e73be;
-  color:white;
-  padding:18px;
-  font-size:20px;
-  font-weight:bold;
-}
-.container{
-  padding:25px;
-  max-width:1200px;
-  margin:auto;
-}
-.card{
-  background:white;
-  padding:20px;
-  margin-bottom:25px;
-  border-radius:12px;
-  box-shadow:0 3px 8px rgba(0,0,0,0.08);
-}
-h3{margin-top:0;}
-table{width:100%;border-collapse:collapse;}
-th{background:#f0f4f8;}
-th,td{padding:10px;border-bottom:1px solid #ddd;text-align:center;}
-th.sortable{cursor:pointer;color:#1e73be;}
-input,select{padding:7px;margin:5px;border-radius:6px;border:1px solid #ccc;}
-button{padding:7px 12px;border:none;background:#1e73be;color:white;border-radius:6px;cursor:pointer;}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;}
-.stat{background:#f4f6f9;padding:15px;border-radius:8px;font-size:18px;text-align:center;}
-.stat b{display:block;font-size:24px;margin-top:5px;}
-.goalGauge{width:200px;height:200px;margin:auto;display:block;}
-.goalGood{color:green;font-weight:bold;}
-.goalBad{color:red;}
-.small{font-size:13px;color:#666;}
-@media (max-width:700px){
-  .stats{grid-template-columns:repeat(2,1fr);}
-}
-.sort-indicator{font-weight:700;margin-left:6px;color:#1e73be;}
+  body{font-family: Arial, Helvetica, sans-serif; margin:0; background:#eef2f6; color:#222;}
+  header{background:#1e73be; color:#fff; padding:18px; font-size:20px; font-weight:700;}
+  .container{max-width:1200px; margin:20px auto; padding:20px;}
+  .card{background:#fff; padding:18px; border-radius:12px; box-shadow:0 3px 8px rgba(0,0,0,0.08); margin-bottom:20px;}
+  h3{margin:0 0 12px 0;}
+  table{width:100%; border-collapse:collapse; margin-top:10px;}
+  th{background:#f0f4f8; padding:8px; border-bottom:1px solid #ddd; text-align:center;}
+  td{padding:8px; border-bottom:1px solid #eee; text-align:center;}
+  input,select{padding:8px; margin:6px; border-radius:6px; border:1px solid #ccc;}
+  button{padding:8px 12px; border-radius:6px; border:none; background:#1e73be; color:#fff; cursor:pointer; margin:6px;}
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px;}
+  .stat{background:#f4f6f9; padding:12px; border-radius:8px; text-align:center;}
+  .stat b{display:block; font-size:20px; margin-top:6px;}
+  .goalGauge{width:220px; height:220px; margin:10px auto; display:block;}
+  .small{font-size:13px; color:#666; margin-top:6px;}
+  th.sortable{cursor:pointer; color:#1e73be;}
+  .sort-indicator{font-weight:700; margin-left:6px; color:#1e73be;}
+  @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} }
 </style>
 </head>
-
 <body>
-
 <header>Swim Record Dashboard</header>
-
 <div class="container">
 
-<div class="card">
-<h3>ダッシュボード</h3>
-<div class="stats" id="stats"></div>
-</div>
+  <div class="card">
+    <h3>ダッシュボード</h3>
+    <div id="stats" class="stats"></div>
+  </div>
 
-<div class="card">
-<h3>記録入力</h3>
+  <div class="card">
+    <h3>記録入力</h3>
+    <div>
+      <label>日付</label>
+      <input id="date" type="date">
+      <label>大会</label>
+      <input id="meet" placeholder="大会名">
+      <label>会場</label>
+      <input id="venue" placeholder="会場">
+    </div>
+    <div>
+      <label>コース</label>
+      <select id="course"><option>短水路</option><option>長水路</option></select>
+      <label>種目</label>
+      <select id="event">
+        <option>自由形50m</option>
+        <option>自由形100m</option>
+        <option>自由形200m</option>
+        <option>背泳ぎ100m</option>
+        <option>平泳ぎ100m</option>
+        <option>バタフライ100m</option>
+        <option>個人メドレー200m</option>
+      </select>
+      <label>タイム</label>
+      <input id="time" placeholder="例 0:23.45 または 23.45">
+      <button id="saveBtn">保存</button>
+    </div>
+    <div class="small">タイムは「m:ss.xx」または「ss.xx」で入力してください。日付が空なら今日の日付が設定されます。</div>
+  </div>
 
-<input id="date" type="date">
-<input id="meet" placeholder="大会名">
-<input id="venue" placeholder="会場">
+  <div class="card">
+    <h3>CSV</h3>
+    <div>
+      <input type="file" id="csvUpload" accept=".csv">
+      <button id="importCsvBtn">CSVインポート</button>
+      <button id="downloadCsvBtn">CSVダウンロード</button>
+    </div>
+    <div class="small">CSV列: <b>date,meet,venue,course,event,time</b>（ヘッダ必須）。</div>
+  </div>
 
-<select id="course">
-<option>短水路</option>
-<option>長水路</option>
-</select>
+  <div class="card">
+    <h3>目標タイム</h3>
+    <div>
+      <label>種目</label>
+      <select id="goalEvent"></select>
+      <label>目標タイム</label>
+      <input id="goalTime" placeholder="例 0:22.00">
+      <button id="saveGoalBtn">保存</button>
+    </div>
+    <table id="goalTable"></table>
+  </div>
 
-<select id="event">
-<option>自由形50m</option>
-<option>自由形100m</option>
-<option>自由形200m</option>
-<option>背泳ぎ100m</option>
-<option>平泳ぎ100m</option>
-<option>バタフライ100m</option>
-<option>個人メドレー200m</option>
-</select>
+  <div class="card">
+    <h3>目標達成率</h3>
+    <canvas id="goalGauge" class="goalGauge"></canvas>
+    <div class="small">ドーナツ中央に「目標秒 / ベスト秒（達成率%）」を表示します。</div>
+  </div>
 
-<input id="time" placeholder="タイム">
+  <div class="card">
+    <h3>記録一覧</h3>
+    <table id="recordsTable"></table>
+  </div>
 
-<button id="saveBtn">保存</button>
+  <div class="card">
+    <h3>ベストタイム</h3>
+    <table id="bestTable"></table>
+  </div>
 
-</div>
+  <div class="card">
+    <h3>記録推移</h3>
+    <div>
+      <label>種目選択</label>
+      <select id="graphEvent"></select>
+    </div>
+    <canvas id="chart"></canvas>
+  </div>
 
-<div class="card">
-<h3>CSV</h3>
-<input type="file" id="csvUpload">
-<button id="importCsvBtn">CSVインポート</button>
-<button id="downloadCsvBtn">CSVダウンロード</button>
-<div class="small">CSV列: date,meet,venue,course,event,time（ヘッダ必須）</div>
-</div>
+  <div class="card">
+    <h3>FINAポイント推移</h3>
+    <canvas id="finaChart"></canvas>
+  </div>
 
-<div class="card">
-<h3>目標タイム</h3>
+  <div class="card">
+    <h3>改善率</h3>
+    <canvas id="improveChart"></canvas>
+  </div>
 
-<select id="goalEvent"></select>
-<input id="goalTime" placeholder="目標タイム">
+  <div class="card">
+    <h3>泳法別平均（泳法 × 距離）</h3>
+    <canvas id="strokeChart"></canvas>
+  </div>
 
-<button id="saveGoalBtn">保存</button>
-
-<table id="goalTable"></table>
-
-</div>
-
-<div class="card">
-<h3>目標達成率</h3>
-<canvas id="goalGauge" class="goalGauge"></canvas>
-</div>
-
-<div class="card">
-<h3>記録一覧</h3>
-
-<table id="recordsTable"></table>
-
-</div>
-
-<div class="card">
-<h3>ベストタイム</h3>
-<table id="bestTable"></table>
-</div>
-
-<div class="card">
-<h3>記録推移</h3>
-
-<select id="graphEvent"></select>
-
-<canvas id="chart"></canvas>
-
-</div>
-
-<div class="card">
-<h3>FINAポイント推移</h3>
-<canvas id="finaChart"></canvas>
-</div>
-
-<div class="card">
-<h3>改善率</h3>
-<canvas id="improveChart"></canvas>
-</div>
-
-<div class="card">
-<h3>泳法別平均（泳法 × 距離）</h3>
-<canvas id="strokeChart"></canvas>
-</div>
-
-<div class="card">
-<h3>シーズンベスト</h3>
-<table id="seasonBest"></table>
-</div>
+  <div class="card">
+    <h3>シーズンベスト</h3>
+    <table id="seasonBest"></table>
+  </div>
 
 </div>
 
 <script>
-let records=[]
-let goals={}
+/* ===== data ===== */
+let records = []
+let goals = {}
+let currentSort = { key: 'date', dir: 'desc' } // newest first
 
-let chart=null, finaChart=null, improveChart=null, strokeChart=null, goalChart=null
+let chart = null, finaChart = null, improveChart = null, strokeChart = null, goalChart = null
 
-let currentSort = { key: 'date', dir: 'desc' } // default: newest first
-
-const finaBase={
-"自由形50m":21.04,
-"自由形100m":46.86,
-"自由形200m":102,
-"背泳ぎ100m":51.6,
-"平泳ぎ100m":56.88,
-"バタフライ100m":49.45
+const finaBase = {
+  "自由形50m":21.04,
+  "自由形100m":46.86,
+  "自由形200m":102,
+  "背泳ぎ100m":51.6,
+  "平泳ぎ100m":56.88,
+  "バタフライ100m":49.45
 }
 
-/* Canvas elements (contexts) - get once after DOM ready (script is at end so safe) */
+/* ===== DOM & canvas contexts ===== */
+const dateInput = document.getElementById('date')
+const meetInput = document.getElementById('meet')
+const venueInput = document.getElementById('venue')
+const courseInput = document.getElementById('course')
+const eventSelect = document.getElementById('event')
+const timeInput = document.getElementById('time')
+const saveBtn = document.getElementById('saveBtn')
+
+const csvUpload = document.getElementById('csvUpload')
+const importCsvBtn = document.getElementById('importCsvBtn')
+const downloadCsvBtn = document.getElementById('downloadCsvBtn')
+
+const goalEventSelect = document.getElementById('goalEvent')
+const goalTimeInput = document.getElementById('goalTime')
+const saveGoalBtn = document.getElementById('saveGoalBtn')
+const goalTable = document.getElementById('goalTable')
+
+const statsDiv = document.getElementById('stats')
+const recordsTable = document.getElementById('recordsTable')
+const bestTable = document.getElementById('bestTable')
+const seasonBestTable = document.getElementById('seasonBest')
+
 const goalGaugeCanvas = document.getElementById('goalGauge')
-const chartCanvas = document.getElementById('chart')
-const finaCanvas = document.getElementById('finaChart')
-const improveCanvas = document.getElementById('improveChart')
-const strokeCanvas = document.getElementById('strokeChart')
+const chartCanvasEl = document.getElementById('chart')
+const finaCanvasEl = document.getElementById('finaChart')
+const improveCanvasEl = document.getElementById('improveChart')
+const strokeCanvasEl = document.getElementById('strokeChart')
+const graphEventSelect = document.getElementById('graphEvent')
 
 /* ===== persistence ===== */
 function save(){
-  localStorage.setItem("swimRecords",JSON.stringify(records))
-  localStorage.setItem("swimGoals",JSON.stringify(goals))
+  localStorage.setItem('swimRecords', JSON.stringify(records))
+  localStorage.setItem('swimGoals', JSON.stringify(goals))
 }
-
 function load(){
-  records=JSON.parse(localStorage.getItem("swimRecords"))||[]
-  goals=JSON.parse(localStorage.getItem("swimGoals"))||{}
+  records = JSON.parse(localStorage.getItem('swimRecords')) || []
+  goals = JSON.parse(localStorage.getItem('swimGoals')) || {}
 
   // populate selects
-  goalEvent.innerHTML=event.innerHTML
-  graphEvent.innerHTML="<option>選択</option>"+event.innerHTML
+  goalEventSelect.innerHTML = eventSelect.innerHTML
+  graphEventSelect.innerHTML = "<option>選択</option>" + eventSelect.innerHTML
 
-  // apply initial sort
+  // initial sort
   sortRecords(currentSort.key, currentSort.dir)
 
-  render()
+  renderAll()
 }
 
 /* ===== time utils ===== */
 function timeToSec(t){
-  if(!t)return NaN
-  t=String(t).trim()
-  if(t.includes(":")){
-    let p=t.split(":")
-    return parseFloat(p[0])*60+parseFloat(p[1])
+  if(t === null || t === undefined) return NaN
+  t = String(t).trim()
+  if(t === '') return NaN
+  if(t.includes(':')){
+    const p = t.split(':')
+    return parseFloat(p[0]) * 60 + parseFloat(p[1])
   }
-  return parseFloat(t)
+  const v = parseFloat(t)
+  return isNaN(v) ? NaN : v
 }
-
 function secToTime(s){
   if(isNaN(s)) return '-'
-  let m=Math.floor(s/60)
-  let sec=(s%60).toFixed(2)
-  if(m>0)return m+":"+sec
+  s = Number(s)
+  const m = Math.floor(s/60)
+  const sec = (s - m*60).toFixed(2)
+  if(m > 0) return `${m}:${sec}`
   return sec
 }
 
 /* ===== FINA ===== */
-function finaPoint(event,time){
-  let base=finaBase[event]
-  if(!base)return "-"
-  let sec=timeToSec(time)
-  if(isNaN(sec) || sec<=0) return "-"
-  return Math.round(1000*Math.pow(base/sec,3))
+function finaPoint(eventName, timeStr){
+  const base = finaBase[eventName]
+  if(!base) return '-'
+  const sec = timeToSec(timeStr)
+  if(isNaN(sec) || sec <= 0) return '-'
+  return Math.round(1000 * Math.pow(base / sec, 3))
 }
 
 /* ===== CRUD ===== */
 function addRecord(){
-  const d = date.value || new Date().toISOString().slice(0,10)
+  const d = dateInput.value || new Date().toISOString().slice(0,10)
   const r = {
     date: d,
-    meet: meet.value.trim(),
-    venue: venue.value.trim(),
-    course: course.value,
-    event: event.value,
-    time: time.value.trim()
+    meet: meetInput.value.trim(),
+    venue: venueInput.value.trim(),
+    course: courseInput.value,
+    event: eventSelect.value,
+    time: timeInput.value.trim()
   }
   const sec = timeToSec(r.time)
-  if(isNaN(sec) || sec<=0){ alert('正しいタイムを入力してください'); return }
+  if(isNaN(sec) || sec <= 0){ alert('正しいタイムを入力してください（例 0:23.45 または 23.45）'); return }
   records.push(r)
   sortRecords(currentSort.key, currentSort.dir)
   save()
-  render()
-  time.value=''
-}
-
-function deleteRecord(i){
-  if(!confirm("削除しますか？"))return
-  records.splice(i,1)
-  save()
-  render()
+  renderAll()
+  timeInput.value = ''
 }
 
 function editRecord(i){
-  let r=records[i]
-  date.value=r.date
-  meet.value=r.meet
-  venue.value=r.venue
-  course.value=r.course
-  event.value=r.event
-  time.value=r.time
+  const r = records[i]
+  if(!r) return
+  dateInput.value = r.date
+  meetInput.value = r.meet
+  venueInput.value = r.venue
+  courseInput.value = r.course
+  eventSelect.value = r.event
+  timeInput.value = r.time
   records.splice(i,1)
   save()
-  render()
+  renderAll()
+}
+
+function deleteRecord(i){
+  if(!confirm('削除しますか？')) return
+  records.splice(i,1)
+  save()
+  renderAll()
 }
 
 /* ===== sorting ===== */
 function sortRecords(key, dir){
-  currentSort.key = key
+  if(key) currentSort.key = key
   if(dir) currentSort.dir = dir
-  else currentSort.dir = (currentSort.key===key && currentSort.dir==='asc') ? 'desc' : 'asc'
+  else currentSort.dir = (currentSort.key === key && currentSort.dir === 'asc') ? 'desc' : currentSort.dir
 
   records.sort((a,b)=>{
-    let va=a[key], vb=b[key]
-    if(key==='date'){ va=new Date(a.date).getTime(); vb=new Date(b.date).getTime() }
-    if(va < vb) return currentSort.dir==='asc' ? -1 : 1
-    if(va > vb) return currentSort.dir==='asc' ? 1 : -1
+    let va = a[currentSort.key], vb = b[currentSort.key]
+    if(currentSort.key === 'date'){ va = new Date(a.date).getTime(); vb = new Date(b.date).getTime() }
+    if(va < vb) return currentSort.dir === 'asc' ? -1 : 1
+    if(va > vb) return currentSort.dir === 'asc' ? 1 : -1
     return 0
   })
 }
 
 /* ===== render functions ===== */
 function renderDashboard(){
-  let races=records.length
-  let meets=new Set(records.map(r=>r.meet)).size
-  let times=records.map(r=>timeToSec(r.time)).filter(v=>!isNaN(v))
-  let avg=(times.reduce((a,b)=>a+b,0)/times.length||0)
-  let best=times.length?Math.min(...times):NaN
-  let latest=times.length?times[times.length-1]:NaN
+  const races = records.length
+  const meets = new Set(records.map(r=>r.meet)).size
+  const times = records.map(r=>timeToSec(r.time)).filter(v=>!isNaN(v))
+  const avg = times.length ? (times.reduce((a,b)=>a+b,0)/times.length) : NaN
+  const best = times.length ? Math.min(...times) : NaN
+  const latest = times.length ? times[times.length-1] : NaN
 
-  stats.innerHTML=`
-  <div class="stat">レース数<b>${races}</b></div>
-  <div class="stat">大会数<b>${meets}</b></div>
-  <div class="stat">平均<b>${isNaN(avg)?'-':secToTime(avg)}</b></div>
-  <div class="stat">ベスト<b>${isNaN(best)?'-':secToTime(best)}</b></div>
-  <div class="stat">最新<b>${isNaN(latest)?'-':secToTime(latest)}</b></div>
+  statsDiv.innerHTML = `
+    <div class="stat">レース数<b>${races}</b></div>
+    <div class="stat">大会数<b>${meets}</b></div>
+    <div class="stat">平均<b>${isNaN(avg)?'-':secToTime(avg)}</b></div>
+    <div class="stat">ベスト<b>${isNaN(best)?'-':secToTime(best)}</b></div>
+    <div class="stat">最新<b>${isNaN(latest)?'-':secToTime(latest)}</b></div>
   `
 }
 
 function renderTable(){
-  // show sort indicator on date header
-  const dirSymbol = currentSort.key==='date' ? (currentSort.dir==='asc' ? '▲' : '▼') : ''
-  let t=recordsTable
-  t.innerHTML=`<tr>
+  const dirSymbol = currentSort.key === 'date' ? (currentSort.dir === 'asc' ? '▲' : '▼') : ''
+  let html = `<tr>
     <th class="sortable" onclick="toggleSort('date')">日付<span class="sort-indicator">${dirSymbol}</span></th>
     <th>大会</th><th>種目</th><th>タイム</th><th>FINA</th><th></th></tr>`
-
   records.forEach((r,i)=>{
-    let goal=goals[r.event]
-    let diff=""
+    const goal = goals[r.event]
+    let diffHtml = ''
     if(goal){
-      let d=(timeToSec(r.time)-timeToSec(goal)).toFixed(2)
-      diff=d<=0?`<span class="goalGood">達成</span>`:`<span class="goalBad">あと${d}s</span>`
+      const d = timeToSec(r.time) - timeToSec(goal)
+      if(!isNaN(d)) diffHtml = d <= 0 ? `<span style="color:green;font-weight:bold">達成</span>` : `<span style="color:red">あと ${d.toFixed(2)}s</span>`
     }
-    t.innerHTML+=`
-    <tr>
-    <td>${r.date}</td>
-    <td>${r.meet}</td>
-    <td>${r.event}</td>
-    <td>${r.time} ${diff}</td>
-    <td>${finaPoint(r.event,r.time)}</td>
-    <td>
-      <button onclick="editRecord(${i})">編集</button>
-      <button onclick="deleteRecord(${i})">削除</button>
-    </td>
-    </tr>
-    `
+    html += `<tr>
+      <td>${r.date}</td>
+      <td>${r.meet}</td>
+      <td>${r.event}</td>
+      <td>${r.time} ${diffHtml}</td>
+      <td>${finaPoint(r.event, r.time)}</td>
+      <td><button onclick="editRecord(${i})">編集</button><button onclick="deleteRecord(${i})">削除</button></td>
+    </tr>`
   })
+  recordsTable.innerHTML = html
 }
 
 function renderBest(){
-  let best={}
+  const best = {}
   records.forEach(r=>{
-    let sec=timeToSec(r.time)
+    const sec = timeToSec(r.time)
     if(isNaN(sec)) return
-    if(!best[r.event]||sec<best[r.event].sec){
-      best[r.event]={time:r.time,sec:sec}
-    }
+    if(!best[r.event] || sec < best[r.event].sec) best[r.event] = { time: r.time, sec }
   })
-  let html="<tr><th>種目</th><th>ベスト</th></tr>"
-  for(let e in best){
-    html+=`<tr><td>${e}</td><td>${best[e].time}</td></tr>`
-  }
-  bestTable.innerHTML=html
+  let html = `<tr><th>種目</th><th>ベスト</th></tr>`
+  Object.keys(best).sort().forEach(e => html += `<tr><td>${e}</td><td>${best[e].time}</td></tr>`)
+  bestTable.innerHTML = html
 }
 
 function renderGoalGauge(){
-  let e=goalEvent.value
-  let goal=goals[e]
-  if(!goal){ if(goalChart){ goalChart.destroy(); goalChart=null } return }
-  let best=records.filter(r=>r.event==e).map(r=>timeToSec(r.time)).filter(v=>!isNaN(v))
-  if(best.length==0){ if(goalChart){ goalChart.destroy(); goalChart=null } return }
-  let bestTime=Math.min(...best)
-  let progress=Math.min(100, Math.round((timeToSec(goal)/bestTime)*100))
-  if(goalChart){ try{ goalChart.destroy() }catch(e){} goalChart=null }
-  // create chart using canvas context
-  goalChart=new Chart(goalGaugeCanvas.getContext('2d'), {
-    type:"doughnut",
-    data:{
-      labels:["達成率","残り"],
-      datasets:[{data:[progress,100-progress], backgroundColor:['#1e73be','#e9eef5'] }]
-    },
-    options:{
-      plugins:{legend:{display:false}},
-      cutout:"70%"
-    }
+  const e = goalEventSelect.value
+  if(!e || !goals[e]){ if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null } return }
+  const bestTimes = records.filter(r=>r.event === e).map(r=>timeToSec(r.time)).filter(v=>!isNaN(v))
+  if(bestTimes.length === 0){ if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null } return }
+  const bestTime = Math.min(...bestTimes)
+  const goalSec = timeToSec(goals[e])
+  if(isNaN(goalSec) || goalSec <= 0) return
+  let progress = Math.round((goalSec / bestTime) * 100)
+  progress = Math.max(0, Math.min(100, progress))
+  const remaining = 100 - progress
+
+  if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null }
+  goalChart = new Chart(goalGaugeCanvas.getContext('2d'), {
+    type: 'doughnut',
+    data: { labels: ['達成率','残り'], datasets: [{ data: [progress, remaining], backgroundColor: ['#1e73be','#e9eef5'] }] },
+    options: { plugins: { legend: { display: false } }, cutout: '70%' }
   })
 
-  // draw center text larger for seconds
+  // draw center text (larger seconds)
   const ctx = goalGaugeCanvas.getContext('2d')
   setTimeout(()=>{
     ctx.save()
-    const cx = goalGaugeCanvas.width/2
-    const cy = goalGaugeCanvas.height/2
-    ctx.clearRect(cx-80, cy-40, 160, 80)
+    const cx = goalGaugeCanvas.width / 2
+    const cy = goalGaugeCanvas.height / 2
+    // small clear area
+    ctx.clearRect(cx - 90, cy - 48, 180, 96)
     ctx.fillStyle = '#333'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.font = '14px Arial'
-    ctx.fillText(`目標: ${timeToSec(goal).toFixed(2)}s`, cx, cy-14)
-    ctx.font = 'bold 26px Arial'
-    ctx.fillText(`${bestTime.toFixed(2)}s`, cx, cy+6)
+    ctx.fillText(`目標: ${goalSec.toFixed(2)}s`, cx, cy - 18)
+    ctx.font = 'bold 28px Arial'
+    ctx.fillText(`${bestTime.toFixed(2)}s`, cx, cy + 8)
     ctx.font = '13px Arial'
-    ctx.fillText(`達成率: ${progress}%`, cx, cy+30)
+    ctx.fillText(`達成率: ${progress}%`, cx, cy + 34)
     ctx.restore()
   }, 200)
 }
 
 function renderProgress(){
-  let e=graphEvent.value
-  if(!e || e==="選択"){ if(chart){ try{ chart.destroy() }catch(e){} chart=null } return }
-  let data=records.filter(r=>r.event==e)
-  let labels=data.map(r=>r.date)
-  let times=data.map(r=>timeToSec(r.time))
-  let goal=goals[e]?Array(labels.length).fill(timeToSec(goals[e])):[]
-  if(chart){ try{ chart.destroy() }catch(e){} chart=null }
-  chart=new Chart(chartCanvas.getContext('2d'),{
-    type:"line",
-    data:{
-      labels:labels,
-      datasets:[
-        {label:"タイム",data:times,borderColor:'#1e73be',backgroundColor:'rgba(30,115,190,0.08)'},
-        {label:"目標",data:goal,borderDash:[5,5],borderColor:'#ff7f50',fill:false}
+  const e = graphEventSelect.value
+  if(!e || e === '選択'){ if(chart){ try{ chart.destroy() }catch{} chart = null } return }
+  const data = records.filter(r=>r.event === e).sort((a,b)=> new Date(a.date) - new Date(b.date))
+  const labels = data.map(r=>r.date)
+  const times = data.map(r=>timeToSec(r.time))
+  const goalArr = goals[e] ? Array(labels.length).fill(timeToSec(goals[e])) : []
+  if(chart){ try{ chart.destroy() }catch{} chart = null }
+  chart = new Chart(chartCanvasEl.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'タイム (秒)', data: times, borderColor: '#1e73be', backgroundColor: 'rgba(30,115,190,0.08)', tension: 0.2 },
+        { label: '目標', data: goalArr, borderColor: '#ff7f50', borderDash: [6,4], fill: false }
       ]
-    }
+    },
+    options: { plugins: { legend: { position: 'top' } } }
   })
 }
 
 function renderFINA(){
-  let data=[...records].sort((a,b)=>new Date(a.date)-new Date(b.date))
-  let labels=data.map(r=>r.date)
-  let points=data.map(r=>finaPoint(r.event,r.time))
-  if(finaChart){ try{ finaChart.destroy() }catch(e){} finaChart=null }
-  finaChart=new Chart(finaCanvas.getContext('2d'), {
-    type:"line",
-    data:{labels:labels,datasets:[{label:"FINA",data:points,borderColor:'#ff7f50'}]}
+  const data = [...records].sort((a,b)=> new Date(a.date) - new Date(b.date))
+  const labels = data.map(r=>r.date)
+  const points = data.map(r=> {
+    const p = finaPoint(r.event, r.time)
+    return p === '-' ? null : p
+  })
+  if(finaChart){ try{ finaChart.destroy() }catch{} finaChart = null }
+  finaChart = new Chart(finaCanvasEl.getContext('2d'), {
+    type: 'line',
+    data: { labels, datasets: [{ label: 'FINA', data: points, borderColor: '#ff7f50', backgroundColor: 'rgba(255,127,80,0.08)', tension: 0.2 }] }
   })
 }
 
 function renderImprove(){
-  let map={}
-  records.forEach(r=>{
-    if(!map[r.event])map[r.event]=[]
+  const map = {}
+  records.forEach(r => {
+    if(!map[r.event]) map[r.event] = []
     map[r.event].push(r)
   })
-  let labels=[], data=[]
-  for(let e in map){
-    let arr=map[e].sort((a,b)=>new Date(a.date)-new Date(b.date))
-    if(arr.length<2)continue
-    let first=timeToSec(arr[0].time)
-    let last=timeToSec(arr[arr.length-1].time)
-    if(isNaN(first)||isNaN(last)||first===0)continue
+  const labels = [], data = []
+  Object.keys(map).forEach(e => {
+    const arr = map[e].sort((a,b)=> new Date(a.date) - new Date(b.date))
+    if(arr.length < 2) return
+    const first = timeToSec(arr[0].time)
+    const last = timeToSec(arr[arr.length-1].time)
+    if(isNaN(first) || isNaN(last) || first === 0) return
     labels.push(e)
-    data.push(((first-last)/first*100).toFixed(1))
-  }
-  if(improveChart){ try{ improveChart.destroy() }catch(e){} improveChart=null }
-  improveChart=new Chart(improveCanvas.getContext('2d'),{
-    type:"bar",
-    data:{labels:labels,datasets:[{label:"改善率%",data:data, backgroundColor:'#4caf50'}]}
+    data.push(Number(((first - last) / first * 100).toFixed(1)))
+  })
+  if(improveChart){ try{ improveChart.destroy() }catch{} improveChart = null }
+  improveChart = new Chart(improveCanvasEl.getContext('2d'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label: '改善率 %', data, backgroundColor: '#4caf50' }] },
+    options: { plugins: { legend: { display: false } } }
   })
 }
 
-/* ===== renderStroke: group by stroke AND distance ===== */
+/* ===== stroke × distance average ===== */
 function renderStroke(){
-  let map={}
+  const map = {}
   records.forEach(r=>{
     if(!r.event) return
-    let sec=timeToSec(r.time)
+    const sec = timeToSec(r.time)
     if(isNaN(sec)) return
-
-    // Normalize event string
-    let ev = String(r.event).trim()
-
-    // Extract distance (digits) - support fullwidth digits and optional 'm'
+    const ev = String(r.event).trim()
+    // distance: digits (support fullwidth) + optional m
     const distMatch = ev.match(/(\d{1,3})\s*[mｍ]?/u)
     const distance = distMatch ? (distMatch[1] + 'm') : ''
-
-    // Extract stroke by removing digits, 'm' and fullwidth digits, and trimming
-    let stroke = ev.replace(/[\d\uFF10-\uFF19]+/g,'') // remove digits (half/fullwidth)
-                   .replace(/[mｍ]/gi,'') // remove m characters
-                   .trim()
-
-    if(!stroke) stroke = ev // fallback to full event if extraction failed
-
-    // Key by stroke + distance (if distance exists)
+    // stroke: remove digits and m characters
+    let stroke = ev.replace(/[\d\uFF10-\uFF19]+/g,'').replace(/[mｍ]/gi,'').trim()
+    if(!stroke) stroke = ev
     const key = distance ? `${stroke} ${distance}` : stroke
-
     if(!map[key]) map[key] = []
     map[key].push(sec)
   })
-
-  let labels=[], data=[]
-  for(let k in map){
+  const labels = [], data = []
+  Object.keys(map).forEach(k=>{
     const arr = map[k]
-    if(!arr || arr.length===0) continue
-    const avg = arr.reduce((a,b)=>a+b,0)/arr.length
+    if(!arr || arr.length === 0) return
+    const avg = arr.reduce((a,b)=>a+b,0) / arr.length
     labels.push(k)
     data.push(Number(avg.toFixed(2)))
-  }
-
-  if(strokeChart){ try{ strokeChart.destroy() }catch(e){} strokeChart=null }
-  strokeChart=new Chart(strokeCanvas.getContext('2d'),{
-    type:"bar",
-    data:{labels:labels,datasets:[{label:"平均秒",data:data, backgroundColor:'#9b59b6'}]}
+  })
+  if(strokeChart){ try{ strokeChart.destroy() }catch{} strokeChart = null }
+  strokeChart = new Chart(strokeCanvasEl.getContext('2d'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label: '平均秒', data, backgroundColor: '#9b59b6' }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
   })
 }
 
 /* ===== season best ===== */
 function renderSeasonBest(){
-  let map={}
+  const map = {}
   records.forEach(r=>{
     if(!r.date || !r.event) return
-    let d=new Date(r.date)
+    const d = new Date(r.date)
     if(isNaN(d.getTime())) return
-    let y=d.getFullYear()
-    let key=y+"_"+r.event
-    let sec=timeToSec(r.time)
+    const y = d.getFullYear()
+    const key = `${y}__${r.event}`
+    const sec = timeToSec(r.time)
     if(isNaN(sec)) return
-    if(!map[key]||sec<map[key])map[key]=sec
+    if(!map[key] || sec < map[key]) map[key] = sec
   })
-  let html="<tr><th>年</th><th>種目</th><th>SB</th></tr>"
-  for(let k in map){
-    let p=k.split("_")
-    html+=`
-    <tr>
-    <td>${p[0]}</td>
-    <td>${p[1]}</td>
-    <td>${secToTime(map[k])}</td>
-    </tr>
-    `
-  }
-  seasonBest.innerHTML=html
+  let html = `<tr><th>年</th><th>種目</th><th>SB</th></tr>`
+  Object.keys(map).sort().forEach(k=>{
+    const [year, ...evParts] = k.split('__')
+    const ev = evParts.join('__')
+    html += `<tr><td>${year}</td><td>${ev}</td><td>${secToTime(map[k])}</td></tr>`
+  })
+  seasonBestTable.innerHTML = html
 }
 
-function saveGoal(){
-  goals[goalEvent.value]=goalTime.value
-  save()
-  render()
-}
-
+/* ===== goals table ===== */
 function renderGoalsTable(){
-  let html="<tr><th>種目</th><th>目標タイム</th><th></th></tr>"
-  for(let e in goals){
-    html+=`<tr><td>${e}</td><td>${goals[e]}</td><td><button onclick="deleteGoal('${e.replace(/'/g,"\\'")}')">削除</button></td></tr>`
-  }
-  goalTable.innerHTML=html
+  let html = `<tr><th>種目</th><th>目標タイム</th><th></th></tr>`
+  Object.keys(goals).sort().forEach(e=>{
+    html += `<tr><td>${e}</td><td>${goals[e]}</td><td><button onclick="deleteGoal('${e.replace(/'/g,"\\'")}')">削除</button></td></tr>`
+  })
+  goalTable.innerHTML = html
 }
-
+function saveGoal(){
+  const e = goalEventSelect.value
+  const t = goalTimeInput.value.trim()
+  if(!e){ alert('種目を選択してください'); return }
+  if(isNaN(timeToSec(t))){ alert('正しい目標タイムを入力してください'); return }
+  goals[e] = t
+  save()
+  renderAll()
+}
 function deleteGoal(e){
   if(goals[e] && confirm(`${e} の目標を削除しますか？`)){
     delete goals[e]
     save()
-    render()
+    renderAll()
   }
 }
 
-function render(){
-  renderDashboard()
-  renderTable()
-  renderBest()
-  renderGoalsTable()
-  renderGoalGauge()
-  renderProgress()
-  renderFINA()
-  renderImprove()
-  renderStroke()
-  renderSeasonBest()
-}
-
-/* ===== CSV import/export (simple) ===== */
+/* ===== CSV simple import/export ===== */
 function recordsToCSV(){
-  const header=['date','meet','venue','course','event','time']
-  const rows=records.map(r=>header.map(h=>`"${String(r[h]||'').replace(/"/g,'""')}"`).join(','))
+  const header = ['date','meet','venue','course','event','time']
+  const rows = records.map(r => header.map(h => `"${String(r[h]||'').replace(/"/g,'""')}"`).join(','))
   return [header.join(','), ...rows].join('\n')
 }
-
 function downloadCSV(){
-  const csv=recordsToCSV()
-  const blob=new Blob([csv],{type:'text/csv'})
-  const url=URL.createObjectURL(blob)
-  const a=document.createElement('a')
-  a.href=url
-  a.download='swim_records.csv'
+  const csv = recordsToCSV()
+  const blob = new Blob([csv], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'swim_records.csv'
   document.body.appendChild(a)
   a.click()
   a.remove()
   URL.revokeObjectURL(url)
 }
-
 function importCSVFile(file){
-  const reader=new FileReader()
-  reader.onload=e=>{
-    const text=e.target.result
-    parseCSV(text)
-  }
-  reader.readAsText(file,'utf-8')
+  const reader = new FileReader()
+  reader.onload = e => parseCSV(e.target.result)
+  reader.readAsText(file, 'utf-8')
 }
-
 function parseCSV(text){
-  const lines=text.split(/\r?\n/).filter(l=>l.trim()!=='')
-  if(lines.length<1) return
-  const header=lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim().toLowerCase())
-  const required=['date','meet','venue','course','event','time']
-  const missing=required.filter(r=>!header.includes(r))
-  if(missing.length){ alert('CSVに必要な列がありません: '+missing.join(',')); return }
-  const idx={}
-  header.forEach((h,i)=>idx[h]=i)
-  const newRecords=[]
+  const lines = text.split(/\r?\n/).filter(l=>l.trim() !== '')
+  if(lines.length < 1) return
+  const header = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim().toLowerCase())
+  const required = ['date','meet','venue','course','event','time']
+  const missing = required.filter(r=>!header.includes(r))
+  if(missing.length){ alert('CSVに必要な列がありません: ' + missing.join(', ')); return }
+  const idx = {}; header.forEach((h,i)=> idx[h] = i)
+  const newRecords = []
   for(let i=1;i<lines.length;i++){
-    // naive split that handles quoted fields roughly
     const cols = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || []
     if(cols.length < header.length) continue
     const r = {
@@ -606,35 +564,54 @@ function parseCSV(text){
     }
     if(!isNaN(timeToSec(r.time))) newRecords.push(r)
   }
+  if(newRecords.length === 0){ alert('有効なレコードが見つかりませんでした'); return }
   records = records.concat(newRecords)
   sortRecords(currentSort.key, currentSort.dir)
   save()
-  render()
+  renderAll()
 }
 
-/* ===== init ===== */
-document.getElementById('saveBtn').addEventListener('click', addRecord)
-document.getElementById('downloadCsvBtn').addEventListener('click', downloadCSV)
-document.getElementById('importCsvBtn').addEventListener('click', ()=>{
-  const f = csvUpload.files[0]
-  if(!f){ alert('CSVファイルを選択してください'); return }
-  importCSVFile(f)
-})
-document.getElementById('saveGoalBtn').addEventListener('click', saveGoal)
+/* ===== render all ===== */
+function renderAll(){
+  renderDashboard()
+  renderTable()
+  renderBest()
+  renderGoalsTable()
+  renderGoalGauge()
+  renderProgress()
+  renderFINA()
+  renderImprove()
+  renderStroke()
+  renderSeasonBest()
+}
 
-window.deleteRecord = deleteRecord
-window.editRecord = editRecord
-window.deleteGoal = deleteGoal
-window.toggleSort = function(key){
-  // toggle between asc/desc for the key
-  const newDir = (currentSort.key===key && currentSort.dir==='asc') ? 'desc' : 'asc'
+/* ===== helpers for UI actions ===== */
+function toggleSort(key){
+  const newDir = (currentSort.key === key && currentSort.dir === 'asc') ? 'desc' : 'asc'
   sortRecords(key, newDir)
   renderTable()
 }
 
+/* ===== init & event wiring ===== */
+saveBtn.addEventListener('click', addRecord)
+downloadCsvBtn.addEventListener('click', downloadCSV)
+importCsvBtn.addEventListener('click', ()=>{
+  const f = csvUpload.files[0]
+  if(!f){ alert('CSVファイルを選択してください'); return }
+  importCSVFile(f)
+})
+saveGoalBtn.addEventListener('click', saveGoal)
+graphEventSelect.addEventListener('change', renderProgress)
+goalEventSelect.addEventListener('change', renderGoalGauge)
+
+// expose functions used in inline handlers
+window.editRecord = editRecord
+window.deleteRecord = deleteRecord
+window.deleteGoal = deleteGoal
+window.toggleSort = toggleSort
+
+// load stored data and render
 load()
-
 </script>
-
 </body>
 </html>
