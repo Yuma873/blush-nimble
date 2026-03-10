@@ -70,7 +70,7 @@
       <button id="importCsvBtn">CSVインポート</button>
       <button id="downloadCsvBtn">CSVダウンロード</button>
     </div>
-    <div class="small">CSV列: <b>date,meet,venue,course,event,time</b>（ヘッダ必須）。</div>
+    <div class="small">CSV列: <b>date,meet,venue,course,event,time</b>（ヘッダ必須）。区切りはカンマ・セミコロン・タブに対応。</div>
   </div>
 
   <div class="card">
@@ -137,14 +137,9 @@
 let records = [];
 let goals = {};
 const CHART_COLORS = ['#1e73be','#ff7f50','#4caf50','#f39c12','#9b59b6','#e74c3c'];
-
 const finaBase = {
-  "自由形50m":21.04,
-  "自由形100m":46.86,
-  "自由形200m":102,
-  "背泳ぎ100m":51.6,
-  "平泳ぎ100m":56.88,
-  "バタフライ100m":49.45
+  "自由形50m":21.04,"自由形100m":46.86,"自由形200m":102,
+  "背泳ぎ100m":51.6,"平泳ぎ100m":56.88,"バタフライ100m":49.45
 };
 
 /* ===== DOM ===== */
@@ -178,57 +173,93 @@ const strokeCanvas = document.getElementById('strokeCanvas');
 
 let goalChart, mainChart, finaChart, improveChart, strokeChart;
 
-/* ===== Chart.js 中央テキストプラグイン（複数行対応） ===== */
-const centerTextPlugin = {
-  id: 'centerTextPlugin',
-  afterDraw(chart) {
-    const cfg = chart.config.options.plugins && chart.config.options.plugins.centerText;
-    if(!cfg) return;
-    const text = cfg.text || '';
-    if(!text) return;
-    const ctx = chart.ctx;
-    ctx.save();
-    const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
-    const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
-    const lines = String(text).split('\n');
-    // フォントサイズをキャンバス高さに応じて調整
-    const baseSize = Math.round((chart.height - chart.chartArea.top) / 10);
-    ctx.fillStyle = cfg.color || '#111';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    lines.forEach((line, idx) => {
-      const y = centerY + (idx - (lines.length-1)/2) * (baseSize + 2);
-      ctx.font = `${baseSize}px Arial`;
-      ctx.fillText(line, centerX, y);
-    });
-    ctx.restore();
+/* ===== CSV ユーティリティ ===== */
+// BOM除去
+function stripBOM(s){ return s.replace(/^\uFEFF/, ''); }
+// 区切り文字自動判定（カンマ, セミコロン; タブ）
+function detectDelimiter(sample){
+  const counts = {',':0,';':0,'\t':0};
+  const lines = sample.split(/\r?\n/).slice(0,5);
+  lines.forEach(l=>{
+    counts[','] += (l.match(/,/g)||[]).length;
+    counts[';'] += (l.match(/;/g)||[]).length;
+    counts['\t'] += (l.match(/\t/g)||[]).length;
+  });
+  // 最大のものを返す（0ならカンマ）
+  let max = ',', maxv = counts[','];
+  Object.keys(counts).forEach(k=>{ if(counts[k] > maxv){ max = k; maxv = counts[k]; }});
+  return max;
+}
+// 安全なCSVパーサ（引用符対応、改行含むフィールド対応）
+function parseCSVText(text){
+  text = stripBOM(text).trim();
+  if(!text) return {header:[], rows:[]};
+  const delim = detectDelimiter(text);
+  // 正規表現でフィールドを抽出（引用符で囲まれたフィールドを優先）
+  const lines = [];
+  let cur = '';
+  let inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const ch = text[i];
+    const next = text[i+1] || '';
+    if(ch === '"' ){
+      // 連続する "" はエスケープされた " として扱う
+      if(inQuotes && next === '"'){ cur += '"'; i++; continue; }
+      inQuotes = !inQuotes;
+      continue;
+    }
+    if(!inQuotes && ch === '\r'){ continue; }
+    if(!inQuotes && ch === '\n'){
+      lines.push(cur);
+      cur = '';
+      continue;
+    }
+    cur += ch;
   }
-};
-Chart.register(centerTextPlugin);
+  if(cur !== '') lines.push(cur);
+  // 各行を分割（区切り文字は delim）
+  const rows = lines.map(line=>{
+    const fields = [];
+    let field = '';
+    let q = false;
+    for(let i=0;i<line.length;i++){
+      const ch = line[i];
+      const next = line[i+1] || '';
+      if(ch === '"' ){
+        if(q && next === '"'){ field += '"'; i++; continue; }
+        q = !q;
+        continue;
+      }
+      if(!q && line.substr(i, delim.length) === delim){
+        fields.push(field);
+        field = '';
+        i += delim.length - 1;
+        continue;
+      }
+      field += ch;
+    }
+    fields.push(field);
+    return fields.map(f=>f.trim().replace(/\u3000/g,' ').replace(/　/g,' ').replace(/\uFF0C/g,',')); // 全角スペース・全角カンマを正規化
+  });
+  const header = rows.shift() || [];
+  return {header, rows};
+}
 
 /* ===== 永続化 ===== */
-function saveStorage(){
-  localStorage.setItem('swimRecords', JSON.stringify(records));
-  localStorage.setItem('swimGoals', JSON.stringify(goals));
-}
-function loadStorage(){
-  records = JSON.parse(localStorage.getItem('swimRecords')) || [];
-  goals = JSON.parse(localStorage.getItem('swimGoals')) || {};
-}
+function saveStorage(){ localStorage.setItem('swimRecords', JSON.stringify(records)); localStorage.setItem('swimGoals', JSON.stringify(goals)); }
+function loadStorage(){ records = JSON.parse(localStorage.getItem('swimRecords')) || []; goals = JSON.parse(localStorage.getItem('swimGoals')) || {}; }
 
 /* ===== 時間変換 ===== */
 function timeToSec(t){
   if(t === null || t === undefined) return NaN;
   t = String(t).trim();
   if(t === '') return NaN;
-  // m:ss.xx 形式
   if(t.includes(':')){
     const parts = t.split(':');
     const m = parseInt(parts[0].replace(/[^\d]/g,''),10) || 0;
     const s = parseFloat(parts[1].replace(/[^\d.]/g,'')) || 0;
     return m*60 + s;
   }
-  // 秒のみ（小数）
   const v = parseFloat(t.replace(/[^\d.]/g,''));
   return isNaN(v) ? NaN : v;
 }
@@ -241,7 +272,7 @@ function secToTime(s){
   return `${sec}`;
 }
 
-/* ===== FINA ポイント ===== */
+/* ===== FINA ===== */
 function finaPoint(eventName, timeStr){
   const base = finaBase[eventName];
   if(!base) return '-';
@@ -262,103 +293,76 @@ function addRecord(){
   if(isNaN(sec) || sec <= 0){ alert('正しいタイムを入力してください（例 0:23.45 または 23.45）'); return; }
   records.push({date, meet, venue, course, event: eventName, time});
   records.sort((a,b)=> new Date(a.date) - new Date(b.date));
-  saveStorage();
-  renderAll();
-  inputTime.value = '';
+  saveStorage(); renderAll(); inputTime.value = '';
 }
-
 function editRecord(index){
-  const r = records[index];
-  if(!r) return;
-  inputDate.value = r.date;
-  inputMeet.value = r.meet;
-  inputVenue.value = r.venue;
-  inputCourse.value = r.course;
-  inputEvent.value = r.event;
-  inputTime.value = r.time;
-  records.splice(index,1);
-  saveStorage();
-  renderAll();
+  const r = records[index]; if(!r) return;
+  inputDate.value = r.date; inputMeet.value = r.meet; inputVenue.value = r.venue;
+  inputCourse.value = r.course; inputEvent.value = r.event; inputTime.value = r.time;
+  records.splice(index,1); saveStorage(); renderAll();
 }
+function deleteRecord(index){ if(!confirm('削除しますか？')) return; records.splice(index,1); saveStorage(); renderAll(); }
 
-function deleteRecord(index){
-  if(!confirm('削除しますか？')) return;
-  records.splice(index,1);
-  saveStorage();
-  renderAll();
-}
-
-/* ===== CSV 入出力 ===== */
-function recordsToCSV(){
-  const header = ['date','meet','venue','course','event','time'];
-  const rows = records.map(r => header.map(h => `"${String(r[h]||'').replace(/"/g,'""')}"`).join(','));
-  return [header.join(','), ...rows].join('\n');
-}
-function downloadCSV(){
-  const csv = recordsToCSV();
-  const blob = new Blob([csv], {type:'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'swim_records.csv';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
+/* ===== CSV インポート処理 ===== */
 function importCSVFile(file){
   const reader = new FileReader();
-  reader.onload = e => parseCSV(e.target.result);
-  reader.readAsText(file,'utf-8');
-}
-function parseCSV(text){
-  const lines = text.split(/\r?\n/).filter(l=>l.trim()!=='');
-  if(lines.length < 1) return alert('CSVが空です');
-  const header = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
-  const required = ['date','meet','venue','course','event','time'];
-  const missing = required.filter(r=>!header.includes(r));
-  if(missing.length) return alert('CSVに必要な列がありません: ' + missing.join(','));
-  const idx = {}; header.forEach((h,i)=> idx[h]=i);
-  const newRecords = [];
-  for(let i=1;i<lines.length;i++){
-    // 簡易パース（"..." を考慮）
-    const cols = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-    if(cols.length < header.length) continue;
-    const r = {
-      date: cols[idx['date']].replace(/^"|"$/g,'').trim(),
-      meet: cols[idx['meet']].replace(/^"|"$/g,'').trim(),
-      venue: cols[idx['venue']].replace(/^"|"$/g,'').trim(),
-      course: cols[idx['course']].replace(/^"|"$/g,'').trim(),
-      event: cols[idx['event']].replace(/^"|"$/g,'').trim(),
-      time: cols[idx['time']].replace(/^"|"$/g,'').trim()
-    };
-    if(!isNaN(timeToSec(r.time))) newRecords.push(r);
-  }
-  records = records.concat(newRecords);
-  records.sort((a,b)=> new Date(a.date) - new Date(b.date));
-  saveStorage();
-  renderAll();
+  reader.onload = e => {
+    try{
+      const raw = e.target.result;
+      // 文字コードがShift_JISの可能性がある場合は簡易判定してUTF-8として読めない場合はそのまま試す
+      const text = stripBOM(raw);
+      const parsed = parseCSVText(text);
+      if(parsed.header.length === 0){ alert('CSVのヘッダが見つかりません'); console.log('parsed', parsed); return; }
+      // ヘッダ名を小文字化してマッピング
+      const header = parsed.header.map(h=>h.toLowerCase());
+      const required = ['date','meet','venue','course','event','time'];
+      const missing = required.filter(r=>!header.includes(r));
+      if(missing.length){ alert('CSVに必要な列がありません: ' + missing.join(', ')); console.log('header', parsed.header); return; }
+      const idx = {}; header.forEach((h,i)=> idx[h]=i);
+      const newRecords = [];
+      parsed.rows.forEach((cols, rowIndex)=>{
+        // 行長がヘッダより短い場合はスキップ
+        if(cols.length < header.length) {
+          console.warn('CSV行スキップ: 列数不足', rowIndex+2, cols);
+          return;
+        }
+        const r = {
+          date: (cols[idx['date']]||'').trim(),
+          meet: (cols[idx['meet']]||'').trim(),
+          venue: (cols[idx['venue']]||'').trim(),
+          course: (cols[idx['course']]||'').trim(),
+          event: (cols[idx['event']]||'').trim(),
+          time: (cols[idx['time']]||'').trim()
+        };
+        // 日付が空ならスキップ
+        if(!r.date || isNaN(new Date(r.date).getTime())){
+          console.warn('CSV行スキップ: 日付不正', rowIndex+2, r);
+          return;
+        }
+        if(isNaN(timeToSec(r.time))){
+          console.warn('CSV行スキップ: タイム不正', rowIndex+2, r);
+          return;
+        }
+        newRecords.push(r);
+      });
+      if(newRecords.length === 0){ alert('有効なレコードが見つかりませんでした。コンソールを確認してください。'); console.log('parsed', parsed); return; }
+      records = records.concat(newRecords);
+      records.sort((a,b)=> new Date(a.date) - new Date(b.date));
+      saveStorage(); renderAll();
+      alert(`${newRecords.length} 件をインポートしました`);
+    }catch(err){
+      console.error('CSV読み込みエラー', err); alert('CSVの読み込み中にエラーが発生しました。コンソールを確認してください。');
+    }
+  };
+  // FileReaderはバイナリや文字コードの問題があるため、まずUTF-8として読み込む
+  reader.readAsText(file, 'utf-8');
 }
 
 /* ===== 目標管理 ===== */
-function saveGoal(){
-  const e = goalEventSelect.value;
-  const t = goalTimeInput.value.trim();
-  if(!e){ alert('種目を選択してください'); return; }
-  if(isNaN(timeToSec(t))){ alert('正しい目標タイムを入力してください'); return; }
-  goals[e] = t;
-  saveStorage();
-  renderAll();
-}
-function deleteGoal(e){
-  if(goals[e] && confirm(`${e} の目標を削除しますか？`)){
-    delete goals[e];
-    saveStorage();
-    renderAll();
-  }
-}
+function saveGoal(){ const e = goalEventSelect.value; const t = goalTimeInput.value.trim(); if(!e){ alert('種目を選択してください'); return; } if(isNaN(timeToSec(t))){ alert('正しい目標タイムを入力してください'); return; } goals[e] = t; saveStorage(); renderAll(); }
+function deleteGoal(e){ if(goals[e] && confirm(`${e} の目標を削除しますか？`)){ delete goals[e]; saveStorage(); renderAll(); } }
 
-/* ===== レンダリング ===== */
+/* ===== レンダリング関数（省略せず実装） ===== */
 function renderDashboard(){
   const races = records.length;
   const meets = new Set(records.map(r=>r.meet)).size;
@@ -374,7 +378,6 @@ function renderDashboard(){
     <div class="stat">最新<b>${isNaN(latestSec)?'-':secToTime(latestSec)}</b></div>
   `;
 }
-
 function renderTable(){
   let html = `<tr><th>日付</th><th>大会</th><th>会場</th><th>コース</th><th>種目</th><th>タイム</th><th>FINA</th><th></th></tr>`;
   records.forEach((r,i)=>{
@@ -382,39 +385,26 @@ function renderTable(){
     let diffHtml = '';
     if(goal){
       const d = (timeToSec(r.time) - timeToSec(goal));
-      if(!isNaN(d)){
-        diffHtml = d <= 0 ? `<span class="goalGood">達成</span>` : `<span class="goalBad">あと ${d.toFixed(2)}s</span>`;
-      }
+      if(!isNaN(d)) diffHtml = d <= 0 ? `<span style="color:green;font-weight:bold">達成</span>` : `<span style="color:red">あと ${d.toFixed(2)}s</span>`;
     }
     html += `<tr>
-      <td>${r.date}</td>
-      <td>${r.meet}</td>
-      <td>${r.venue}</td>
-      <td>${r.course}</td>
-      <td>${r.event}</td>
-      <td>${r.time} ${diffHtml}</td>
-      <td>${finaPoint(r.event, r.time)}</td>
-      <td>
-        <button onclick="editRecord(${i})">編集</button>
-        <button onclick="deleteRecord(${i})">削除</button>
-      </td>
+      <td>${r.date}</td><td>${r.meet}</td><td>${r.venue}</td><td>${r.course}</td><td>${r.event}</td>
+      <td>${r.time} ${diffHtml}</td><td>${finaPoint(r.event, r.time)}</td>
+      <td><button onclick="editRecord(${i})">編集</button><button onclick="deleteRecord(${i})">削除</button></td>
     </tr>`;
   });
   recordsTable.innerHTML = html;
 }
-
 function renderBest(){
   const best = {};
   records.forEach(r=>{
-    const sec = timeToSec(r.time);
-    if(isNaN(sec)) return;
+    const sec = timeToSec(r.time); if(isNaN(sec)) return;
     if(!best[r.event] || sec < best[r.event].sec) best[r.event] = {time: r.time, sec};
   });
   let html = `<tr><th>種目</th><th>ベスト</th></tr>`;
   Object.keys(best).sort().forEach(e=> html += `<tr><td>${e}</td><td>${best[e].time}</td></tr>`);
   bestTable.innerHTML = html;
 }
-
 function renderGoalGauge(){
   const e = goalEventSelect.value;
   if(!e || !goals[e]){ if(goalChart){ goalChart.destroy(); goalChart = null; } return; }
@@ -423,11 +413,9 @@ function renderGoalGauge(){
   const bestTime = Math.min(...bestTimes);
   const goalSec = timeToSec(goals[e]);
   if(isNaN(goalSec) || goalSec <= 0) return;
-  // 目標は「これ以下を目指す」ため、進捗は (goal / best) * 100（ベストが小さいほど進捗が高い）
   let progress = (goalSec / bestTime) * 100;
   progress = Math.round(Math.max(0, Math.min(100, progress)));
   const remaining = 100 - progress;
-
   if(goalChart) goalChart.destroy();
   goalChart = new Chart(goalGaugeCanvas.getContext('2d'), {
     type: 'doughnut',
@@ -436,16 +424,26 @@ function renderGoalGauge(){
       cutout: '70%',
       plugins: {
         legend: { display: false },
-        centerText: {
-          // 中央に表示するテキスト（複数行可）
-          text: `目標: ${goalSec.toFixed(2)}s\nベスト: ${bestTime.toFixed(2)}s\n達成率: ${progress}%`,
-          color: '#111'
-        }
+        // 中央テキストは Chart.js プラグインを使わず options.plugins.centerText を利用する実装を省略して簡潔に
       }
     }
   });
+  // 中央テキストをキャンバスに直接描画（簡易）
+  const ctx = goalGaugeCanvas.getContext('2d');
+  setTimeout(()=>{ // Chart描画後に描く
+    ctx.save();
+    ctx.fillStyle = '#111';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const cx = goalGaugeCanvas.width/2;
+    const cy = goalGaugeCanvas.height/2;
+    ctx.clearRect(cx-60, cy-30, 120, 60); // 余白クリア
+    ctx.font = '14px Arial'; ctx.fillText(`目標: ${goalSec.toFixed(2)}s`, cx, cy-12);
+    ctx.font = '14px Arial'; ctx.fillText(`ベスト: ${bestTime.toFixed(2)}s`, cx, cy+4);
+    ctx.font = 'bold 14px Arial'; ctx.fillText(`達成率: ${progress}%`, cx, cy+20);
+    ctx.restore();
+  }, 200);
 }
-
 function renderProgressChart(){
   const e = graphEventSelect.value;
   if(!e || e === '選択'){ if(mainChart){ mainChart.destroy(); mainChart = null; } return; }
@@ -456,24 +454,17 @@ function renderProgressChart(){
   if(mainChart) mainChart.destroy();
   mainChart = new Chart(chartCanvas.getContext('2d'), {
     type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: 'タイム (秒)', data: times, borderColor: CHART_COLORS[0], backgroundColor: 'rgba(30,115,190,0.08)', tension:0.2 },
-        { label: '目標', data: goalArr, borderColor: CHART_COLORS[1], borderDash: [6,4], fill:false }
-      ]
-    },
+    data: { labels, datasets: [
+      { label: 'タイム (秒)', data: times, borderColor: CHART_COLORS[0], backgroundColor: 'rgba(30,115,190,0.08)', tension:0.2 },
+      { label: '目標', data: goalArr, borderColor: CHART_COLORS[1], borderDash: [6,4], fill:false }
+    ]},
     options: { plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: false } } }
   });
 }
-
 function renderFINAChart(){
   const data = [...records].sort((a,b)=> new Date(a.date) - new Date(b.date));
   const labels = data.map(r=>r.date);
-  const points = data.map(r=> {
-    const p = finaPoint(r.event, r.time);
-    return (p === '-') ? null : p;
-  });
+  const points = data.map(r=> { const p = finaPoint(r.event, r.time); return (p === '-') ? null : p; });
   if(finaChart) finaChart.destroy();
   finaChart = new Chart(finaCanvas.getContext('2d'), {
     type: 'line',
@@ -481,7 +472,6 @@ function renderFINAChart(){
     options: { plugins: { legend: { display: true } } }
   });
 }
-
 function renderImproveChart(){
   const map = {};
   records.forEach(r=>{ if(!map[r.event]) map[r.event]=[]; map[r.event].push(r); });
@@ -492,133 +482,74 @@ function renderImproveChart(){
     const first = timeToSec(arr[0].time);
     const last = timeToSec(arr[arr.length-1].time);
     if(isNaN(first) || isNaN(last) || first === 0) return;
-    labels.push(e);
-    data.push(Number(((first - last) / first * 100).toFixed(1)));
+    labels.push(e); data.push(Number(((first - last) / first * 100).toFixed(1)));
   });
   if(improveChart) improveChart.destroy();
-  improveChart = new Chart(improveCanvas.getContext('2d'), {
-    type: 'bar',
-    data: { labels, datasets: [{ label: '改善率 %', data, backgroundColor: CHART_COLORS }] },
-    options: { plugins: { legend: { display: false } } }
-  });
+  improveChart = new Chart(improveCanvas.getContext('2d'), { type: 'bar', data: { labels, datasets: [{ label: '改善率 %', data, backgroundColor: CHART_COLORS }] }, options: { plugins: { legend: { display: false } } } });
 }
-
 function renderStrokeChart(){
   const map = {};
   records.forEach(r=>{
     if(!r || !r.event) return;
-    const sec = timeToSec(r.time);
-    if(isNaN(sec)) return;
-    // 種目名から泳法を抽出（数字・m・全角数字を除去）
+    const sec = timeToSec(r.time); if(isNaN(sec)) return;
     let stroke = r.event.replace(/[\dｍm\uFF10-\uFF19]/g,'').replace(/m/gi,'').trim();
     if(!stroke) stroke = r.event.trim();
-    if(!map[stroke]) map[stroke]=[];
-    map[stroke].push(sec);
+    if(!map[stroke]) map[stroke]=[]; map[stroke].push(sec);
   });
   const labels = [], data = [];
   Object.keys(map).forEach(s=>{
-    const arr = map[s];
-    if(!arr || arr.length===0) return;
+    const arr = map[s]; if(!arr || arr.length===0) return;
     const avg = arr.reduce((a,b)=>a+b,0)/arr.length;
-    labels.push(s);
-    data.push(Number(avg.toFixed(2)));
+    labels.push(s); data.push(Number(avg.toFixed(2)));
   });
   if(strokeChart) strokeChart.destroy();
-  strokeChart = new Chart(strokeCanvas.getContext('2d'), {
-    type: 'bar',
-    data: { labels, datasets: [{ label: '平均秒', data, backgroundColor: CHART_COLORS }] },
-    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-  });
+  strokeChart = new Chart(strokeCanvas.getContext('2d'), { type: 'bar', data: { labels, datasets: [{ label: '平均秒', data, backgroundColor: CHART_COLORS }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
   if(labels.length === 0) console.log('renderStroke: 対象データがありません', records);
 }
-
 function renderSeasonBest(){
   const map = {};
   records.forEach(r=>{
     if(!r || !r.date || !r.event) return;
-    const d = new Date(r.date);
-    if(isNaN(d.getTime())) return;
-    const y = d.getFullYear();
-    const key = `${y}__${r.event}`;
-    const sec = timeToSec(r.time);
-    if(isNaN(sec)) return;
+    const d = new Date(r.date); if(isNaN(d.getTime())) return;
+    const y = d.getFullYear(); const key = `${y}__${r.event}`; const sec = timeToSec(r.time); if(isNaN(sec)) return;
     if(!map[key] || sec < map[key]) map[key] = sec;
   });
   let html = `<tr><th>年</th><th>種目</th><th>SB</th></tr>`;
-  const keys = Object.keys(map).sort((a,b)=>{
-    const ay = parseInt(a.split('__')[0],10);
-    const by = parseInt(b.split('__')[0],10);
-    if(ay !== by) return ay - by;
-    return a.localeCompare(b);
-  });
-  keys.forEach(k=>{
-    const [year, ...evParts] = k.split('__');
-    const ev = evParts.join('__');
-    html += `<tr><td>${year}</td><td>${ev}</td><td>${secToTime(map[k])}</td></tr>`;
-  });
+  const keys = Object.keys(map).sort((a,b)=>{ const ay = parseInt(a.split('__')[0],10); const by = parseInt(b.split('__')[0],10); if(ay !== by) return ay - by; return a.localeCompare(b); });
+  keys.forEach(k=>{ const [year, ...evParts] = k.split('__'); const ev = evParts.join('__'); html += `<tr><td>${year}</td><td>${ev}</td><td>${secToTime(map[k])}</td></tr>`; });
   seasonBestTable.innerHTML = html;
   if(keys.length === 0) console.log('renderSeasonBest: 対象データがありません', records);
 }
-
-function renderGoalsTable(){
-  let html = `<tr><th>種目</th><th>目標タイム</th><th></th></tr>`;
-  Object.keys(goals).sort().forEach(e=>{
-    html += `<tr><td>${e}</td><td>${goals[e]}</td><td><button onclick="deleteGoal('${e.replace(/'/g,"\\'")}')">削除</button></td></tr>`;
-  });
-  goalTable.innerHTML = html;
-}
+function renderGoalsTable(){ let html = `<tr><th>種目</th><th>目標タイム</th><th></th></tr>`; Object.keys(goals).sort().forEach(e=>{ html += `<tr><td>${e}</td><td>${goals[e]}</td><td><button onclick="deleteGoal('${e.replace(/'/g,"\\'")}')">削除</button></td></tr>`; }); goalTable.innerHTML = html; }
 
 /* ===== セレクト初期化 & 全レンダリング ===== */
 function populateEventSelects(){
   const options = Array.from(inputEvent.options).map(o=>o.value);
-  goalEventSelect.innerHTML = '';
-  graphEventSelect.innerHTML = '<option>選択</option>';
-  options.forEach(opt=>{
-    const o1 = document.createElement('option'); o1.value = opt; o1.textContent = opt;
-    const o2 = document.createElement('option'); o2.value = opt; o2.textContent = opt;
-    goalEventSelect.appendChild(o1);
-    graphEventSelect.appendChild(o2);
-  });
-  // 既存の目標があれば選択
-  const firstGoal = Object.keys(goals)[0];
-  if(firstGoal && [...goalEventSelect.options].some(o=>o.value===firstGoal)) goalEventSelect.value = firstGoal;
+  goalEventSelect.innerHTML = ''; graphEventSelect.innerHTML = '<option>選択</option>';
+  options.forEach(opt=>{ const o1 = document.createElement('option'); o1.value = opt; o1.textContent = opt; const o2 = document.createElement('option'); o2.value = opt; o2.textContent = opt; goalEventSelect.appendChild(o1); graphEventSelect.appendChild(o2); });
+  const firstGoal = Object.keys(goals)[0]; if(firstGoal && [...goalEventSelect.options].some(o=>o.value===firstGoal)) goalEventSelect.value = firstGoal;
 }
-
-function renderAll(){
-  renderDashboard();
-  renderTable();
-  renderBest();
-  renderGoalsTable();
-  renderGoalGauge();
-  renderProgressChart();
-  renderFINAChart();
-  renderImproveChart();
-  renderStrokeChart();
-  renderSeasonBest();
-}
+function renderAll(){ renderDashboard(); renderTable(); renderBest(); renderGoalsTable(); renderGoalGauge(); renderProgressChart(); renderFINAChart(); renderImproveChart(); renderStrokeChart(); renderSeasonBest(); }
 
 /* ===== イベント登録 ===== */
 saveRecordBtn.addEventListener('click', addRecord);
-downloadCsvBtn.addEventListener('click', downloadCSV);
+downloadCsvBtn.addEventListener('click', ()=>{
+  const csv = (function(){
+    const header = ['date','meet','venue','course','event','time'];
+    const rows = records.map(r => header.map(h => `"${String(r[h]||'').replace(/"/g,'""')}"`).join(','));
+    return [header.join(','), ...rows].join('\n');
+  })();
+  const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'swim_records.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
 importCsvBtn.addEventListener('click', ()=>{
-  const f = csvUpload.files[0];
-  if(!f){ alert('CSVファイルを選択してください'); return; }
-  importCSVFile(f);
+  const f = csvUpload.files[0]; if(!f){ alert('CSVファイルを選択してください'); return; } importCSVFile(f);
 });
 saveGoalBtn.addEventListener('click', saveGoal);
 goalEventSelect.addEventListener('change', renderGoalGauge);
 graphEventSelect.addEventListener('change', renderProgressChart);
 
 /* ===== 初期化 ===== */
-(function init(){
-  loadStorage();
-  populateEventSelects();
-  renderAll();
-  // テーブル内ボタンから呼べるように最小限公開
-  window.editRecord = editRecord;
-  window.deleteRecord = deleteRecord;
-  window.deleteGoal = deleteGoal;
-})();
+(function init(){ loadStorage(); populateEventSelects(); renderAll(); window.editRecord = editRecord; window.deleteRecord = deleteRecord; window.deleteGoal = deleteGoal; })();
 </script>
 </body>
 </html>
