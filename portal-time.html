@@ -175,7 +175,7 @@ const strokeCanvas = document.getElementById('strokeCanvas');
 
 let goalChart, mainChart, finaChart, improveChart, strokeChart;
 
-/* ===== Chart.js 中央テキストプラグイン（行ごとにサイズ指定可） ===== */
+/* ===== Chart.js 中央テキストプラグイン ===== */
 const centerLinesPlugin = {
   id: 'centerLinesPlugin',
   afterDraw(chart) {
@@ -186,7 +186,6 @@ const centerLinesPlugin = {
     const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
     const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
     const lines = cfg.lines;
-    // 合計高さを計算して中央揃え
     const totalHeight = lines.reduce((sum, ln) => sum + (ln.size || 14) + (ln.spacing || 4), - (lines[lines.length-1].spacing || 4));
     let y = centerY - totalHeight/2;
     lines.forEach(ln=>{
@@ -202,7 +201,7 @@ const centerLinesPlugin = {
 };
 Chart.register(centerLinesPlugin);
 
-/* ===== CSV ユーティリティ ===== */
+/* ===== CSV ユーティリティ（堅牢） ===== */
 function stripBOM(s){ return s.replace(/^\uFEFF/, ''); }
 function detectDelimiter(sample){
   const counts = {',':0,';':0,'\t':0};
@@ -255,17 +254,51 @@ function parseCSVText(text){
   const header = parsed.shift() || [];
   return {header, rows: parsed};
 }
+
+/* ===== 修正版: readFileWithEncodings（コールバック一度だけ） ===== */
 function readFileWithEncodings(file, callback){
-  const reader = new FileReader();
-  reader.onload = e => { callback(String(e.target.result)); };
-  reader.readAsText(file, 'utf-8');
-  const reader2 = new FileReader();
-  reader2.onload = e => {
-    const ab = e.target.result;
-    try { const dec1 = new TextDecoder('shift_jis'); callback(dec1.decode(ab)); return; } catch(err){}
-    try { const dec2 = new TextDecoder('windows-31j'); callback(dec2.decode(ab)); return; } catch(err){}
+  let called = false;
+  function onceCallback(text){
+    if(called) return;
+    called = true;
+    callback(text);
+  }
+
+  // try UTF-8 first
+  const readerUtf8 = new FileReader();
+  readerUtf8.onload = e => {
+    const txt = String(e.target.result || '');
+    if(txt && txt.length > 0){
+      onceCallback(txt);
+    }
   };
-  reader2.readAsArrayBuffer(file);
+  readerUtf8.onerror = () => { /* ignore */ };
+  readerUtf8.readAsText(file, 'utf-8');
+
+  // also try ArrayBuffer -> shift_jis / windows-31j
+  const readerBuf = new FileReader();
+  readerBuf.onload = e => {
+    if(called) return;
+    const ab = e.target.result;
+    const encCandidates = ['shift_jis','windows-31j','utf-8'];
+    for(const enc of encCandidates){
+      try{
+        const dec = new TextDecoder(enc);
+        const txt = dec.decode(ab);
+        if(txt && txt.length > 0){
+          onceCallback(txt);
+          return;
+        }
+      }catch(err){
+        // try next
+      }
+    }
+    if(!called){
+      onceCallback('');
+    }
+  };
+  readerBuf.onerror = () => { if(!called) onceCallback(''); };
+  readerBuf.readAsArrayBuffer(file);
 }
 
 /* ===== 永続化 ===== */
@@ -328,36 +361,43 @@ function editRecord(index){
 }
 function deleteRecord(index){ if(!confirm('削除しますか？')) return; records.splice(index,1); saveStorage(); renderAll(); }
 
-/* ===== CSV インポート ===== */
-function importCSVFileEnhanced(file){
+/* ===== CSV インポート（importCSVFileEnhanced を onDone コールバック対応に変更） ===== */
+function importCSVFileEnhanced(file, onDone){
   readFileWithEncodings(file, (text) => {
-    if(!text){ alert('ファイルの読み込みに失敗しました'); return; }
-    const parsed = parseCSVText(text);
-    if(!parsed.header || parsed.header.length === 0){ alert('CSVのヘッダが見つかりません'); console.log(parsed); return; }
-    const header = parsed.header.map(h=>h.toLowerCase());
-    const required = ['date','meet','venue','course','event','time'];
-    const missing = required.filter(r=>!header.includes(r));
-    if(missing.length){ alert('CSVに必要な列がありません: ' + missing.join(', ')); console.log('header', parsed.header); return; }
-    const idx = {}; header.forEach((h,i)=> idx[h]=i);
-    const newRecords = [];
-    parsed.rows.forEach((cols, rowIndex)=>{
-      if(cols.length < header.length){ console.warn('行スキップ: 列数不足', rowIndex+2, cols); return; }
-      const r = {
-        date: (cols[idx['date']]||'').trim(),
-        meet: (cols[idx['meet']]||'').trim(),
-        venue: (cols[idx['venue']]||'').trim(),
-        course: (cols[idx['course']]||'').trim(),
-        event: (cols[idx['event']]||'').trim(),
-        time: (cols[idx['time']]||'').trim()
-      };
-      if(!r.date || isNaN(new Date(r.date).getTime())){ console.warn('行スキップ: 日付不正', rowIndex+2, r); return; }
-      if(isNaN(timeToSec(r.time))){ console.warn('行スキップ: タイム不正', rowIndex+2, r); return; }
-      newRecords.push(r);
-    });
-    if(newRecords.length === 0){ alert('有効なレコードが見つかりませんでした。コンソールを確認してください。'); console.log(parsed); return; }
-    records = records.concat(newRecords);
-    records.sort((a,b)=> new Date(a.date) - new Date(b.date));
-    saveStorage(); renderAll(); alert(`${newRecords.length} 件をインポートしました`);
+    try{
+      if(!text){ alert('ファイルの読み込みに失敗しました'); if(typeof onDone==='function') onDone(); return; }
+      const parsed = parseCSVText(text);
+      if(!parsed.header || parsed.header.length === 0){ alert('CSVのヘッダが見つかりません'); console.log(parsed); if(typeof onDone==='function') onDone(); return; }
+      const header = parsed.header.map(h=>String(h).toLowerCase());
+      const required = ['date','meet','venue','course','event','time'];
+      const missing = required.filter(r=>!header.includes(r));
+      if(missing.length){ alert('CSVに必要な列がありません: ' + missing.join(', ')); console.log('header', parsed.header); if(typeof onDone==='function') onDone(); return; }
+      const idx = {}; header.forEach((h,i)=> idx[h]=i);
+      const newRecords = [];
+      parsed.rows.forEach((cols, rowIndex)=>{
+        if(cols.length < header.length){ console.warn('行スキップ: 列数不足', rowIndex+2, cols); return; }
+        const r = {
+          date: (cols[idx['date']]||'').trim(),
+          meet: (cols[idx['meet']]||'').trim(),
+          venue: (cols[idx['venue']]||'').trim(),
+          course: (cols[idx['course']]||'').trim(),
+          event: (cols[idx['event']]||'').trim(),
+          time: (cols[idx['time']]||'').trim()
+        };
+        if(!r.date || isNaN(new Date(r.date).getTime())){ console.warn('行スキップ: 日付不正', rowIndex+2, r); return; }
+        if(isNaN(timeToSec(r.time))){ console.warn('行スキップ: タイム不正', rowIndex+2, r); return; }
+        newRecords.push(r);
+      });
+      if(newRecords.length === 0){ alert('有効なレコードが見つかりませんでした。コンソールを確認してください。'); console.log(parsed); if(typeof onDone==='function') onDone(); return; }
+      records = records.concat(newRecords);
+      records.sort((a,b)=> new Date(a.date) - new Date(b.date));
+      saveStorage(); renderAll(); alert(`${newRecords.length} 件をインポートしました`);
+    }catch(err){
+      console.error('importCSVFileEnhanced error', err);
+      alert('CSVの読み込み中にエラーが発生しました。コンソールを確認してください。');
+    } finally {
+      if(typeof onDone==='function') onDone();
+    }
   });
 }
 
@@ -545,7 +585,15 @@ downloadCsvBtn.addEventListener('click', ()=>{
   const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'swim_records.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 });
 importCsvBtn.addEventListener('click', ()=>{
-  const f = csvUpload.files[0]; if(!f){ alert('CSVファイルを選択してください'); return; } importCSVFileEnhanced(f);
+  const f = csvUpload.files[0]; if(!f){ alert('CSVファイルを選択してください'); return; }
+  // disable button to prevent double-clicks
+  importCsvBtn.disabled = true;
+  importCsvBtn.textContent = 'インポート中...';
+  importCSVFileEnhanced(f, ()=>{
+    // re-enable after processing
+    importCsvBtn.disabled = false;
+    importCsvBtn.textContent = 'CSVインポート';
+  });
 });
 saveGoalBtn.addEventListener('click', saveGoal);
 goalEventSelect.addEventListener('change', renderGoalGauge);
