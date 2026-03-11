@@ -136,10 +136,15 @@
         <option>自由形50m</option>
         <option>自由形100m</option>
         <option>自由形200m</option>
+                <option>背泳ぎ50m</option>
         <option>背泳ぎ100m</option>
-        <option>平泳ぎ100m</option>
-        <option>バタフライ100m</option>
-        <option>個人メドレー200m</option>
+                <option>背泳ぎ50m</option>
+<option>平泳ぎ100m</option>
+<option>ﾊﾞﾀﾌﾗｲ50m</option>
+<option>ﾊﾞﾀﾌﾗｲ100m</option>      
+<option>個人ﾒﾄﾞﾚｰ50m</option>
+<option>個人ﾒﾄﾞﾚｰ100m</option>
+<option>ﾒﾄﾞﾚｰﾘﾚｰ100m</option><option>ﾒﾄﾞﾚｰﾘﾚｰ200m</option><option>ﾒﾄﾞﾚｰﾘﾚｰ400m</option><option>ﾘﾚｰ100m</option><option>ﾘﾚｰ200m</option><option>ﾘﾚｰ400m</option>
       </select>
       <label>タイム</label>
       <input id="inputTime" placeholder="例 0:23.45 または 23.45">
@@ -239,10 +244,43 @@
 let records = [];
 let goals = {};
 const CHART_COLORS = ['#1e73be','#ff7f50','#4caf50','#f39c12','#9b59b6','#e74c3c'];
+/* ===== 置換用：拡張種目対応の finaBase マップ（必要に応じて値は調整してください） ===== */
 const finaBase = {
-  "自由形50m":21.04,"自由形100m":46.86,"自由形200m":102,
-  "背泳ぎ100m":51.6,"平泳ぎ100m":56.88,"バタフライ100m":49.45
+  "自由形50m": 21.04,
+  "自由形100m": 46.86,
+  "自由形200m": 102.00,
+
+  "背泳ぎ50m": 24.50,
+  "背泳ぎ100m": 51.60,
+
+  "平泳ぎ50m": 27.00,
+  "平泳ぎ100m": 56.88,
+
+  "バタフライ50m": 23.50,
+  "ﾊﾞﾀﾌﾗｲ50m": 23.50,   // 全角/半角表記の違いに対応
+  "バタフライ100m": 49.45,
+  "ﾊﾞﾀﾌﾗｲ100m": 49.45,  // 同上
+
+  "個人ﾒﾄﾞﾚｰ50m": 25.50,
+  "個人ﾒﾄﾞﾚｰ100m": 54.00,
+
+  "ﾒﾄﾞﾚｰﾘﾚｰ100m": 54.00,
+  "ﾒﾄﾞﾚｰﾘﾚｰ200m": 110.00,
+  "ﾒﾄﾞﾚｰﾘﾚｰ400m": 220.00,
+
+  "ﾘﾚｰ100m": 47.00,
+  "ﾘﾚｰ200m": 95.00,
+  "ﾘﾚｰ400m": 190.00
 };
+
+/*
+注意：
+- 上の数値は「FINAポイント計算の基準タイム（ベースタイム）」として使うための目安値です。
+- 実際のベース値（公式や目的に応じた基準）は必要に応じて調整してください。
+- 同じ種目が全角/半角や表記ゆれで複数ある場合は両方登録しておくと既存データとの照合が楽になります。
+*/
+
+
 
 /* DOM refs */
 const inputDate = document.getElementById('inputDate');
