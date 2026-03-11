@@ -26,6 +26,8 @@
   .pagination{display:flex; gap:6px; align-items:center; justify-content:center; margin-top:8px;}
   .page-btn{padding:6px 10px; border-radius:6px; border:1px solid #ddd; background:#fff; cursor:pointer;}
   .page-btn.active{background:#1e73be; color:#fff; border-color:#1e73be;}
+  .undo-area{margin-left:12px;}
+  .danger{background:#e74c3c;}
   @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} .table-controls{flex-direction:column; align-items:flex-start;} }
 </style>
 </head>
@@ -69,13 +71,19 @@
   </div>
 
   <div class="card">
-    <h3>CSV</h3>
+    <h3>CSV / 全消去</h3>
     <div>
       <input type="file" id="csvUpload" accept=".csv">
       <button id="importCsvBtn">CSVインポート</button>
       <button id="downloadCsvBtn">CSVダウンロード</button>
+      <!-- Minimal-change: 全消去ボタンと元に戻すエリア -->
+      <button id="clearRecordsBtn" class="danger">全記録削除</button>
+      <button id="clearAllBtn" class="danger">全データ削除</button>
+      <span class="undo-area" id="undoArea" style="display:none;">
+        <button id="undoBtn">元に戻す</button>
+      </span>
     </div>
-    <div class="small">CSV列: <b>date,meet,venue,course,event,time</b>（ヘッダ必須）。</div>
+    <div class="small">CSV列: <b>date,meet,venue,course,event,time</b>（ヘッダ必須）。全消去は取り消し可能です。</div>
   </div>
 
   <div class="card">
@@ -99,7 +107,6 @@
   <div class="card">
     <h3>記録一覧</h3>
 
-    <!-- Table controls: search, filter, page size -->
     <div class="table-controls">
       <input id="searchInput" placeholder="検索: 大会名・種目・会場を検索" style="min-width:220px;">
       <select id="filterEvent"><option value="">全種目</option></select>
@@ -157,7 +164,7 @@
 </div>
 
 <script>
-/* ===== minimal-change enhancement: table controls (search, filter, pagination, multi-column sort) ===== */
+/* ===== minimal-change enhancement: 全消去（取り消し可能）を追加 ===== */
 
 /* ===== data & state ===== */
 let records = []
@@ -187,6 +194,10 @@ const saveBtn = document.getElementById('saveBtn')
 const csvUpload = document.getElementById('csvUpload')
 const importCsvBtn = document.getElementById('importCsvBtn')
 const downloadCsvBtn = document.getElementById('downloadCsvBtn')
+const clearRecordsBtn = document.getElementById('clearRecordsBtn')
+const clearAllBtn = document.getElementById('clearAllBtn')
+const undoArea = document.getElementById('undoArea')
+const undoBtn = document.getElementById('undoBtn')
 
 const goalEventSelect = document.getElementById('goalEvent')
 const goalTimeInput = document.getElementById('goalTime')
@@ -216,6 +227,28 @@ const clearFiltersBtn = document.getElementById('clearFiltersBtn')
 /* pagination state */
 let currentPage = 1
 function pageSize(){ return parseInt(pageSizeSelect.value,10) }
+
+/* ===== undo backup (for clear actions) ===== */
+let lastBackup = null
+function setBackup(recordsBackup, goalsBackup){
+  lastBackup = { records: JSON.parse(JSON.stringify(recordsBackup || [])), goals: JSON.parse(JSON.stringify(goalsBackup || {})) }
+  // show undo UI
+  undoArea.style.display = 'inline-block'
+  // auto-hide undo after 20 seconds
+  if(window._undoTimeout) clearTimeout(window._undoTimeout)
+  window._undoTimeout = setTimeout(()=>{ undoArea.style.display = 'none'; lastBackup = null }, 20000)
+}
+function undoClear(){
+  if(!lastBackup) return
+  records = lastBackup.records
+  goals = lastBackup.goals
+  lastBackup = null
+  undoArea.style.display = 'none'
+  if(window._undoTimeout) clearTimeout(window._undoTimeout)
+  save()
+  populateFilterEvents()
+  renderAll()
+}
 
 /* ===== persistence ===== */
 function save(){
@@ -313,6 +346,32 @@ function deleteRecord(i){
   renderAll()
 }
 
+/* ===== clear functions (new) ===== */
+function clearAllRecords(){
+  if(records.length === 0){ alert('記録はありません'); return }
+  if(!confirm('すべての記録を削除しますか？（取り消し可能）')) return
+  // backup
+  setBackup(records, goals)
+  records = []
+  save()
+  populateFilterEvents()
+  renderAll()
+  alert('すべての記録を削除しました。元に戻すには「元に戻す」を押してください（20秒）')
+}
+
+function clearAllData(){
+  if(records.length === 0 && Object.keys(goals).length === 0){ alert('データは既に空です'); return }
+  if(!confirm('すべての記録と目標を削除しますか？（取り消し可能）')) return
+  // backup
+  setBackup(records, goals)
+  records = []
+  goals = {}
+  save()
+  populateFilterEvents()
+  renderAll()
+  alert('すべてのデータを削除しました。元に戻すには「元に戻す」を押してください（20秒）')
+}
+
 /* ===== sorting ===== */
 function sortRecords(key, dir){
   if(key) currentSort.key = key
@@ -335,7 +394,6 @@ function getFilteredRecords(){
     if(evFilter && r.event !== evFilter) return false
     if(courseFilter && r.course !== courseFilter) return false
     if(!q) return true
-    // search in meet, event, venue
     return (r.meet || '').toLowerCase().includes(q) ||
            (r.event || '').toLowerCase().includes(q) ||
            (r.venue || '').toLowerCase().includes(q)
@@ -348,11 +406,9 @@ function renderPagination(totalItems){
   const totalPages = Math.max(1, Math.ceil(totalItems / size))
   if(currentPage > totalPages) currentPage = totalPages
   paginationDiv.innerHTML = ''
-  // prev
   const prev = document.createElement('button'); prev.className='page-btn'; prev.textContent='‹'; prev.disabled = currentPage===1
   prev.addEventListener('click', ()=>{ if(currentPage>1) currentPage--; renderTable() })
   paginationDiv.appendChild(prev)
-  // page numbers (limit to window)
   const maxButtons = 7
   let start = Math.max(1, currentPage - Math.floor(maxButtons/2))
   let end = Math.min(totalPages, start + maxButtons - 1)
@@ -362,7 +418,6 @@ function renderPagination(totalItems){
     btn.addEventListener('click', ()=>{ currentPage = p; renderTable() })
     paginationDiv.appendChild(btn)
   }
-  // next
   const next = document.createElement('button'); next.className='page-btn'; next.textContent='›'; next.disabled = currentPage===totalPages
   next.addEventListener('click', ()=>{ if(currentPage<totalPages) currentPage++; renderTable() })
   paginationDiv.appendChild(next)
@@ -722,6 +777,10 @@ clearFiltersBtn.addEventListener('click', ()=>{
   currentPage = 1
   renderTable()
 })
+
+clearRecordsBtn.addEventListener('click', clearAllRecords)
+clearAllBtn.addEventListener('click', clearAllData)
+undoBtn.addEventListener('click', undoClear)
 
 /* expose for inline handlers */
 window.editRecord = editRecord
