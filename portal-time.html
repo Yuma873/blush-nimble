@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>Swim Record Dashboard</title>
+<title>Swim Record Dashboard — Final</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -19,7 +19,8 @@
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
   .stat{background:#f4f6f9;padding:12px;border-radius:8px;text-align:center;}
   .stat b{display:block;font-size:20px;margin-top:6px;}
-  .goalGauge{width:260px;height:260px;margin:10px auto;display:block;}
+  /* 固定サイズにして縦伸びを防ぐ */
+  .goalGauge{width:260px;height:260px;margin:10px auto;display:block;max-width:260px;max-height:260px;}
   .small{font-size:13px;color:#666;margin-top:6px;}
   @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} }
   .sort-indicator{font-weight:700;margin-left:6px;color:#1e73be;}
@@ -89,7 +90,7 @@
   <div class="card">
     <h3>目標達成率</h3>
     <canvas id="goalGauge" class="goalGauge"></canvas>
-    <div class="small">ドーナツ中央に <b>目標秒 / ベスト秒（達成率%）</b> を表示します。秒は大きく表示されます。</div>
+    <div class="small">ドーナツ中央に <b>目標秒 / ベスト秒（達成率%）</b> を大きく表示します。</div>
   </div>
 
   <div class="card">
@@ -134,7 +135,7 @@
 </div>
 
 <script>
-/* ===== 元の動作を維持しつつ、ドーナツ中央に大きく「目標秒 / ベスト秒（達成率%）」を表示する最小変更版 ===== */
+/* ===== Final version: keep original behavior, fix donut central text accumulation and stretching ===== */
 
 let records = [];
 let goals = {};
@@ -144,7 +145,7 @@ const finaBase = {
   "背泳ぎ100m":51.6,"平泳ぎ100m":56.88,"バタフライ100m":49.45
 };
 
-/* DOM */
+/* DOM refs */
 const inputDate = document.getElementById('inputDate');
 const inputMeet = document.getElementById('inputMeet');
 const inputVenue = document.getElementById('inputVenue');
@@ -175,7 +176,7 @@ const strokeCanvas = document.getElementById('strokeCanvas');
 
 let goalChart, mainChart, finaChart, improveChart, strokeChart;
 
-/* CSV utils (unchanged) */
+/* CSV helpers (unchanged) */
 function stripBOM(s){ return s.replace(/^\uFEFF/, ''); }
 function detectDelimiter(sample){
   const counts = {',':0,';':0,'\t':0};
@@ -229,7 +230,7 @@ function parseCSVText(text){
   return {header, rows: parsed};
 }
 
-/* readFileWithEncodings (single-callback) */
+/* read file once only */
 function readFileWithEncodings(file, callback){
   let called = false;
   function onceCallback(text){
@@ -267,7 +268,7 @@ function readFileWithEncodings(file, callback){
 function saveStorage(){ localStorage.setItem('swimRecords', JSON.stringify(records)); localStorage.setItem('swimGoals', JSON.stringify(goals)); }
 function loadStorage(){ records = JSON.parse(localStorage.getItem('swimRecords')) || []; goals = JSON.parse(localStorage.getItem('swimGoals')) || {}; }
 
-/* time utils */
+/* time helpers */
 function timeToSec(t){
   if(t === null || t === undefined) return NaN;
   t = String(t).trim();
@@ -299,7 +300,7 @@ function finaPoint(eventName, timeStr){
   return Math.round(1000 * Math.pow(base / sec, 3));
 }
 
-/* record CRUD */
+/* CRUD */
 function addRecord(){
   const date = inputDate.value || new Date().toISOString().slice(0,10);
   const meet = inputMeet.value.trim();
@@ -367,7 +368,7 @@ function importCSVFileEnhanced(file, onDone){
 function saveGoal(){ const e = goalEventSelect.value; const t = goalTimeInput.value.trim(); if(!e){ alert('種目を選択してください'); return; } if(isNaN(timeToSec(t))){ alert('正しい目標タイムを入力してください'); return; } goals[e] = t; saveStorage(); renderAll(); }
 function deleteGoal(e){ if(goals[e] && confirm(`${e} の目標を削除しますか？`)){ delete goals[e]; saveStorage(); renderAll(); } }
 
-/* ===== renderGoalGauge: ドーナツ中央に「目標秒 / ベスト秒（達成率%）」を大きく表示 ===== */
+/* ===== Fixed renderGoalGauge: prevent stretching and accumulation, draw large center text ===== */
 function renderGoalGauge(){
   const e = goalEventSelect.value;
   if(!e || !goals[e]){
@@ -388,62 +389,67 @@ function renderGoalGauge(){
   let progress = Math.round(Math.max(0, Math.min(100, (goalSec / bestTime) * 100)));
   const remaining = 100 - progress;
 
+  // Ensure canvas fixed pixel size to avoid Chart.js responsive resizing issues
+  const dpr = window.devicePixelRatio || 1;
+  const cssSize = 260;
+  goalGaugeCanvas.style.width = cssSize + 'px';
+  goalGaugeCanvas.style.height = cssSize + 'px';
+  goalGaugeCanvas.width = cssSize * dpr;
+  goalGaugeCanvas.height = cssSize * dpr;
+
   if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
 
-  // ドーナツ作成
+  // Create chart with responsive:false so it doesn't resize and cause vertical stretching
   goalChart = new Chart(goalGaugeCanvas.getContext('2d'), {
     type: 'doughnut',
     data: { labels: ['達成率','残り'], datasets: [{ data: [progress, remaining], backgroundColor: [CHART_COLORS[0], '#e9eef5'] }] },
     options: {
       cutout: '70%',
       plugins: { legend: { display: false } },
-      responsive: true,
+      responsive: false,
       maintainAspectRatio: false
     }
   });
 
-  // 中央に大きく「目標秒 / ベスト秒（達成率%）」を描画
-  // 例: "22.00s / 21.50s (103%)"
+  // Draw center text once after chart drawn. Clear canvas first to avoid accumulation.
   setTimeout(()=>{
     try{
       const ctx = goalGaugeCanvas.getContext('2d');
-      const chartArea = goalChart && goalChart.chartArea ? goalChart.chartArea : null;
-      const cx = chartArea ? (chartArea.left + chartArea.right) / 2 : goalGaugeCanvas.width / 2;
-      const cy = chartArea ? (chartArea.top + chartArea.bottom) / 2 : goalGaugeCanvas.height / 2;
+      const width = goalGaugeCanvas.width;
+      const height = goalGaugeCanvas.height;
 
-      ctx.save();
+      // Clear entire canvas and redraw chart so we have a clean base
+      ctx.clearRect(0, 0, width, height);
+      try{ goalChart.draw(); }catch(e){ goalChart.update(); }
 
-      // 高解像度対応（Canvas の実ピクセルと CSS サイズの差を考慮）
-      // ここでは単純にフォントサイズを大きめに指定して描画
-      // まず中央の大きな行（目標 / ベスト）
+      // Compose center text
       const mainText = `${goalSec.toFixed(2)}s / ${bestTime.toFixed(2)}s`;
       const subText = `(${progress}%)`;
 
-      // クリア（中央付近のみ）
-      const clearW = 220, clearH = 120;
-      ctx.clearRect(cx - clearW/2, cy - clearH/2, clearW, clearH);
-
-      // 大きなメインテキスト
-      ctx.fillStyle = '#111';
+      ctx.save();
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      // メインは太字で大きく
-      ctx.font = 'bold 26px Arial';
-      ctx.fillText(mainText, cx, cy - 6);
 
-      // サブテキスト（達成率）は少し小さめ
-      ctx.font = '14px Arial';
+      // Scale fonts for DPR so they appear large and crisp
+      const mainFontPx = 26 * dpr;
+      const subFontPx = 14 * dpr;
+
+      ctx.fillStyle = '#111';
+      ctx.font = `bold ${mainFontPx}px Arial`;
+      ctx.fillText(mainText, width / 2, height / 2 - (6 * dpr));
+
+      ctx.font = `${subFontPx}px Arial`;
       ctx.fillStyle = '#333';
-      ctx.fillText(subText, cx, cy + 26);
+      ctx.fillText(subText, width / 2, height / 2 + (26 * dpr));
 
       ctx.restore();
     }catch(err){
       console.error('draw center text error', err);
     }
-  }, 120);
+  }, 80);
 }
 
-/* rendering other parts (unchanged) */
+/* rendering other parts (kept as original behavior) */
 function renderDashboard(){
   const races = records.length;
   const meets = new Set(records.map(r=>r.meet)).size;
