@@ -22,9 +22,7 @@
   .stat b{display:block;font-size:20px;margin-top:6px;}
   .goalGauge{width:260px;height:260px;margin:10px auto;display:block;}
   .small{font-size:13px;color:#666;margin-top:6px;}
-  .table-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
-  .table-controls input{min-width:180px;}
-  @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} .table-controls{flex-direction:column;align-items:flex-start;} }
+  @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} }
   .sort-indicator{font-weight:700;margin-left:6px;color:#1e73be;}
 </style>
 </head>
@@ -97,15 +95,6 @@
 
   <div class="card">
     <h3>記録一覧</h3>
-
-    <!-- フィルタと検索（最小変更で追加） -->
-    <div class="table-controls">
-      <input id="filterSearch" placeholder="検索: 大会・種目・会場">
-      <select id="filterEvent"><option value="">全種目</option></select>
-      <select id="filterCourse"><option value="">全コース</option><option>短水路</option><option>長水路</option></select>
-      <button id="clearFiltersBtn">フィルタ解除</button>
-    </div>
-
     <table id="recordsTable"></table>
   </div>
 
@@ -146,8 +135,7 @@
 </div>
 
 <script>
-/* ===== 元のコードを最小変更で：日付ソートとフィルタ追加 ===== */
-
+/* ===== データ ===== */
 let records = [];
 let goals = {};
 const CHART_COLORS = ['#1e73be','#ff7f50','#4caf50','#f39c12','#9b59b6','#e74c3c'];
@@ -156,7 +144,7 @@ const finaBase = {
   "背泳ぎ100m":51.6,"平泳ぎ100m":56.88,"バタフライ100m":49.45
 };
 
-/* DOM */
+/* ===== DOM ===== */
 const inputDate = document.getElementById('inputDate');
 const inputMeet = document.getElementById('inputMeet');
 const inputVenue = document.getElementById('inputVenue');
@@ -185,17 +173,11 @@ const finaCanvas = document.getElementById('finaCanvas');
 const improveCanvas = document.getElementById('improveCanvas');
 const strokeCanvas = document.getElementById('strokeCanvas');
 
-const filterSearch = document.getElementById('filterSearch');
-const filterEvent = document.getElementById('filterEvent');
-const filterCourse = document.getElementById('filterCourse');
-const clearFiltersBtn = document.getElementById('clearFiltersBtn');
-
 let goalChart, mainChart, finaChart, improveChart, strokeChart;
 
-/* 追加状態：日付ソート方向（desc/asc） */
-let dateSortDir = 'desc';
+/* ===== Chart.js 中央テキストプラグイン（既存コードは使用しない、直接描画） ===== */
 
-/* 既存ユーティリティ（そのまま） */
+/* ===== CSV ユーティリティ（堅牢） ===== */
 function stripBOM(s){ return s.replace(/^\uFEFF/, ''); }
 function detectDelimiter(sample){
   const counts = {',':0,';':0,'\t':0};
@@ -249,7 +231,7 @@ function parseCSVText(text){
   return {header, rows: parsed};
 }
 
-/* 修正版: readFileWithEncodings（コールバック一度だけ） */
+/* ===== 修正版: readFileWithEncodings（コールバック一度だけ） ===== */
 function readFileWithEncodings(file, callback){
   let called = false;
   function onceCallback(text){
@@ -257,14 +239,19 @@ function readFileWithEncodings(file, callback){
     called = true;
     callback(text);
   }
+
+  // try UTF-8 first
   const readerUtf8 = new FileReader();
   readerUtf8.onload = e => {
     const txt = String(e.target.result || '');
-    if(txt && txt.length > 0) onceCallback(txt);
+    if(txt && txt.length > 0){
+      onceCallback(txt);
+    }
   };
-  readerUtf8.onerror = () => {};
+  readerUtf8.onerror = () => { /* ignore */ };
   readerUtf8.readAsText(file, 'utf-8');
 
+  // also try ArrayBuffer -> shift_jis / windows-31j
   const readerBuf = new FileReader();
   readerBuf.onload = e => {
     if(called) return;
@@ -274,20 +261,27 @@ function readFileWithEncodings(file, callback){
       try{
         const dec = new TextDecoder(enc);
         const txt = dec.decode(ab);
-        if(txt && txt.length > 0){ onceCallback(txt); return; }
-      }catch(err){}
+        if(txt && txt.length > 0){
+          onceCallback(txt);
+          return;
+        }
+      }catch(err){
+        // try next
+      }
     }
-    if(!called) onceCallback('');
+    if(!called){
+      onceCallback('');
+    }
   };
   readerBuf.onerror = () => { if(!called) onceCallback(''); };
   readerBuf.readAsArrayBuffer(file);
 }
 
-/* 永続化 */
+/* ===== 永続化 ===== */
 function saveStorage(){ localStorage.setItem('swimRecords', JSON.stringify(records)); localStorage.setItem('swimGoals', JSON.stringify(goals)); }
 function loadStorage(){ records = JSON.parse(localStorage.getItem('swimRecords')) || []; goals = JSON.parse(localStorage.getItem('swimGoals')) || {}; }
 
-/* 時間変換 */
+/* ===== 時間変換 ===== */
 function timeToSec(t){
   if(t === null || t === undefined) return NaN;
   t = String(t).trim();
@@ -310,7 +304,7 @@ function secToTime(s){
   return `${sec}`;
 }
 
-/* FINA */
+/* ===== FINA ===== */
 function finaPoint(eventName, timeStr){
   const base = finaBase[eventName];
   if(!base) return '-';
@@ -319,7 +313,7 @@ function finaPoint(eventName, timeStr){
   return Math.round(1000 * Math.pow(base / sec, 3));
 }
 
-/* レコード操作 */
+/* ===== レコード操作 ===== */
 function addRecord(){
   const date = inputDate.value || new Date().toISOString().slice(0,10);
   const meet = inputMeet.value.trim();
@@ -332,7 +326,6 @@ function addRecord(){
   records.push({date, meet, venue, course, event: eventName, time});
   records.sort((a,b)=> new Date(a.date) - new Date(b.date));
   saveStorage();
-  populateFilterEvent(); // 更新
   renderAll();
   inputTime.value = '';
 }
@@ -340,11 +333,11 @@ function editRecord(index){
   const r = records[index]; if(!r) return;
   inputDate.value = r.date; inputMeet.value = r.meet; inputVenue.value = r.venue;
   inputCourse.value = r.course; inputEvent.value = r.event; inputTime.value = r.time;
-  records.splice(index,1); saveStorage(); populateFilterEvent(); renderAll();
+  records.splice(index,1); saveStorage(); renderAll();
 }
-function deleteRecord(index){ if(!confirm('削除しますか？')) return; records.splice(index,1); saveStorage(); populateFilterEvent(); renderAll(); }
+function deleteRecord(index){ if(!confirm('削除しますか？')) return; records.splice(index,1); saveStorage(); renderAll(); }
 
-/* CSV インポート */
+/* ===== CSV インポート ===== */
 function importCSVFileEnhanced(file, onDone){
   readFileWithEncodings(file, (text) => {
     try{
@@ -374,7 +367,7 @@ function importCSVFileEnhanced(file, onDone){
       if(newRecords.length === 0){ alert('有効なレコードが見つかりませんでした。コンソールを確認してください。'); console.log(parsed); if(typeof onDone==='function') onDone(); return; }
       records = records.concat(newRecords);
       records.sort((a,b)=> new Date(a.date) - new Date(b.date));
-      saveStorage(); populateFilterEvent(); renderAll(); alert(`${newRecords.length} 件をインポートしました`);
+      saveStorage(); renderAll(); alert(`${newRecords.length} 件をインポートしました`);
     }catch(err){
       console.error('importCSVFileEnhanced error', err);
       alert('CSVの読み込み中にエラーが発生しました。コンソールを確認してください。');
@@ -384,46 +377,79 @@ function importCSVFileEnhanced(file, onDone){
   });
 }
 
-/* 目標管理 */
+/* ===== 目標管理 ===== */
 function saveGoal(){ const e = goalEventSelect.value; const t = goalTimeInput.value.trim(); if(!e){ alert('種目を選択してください'); return; } if(isNaN(timeToSec(t))){ alert('正しい目標タイムを入力してください'); return; } goals[e] = t; saveStorage(); renderAll(); }
 function deleteGoal(e){ if(goals[e] && confirm(`${e} の目標を削除しますか？`)){ delete goals[e]; saveStorage(); renderAll(); } }
 
-/* フィルタ用: filterEvent を inputEvent の選択肢で埋める（最小変更） */
-function populateFilterEvent(){
-  const options = Array.from(inputEvent.options).map(o=>o.value);
-  filterEvent.innerHTML = '<option value="">全種目</option>';
-  options.forEach(opt=>{
-    const o = document.createElement('option'); o.value = opt; o.textContent = opt; filterEvent.appendChild(o);
+/* ===== 修正済み: renderGoalGauge（中央テキストを確実に描画） ===== */
+function renderGoalGauge(){
+  const e = goalEventSelect.value;
+  if(!e || !goals[e]){
+    if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
+    return;
+  }
+
+  const bestTimes = records.filter(r=>r.event===e).map(r=>timeToSec(r.time)).filter(v=>!isNaN(v));
+  if(bestTimes.length === 0){
+    if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
+    return;
+  }
+
+  const bestTime = Math.min(...bestTimes);
+  const goalSec = timeToSec(goals[e]);
+  if(isNaN(goalSec) || goalSec <= 0) return;
+
+  let progress = Math.round(Math.max(0, Math.min(100, (goalSec / bestTime) * 100)));
+  const remaining = 100 - progress;
+
+  if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
+
+  // チャート作成
+  goalChart = new Chart(goalGaugeCanvas.getContext('2d'), {
+    type: 'doughnut',
+    data: { labels: ['達成率','残り'], datasets: [{ data: [progress, remaining], backgroundColor: [CHART_COLORS[0], '#e9eef5'] }] },
+    options: {
+      cutout: '70%',
+      plugins: { legend: { display: false } },
+      responsive: true,
+      maintainAspectRatio: false
+    }
   });
-  // goal/graph セレクトも更新（既存の挙動を維持）
-  goalEventSelect.innerHTML = '';
-  graphEventSelect.innerHTML = '<option>選択</option>';
-  options.forEach(opt=>{
-    const o1 = document.createElement('option'); o1.value = opt; o1.textContent = opt; goalEventSelect.appendChild(o1);
-    const o2 = document.createElement('option'); o2.value = opt; o2.textContent = opt; graphEventSelect.appendChild(o2);
-  });
+
+  // 中央テキストを確実に描く（チャート描画完了後に1回だけ）
+  setTimeout(()=>{
+    try{
+      const ctx = goalGaugeCanvas.getContext('2d');
+      const chartArea = goalChart && goalChart.chartArea ? goalChart.chartArea : null;
+      const cx = chartArea ? (chartArea.left + chartArea.right) / 2 : goalGaugeCanvas.width / 2;
+      const cy = chartArea ? (chartArea.top + chartArea.bottom) / 2 : goalGaugeCanvas.height / 2;
+
+      ctx.save();
+      // クリアしてから描画（中央付近のみ）
+      const clearW = 180, clearH = 96;
+      ctx.clearRect(cx - clearW/2, cy - clearH/2, clearW, clearH);
+
+      ctx.fillStyle = '#333';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.font = '14px Arial';
+      ctx.fillText(`目標: ${goalSec.toFixed(2)}s`, cx, cy - 18);
+
+      ctx.font = 'bold 28px Arial';
+      ctx.fillText(`${bestTime.toFixed(2)}s`, cx, cy + 6);
+
+      ctx.font = '13px Arial';
+      ctx.fillText(`達成率: ${progress}%`, cx, cy + 34);
+
+      ctx.restore();
+    }catch(err){
+      console.error('draw center text error', err);
+    }
+  }, 120);
 }
 
-/* フィルタ処理（最小） */
-function getFilteredRecords(){
-  const q = (filterSearch.value || '').trim().toLowerCase();
-  const ev = filterEvent.value;
-  const course = filterCourse.value;
-  return records.filter(r=>{
-    if(ev && r.event !== ev) return false;
-    if(course && r.course !== course) return false;
-    if(!q) return true;
-    return (r.meet||'').toLowerCase().includes(q) || (r.event||'').toLowerCase().includes(q) || (r.venue||'').toLowerCase().includes(q);
-  });
-}
-
-/* 日付ソート切替（最小実装） */
-function toggleDateSort(){
-  dateSortDir = (dateSortDir === 'desc') ? 'asc' : 'desc';
-  renderTable(); // 再描画（renderTable は getFilteredRecords を使う）
-}
-
-/* レンダリング（renderTable をフィルタ対応に差し替え） */
+/* ===== レンダリング（その他は元のまま） ===== */
 function renderDashboard(){
   const races = records.length;
   const meets = new Set(records.map(r=>r.meet)).size;
@@ -441,22 +467,10 @@ function renderDashboard(){
 }
 
 function renderTable(){
-  const filtered = getFilteredRecords();
-  // sort by date according to dateSortDir
-  filtered.sort((a,b)=>{
-    const ta = new Date(a.date).getTime();
-    const tb = new Date(b.date).getTime();
-    if(ta === tb) return 0;
-    return dateSortDir === 'asc' ? (ta - tb) : (tb - ta);
-  });
-
-  const dirSymbol = dateSortDir === 'asc' ? '▲' : '▼';
   let html = `<tr>
-    <th class="sortable" onclick="toggleDateSort()">日付<span class="sort-indicator">${dirSymbol}</span></th>
+    <th>日付</th>
     <th>大会</th><th>会場</th><th>コース</th><th>種目</th><th>タイム</th><th>FINA</th><th></th></tr>`;
-  filtered.forEach((r,i)=>{
-    // find original index for edit/delete
-    const globalIndex = records.indexOf(r);
+  records.forEach((r,i)=>{
     const goal = goals[r.event];
     let diffHtml = '';
     if(goal){
@@ -466,13 +480,12 @@ function renderTable(){
     html += `<tr>
       <td>${r.date}</td><td>${r.meet}</td><td>${r.venue}</td><td>${r.course}</td><td>${r.event}</td>
       <td>${r.time} ${diffHtml}</td><td>${finaPoint(r.event, r.time)}</td>
-      <td><button onclick="editRecord(${globalIndex})">編集</button><button onclick="deleteRecord(${globalIndex})">削除</button></td>
+      <td><button onclick="editRecord(${i})">編集</button><button onclick="deleteRecord(${i})">削除</button></td>
     </tr>`;
   });
   recordsTable.innerHTML = html;
 }
 
-/* 以下のレンダリング関数は元のまま（最小変更） */
 function renderBest(){
   const best = {};
   records.forEach(r=>{
@@ -482,30 +495,6 @@ function renderBest(){
   let html = `<tr><th>種目</th><th>ベスト</th></tr>`;
   Object.keys(best).sort().forEach(e=> html += `<tr><td>${e}</td><td>${best[e].time}</td></tr>`);
   bestTable.innerHTML = html;
-}
-
-function renderGoalGauge(){
-  const e = goalEventSelect.value;
-  if(!e || !goals[e]){ if(goalChart){ goalChart.destroy(); goalChart = null; } return; }
-  const bestTimes = records.filter(r=>r.event===e).map(r=>timeToSec(r.time)).filter(v=>!isNaN(v));
-  if(bestTimes.length === 0){ if(goalChart){ goalChart.destroy(); goalChart = null; } return; }
-  const bestTime = Math.min(...bestTimes);
-  const goalSec = timeToSec(goals[e]);
-  if(isNaN(goalSec) || goalSec <= 0) return;
-  let progress = (goalSec / bestTime) * 100;
-  progress = Math.round(Math.max(0, Math.min(100, progress)));
-  const remaining = 100 - progress;
-  if(goalChart) goalChart.destroy();
-  goalChart = new Chart(goalGaugeCanvas.getContext('2d'), {
-    type: 'doughnut',
-    data: { labels: ['達成率','残り'], datasets: [{ data: [progress, remaining], backgroundColor: [CHART_COLORS[0], '#e9eef5'] }] },
-    options: {
-      cutout: '70%',
-      plugins: {
-        legend: { display: false }
-      }
-    }
-  });
 }
 
 function renderProgressChart(){
@@ -594,11 +583,10 @@ function populateEventSelects(){
   const options = Array.from(inputEvent.options).map(o=>o.value);
   goalEventSelect.innerHTML = ''; graphEventSelect.innerHTML = '<option>選択</option>';
   options.forEach(opt=>{ const o1 = document.createElement('option'); o1.value = opt; o1.textContent = opt; const o2 = document.createElement('option'); o2.value = opt; o2.textContent = opt; goalEventSelect.appendChild(o1); graphEventSelect.appendChild(o2); });
-  populateFilterEvent();
 }
 function renderAll(){ renderDashboard(); renderTable(); renderBest(); renderGoalsTable(); renderGoalGauge(); renderProgressChart(); renderFINAChart(); renderImproveChart(); renderStrokeChart(); renderSeasonBest(); }
 
-/* イベント登録（最小変更でフィルタのイベントも追加） */
+/* イベント登録 */
 saveRecordBtn.addEventListener('click', addRecord);
 downloadCsvBtn.addEventListener('click', ()=>{
   const header = ['date','meet','venue','course','event','time'];
@@ -615,13 +603,8 @@ saveGoalBtn.addEventListener('click', saveGoal);
 goalEventSelect.addEventListener('change', renderGoalGauge);
 graphEventSelect.addEventListener('change', renderProgressChart);
 
-filterSearch.addEventListener('input', ()=>{ renderTable(); });
-filterEvent.addEventListener('change', ()=>{ renderTable(); });
-filterCourse.addEventListener('change', ()=>{ renderTable(); });
-clearFiltersBtn.addEventListener('click', ()=>{ filterSearch.value=''; filterEvent.value=''; filterCourse.value=''; renderTable(); });
-
 /* 初期化 */
-(function init(){ loadStorage(); populateEventSelects(); records.sort((a,b)=> new Date(b.date) - new Date(a.date)); renderAll(); window.editRecord = editRecord; window.deleteRecord = deleteRecord; window.deleteGoal = deleteGoal; window.toggleDateSort = toggleDateSort; })();
+(function init(){ loadStorage(); populateEventSelects(); records.sort((a,b)=> new Date(b.date) - new Date(a.date)); renderAll(); window.editRecord = editRecord; window.deleteRecord = deleteRecord; window.deleteGoal = deleteGoal; })();
 </script>
 </body>
 </html>
