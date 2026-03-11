@@ -135,7 +135,7 @@
 </div>
 
 <script>
-/* ===== Final version: keep original behavior, fix donut central text accumulation and stretching ===== */
+/* ===== Final: Chart.js center-text plugin + stable donut center rendering ===== */
 
 let records = [];
 let goals = {};
@@ -176,7 +176,39 @@ const strokeCanvas = document.getElementById('strokeCanvas');
 
 let goalChart, mainChart, finaChart, improveChart, strokeChart;
 
-/* CSV helpers (unchanged) */
+/* ===== Center text plugin for Chart.js (register once) ===== */
+const centerTextPlugin = {
+  id: 'centerTextPlugin',
+  afterDraw(chart) {
+    const cfg = chart.config.options.plugins && chart.config.options.plugins.centerText;
+    if(!cfg) return;
+    const ctx = chart.ctx;
+    const width = chart.width;
+    const height = chart.height;
+
+    const mainText = typeof cfg.mainText === 'function' ? cfg.mainText(chart) : cfg.mainText;
+    const subText  = typeof cfg.subText  === 'function' ? cfg.subText(chart)  : cfg.subText;
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // main
+    ctx.fillStyle = cfg.mainColor || '#111';
+    ctx.font = `${cfg.mainWeight || 'bold'} ${cfg.mainSize || 28}px ${cfg.font || 'Arial'}`;
+    ctx.fillText(mainText || '', width / 2, height / 2 - (cfg.mainOffsetY || 6));
+
+    // sub
+    ctx.fillStyle = cfg.subColor || '#333';
+    ctx.font = `${cfg.subWeight || 'normal'} ${cfg.subSize || 16}px ${cfg.font || 'Arial'}`;
+    ctx.fillText(subText || '', width / 2, height / 2 + (cfg.subOffsetY || 34));
+
+    ctx.restore();
+  }
+};
+Chart.register(centerTextPlugin);
+
+/* ===== CSV helpers (robust) ===== */
 function stripBOM(s){ return s.replace(/^\uFEFF/, ''); }
 function detectDelimiter(sample){
   const counts = {',':0,';':0,'\t':0};
@@ -368,7 +400,7 @@ function importCSVFileEnhanced(file, onDone){
 function saveGoal(){ const e = goalEventSelect.value; const t = goalTimeInput.value.trim(); if(!e){ alert('種目を選択してください'); return; } if(isNaN(timeToSec(t))){ alert('正しい目標タイムを入力してください'); return; } goals[e] = t; saveStorage(); renderAll(); }
 function deleteGoal(e){ if(goals[e] && confirm(`${e} の目標を削除しますか？`)){ delete goals[e]; saveStorage(); renderAll(); } }
 
-/* ===== Fixed renderGoalGauge: prevent stretching and accumulation, draw large center text ===== */
+/* ===== renderGoalGauge using plugin (stable, large center text) ===== */
 function renderGoalGauge(){
   const e = goalEventSelect.value;
   if(!e || !goals[e]){
@@ -389,67 +421,43 @@ function renderGoalGauge(){
   let progress = Math.round(Math.max(0, Math.min(100, (goalSec / bestTime) * 100)));
   const remaining = 100 - progress;
 
-  // Ensure canvas fixed pixel size to avoid Chart.js responsive resizing issues
-  const dpr = window.devicePixelRatio || 1;
-  const cssSize = 260;
-  goalGaugeCanvas.style.width = cssSize + 'px';
-  goalGaugeCanvas.style.height = cssSize + 'px';
-  goalGaugeCanvas.width = cssSize * dpr;
-  goalGaugeCanvas.height = cssSize * dpr;
-
+  // Ensure CSS fixed size (already set in CSS) and use responsive:true with plugin
   if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
 
-  // Create chart with responsive:false so it doesn't resize and cause vertical stretching
   goalChart = new Chart(goalGaugeCanvas.getContext('2d'), {
     type: 'doughnut',
-    data: { labels: ['達成率','残り'], datasets: [{ data: [progress, remaining], backgroundColor: [CHART_COLORS[0], '#e9eef5'] }] },
+    data: {
+      labels: ['達成率','残り'],
+      datasets: [{ data: [progress, remaining], backgroundColor: [CHART_COLORS[0], '#e9eef5'] }]
+    },
     options: {
       cutout: '70%',
-      plugins: { legend: { display: false } },
-      responsive: false,
-      maintainAspectRatio: false
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        centerText: {
+          mainText: () => `${goalSec.toFixed(2)}s / ${bestTime.toFixed(2)}s`,
+          subText:  () => `(${progress}%)`,
+          mainSize: 28,
+          subSize: 16,
+          mainWeight: 'bold',
+          subWeight: 'normal',
+          mainColor: '#111',
+          subColor: '#333',
+          font: 'Arial',
+          mainOffsetY: 6,
+          subOffsetY: 34
+        }
+      }
     }
   });
 
-  // Draw center text once after chart drawn. Clear canvas first to avoid accumulation.
-  setTimeout(()=>{
-    try{
-      const ctx = goalGaugeCanvas.getContext('2d');
-      const width = goalGaugeCanvas.width;
-      const height = goalGaugeCanvas.height;
-
-      // Clear entire canvas and redraw chart so we have a clean base
-      ctx.clearRect(0, 0, width, height);
-      try{ goalChart.draw(); }catch(e){ goalChart.update(); }
-
-      // Compose center text
-      const mainText = `${goalSec.toFixed(2)}s / ${bestTime.toFixed(2)}s`;
-      const subText = `(${progress}%)`;
-
-      ctx.save();
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      // Scale fonts for DPR so they appear large and crisp
-      const mainFontPx = 26 * dpr;
-      const subFontPx = 14 * dpr;
-
-      ctx.fillStyle = '#111';
-      ctx.font = `bold ${mainFontPx}px Arial`;
-      ctx.fillText(mainText, width / 2, height / 2 - (6 * dpr));
-
-      ctx.font = `${subFontPx}px Arial`;
-      ctx.fillStyle = '#333';
-      ctx.fillText(subText, width / 2, height / 2 + (26 * dpr));
-
-      ctx.restore();
-    }catch(err){
-      console.error('draw center text error', err);
-    }
-  }, 80);
+  // small safeguard: update once after render
+  setTimeout(()=>{ try{ goalChart.update(); }catch(e){} }, 80);
 }
 
-/* rendering other parts (kept as original behavior) */
+/* rendering other parts */
 function renderDashboard(){
   const races = records.length;
   const meets = new Set(records.map(r=>r.meet)).size;
