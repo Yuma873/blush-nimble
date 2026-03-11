@@ -2,10 +2,11 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>Swim Record Dashboard — Sorted & Filterable</title>
+<title>Swim Record Dashboard — Final (CSS-only center overlay)</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
+  /* ===== 全体スタイル（既存の見た目を維持） ===== */
   body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#eef2f6;color:#222;}
   header{background:#1e73be;color:#fff;padding:18px;font-size:20px;font-weight:700;}
   .container{max-width:1200px;margin:20px auto;padding:20px;}
@@ -13,19 +14,99 @@
   h3{margin:0 0 12px 0;}
   table{width:100%;border-collapse:collapse;margin-top:10px;}
   th{background:#f0f4f8;padding:8px;border-bottom:1px solid #ddd;text-align:center;cursor:default;}
-  th.sortable{cursor:pointer;color:#1e73be;}
   td{padding:8px;border-bottom:1px solid #eee;text-align:center;}
   input,select{padding:8px;margin:6px;border-radius:6px;border:1px solid #ccc;}
   button{padding:8px 12px;border-radius:6px;border:none;background:#1e73be;color:#fff;cursor:pointer;margin:6px;}
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
   .stat{background:#f4f6f9;padding:12px;border-radius:8px;text-align:center;}
   .stat b{display:block;font-size:20px;margin-top:6px;}
-  .goalGauge{width:260px;height:260px;margin:10px auto;display:block;max-width:260px;max-height:260px;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.06);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
   .small{font-size:13px;color:#666;margin-top:6px;}
   .table-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
   .table-controls input{min-width:180px;}
   @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} .table-controls{flex-direction:column;align-items:flex-start;} }
   .sort-indicator{font-weight:700;margin-left:6px;color:#1e73be;}
+
+  /* ===== 置換用：ドーナツ中央の見やすさを改善する最終版スタイル ===== */
+
+  /* キャンバス本体の固定サイズ・高DPI対応 */
+  .goalGauge{
+    width: 260px;
+    height: 260px;
+    max-width: 260px;
+    max-height: 260px;
+    display: block;
+    margin: 10px auto;
+    background: transparent;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    image-rendering: optimizeQuality;
+    object-fit: contain;
+  }
+
+  /* オーバーレイ方式で中央テキストを表示するラッパー */
+  .goalGauge-wrap{
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin: 10px auto;
+    pointer-events: none;
+  }
+  .goalGauge-center{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    line-height: 1;
+    pointer-events: none;
+    font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", Arial, sans-serif;
+    color: #111;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+    width: 85%;
+    box-sizing: border-box;
+  }
+
+  /* 中央テキストの階層化（メイン：目標/ベスト、サブ：達成率） */
+  .goalGauge-center .main{
+    display: block;
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1.05;
+    margin-bottom: 6px;
+    color: #0b2540;
+    letter-spacing: 0.2px;
+  }
+  .goalGauge-center .sub{
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    color: #2f3b4a;
+    opacity: 0.95;
+  }
+
+  /* 小画面での縮小対応 */
+  @media (max-width:420px){
+    .goalGauge, .goalGauge-wrap{ width:200px; height:200px; max-width:200px; max-height:200px; }
+    .goalGauge-center .main{ font-size:18px; }
+    .goalGauge-center .sub{ font-size:12px; }
+  }
+
+  /* 補助：ソート可能なヘッダの視認性向上 */
+  th.sortable{
+    cursor: pointer;
+    color: #1e73be;
+    position: relative;
+    user-select: none;
+  }
+  th.sortable .sort-indicator{
+    display: inline-block;
+    margin-left: 6px;
+    font-weight: 700;
+  }
 </style>
 </head>
 <body>
@@ -91,7 +172,14 @@
 
   <div class="card">
     <h3>目標達成率</h3>
-    <canvas id="goalGauge" class="goalGauge"></canvas>
+    <!-- ここは canvas をラップして中央オーバーレイを置く -->
+    <div class="goalGauge-wrap">
+      <canvas id="goalGauge" class="goalGauge"></canvas>
+      <div id="goalGaugeCenter" class="goalGauge-center" aria-hidden="true">
+        <span class="main">-- / --</span>
+        <span class="sub">(--%)</span>
+      </div>
+    </div>
     <div class="small">ドーナツ中央に <b>目標秒 / ベスト秒（達成率%）</b> を大きく表示します。</div>
   </div>
 
@@ -146,7 +234,7 @@
 </div>
 
 <script>
-/* ===== Final: add date sort + filters (minimal changes) ===== */
+/* ===== JS: 既存の機能を維持しつつ、中央テキストはオーバーレイで表示する最小変更版 ===== */
 
 let records = [];
 let goals = {};
@@ -180,6 +268,7 @@ const bestTable = document.getElementById('bestTable');
 const seasonBestTable = document.getElementById('seasonBestTable');
 
 const goalGaugeCanvas = document.getElementById('goalGauge');
+const goalGaugeCenter = document.getElementById('goalGaugeCenter');
 const chartCanvas = document.getElementById('chartCanvas');
 const finaCanvas = document.getElementById('finaCanvas');
 const improveCanvas = document.getElementById('improveCanvas');
@@ -193,39 +282,11 @@ const clearFiltersBtn = document.getElementById('clearFiltersBtn');
 let goalChart, mainChart, finaChart, improveChart, strokeChart;
 
 /* date sort direction */
-let dateSortDir = 'desc'; // 'asc' or 'desc'
+let dateSortDir = 'desc';
 
-/* ===== Chart.js center-text plugin (registered once) ===== */
-const centerTextPlugin = {
-  id: 'centerTextPlugin',
-  afterDraw(chart) {
-    const cfg = chart.config.options.plugins && chart.config.options.plugins.centerText;
-    if(!cfg) return;
-    const ctx = chart.ctx;
-    const width = chart.width;
-    const height = chart.height;
+/* Chart.js plugin not required for overlay; keep charts simple */
 
-    const mainText = typeof cfg.mainText === 'function' ? cfg.mainText(chart) : cfg.mainText;
-    const subText  = typeof cfg.subText  === 'function' ? cfg.subText(chart)  : cfg.subText;
-
-    ctx.save();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    ctx.fillStyle = cfg.mainColor || '#111';
-    ctx.font = `${cfg.mainWeight || 'bold'} ${cfg.mainSize || 28}px ${cfg.font || 'Arial'}`;
-    ctx.fillText(mainText || '', width / 2, height / 2 - (cfg.mainOffsetY || 6));
-
-    ctx.fillStyle = cfg.subColor || '#333';
-    ctx.font = `${cfg.subWeight || 'normal'} ${cfg.subSize || 16}px ${cfg.font || 'Arial'}`;
-    ctx.fillText(subText || '', width / 2, height / 2 + (cfg.subOffsetY || 34));
-
-    ctx.restore();
-  }
-};
-Chart.register(centerTextPlugin);
-
-/* ===== CSV helpers (unchanged) ===== */
+/* CSV helpers */
 function stripBOM(s){ return s.replace(/^\uFEFF/, ''); }
 function detectDelimiter(sample){
   const counts = {',':0,';':0,'\t':0};
@@ -453,17 +514,22 @@ function toggleDateSort(){
   renderTable();
 }
 
-/* renderGoalGauge using plugin */
+/* renderGoalGauge: draw donut and update overlay center text (no canvas text) */
 function renderGoalGauge(){
   const e = goalEventSelect.value;
   if(!e || !goals[e]){
     if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
+    // clear overlay
+    goalGaugeCenter.querySelector('.main').textContent = '-- / --';
+    goalGaugeCenter.querySelector('.sub').textContent = '(--%)';
     return;
   }
 
   const bestTimes = records.filter(r=>r.event===e).map(r=>timeToSec(r.time)).filter(v=>!isNaN(v));
   if(bestTimes.length === 0){
     if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
+    goalGaugeCenter.querySelector('.main').textContent = '-- / --';
+    goalGaugeCenter.querySelector('.sub').textContent = '(--%)';
     return;
   }
 
@@ -474,8 +540,17 @@ function renderGoalGauge(){
   let progress = Math.round(Math.max(0, Math.min(100, (goalSec / bestTime) * 100)));
   const remaining = 100 - progress;
 
+  // ensure canvas pixel size matches CSS for crisp overlay
+  const dpr = window.devicePixelRatio || 1;
+  const cssSize = parseInt(getComputedStyle(goalGaugeCanvas).width,10) || 260;
+  goalGaugeCanvas.width = cssSize * dpr;
+  goalGaugeCanvas.height = cssSize * dpr;
+  goalGaugeCanvas.style.width = cssSize + 'px';
+  goalGaugeCanvas.style.height = cssSize + 'px';
+
   if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
 
+  // create donut chart (responsive:false to avoid unexpected resizing)
   goalChart = new Chart(goalGaugeCanvas.getContext('2d'), {
     type: 'doughnut',
     data: {
@@ -484,28 +559,19 @@ function renderGoalGauge(){
     },
     options: {
       cutout: '70%',
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: { display: false },
-        centerText: {
-          mainText: () => `${goalSec.toFixed(2)}s / ${bestTime.toFixed(2)}s`,
-          subText:  () => `(${progress}%)`,
-          mainSize: 28,
-          subSize: 16,
-          mainWeight: 'bold',
-          subWeight: 'normal',
-          mainColor: '#111',
-          subColor: '#333',
-          font: 'Arial',
-          mainOffsetY: 6,
-          subOffsetY: 34
-        }
-      }
+      responsive: false,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } }
     }
   });
 
-  setTimeout(()=>{ try{ goalChart.update(); }catch(e){} }, 80);
+  // update overlay center text (large & clear)
+  const mainText = `${goalSec.toFixed(2)}s / ${bestTime.toFixed(2)}s`;
+  const subText = `(${progress}%)`;
+  const mainEl = goalGaugeCenter.querySelector('.main');
+  const subEl = goalGaugeCenter.querySelector('.sub');
+  if(mainEl) mainEl.textContent = mainText;
+  if(subEl) subEl.textContent = subText;
 }
 
 /* render functions */
