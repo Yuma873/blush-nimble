@@ -20,7 +20,64 @@
   .stat{background:#f4f6f9;padding:12px;border-radius:8px;text-align:center;}
   .stat b{display:block;font-size:20px;margin-top:6px;}
   /* 固定サイズにして縦伸びを防ぐ */
-  .goalGauge{width:260px;height:260px;margin:10px auto;display:block;max-width:260px;max-height:260px;}
+/* 変更箇所：ドーナツ中央の見やすさを改善するスタイル（このブロックだけ差し替えてください） */
+
+/* キャンバス本体の固定サイズ・高DPI対応 */
+.goalGauge{
+  width: 260px;
+  height: 260px;
+  max-width: 260px;
+  max-height: 260px;
+  display: block;
+  margin: 10px auto;
+  /* 見た目の安定化 */
+  background: transparent;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  /* 文字をシャープにするヒント（ブラウザ依存） */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  image-rendering: optimizeQuality;
+}
+
+/* 中央テキスト用オーバーレイ（HTMLに .goalGauge-wrap と .goalGauge-center を追加する場合に使えます） */
+.goalGauge-wrap{
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 10px auto;
+}
+.goalGauge-center{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none; /* クリックをキャンバスに通す */
+  line-height: 1;
+  /* 見やすく大きめのフォント */
+  font-family: Arial, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  color: #111;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+}
+.goalGauge-center .main{
+  font-weight: 700;
+  font-size: 22px; /* 目標秒 / ベスト秒（大） */
+  display: block;
+  margin-bottom: 6px;
+}
+.goalGauge-center .sub{
+  font-weight: 500;
+  font-size: 14px; /* 達成率（小） */
+  color: #444;
+}
+
+/* 小画面での縮小対応 */
+@media (max-width:420px){
+  .goalGauge, .goalGauge-wrap{ width:200px; height:200px; max-width:200px; max-height:200px; }
+  .goalGauge-center .main{ font-size:18px; }
+  .goalGauge-center .sub{ font-size:12px; }
+}
   .small{font-size:13px;color:#666;margin-top:6px;}
   @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} }
   .sort-indicator{font-weight:700;margin-left:6px;color:#1e73be;}
