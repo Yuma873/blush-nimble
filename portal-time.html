@@ -22,7 +22,11 @@
   .small{font-size:13px; color:#666; margin-top:6px;}
   th.sortable{cursor:pointer; color:#1e73be;}
   .sort-indicator{font-weight:700; margin-left:6px; color:#1e73be;}
-  @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} }
+  .table-controls{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;}
+  .pagination{display:flex; gap:6px; align-items:center; justify-content:center; margin-top:8px;}
+  .page-btn{padding:6px 10px; border-radius:6px; border:1px solid #ddd; background:#fff; cursor:pointer;}
+  .page-btn.active{background:#1e73be; color:#fff; border-color:#1e73be;}
+  @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} .table-controls{flex-direction:column; align-items:flex-start;} }
 </style>
 </head>
 <body>
@@ -94,7 +98,26 @@
 
   <div class="card">
     <h3>記録一覧</h3>
+
+    <!-- Table controls: search, filter, page size -->
+    <div class="table-controls">
+      <input id="searchInput" placeholder="検索: 大会名・種目・会場を検索" style="min-width:220px;">
+      <select id="filterEvent"><option value="">全種目</option></select>
+      <select id="filterCourse"><option value="">全コース</option><option>短水路</option><option>長水路</option></select>
+      <label>表示件数</label>
+      <select id="pageSizeSelect">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+      </select>
+      <div style="margin-left:auto;">
+        <button id="clearFiltersBtn">フィルタ解除</button>
+      </div>
+    </div>
+
     <table id="recordsTable"></table>
+
+    <div class="pagination" id="pagination"></div>
   </div>
 
   <div class="card">
@@ -134,10 +157,12 @@
 </div>
 
 <script>
-/* ===== data ===== */
+/* ===== minimal-change enhancement: table controls (search, filter, pagination, multi-column sort) ===== */
+
+/* ===== data & state ===== */
 let records = []
 let goals = {}
-let currentSort = { key: 'date', dir: 'desc' } // newest first
+let currentSort = { key: 'date', dir: 'desc' } // default newest first
 
 let chart = null, finaChart = null, improveChart = null, strokeChart = null, goalChart = null
 
@@ -150,7 +175,7 @@ const finaBase = {
   "バタフライ100m":49.45
 }
 
-/* ===== DOM & canvas contexts ===== */
+/* ===== DOM refs ===== */
 const dateInput = document.getElementById('date')
 const meetInput = document.getElementById('meet')
 const venueInput = document.getElementById('venue')
@@ -180,18 +205,33 @@ const improveCanvasEl = document.getElementById('improveChart')
 const strokeCanvasEl = document.getElementById('strokeChart')
 const graphEventSelect = document.getElementById('graphEvent')
 
+/* table controls */
+const searchInput = document.getElementById('searchInput')
+const filterEvent = document.getElementById('filterEvent')
+const filterCourse = document.getElementById('filterCourse')
+const pageSizeSelect = document.getElementById('pageSizeSelect')
+const paginationDiv = document.getElementById('pagination')
+const clearFiltersBtn = document.getElementById('clearFiltersBtn')
+
+/* pagination state */
+let currentPage = 1
+function pageSize(){ return parseInt(pageSizeSelect.value,10) }
+
 /* ===== persistence ===== */
 function save(){
-  localStorage.setItem('swimRecords', JSON.stringify(records))
-  localStorage.setItem('swimGoals', JSON.stringify(goals))
+  localStorage.setItem("swimRecords", JSON.stringify(records))
+  localStorage.setItem("swimGoals", JSON.stringify(goals))
 }
 function load(){
-  records = JSON.parse(localStorage.getItem('swimRecords')) || []
-  goals = JSON.parse(localStorage.getItem('swimGoals')) || {}
+  records = JSON.parse(localStorage.getItem("swimRecords")) || []
+  goals = JSON.parse(localStorage.getItem("swimGoals")) || {}
 
   // populate selects
   goalEventSelect.innerHTML = eventSelect.innerHTML
   graphEventSelect.innerHTML = "<option>選択</option>" + eventSelect.innerHTML
+
+  // populate filterEvent options
+  populateFilterEvents()
 
   // initial sort
   sortRecords(currentSort.key, currentSort.dir)
@@ -245,6 +285,7 @@ function addRecord(){
   records.push(r)
   sortRecords(currentSort.key, currentSort.dir)
   save()
+  populateFilterEvents()
   renderAll()
   timeInput.value = ''
 }
@@ -260,6 +301,7 @@ function editRecord(i){
   timeInput.value = r.time
   records.splice(i,1)
   save()
+  populateFilterEvents()
   renderAll()
 }
 
@@ -267,6 +309,7 @@ function deleteRecord(i){
   if(!confirm('削除しますか？')) return
   records.splice(i,1)
   save()
+  populateFilterEvents()
   renderAll()
 }
 
@@ -274,8 +317,6 @@ function deleteRecord(i){
 function sortRecords(key, dir){
   if(key) currentSort.key = key
   if(dir) currentSort.dir = dir
-  else currentSort.dir = (currentSort.key === key && currentSort.dir === 'asc') ? 'desc' : currentSort.dir
-
   records.sort((a,b)=>{
     let va = a[currentSort.key], vb = b[currentSort.key]
     if(currentSort.key === 'date'){ va = new Date(a.date).getTime(); vb = new Date(b.date).getTime() }
@@ -285,7 +326,89 @@ function sortRecords(key, dir){
   })
 }
 
-/* ===== render functions ===== */
+/* ===== filtering & search ===== */
+function getFilteredRecords(){
+  const q = (searchInput.value || '').trim().toLowerCase()
+  const evFilter = filterEvent.value
+  const courseFilter = filterCourse.value
+  return records.filter(r=>{
+    if(evFilter && r.event !== evFilter) return false
+    if(courseFilter && r.course !== courseFilter) return false
+    if(!q) return true
+    // search in meet, event, venue
+    return (r.meet || '').toLowerCase().includes(q) ||
+           (r.event || '').toLowerCase().includes(q) ||
+           (r.venue || '').toLowerCase().includes(q)
+  })
+}
+
+/* ===== pagination helpers ===== */
+function renderPagination(totalItems){
+  const size = pageSize()
+  const totalPages = Math.max(1, Math.ceil(totalItems / size))
+  if(currentPage > totalPages) currentPage = totalPages
+  paginationDiv.innerHTML = ''
+  // prev
+  const prev = document.createElement('button'); prev.className='page-btn'; prev.textContent='‹'; prev.disabled = currentPage===1
+  prev.addEventListener('click', ()=>{ if(currentPage>1) currentPage--; renderTable() })
+  paginationDiv.appendChild(prev)
+  // page numbers (limit to window)
+  const maxButtons = 7
+  let start = Math.max(1, currentPage - Math.floor(maxButtons/2))
+  let end = Math.min(totalPages, start + maxButtons - 1)
+  if(end - start < maxButtons -1) start = Math.max(1, end - maxButtons + 1)
+  for(let p = start; p <= end; p++){
+    const btn = document.createElement('button'); btn.className='page-btn' + (p===currentPage ? ' active' : ''); btn.textContent = p
+    btn.addEventListener('click', ()=>{ currentPage = p; renderTable() })
+    paginationDiv.appendChild(btn)
+  }
+  // next
+  const next = document.createElement('button'); next.className='page-btn'; next.textContent='›'; next.disabled = currentPage===totalPages
+  next.addEventListener('click', ()=>{ if(currentPage<totalPages) currentPage++; renderTable() })
+  paginationDiv.appendChild(next)
+}
+
+/* ===== render table (uses filtered + pagination) ===== */
+function renderTable(){
+  const filtered = getFilteredRecords()
+  const total = filtered.length
+  const size = pageSize()
+  const totalPages = Math.max(1, Math.ceil(total / size))
+  if(currentPage > totalPages) currentPage = totalPages
+  const startIdx = (currentPage - 1) * size
+  const pageItems = filtered.slice(startIdx, startIdx + size)
+
+  const dirSymbol = currentSort.key === 'date' ? (currentSort.dir === 'asc' ? '▲' : '▼') : ''
+  let html = `<tr>
+    <th class="sortable" onclick="toggleSort('date')">日付<span class="sort-indicator">${dirSymbol}</span></th>
+    <th class="sortable" onclick="toggleSort('meet')">大会</th>
+    <th class="sortable" onclick="toggleSort('event')">種目</th>
+    <th class="sortable" onclick="toggleSort('time')">タイム</th>
+    <th>FINA</th><th></th></tr>`
+
+  pageItems.forEach((r, idx)=>{
+    const globalIndex = records.indexOf(r)
+    const goal = goals[r.event]
+    let diffHtml = ''
+    if(goal){
+      const d = timeToSec(r.time) - timeToSec(goal)
+      if(!isNaN(d)) diffHtml = d <= 0 ? `<span style="color:green;font-weight:bold">達成</span>` : `<span style="color:red">あと ${d.toFixed(2)}s</span>`
+    }
+    html += `<tr>
+      <td>${r.date}</td>
+      <td>${r.meet}</td>
+      <td>${r.event}</td>
+      <td>${r.time} ${diffHtml}</td>
+      <td>${finaPoint(r.event, r.time)}</td>
+      <td><button onclick="editRecord(${globalIndex})">編集</button><button onclick="deleteRecord(${globalIndex})">削除</button></td>
+    </tr>`
+  })
+
+  recordsTable.innerHTML = html
+  renderPagination(total)
+}
+
+/* ===== other render functions (unchanged behavior) ===== */
 function renderDashboard(){
   const races = records.length
   const meets = new Set(records.map(r=>r.meet)).size
@@ -301,30 +424,6 @@ function renderDashboard(){
     <div class="stat">ベスト<b>${isNaN(best)?'-':secToTime(best)}</b></div>
     <div class="stat">最新<b>${isNaN(latest)?'-':secToTime(latest)}</b></div>
   `
-}
-
-function renderTable(){
-  const dirSymbol = currentSort.key === 'date' ? (currentSort.dir === 'asc' ? '▲' : '▼') : ''
-  let html = `<tr>
-    <th class="sortable" onclick="toggleSort('date')">日付<span class="sort-indicator">${dirSymbol}</span></th>
-    <th>大会</th><th>種目</th><th>タイム</th><th>FINA</th><th></th></tr>`
-  records.forEach((r,i)=>{
-    const goal = goals[r.event]
-    let diffHtml = ''
-    if(goal){
-      const d = timeToSec(r.time) - timeToSec(goal)
-      if(!isNaN(d)) diffHtml = d <= 0 ? `<span style="color:green;font-weight:bold">達成</span>` : `<span style="color:red">あと ${d.toFixed(2)}s</span>`
-    }
-    html += `<tr>
-      <td>${r.date}</td>
-      <td>${r.meet}</td>
-      <td>${r.event}</td>
-      <td>${r.time} ${diffHtml}</td>
-      <td>${finaPoint(r.event, r.time)}</td>
-      <td><button onclick="editRecord(${i})">編集</button><button onclick="deleteRecord(${i})">削除</button></td>
-    </tr>`
-  })
-  recordsTable.innerHTML = html
 }
 
 function renderBest(){
@@ -358,13 +457,11 @@ function renderGoalGauge(){
     options: { plugins: { legend: { display: false } }, cutout: '70%' }
   })
 
-  // draw center text (larger seconds)
   const ctx = goalGaugeCanvas.getContext('2d')
   setTimeout(()=>{
     ctx.save()
     const cx = goalGaugeCanvas.width / 2
     const cy = goalGaugeCanvas.height / 2
-    // small clear area
     ctx.clearRect(cx - 90, cy - 48, 180, 96)
     ctx.fillStyle = '#333'
     ctx.textAlign = 'center'
@@ -438,7 +535,6 @@ function renderImprove(){
   })
 }
 
-/* ===== stroke × distance average ===== */
 function renderStroke(){
   const map = {}
   records.forEach(r=>{
@@ -446,10 +542,8 @@ function renderStroke(){
     const sec = timeToSec(r.time)
     if(isNaN(sec)) return
     const ev = String(r.event).trim()
-    // distance: digits (support fullwidth) + optional m
     const distMatch = ev.match(/(\d{1,3})\s*[mｍ]?/u)
     const distance = distMatch ? (distMatch[1] + 'm') : ''
-    // stroke: remove digits and m characters
     let stroke = ev.replace(/[\d\uFF10-\uFF19]+/g,'').replace(/[mｍ]/gi,'').trim()
     if(!stroke) stroke = ev
     const key = distance ? `${stroke} ${distance}` : stroke
@@ -472,7 +566,6 @@ function renderStroke(){
   })
 }
 
-/* ===== season best ===== */
 function renderSeasonBest(){
   const map = {}
   records.forEach(r=>{
@@ -568,7 +661,20 @@ function parseCSV(text){
   records = records.concat(newRecords)
   sortRecords(currentSort.key, currentSort.dir)
   save()
+  populateFilterEvents()
   renderAll()
+}
+
+/* ===== helpers ===== */
+function populateFilterEvents(){
+  const events = Array.from(new Set(records.map(r=>r.event).filter(Boolean)))
+  filterEvent.innerHTML = '<option value="">全種目</option>'
+  events.forEach(ev => {
+    const o = document.createElement('option'); o.value = ev; o.textContent = ev; filterEvent.appendChild(o)
+  })
+  // ensure goalEvent and graphEvent keep options
+  goalEventSelect.innerHTML = eventSelect.innerHTML
+  graphEventSelect.innerHTML = "<option>選択</option>" + eventSelect.innerHTML
 }
 
 /* ===== render all ===== */
@@ -585,14 +691,14 @@ function renderAll(){
   renderSeasonBest()
 }
 
-/* ===== helpers for UI actions ===== */
+/* ===== UI wiring ===== */
 function toggleSort(key){
   const newDir = (currentSort.key === key && currentSort.dir === 'asc') ? 'desc' : 'asc'
   sortRecords(key, newDir)
   renderTable()
 }
 
-/* ===== init & event wiring ===== */
+/* event listeners */
 saveBtn.addEventListener('click', addRecord)
 downloadCsvBtn.addEventListener('click', downloadCSV)
 importCsvBtn.addEventListener('click', ()=>{
@@ -604,13 +710,26 @@ saveGoalBtn.addEventListener('click', saveGoal)
 graphEventSelect.addEventListener('change', renderProgress)
 goalEventSelect.addEventListener('change', renderGoalGauge)
 
-// expose functions used in inline handlers
+searchInput.addEventListener('input', ()=>{ currentPage = 1; renderTable() })
+filterEvent.addEventListener('change', ()=>{ currentPage = 1; renderTable() })
+filterCourse.addEventListener('change', ()=>{ currentPage = 1; renderTable() })
+pageSizeSelect.addEventListener('change', ()=>{ currentPage = 1; renderTable() })
+clearFiltersBtn.addEventListener('click', ()=>{
+  searchInput.value = ''
+  filterEvent.value = ''
+  filterCourse.value = ''
+  pageSizeSelect.value = '10'
+  currentPage = 1
+  renderTable()
+})
+
+/* expose for inline handlers */
 window.editRecord = editRecord
 window.deleteRecord = deleteRecord
 window.deleteGoal = deleteGoal
 window.toggleSort = toggleSort
 
-// load stored data and render
+/* init */
 load()
 </script>
 </body>
