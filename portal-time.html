@@ -13,7 +13,6 @@
   h3{margin:0 0 12px 0;}
   table{width:100%;border-collapse:collapse;margin-top:10px;}
   th{background:#f0f4f8;padding:8px;border-bottom:1px solid #ddd;text-align:center;cursor:default;}
-  th.sortable{cursor:pointer;color:#1e73be;}
   td{padding:8px;border-bottom:1px solid #eee;text-align:center;}
   input,select{padding:8px;margin:6px;border-radius:6px;border:1px solid #ccc;}
   button{padding:8px 12px;border-radius:6px;border:none;background:#1e73be;color:#fff;cursor:pointer;margin:6px;}
@@ -135,7 +134,8 @@
 </div>
 
 <script>
-/* ===== データ ===== */
+/* ===== 元の動作を維持しつつ、ドーナツ中央に大きく「目標秒 / ベスト秒（達成率%）」を表示する最小変更版 ===== */
+
 let records = [];
 let goals = {};
 const CHART_COLORS = ['#1e73be','#ff7f50','#4caf50','#f39c12','#9b59b6','#e74c3c'];
@@ -144,7 +144,7 @@ const finaBase = {
   "背泳ぎ100m":51.6,"平泳ぎ100m":56.88,"バタフライ100m":49.45
 };
 
-/* ===== DOM ===== */
+/* DOM */
 const inputDate = document.getElementById('inputDate');
 const inputMeet = document.getElementById('inputMeet');
 const inputVenue = document.getElementById('inputVenue');
@@ -175,9 +175,7 @@ const strokeCanvas = document.getElementById('strokeCanvas');
 
 let goalChart, mainChart, finaChart, improveChart, strokeChart;
 
-/* ===== Chart.js 中央テキストプラグイン（既存コードは使用しない、直接描画） ===== */
-
-/* ===== CSV ユーティリティ（堅牢） ===== */
+/* CSV utils (unchanged) */
 function stripBOM(s){ return s.replace(/^\uFEFF/, ''); }
 function detectDelimiter(sample){
   const counts = {',':0,';':0,'\t':0};
@@ -231,7 +229,7 @@ function parseCSVText(text){
   return {header, rows: parsed};
 }
 
-/* ===== 修正版: readFileWithEncodings（コールバック一度だけ） ===== */
+/* readFileWithEncodings (single-callback) */
 function readFileWithEncodings(file, callback){
   let called = false;
   function onceCallback(text){
@@ -239,19 +237,14 @@ function readFileWithEncodings(file, callback){
     called = true;
     callback(text);
   }
-
-  // try UTF-8 first
   const readerUtf8 = new FileReader();
   readerUtf8.onload = e => {
     const txt = String(e.target.result || '');
-    if(txt && txt.length > 0){
-      onceCallback(txt);
-    }
+    if(txt && txt.length > 0) onceCallback(txt);
   };
-  readerUtf8.onerror = () => { /* ignore */ };
+  readerUtf8.onerror = () => {};
   readerUtf8.readAsText(file, 'utf-8');
 
-  // also try ArrayBuffer -> shift_jis / windows-31j
   const readerBuf = new FileReader();
   readerBuf.onload = e => {
     if(called) return;
@@ -261,27 +254,20 @@ function readFileWithEncodings(file, callback){
       try{
         const dec = new TextDecoder(enc);
         const txt = dec.decode(ab);
-        if(txt && txt.length > 0){
-          onceCallback(txt);
-          return;
-        }
-      }catch(err){
-        // try next
-      }
+        if(txt && txt.length > 0){ onceCallback(txt); return; }
+      }catch(err){}
     }
-    if(!called){
-      onceCallback('');
-    }
+    if(!called) onceCallback('');
   };
   readerBuf.onerror = () => { if(!called) onceCallback(''); };
   readerBuf.readAsArrayBuffer(file);
 }
 
-/* ===== 永続化 ===== */
+/* persistence */
 function saveStorage(){ localStorage.setItem('swimRecords', JSON.stringify(records)); localStorage.setItem('swimGoals', JSON.stringify(goals)); }
 function loadStorage(){ records = JSON.parse(localStorage.getItem('swimRecords')) || []; goals = JSON.parse(localStorage.getItem('swimGoals')) || {}; }
 
-/* ===== 時間変換 ===== */
+/* time utils */
 function timeToSec(t){
   if(t === null || t === undefined) return NaN;
   t = String(t).trim();
@@ -304,7 +290,7 @@ function secToTime(s){
   return `${sec}`;
 }
 
-/* ===== FINA ===== */
+/* FINA */
 function finaPoint(eventName, timeStr){
   const base = finaBase[eventName];
   if(!base) return '-';
@@ -313,7 +299,7 @@ function finaPoint(eventName, timeStr){
   return Math.round(1000 * Math.pow(base / sec, 3));
 }
 
-/* ===== レコード操作 ===== */
+/* record CRUD */
 function addRecord(){
   const date = inputDate.value || new Date().toISOString().slice(0,10);
   const meet = inputMeet.value.trim();
@@ -337,7 +323,7 @@ function editRecord(index){
 }
 function deleteRecord(index){ if(!confirm('削除しますか？')) return; records.splice(index,1); saveStorage(); renderAll(); }
 
-/* ===== CSV インポート ===== */
+/* CSV import */
 function importCSVFileEnhanced(file, onDone){
   readFileWithEncodings(file, (text) => {
     try{
@@ -377,11 +363,11 @@ function importCSVFileEnhanced(file, onDone){
   });
 }
 
-/* ===== 目標管理 ===== */
+/* goals */
 function saveGoal(){ const e = goalEventSelect.value; const t = goalTimeInput.value.trim(); if(!e){ alert('種目を選択してください'); return; } if(isNaN(timeToSec(t))){ alert('正しい目標タイムを入力してください'); return; } goals[e] = t; saveStorage(); renderAll(); }
 function deleteGoal(e){ if(goals[e] && confirm(`${e} の目標を削除しますか？`)){ delete goals[e]; saveStorage(); renderAll(); } }
 
-/* ===== 修正済み: renderGoalGauge（中央テキストを確実に描画） ===== */
+/* ===== renderGoalGauge: ドーナツ中央に「目標秒 / ベスト秒（達成率%）」を大きく表示 ===== */
 function renderGoalGauge(){
   const e = goalEventSelect.value;
   if(!e || !goals[e]){
@@ -404,7 +390,7 @@ function renderGoalGauge(){
 
   if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
 
-  // チャート作成
+  // ドーナツ作成
   goalChart = new Chart(goalGaugeCanvas.getContext('2d'), {
     type: 'doughnut',
     data: { labels: ['達成率','残り'], datasets: [{ data: [progress, remaining], backgroundColor: [CHART_COLORS[0], '#e9eef5'] }] },
@@ -416,7 +402,8 @@ function renderGoalGauge(){
     }
   });
 
-  // 中央テキストを確実に描く（チャート描画完了後に1回だけ）
+  // 中央に大きく「目標秒 / ベスト秒（達成率%）」を描画
+  // 例: "22.00s / 21.50s (103%)"
   setTimeout(()=>{
     try{
       const ctx = goalGaugeCanvas.getContext('2d');
@@ -425,22 +412,29 @@ function renderGoalGauge(){
       const cy = chartArea ? (chartArea.top + chartArea.bottom) / 2 : goalGaugeCanvas.height / 2;
 
       ctx.save();
-      // クリアしてから描画（中央付近のみ）
-      const clearW = 180, clearH = 96;
+
+      // 高解像度対応（Canvas の実ピクセルと CSS サイズの差を考慮）
+      // ここでは単純にフォントサイズを大きめに指定して描画
+      // まず中央の大きな行（目標 / ベスト）
+      const mainText = `${goalSec.toFixed(2)}s / ${bestTime.toFixed(2)}s`;
+      const subText = `(${progress}%)`;
+
+      // クリア（中央付近のみ）
+      const clearW = 220, clearH = 120;
       ctx.clearRect(cx - clearW/2, cy - clearH/2, clearW, clearH);
 
-      ctx.fillStyle = '#333';
+      // 大きなメインテキスト
+      ctx.fillStyle = '#111';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      // メインは太字で大きく
+      ctx.font = 'bold 26px Arial';
+      ctx.fillText(mainText, cx, cy - 6);
 
+      // サブテキスト（達成率）は少し小さめ
       ctx.font = '14px Arial';
-      ctx.fillText(`目標: ${goalSec.toFixed(2)}s`, cx, cy - 18);
-
-      ctx.font = 'bold 28px Arial';
-      ctx.fillText(`${bestTime.toFixed(2)}s`, cx, cy + 6);
-
-      ctx.font = '13px Arial';
-      ctx.fillText(`達成率: ${progress}%`, cx, cy + 34);
+      ctx.fillStyle = '#333';
+      ctx.fillText(subText, cx, cy + 26);
 
       ctx.restore();
     }catch(err){
@@ -449,7 +443,7 @@ function renderGoalGauge(){
   }, 120);
 }
 
-/* ===== レンダリング（その他は元のまま） ===== */
+/* rendering other parts (unchanged) */
 function renderDashboard(){
   const races = records.length;
   const meets = new Set(records.map(r=>r.meet)).size;
@@ -576,7 +570,7 @@ function renderSeasonBest(){
   seasonBestTable.innerHTML = html;
 }
 
-/* セレクト初期化 & 全レンダリング */
+/* select init & render all */
 function renderGoalsTable(){ let html = `<tr><th>種目</th><th>目標タイム</th><th></th></tr>`; Object.keys(goals).sort().forEach(e=>{ html += `<tr><td>${e}</td><td>${goals[e]}</td><td><button onclick="deleteGoal('${e.replace(/'/g,"\\'")}')">削除</button></td></tr>`; }); goalTable.innerHTML = html; }
 
 function populateEventSelects(){
@@ -586,7 +580,7 @@ function populateEventSelects(){
 }
 function renderAll(){ renderDashboard(); renderTable(); renderBest(); renderGoalsTable(); renderGoalGauge(); renderProgressChart(); renderFINAChart(); renderImproveChart(); renderStrokeChart(); renderSeasonBest(); }
 
-/* イベント登録 */
+/* events */
 saveRecordBtn.addEventListener('click', addRecord);
 downloadCsvBtn.addEventListener('click', ()=>{
   const header = ['date','meet','venue','course','event','time'];
@@ -603,7 +597,7 @@ saveGoalBtn.addEventListener('click', saveGoal);
 goalEventSelect.addEventListener('change', renderGoalGauge);
 graphEventSelect.addEventListener('change', renderProgressChart);
 
-/* 初期化 */
+/* init */
 (function init(){ loadStorage(); populateEventSelects(); records.sort((a,b)=> new Date(b.date) - new Date(a.date)); renderAll(); window.editRecord = editRecord; window.deleteRecord = deleteRecord; window.deleteGoal = deleteGoal; })();
 </script>
 </body>
