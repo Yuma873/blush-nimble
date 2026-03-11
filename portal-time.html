@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>Swim Record Dashboard — Final</title>
+<title>Swim Record Dashboard — Sorted & Filterable</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -13,73 +13,18 @@
   h3{margin:0 0 12px 0;}
   table{width:100%;border-collapse:collapse;margin-top:10px;}
   th{background:#f0f4f8;padding:8px;border-bottom:1px solid #ddd;text-align:center;cursor:default;}
+  th.sortable{cursor:pointer;color:#1e73be;}
   td{padding:8px;border-bottom:1px solid #eee;text-align:center;}
   input,select{padding:8px;margin:6px;border-radius:6px;border:1px solid #ccc;}
   button{padding:8px 12px;border-radius:6px;border:none;background:#1e73be;color:#fff;cursor:pointer;margin:6px;}
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
   .stat{background:#f4f6f9;padding:12px;border-radius:8px;text-align:center;}
   .stat b{display:block;font-size:20px;margin-top:6px;}
-  /* 固定サイズにして縦伸びを防ぐ */
-/* 変更箇所：ドーナツ中央の見やすさを改善するスタイル（このブロックだけ差し替えてください） */
-
-/* キャンバス本体の固定サイズ・高DPI対応 */
-.goalGauge{
-  width: 260px;
-  height: 260px;
-  max-width: 260px;
-  max-height: 260px;
-  display: block;
-  margin: 10px auto;
-  /* 見た目の安定化 */
-  background: transparent;
-  border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  /* 文字をシャープにするヒント（ブラウザ依存） */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  image-rendering: optimizeQuality;
-}
-
-/* 中央テキスト用オーバーレイ（HTMLに .goalGauge-wrap と .goalGauge-center を追加する場合に使えます） */
-.goalGauge-wrap{
-  position: relative;
-  width: 260px;
-  height: 260px;
-  margin: 10px auto;
-}
-.goalGauge-center{
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  pointer-events: none; /* クリックをキャンバスに通す */
-  line-height: 1;
-  /* 見やすく大きめのフォント */
-  font-family: Arial, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-  color: #111;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.6);
-}
-.goalGauge-center .main{
-  font-weight: 700;
-  font-size: 22px; /* 目標秒 / ベスト秒（大） */
-  display: block;
-  margin-bottom: 6px;
-}
-.goalGauge-center .sub{
-  font-weight: 500;
-  font-size: 14px; /* 達成率（小） */
-  color: #444;
-}
-
-/* 小画面での縮小対応 */
-@media (max-width:420px){
-  .goalGauge, .goalGauge-wrap{ width:200px; height:200px; max-width:200px; max-height:200px; }
-  .goalGauge-center .main{ font-size:18px; }
-  .goalGauge-center .sub{ font-size:12px; }
-}
+  .goalGauge{width:260px;height:260px;margin:10px auto;display:block;max-width:260px;max-height:260px;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.06);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
   .small{font-size:13px;color:#666;margin-top:6px;}
-  @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} }
+  .table-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
+  .table-controls input{min-width:180px;}
+  @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} .table-controls{flex-direction:column;align-items:flex-start;} }
   .sort-indicator{font-weight:700;margin-left:6px;color:#1e73be;}
 </style>
 </head>
@@ -152,6 +97,15 @@
 
   <div class="card">
     <h3>記録一覧</h3>
+
+    <!-- フィルタと検索 -->
+    <div class="table-controls">
+      <input id="filterSearch" placeholder="検索: 大会・種目・会場">
+      <select id="filterEvent"><option value="">全種目</option></select>
+      <select id="filterCourse"><option value="">全コース</option><option>短水路</option><option>長水路</option></select>
+      <button id="clearFiltersBtn">フィルタ解除</button>
+    </div>
+
     <table id="recordsTable"></table>
   </div>
 
@@ -192,7 +146,7 @@
 </div>
 
 <script>
-/* ===== Final: Chart.js center-text plugin + stable donut center rendering ===== */
+/* ===== Final: add date sort + filters (minimal changes) ===== */
 
 let records = [];
 let goals = {};
@@ -231,9 +185,17 @@ const finaCanvas = document.getElementById('finaCanvas');
 const improveCanvas = document.getElementById('improveCanvas');
 const strokeCanvas = document.getElementById('strokeCanvas');
 
+const filterSearch = document.getElementById('filterSearch');
+const filterEvent = document.getElementById('filterEvent');
+const filterCourse = document.getElementById('filterCourse');
+const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+
 let goalChart, mainChart, finaChart, improveChart, strokeChart;
 
-/* ===== Center text plugin for Chart.js (register once) ===== */
+/* date sort direction */
+let dateSortDir = 'desc'; // 'asc' or 'desc'
+
+/* ===== Chart.js center-text plugin (registered once) ===== */
 const centerTextPlugin = {
   id: 'centerTextPlugin',
   afterDraw(chart) {
@@ -250,12 +212,10 @@ const centerTextPlugin = {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    // main
     ctx.fillStyle = cfg.mainColor || '#111';
     ctx.font = `${cfg.mainWeight || 'bold'} ${cfg.mainSize || 28}px ${cfg.font || 'Arial'}`;
     ctx.fillText(mainText || '', width / 2, height / 2 - (cfg.mainOffsetY || 6));
 
-    // sub
     ctx.fillStyle = cfg.subColor || '#333';
     ctx.font = `${cfg.subWeight || 'normal'} ${cfg.subSize || 16}px ${cfg.font || 'Arial'}`;
     ctx.fillText(subText || '', width / 2, height / 2 + (cfg.subOffsetY || 34));
@@ -265,7 +225,7 @@ const centerTextPlugin = {
 };
 Chart.register(centerTextPlugin);
 
-/* ===== CSV helpers (robust) ===== */
+/* ===== CSV helpers (unchanged) ===== */
 function stripBOM(s){ return s.replace(/^\uFEFF/, ''); }
 function detectDelimiter(sample){
   const counts = {',':0,';':0,'\t':0};
@@ -402,6 +362,7 @@ function addRecord(){
   records.push({date, meet, venue, course, event: eventName, time});
   records.sort((a,b)=> new Date(a.date) - new Date(b.date));
   saveStorage();
+  populateFilterEvent();
   renderAll();
   inputTime.value = '';
 }
@@ -409,9 +370,9 @@ function editRecord(index){
   const r = records[index]; if(!r) return;
   inputDate.value = r.date; inputMeet.value = r.meet; inputVenue.value = r.venue;
   inputCourse.value = r.course; inputEvent.value = r.event; inputTime.value = r.time;
-  records.splice(index,1); saveStorage(); renderAll();
+  records.splice(index,1); saveStorage(); populateFilterEvent(); renderAll();
 }
-function deleteRecord(index){ if(!confirm('削除しますか？')) return; records.splice(index,1); saveStorage(); renderAll(); }
+function deleteRecord(index){ if(!confirm('削除しますか？')) return; records.splice(index,1); saveStorage(); populateFilterEvent(); renderAll(); }
 
 /* CSV import */
 function importCSVFileEnhanced(file, onDone){
@@ -443,7 +404,7 @@ function importCSVFileEnhanced(file, onDone){
       if(newRecords.length === 0){ alert('有効なレコードが見つかりませんでした。コンソールを確認してください。'); console.log(parsed); if(typeof onDone==='function') onDone(); return; }
       records = records.concat(newRecords);
       records.sort((a,b)=> new Date(a.date) - new Date(b.date));
-      saveStorage(); renderAll(); alert(`${newRecords.length} 件をインポートしました`);
+      saveStorage(); populateFilterEvent(); renderAll(); alert(`${newRecords.length} 件をインポートしました`);
     }catch(err){
       console.error('importCSVFileEnhanced error', err);
       alert('CSVの読み込み中にエラーが発生しました。コンソールを確認してください。');
@@ -457,7 +418,42 @@ function importCSVFileEnhanced(file, onDone){
 function saveGoal(){ const e = goalEventSelect.value; const t = goalTimeInput.value.trim(); if(!e){ alert('種目を選択してください'); return; } if(isNaN(timeToSec(t))){ alert('正しい目標タイムを入力してください'); return; } goals[e] = t; saveStorage(); renderAll(); }
 function deleteGoal(e){ if(goals[e] && confirm(`${e} の目標を削除しますか？`)){ delete goals[e]; saveStorage(); renderAll(); } }
 
-/* ===== renderGoalGauge using plugin (stable, large center text) ===== */
+/* populate filter event select from inputEvent options */
+function populateFilterEvent(){
+  const options = Array.from(inputEvent.options).map(o=>o.value);
+  filterEvent.innerHTML = '<option value="">全種目</option>';
+  options.forEach(opt=>{
+    const o = document.createElement('option'); o.value = opt; o.textContent = opt; filterEvent.appendChild(o);
+  });
+  // also keep goal/graph selects in sync
+  goalEventSelect.innerHTML = '';
+  graphEventSelect.innerHTML = '<option>選択</option>';
+  options.forEach(opt=>{
+    const o1 = document.createElement('option'); o1.value = opt; o1.textContent = opt; goalEventSelect.appendChild(o1);
+    const o2 = document.createElement('option'); o2.value = opt; o2.textContent = opt; graphEventSelect.appendChild(o2);
+  });
+}
+
+/* filtering */
+function getFilteredRecords(){
+  const q = (filterSearch.value || '').trim().toLowerCase();
+  const ev = filterEvent.value;
+  const course = filterCourse.value;
+  return records.filter(r=>{
+    if(ev && r.event !== ev) return false;
+    if(course && r.course !== course) return false;
+    if(!q) return true;
+    return (r.meet||'').toLowerCase().includes(q) || (r.event||'').toLowerCase().includes(q) || (r.venue||'').toLowerCase().includes(q);
+  });
+}
+
+/* toggle date sort */
+function toggleDateSort(){
+  dateSortDir = (dateSortDir === 'desc') ? 'asc' : 'desc';
+  renderTable();
+}
+
+/* renderGoalGauge using plugin */
 function renderGoalGauge(){
   const e = goalEventSelect.value;
   if(!e || !goals[e]){
@@ -478,7 +474,6 @@ function renderGoalGauge(){
   let progress = Math.round(Math.max(0, Math.min(100, (goalSec / bestTime) * 100)));
   const remaining = 100 - progress;
 
-  // Ensure CSS fixed size (already set in CSS) and use responsive:true with plugin
   if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
 
   goalChart = new Chart(goalGaugeCanvas.getContext('2d'), {
@@ -510,11 +505,10 @@ function renderGoalGauge(){
     }
   });
 
-  // small safeguard: update once after render
   setTimeout(()=>{ try{ goalChart.update(); }catch(e){} }, 80);
 }
 
-/* rendering other parts */
+/* render functions */
 function renderDashboard(){
   const races = records.length;
   const meets = new Set(records.map(r=>r.meet)).size;
@@ -532,10 +526,20 @@ function renderDashboard(){
 }
 
 function renderTable(){
+  const filtered = getFilteredRecords();
+  filtered.sort((a,b)=>{
+    const ta = new Date(a.date).getTime();
+    const tb = new Date(b.date).getTime();
+    if(ta === tb) return 0;
+    return dateSortDir === 'asc' ? (ta - tb) : (tb - ta);
+  });
+
+  const dirSymbol = dateSortDir === 'asc' ? '▲' : '▼';
   let html = `<tr>
-    <th>日付</th>
+    <th class="sortable" onclick="toggleDateSort()">日付<span class="sort-indicator">${dirSymbol}</span></th>
     <th>大会</th><th>会場</th><th>コース</th><th>種目</th><th>タイム</th><th>FINA</th><th></th></tr>`;
-  records.forEach((r,i)=>{
+  filtered.forEach((r)=>{
+    const globalIndex = records.indexOf(r);
     const goal = goals[r.event];
     let diffHtml = '';
     if(goal){
@@ -545,7 +549,7 @@ function renderTable(){
     html += `<tr>
       <td>${r.date}</td><td>${r.meet}</td><td>${r.venue}</td><td>${r.course}</td><td>${r.event}</td>
       <td>${r.time} ${diffHtml}</td><td>${finaPoint(r.event, r.time)}</td>
-      <td><button onclick="editRecord(${i})">編集</button><button onclick="deleteRecord(${i})">削除</button></td>
+      <td><button onclick="editRecord(${globalIndex})">編集</button><button onclick="deleteRecord(${globalIndex})">削除</button></td>
     </tr>`;
   });
   recordsTable.innerHTML = html;
@@ -648,6 +652,7 @@ function populateEventSelects(){
   const options = Array.from(inputEvent.options).map(o=>o.value);
   goalEventSelect.innerHTML = ''; graphEventSelect.innerHTML = '<option>選択</option>';
   options.forEach(opt=>{ const o1 = document.createElement('option'); o1.value = opt; o1.textContent = opt; const o2 = document.createElement('option'); o2.value = opt; o2.textContent = opt; goalEventSelect.appendChild(o1); graphEventSelect.appendChild(o2); });
+  populateFilterEvent();
 }
 function renderAll(){ renderDashboard(); renderTable(); renderBest(); renderGoalsTable(); renderGoalGauge(); renderProgressChart(); renderFINAChart(); renderImproveChart(); renderStrokeChart(); renderSeasonBest(); }
 
@@ -668,8 +673,13 @@ saveGoalBtn.addEventListener('click', saveGoal);
 goalEventSelect.addEventListener('change', renderGoalGauge);
 graphEventSelect.addEventListener('change', renderProgressChart);
 
+filterSearch.addEventListener('input', ()=>{ renderTable(); });
+filterEvent.addEventListener('change', ()=>{ renderTable(); });
+filterCourse.addEventListener('change', ()=>{ renderTable(); });
+clearFiltersBtn.addEventListener('click', ()=>{ filterSearch.value=''; filterEvent.value=''; filterCourse.value=''; renderTable(); });
+
 /* init */
-(function init(){ loadStorage(); populateEventSelects(); records.sort((a,b)=> new Date(b.date) - new Date(a.date)); renderAll(); window.editRecord = editRecord; window.deleteRecord = deleteRecord; window.deleteGoal = deleteGoal; })();
+(function init(){ loadStorage(); populateEventSelects(); records.sort((a,b)=> new Date(b.date) - new Date(a.date)); renderAll(); window.editRecord = editRecord; window.deleteRecord = deleteRecord; window.deleteGoal = deleteGoal; window.toggleDateSort = toggleDateSort; })();
 </script>
 </body>
 </html>
