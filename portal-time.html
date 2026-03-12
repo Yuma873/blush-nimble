@@ -1,16 +1,21 @@
+```html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>Swim Record Dashboard</title>
-    <link rel="shortcut icon" href="favicon-log.png" type="image/png">
-
+<title>Swim Record Dashboard — Final (with Menu)</title>
+    
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-  /* ===== 全体スタイル（既存の見た目を維持） ===== */
+  /* ===== 全体スタイル ===== */
   body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#eef2f6;color:#222;}
-  header{background:#1e73be;color:#fff;padding:18px;font-size:20px;font-weight:700;}
+  header{background:#1e73be;color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;}
+  header .title{font-size:20px;font-weight:700;}
+  /* メニュー */
+  .top-menu{display:flex;gap:8px;align-items:center;}
+  .top-menu a{background:rgba(255,255,255,0.12);color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600;}
+  .top-menu a:hover{background:rgba(255,255,255,0.18);}
   .container{max-width:1200px;margin:20px auto;padding:20px;}
   .card{background:#fff;padding:18px;border-radius:12px;box-shadow:0 3px 8px rgba(0,0,0,0.08);margin-bottom:20px;}
   h3{margin:0 0 12px 0;}
@@ -28,133 +33,30 @@
   @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} .table-controls{flex-direction:column;align-items:flex-start;} }
   .sort-indicator{font-weight:700;margin-left:6px;color:#1e73be;}
 
-  /* ===== 置換用：ドーナツ中央の見やすさを改善する最終版スタイル ===== */
+  /* ===== ドーナツ中央の見やすさ（オーバーレイ） ===== */
+  .goalGauge{ width:260px; height:260px; max-width:260px; max-height:260px; display:block; margin:10px auto; background:transparent; border-radius:50%; box-shadow:0 2px 6px rgba(0,0,0,0.06); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; image-rendering:optimizeQuality; object-fit:contain; }
+  .goalGauge-wrap{ position:relative; width:260px; height:260px; margin:10px auto; pointer-events:none; }
+  .goalGauge-center{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; line-height:1; pointer-events:none; font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",Arial,sans-serif; color:#111; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; text-shadow:0 1px 0 rgba(255,255,255,0.6); width:85%; box-sizing:border-box; }
+  .goalGauge-center .main{ display:block; font-weight:800; font-size:22px; line-height:1.05; margin-bottom:6px; color:#0b2540; letter-spacing:0.2px; }
+  .goalGauge-center .sub{ display:block; font-weight:600; font-size:14px; color:#2f3b4a; opacity:0.95; }
+  @media (max-width:420px){ .goalGauge, .goalGauge-wrap{ width:200px; height:200px; max-width:200px; max-height:200px; } .goalGauge-center .main{ font-size:18px; } .goalGauge-center .sub{ font-size:12px; } }
 
-  /* キャンバス本体の固定サイズ・高DPI対応 */
-          nav {
-  width: 230px;
-  background-color: #2c3e50;
-  color: white;
-  padding: 10px;
-  box-sizing: border-box;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  overflow-y: auto;
-  z-index: 1000;
-}
-nav video {
-  width: 1%;
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
-nav a {
-  display: block;
-  color: white;
-  text-decoration: none;
-  padding: 10px;
-  margin: 5px 0;
-  background-color: #34495e;
-  border-radius: 6px;
-  text-align: center;
-  transition: 0.3s;
-}
-nav a:hover { background-color: #1abc9c; }
-main {
-  flex: 1;
-  margin-left: 230px;
-  padding: 15px;
-  overflow: auto;
-}
-  .goalGauge{
-    width: 260px;
-    height: 260px;
-    max-width: 260px;
-    max-height: 260px;
-    display: block;
-    margin: 10px auto;
-    background: transparent;
-    border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    image-rendering: optimizeQuality;
-    object-fit: contain;
-  }
-
-  /* オーバーレイ方式で中央テキストを表示するラッパー */
-  .goalGauge-wrap{
-    position: relative;
-    width: 260px;
-    height: 260px;
-    margin: 10px auto;
-    pointer-events: none;
-  }
-  .goalGauge-center{
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    line-height: 1;
-    pointer-events: none;
-    font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", Arial, sans-serif;
-    color: #111;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
-    width: 85%;
-    box-sizing: border-box;
-  }
-
-  /* 中央テキストの階層化（メイン：目標/ベスト、サブ：達成率） */
-  .goalGauge-center .main{
-    display: block;
-    font-weight: 800;
-    font-size: 22px;
-    line-height: 1.05;
-    margin-bottom: 6px;
-    color: #0b2540;
-    letter-spacing: 0.2px;
-  }
-  .goalGauge-center .sub{
-    display: block;
-    font-weight: 600;
-    font-size: 14px;
-    color: #2f3b4a;
-    opacity: 0.95;
-  }
-
-  /* 小画面での縮小対応 */
-  @media (max-width:420px){
-    .goalGauge, .goalGauge-wrap{ width:200px; height:200px; max-width:200px; max-height:200px; }
-    .goalGauge-center .main{ font-size:18px; }
-    .goalGauge-center .sub{ font-size:12px; }
-  }
-
-  /* 補助：ソート可能なヘッダの視認性向上 */
-  th.sortable{
-    cursor: pointer;
-    color: #1e73be;
-    position: relative;
-    user-select: none;
-  }
-  th.sortable .sort-indicator{
-    display: inline-block;
-    margin-left: 6px;
-    font-weight: 700;
-  }
+  /* sortable header */
+  th.sortable{ cursor:pointer; color:#1e73be; position:relative; user-select:none; }
+  th.sortable .sort-indicator{ display:inline-block; margin-left:6px; font-weight:700; }
 </style>
 </head>
-  
 <body>
-  <nav>
-  <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
-  <a href="https://yuma873.github.io/blush-nimble/index.html" style="background-color:#f44336;font-weight:bold;">ログアウト</a>
-</nav>
-<header>Swim Record Dashboard</header>
+<header>
+  <div class="title">Swim Record Dashboard</div>
+  <nav class="top-menu" aria-label="Main menu">
+    <a href="toppage.html">トップページ</a>
+    <a href="index.html">ログアウト</a>
+  </nav>
+</header>
+
 <div class="container">
+
   <div class="card">
     <h3>ダッシュボード</h3>
     <div id="stats" class="stats"></div>
@@ -178,15 +80,20 @@ main {
         <option>自由形50m</option>
         <option>自由形100m</option>
         <option>自由形200m</option>
-                <option>背泳ぎ50m</option>
+        <option>背泳ぎ50m</option>
         <option>背泳ぎ100m</option>
-                <option>平泳ぎ50m</option>
-<option>平泳ぎ100m</option>
-<option>ﾊﾞﾀﾌﾗｲ50m</option>
-<option>ﾊﾞﾀﾌﾗｲ100m</option>      
-<option>個人ﾒﾄﾞﾚｰ50m</option>
-<option>個人ﾒﾄﾞﾚｰ100m</option>
-<option>ﾒﾄﾞﾚｰﾘﾚｰ100m</option><option>ﾒﾄﾞﾚｰﾘﾚｰ200m</option><option>ﾒﾄﾞﾚｰﾘﾚｰ400m</option><option>ﾘﾚｰ100m</option><option>ﾘﾚｰ200m</option><option>ﾘﾚｰ400m</option>
+        <option>平泳ぎ50m</option>
+        <option>平泳ぎ100m</option>
+        <option>ﾊﾞﾀﾌﾗｲ50m</option>
+        <option>ﾊﾞﾀﾌﾗｲ100m</option>
+        <option>個人ﾒﾄﾞﾚｰ50m</option>
+        <option>個人ﾒﾄﾞﾚｰ100m</option>
+        <option>ﾒﾄﾞﾚｰﾘﾚｰ100m</option>
+        <option>ﾒﾄﾞﾚｰﾘﾚｰ200m</option>
+        <option>ﾒﾄﾞﾚｰﾘﾚｰ400m</option>
+        <option>ﾘﾚｰ100m</option>
+        <option>ﾘﾚｰ200m</option>
+        <option>ﾘﾚｰ400m</option>
       </select>
       <label>タイム</label>
       <input id="inputTime" placeholder="例 0:23.45 または 23.45">
@@ -219,7 +126,6 @@ main {
 
   <div class="card">
     <h3>目標達成率</h3>
-    <!-- ここは canvas をラップして中央オーバーレイを置く -->
     <div class="goalGauge-wrap">
       <canvas id="goalGauge" class="goalGauge"></canvas>
       <div id="goalGaugeCenter" class="goalGauge-center" aria-hidden="true">
@@ -232,15 +138,12 @@ main {
 
   <div class="card">
     <h3>記録一覧</h3>
-
-    <!-- フィルタと検索 -->
     <div class="table-controls">
       <input id="filterSearch" placeholder="検索: 大会・種目・会場">
       <select id="filterEvent"><option value="">全種目</option></select>
       <select id="filterCourse"><option value="">全コース</option><option>短水路</option><option>長水路</option></select>
       <button id="clearFiltersBtn">フィルタ解除</button>
     </div>
-
     <table id="recordsTable"></table>
   </div>
 
@@ -279,46 +182,59 @@ main {
   </div>
 
 </div>
-<script>
-/* ===== JS: 既存の機能を維持しつつ、中央テキストはオーバーレイで表示する最小変更版 ===== */
 
-let records = [];
-let goals = {};
-const CHART_COLORS = ['#1e73be','#ff7f50','#4caf50','#f39c12','#9b59b6','#e74c3c'];
-/* ===== 置換用：拡張種目対応の finaBase マップ（必要に応じて値は調整してください） ===== */
+<script>
+/* ===== Data & FINA base map (extended) ===== */
+const eventCanonical = {
+  "自由形50m":"自由形50m","自由形100m":"自由形100m","自由形200m":"自由形200m",
+  "背泳ぎ50m":"背泳ぎ50m","背泳ぎ100m":"背泳ぎ100m",
+  "平泳ぎ50m":"平泳ぎ50m","平泳ぎ100m":"平泳ぎ100m",
+  "ﾊﾞﾀﾌﾗｲ50m":"バタフライ50m","ﾊﾞﾀﾌﾗｲ100m":"バタフライ100m",
+  "バタフライ50m":"バタフライ50m","バタフライ100m":"バタフライ100m",
+  "個人ﾒﾄﾞﾚｰ50m":"個人ﾒﾄﾞﾚｰ50m","個人ﾒﾄﾞﾚｰ100m":"個人ﾒﾄﾞﾚｰ100m",
+  "ﾒﾄﾞﾚｰﾘﾚｰ100m":"ﾒﾄﾞﾚｰﾘﾚｰ100m","ﾒﾄﾞﾚｰﾘﾚｰ200m":"ﾒﾄﾞﾚｰﾘﾚｰ200m","ﾒﾄﾞﾚｰﾘﾚｰ400m":"ﾒﾄﾞﾚｰﾘﾚｰ400m",
+  "ﾘﾚｰ100m":"ﾘﾚｰ100m","ﾘﾚｰ200m":"ﾘﾚｰ200m","ﾘﾚｰ400m":"ﾘﾚｰ400m"
+};
+
 const finaBase = {
   "自由形50m": 21.04,
   "自由形100m": 46.86,
   "自由形200m": 102.00,
-
   "背泳ぎ50m": 24.50,
   "背泳ぎ100m": 51.60,
-
   "平泳ぎ50m": 27.00,
   "平泳ぎ100m": 56.88,
-
   "バタフライ50m": 23.50,
-  "ﾊﾞﾀﾌﾗｲ50m": 23.50,   // 全角/半角表記の違いに対応
   "バタフライ100m": 49.45,
-  "ﾊﾞﾀﾌﾗｲ100m": 49.45,  // 同上
-
   "個人ﾒﾄﾞﾚｰ50m": 25.50,
   "個人ﾒﾄﾞﾚｰ100m": 54.00,
-
- 
+  "ﾒﾄﾞﾚｰﾘﾚｰ100m": 54.00,
+  "ﾒﾄﾞﾚｰﾘﾚｰ200m": 110.00,
   "ﾒﾄﾞﾚｰﾘﾚｰ400m": 220.00,
-
+  "ﾘﾚｰ100m": 47.00,
+  "ﾘﾚｰ200m": 95.00,
   "ﾘﾚｰ400m": 190.00
 };
 
-/*
-注意：
-- 上の数値は「FINAポイント計算の基準タイム（ベースタイム）」として使うための目安値です。
-- 実際のベース値（公式や目的に応じた基準）は必要に応じて調整してください。
-- 同じ種目が全角/半角や表記ゆれで複数ある場合は両方登録しておくと既存データとの照合が楽になります。
-*/
+function normalizeEventName(raw){
+  if(!raw) return raw;
+  const s = String(raw).trim();
+  if(eventCanonical[s]) return eventCanonical[s];
+  const alt = s.replace(/ﾊﾞﾀﾌﾗｲ/g,'バタフライ').replace(/ﾒﾄﾞﾚｰ/g,'メドレー').replace(/ﾘﾚｰ/g,'リレー');
+  if(eventCanonical[alt]) return eventCanonical[alt];
+  return s;
+}
 
+function finaPoint(eventName, timeStr){
+  const key = normalizeEventName(eventName);
+  const base = finaBase[key];
+  if(!base) return '-';
+  const sec = timeToSec(timeStr);
+  if(isNaN(sec) || sec <= 0) return '-';
+  return Math.round(1000 * Math.pow(base / sec, 3));
+}
 
+/* ===== Rest of app (unchanged behavior) ===== */
 
 /* DOM refs */
 const inputDate = document.getElementById('inputDate');
@@ -355,12 +271,10 @@ const filterEvent = document.getElementById('filterEvent');
 const filterCourse = document.getElementById('filterCourse');
 const clearFiltersBtn = document.getElementById('clearFiltersBtn');
 
+let records = [];
+let goals = {};
 let goalChart, mainChart, finaChart, improveChart, strokeChart;
-
-/* date sort direction */
 let dateSortDir = 'desc';
-
-/* Chart.js plugin not required for overlay; keep charts simple */
 
 /* CSV helpers */
 function stripBOM(s){ return s.replace(/^\uFEFF/, ''); }
@@ -477,16 +391,7 @@ function secToTime(s){
   return `${sec}`;
 }
 
-/* FINA */
-function finaPoint(eventName, timeStr){
-  const base = finaBase[eventName];
-  if(!base) return '-';
-  const sec = timeToSec(timeStr);
-  if(isNaN(sec) || sec <= 0) return '-';
-  return Math.round(1000 * Math.pow(base / sec, 3));
-}
-
-/* CRUD */
+/* record CRUD */
 function addRecord(){
   const date = inputDate.value || new Date().toISOString().slice(0,10);
   const meet = inputMeet.value.trim();
@@ -562,7 +467,6 @@ function populateFilterEvent(){
   options.forEach(opt=>{
     const o = document.createElement('option'); o.value = opt; o.textContent = opt; filterEvent.appendChild(o);
   });
-  // also keep goal/graph selects in sync
   goalEventSelect.innerHTML = '';
   graphEventSelect.innerHTML = '<option>選択</option>';
   options.forEach(opt=>{
@@ -590,12 +494,11 @@ function toggleDateSort(){
   renderTable();
 }
 
-/* renderGoalGauge: draw donut and update overlay center text (no canvas text) */
+/* renderGoalGauge: draw donut and update overlay center text */
 function renderGoalGauge(){
   const e = goalEventSelect.value;
   if(!e || !goals[e]){
     if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
-    // clear overlay
     goalGaugeCenter.querySelector('.main').textContent = '-- / --';
     goalGaugeCenter.querySelector('.sub').textContent = '(--%)';
     return;
@@ -616,7 +519,6 @@ function renderGoalGauge(){
   let progress = Math.round(Math.max(0, Math.min(100, (goalSec / bestTime) * 100)));
   const remaining = 100 - progress;
 
-  // ensure canvas pixel size matches CSS for crisp overlay
   const dpr = window.devicePixelRatio || 1;
   const cssSize = parseInt(getComputedStyle(goalGaugeCanvas).width,10) || 260;
   goalGaugeCanvas.width = cssSize * dpr;
@@ -626,7 +528,6 @@ function renderGoalGauge(){
 
   if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
 
-  // create donut chart (responsive:false to avoid unexpected resizing)
   goalChart = new Chart(goalGaugeCanvas.getContext('2d'), {
     type: 'doughnut',
     data: {
@@ -641,7 +542,6 @@ function renderGoalGauge(){
     }
   });
 
-  // update overlay center text (large & clear)
   const mainText = `${goalSec.toFixed(2)}s / ${bestTime.toFixed(2)}s`;
   const subText = `(${progress}%)`;
   const mainEl = goalGaugeCenter.querySelector('.main');
@@ -825,3 +725,4 @@ clearFiltersBtn.addEventListener('click', ()=>{ filterSearch.value=''; filterEve
 </script>
 </body>
 </html>
+```
