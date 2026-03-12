@@ -438,8 +438,8 @@ function readFileWithEncodings(file, callback){
 }
 
 /* persistence */
-function saveStorage(){ localStorage.setItem('swimRecords', JSON.stringify(records)); localStorage.setItem('swimGoals', JSON.stringify(goals)); }
-function loadStorage(){ records = JSON.parse(localStorage.getItem('swimRecords')) || []; goals = JSON.parse(localStorage.getItem('swimGoals')) || {}; }
+function saveStorage(){ localStorage.setItem('SRD', JSON.stringify(records)); localStorage.setItem('swimGoals', JSON.stringify(goals)); }
+function loadStorage(){ records = JSON.parse(localStorage.getItem('SRD')) || []; goals = JSON.parse(localStorage.getItem('swimGoals')) || {}; }
 
 /* time helpers */
 function timeToSec(t){
