@@ -132,7 +132,9 @@ main {
     .goalGauge-center .main{ font-size:18px; }
     .goalGauge-center .sub{ font-size:12px; }
   }
-
+.top-menu{display:flex;gap:8px;align-items:center;}
+  .top-menu a{background:rgba(255,255,255,0.12);color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600;}
+  .top-menu a:hover{background:rgba(255,255,255,0.18);}
   /* 補助：ソート可能なヘッダの視認性向上 */
   th.sortable{
     cursor: pointer;
@@ -149,10 +151,10 @@ main {
 </head>
   
 <body>
-  <nav>
-  <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
-  <a href="https://yuma873.github.io/blush-nimble/index.html" style="background-color:#f44336;font-weight:bold;">ログアウト</a>
-</nav>
+   <nav class="top-menu" aria-label="Main menu">
+    <a href="toppage.html">トップページ</a>
+    <a href="index.html">ログアウト</a>
+  </nav>
 <header>Swim Record Dashboard</header>
 <div class="container">
   <div class="card">
