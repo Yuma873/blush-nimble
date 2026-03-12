@@ -524,6 +524,108 @@ function importCSVFileEnhanced(file, onDone){
 /* goals */
 function saveGoal(){ const e = goalEventSelect.value; const t = goalTimeInput.value.trim(); if(!e){ alert('種目を選択してください'); return; } if(isNaN(timeToSec(t))){ alert('正しい目標タイムを入力してください'); return; } goals[e] = t; saveStorage(); renderAll(); }
 function deleteGoal(e){ if(goals[e] && confirm(`${e} の目標を削除しますか？`)){ delete goals[e]; saveStorage(); renderAll(); } }
+// 変更箇所：目標データ構造と関連関数（既存の同名関数と差し替え）
+// goals は種目 -> { time: "0:22.00", date: "YYYY-MM-DD" } を保持するように変更
+
+/* helper: 目標日までの日数を計算（target - today） */
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const t = new Date(dateStr);
+  if(isNaN(t.getTime())) return null;
+  t.setHours(0,0,0,0);
+  const diff = Math.ceil((t - today) / (1000*60*60*24));
+  return diff;
+}
+
+/* 変更：目標保存（時間 + 日付を保存） */
+function saveGoal(){
+  const e = goalEventSelect.value;
+  const t = goalTimeInput.value.trim();
+  const d = goalDateInput.value || '';
+  if(!e){ alert('種目を選択してください'); return; }
+  if(isNaN(timeToSec(t))){ alert('正しい目標タイムを入力してください'); return; }
+  // 種目ごとにオブジェクトで保存
+  goals[e] = { time: t, date: d };
+  saveStorage();
+  renderAll();
+}
+
+/* 変更：目標一覧表示（目標日と残日数を表示） */
+function renderGoalsTable(){
+  let html = `<tr><th>種目</th><th>目標タイム</th><th>目標日付</th><th>残日数</th><th></th></tr>`;
+  Object.keys(goals).sort().forEach(e=>{
+    const g = goals[e];
+    const date = g.date || '';
+    const days = daysUntil(date);
+    let daysHtml = date ? (days === null ? '-' : (days >= 0 ? `${days} 日` : `期限切れ (${Math.abs(days)} 日過去)`)) : '-';
+    html += `<tr><td>${e}</td><td>${g.time}</td><td>${date || '-'}</td><td>${daysHtml}</td><td><button onclick="deleteGoal('${e.replace(/'/g,"\\'")}')">削除</button></td></tr>`;
+  });
+  goalTable.innerHTML = html;
+}
+
+/* 変更：ドーナツ中央のオーバーレイに期限情報を表示するように renderGoalGauge を更新 */
+function renderGoalGauge(){
+  const e = goalEventSelect.value;
+  if(!e || !goals[e]){
+    if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
+    goalGaugeCenter.querySelector('.main').textContent = '-- / --';
+    goalGaugeCenter.querySelector('.sub').textContent = '(--%)';
+    goalGaugeCenter.querySelector('.days').textContent = '期限: -- (残り -- 日)';
+    return;
+  }
+
+  const bestTimes = records.filter(r=>r.event===e).map(r=>timeToSec(r.time)).filter(v=>!isNaN(v));
+  if(bestTimes.length === 0){
+    if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
+    goalGaugeCenter.querySelector('.main').textContent = '-- / --';
+    goalGaugeCenter.querySelector('.sub').textContent = '(--%)';
+    const date = goals[e].date || '';
+    const days = daysUntil(date);
+    const daysText = date ? (days === null ? `期限: ${date}` : `期限: ${date} (残り ${days} 日)`) : '期限: -';
+    goalGaugeCenter.querySelector('.days').textContent = daysText;
+    return;
+  }
+
+  const bestTime = Math.min(...bestTimes);
+  const goalSec = timeToSec(goals[e].time);
+  if(isNaN(goalSec) || goalSec <= 0) return;
+
+  let progress = Math.round(Math.max(0, Math.min(100, (goalSec / bestTime) * 100)));
+  const remaining = 100 - progress;
+
+  // Canvas を CSS サイズに合わせてピクセル設定（高DPI 対応）
+  const dpr = window.devicePixelRatio || 1;
+  const cssSize = parseInt(getComputedStyle(goalGaugeCanvas).width,10) || 260;
+  goalGaugeCanvas.width = cssSize * dpr;
+  goalGaugeCanvas.height = cssSize * dpr;
+  goalGaugeCanvas.style.width = cssSize + 'px';
+  goalGaugeCanvas.style.height = cssSize + 'px';
+
+  if(goalChart){ try{ goalChart.destroy() }catch{} goalChart = null; }
+
+  goalChart = new Chart(goalGaugeCanvas.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['達成率','残り'],
+      datasets: [{ data: [progress, remaining], backgroundColor: ['#1e73be', '#e9eef5'] }]
+    },
+    options: {
+      cutout: '70%',
+      responsive: false,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // オーバーレイに表示
+  goalGaugeCenter.querySelector('.main').textContent = `${goalSec.toFixed(2)}s / ${bestTime.toFixed(2)}s`;
+  goalGaugeCenter.querySelector('.sub').textContent = `(${progress}%)`;
+  const date = goals[e].date || '';
+  const days = daysUntil(date);
+  const daysText = date ? (days === null ? `期限: ${date}` : (days >= 0 ? `期限: ${date} (残り ${days} 日)` : `期限: ${date} (期限切れ ${Math.abs(days)} 日)`)) : '期限: -';
+  goalGaugeCenter.querySelector('.days').textContent = daysText;
+}
 
 /* populate filter event select from inputEvent options */
 function populateFilterEvent(){
