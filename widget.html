@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+
+body{
+margin:0;
+font-family:sans-serif;
+}
+
+.box{
+border-radius:10px;
+box-shadow:0 3px 12px rgba(0,0,0,0.25);
+padding:10px 14px;
+width:210px;
+color:white;
+transition:0.3s;
+}
+
+.title{
+font-size:12px;
+opacity:0.9;
+}
+
+.status{
+font-size:20px;
+font-weight:bold;
+margin:4px 0;
+}
+
+.time{
+font-size:11px;
+opacity:0.85;
+}
+
+.open{background:#2ecc71;}
+.normal{background:#f1c40f;color:#333;}
+.busy{background:#e67e22;}
+.verybusy{background:#e74c3c;}
+.closed{background:#7f8c8d;}
+.adjust{background:#3498db;}
+.off{background:#2c3e50;}
+
+</style>
+</head>
+
+<body>
+
+<div id="box" class="box">
+<div class="title">現在の混雑状況</div>
+<div id="status" class="status">読み込み中</div>
+<div id="time" class="time"></div>
+</div>
+
+<script>
+
+function getClass(status){
+
+if(status==="空いています") return "open";
+if(status==="普通") return "normal";
+if(status==="混雑") return "busy";
+if(status==="非常に混雑") return "verybusy";
+if(status==="一般開放なし") return "closed";
+if(status==="調整中") return "adjust";
+if(status==="営業時間外") return "off";
+
+return "adjust";
+}
+
+function autoClosed(){
+
+const h=new Date().getHours();
+
+if(h>=21 || h<9){
+return "営業時間外";
+}
+
+return null;
+}
+
+function load(){
+
+let data=JSON.parse(localStorage.getItem("shop_status"))||{
+status:"調整中",
+time:""
+};
+
+const auto=autoClosed();
+
+if(auto){
+data.status=auto;
+}
+
+document.getElementById("status").innerText=data.status;
+document.getElementById("time").innerText="最終更新 "+data.time;
+
+const box=document.getElementById("box");
+box.className="box "+getClass(data.status);
+
+}
+
+load();
+
+</script>
+
+</body>
+</html>
