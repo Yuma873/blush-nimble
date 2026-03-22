@@ -1,107 +1,128 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>[簡易]ポータルサイト - カレンダー（時刻正規化＋通知）</title>
-
-  <!-- FullCalendar CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
-
-  <style>
-    :root{
-      --nav-width:240px;
-      --accent:#1abc9c;
-      --bg:#f5f7fa;
-      --card:#ffffff;
-    }
-    html,body{ height:100%; margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN",Meiryo,Arial; background:var(--bg); color:#222; }
-    nav{ position:fixed; left:0; top:0; bottom:0; width:var(--nav-width); background:#2c3e50; color:#fff; padding:16px; box-sizing:border-box; overflow:auto; }
-    nav a{ display:block; color:#fff; text-decoration:none; margin:8px 0; padding:10px; background:#34495e; border-radius:6px; text-align:center; }
-    main{ margin-left:var(--nav-width); padding:18px; min-height:100vh; box-sizing:border-box; }
-    .top-controls{ display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
-    .search, .filter, .export { padding:8px 10px; border-radius:6px; border:1px solid #ddd; background:var(--card); }
-    .legend{ display:flex; gap:10px; margin-top:12px; font-size:14px; flex-wrap:wrap; }
-    .legend span{ display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:middle; }
-    .fc .fc-toolbar-title{ font-weight:700; }
-    #calendar{ background:var(--card); padding:12px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
-    /* modal */
-    .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.4); display:none; align-items:center; justify-content:center; z-index:2000; }
-    .modal{ background:var(--card); padding:16px; border-radius:8px; width:360px; max-width:94%; box-shadow:0 6px 24px rgba(0,0,0,0.2); }
-    .btn{ padding:8px 10px; border-radius:6px; border:none; cursor:pointer; }
-    .btn.primary{ background:var(--accent); color:#fff; }
-    .btn.ghost{ background:transparent; border:1px solid #ccc; }
-    /* event colors (fallback) */
-    .type-practice{ background:#2b8cff !important; border-color:#2b8cff !important; color:#fff !important; }
-    .type-tournament{ background:#e74c3c !important; border-color:#e74c3c !important; color:#fff !important; }
-    .type-school{ background:#27ae60 !important; border-color:#27ae60 !important; color:#fff !important; }
-    .type-other{ background:#f39c12 !important; border-color:#f39c12 !important; color:#fff !important; }
-
-    @media(max-width:768px){
-      nav{ position:relative; width:100%; height:auto; display:flex; gap:8px; overflow-x:auto; padding:8px; }
-      main{ margin-left:0; margin-top:8px; }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>シンプルカレンダー（Vanilla JS）</title>
+<style>
+  :root{ --nav:#2c3e50; --accent:#1abc9c; --bg:#f5f7fa; --card:#fff; }
+  body{ margin:0; font-family: "Hiragino Kaku Gothic ProN", Meiryo, Arial, sans-serif; background:var(--bg); color:#222; }
+  header{ background:var(--nav); color:#fff; padding:12px 16px; display:flex; align-items:center; gap:12px; }
+  header h1{ font-size:18px; margin:0; }
+  .controls{ margin-left:auto; display:flex; gap:8px; align-items:center; }
+  .btn{ background:#fff; border:0; padding:8px 10px; border-radius:6px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+  .btn.primary{ background:var(--accent); color:#fff; }
+  main{ padding:16px; display:flex; gap:16px; box-sizing:border-box; }
+  nav{ width:220px; background:#2c3e50; color:#fff; padding:12px; border-radius:8px; height:calc(100vh - 96px); box-sizing:border-box; }
+  nav a{ display:block; color:#fff; text-decoration:none; margin:6px 0; padding:8px; background:#34495e; border-radius:6px; text-align:center; }
+  .sidebar-section{ margin-top:12px; font-size:14px; }
+  .legend{ display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .legend div{ display:flex; align-items:center; gap:6px; color:#fff; }
+  .legend span{ width:12px; height:12px; display:inline-block; border-radius:3px; }
+  .calendar-wrap{ flex:1; }
+  .month-header{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .month-title{ font-size:20px; font-weight:700; }
+  .grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+  .dow{ background:#2c3e50; color:#fff; padding:8px; text-align:center; border-radius:6px; font-weight:700; }
+  .cell{ background:var(--card); min-height:100px; padding:6px; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.04); position:relative; overflow:hidden; }
+  .cell .date{ font-weight:700; margin-bottom:6px; }
+  .cell.sunday{ background: #fff0f0; }
+  .cell.saturday{ background: #f0f8ff; }
+  .event{ display:block; padding:4px 6px; margin:4px 0; border-radius:6px; color:#fff; font-size:12px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .type-practice{ background:#2b8cff; }
+  .type-tournament{ background:#e74c3c; }
+  .type-school{ background:#27ae60; }
+  .type-other{ background:#f39c12; }
+  .today{ outline:3px solid var(--accent); }
+  .modal-backdrop{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.4); z-index:2000; }
+  .modal{ background:var(--card); padding:14px; border-radius:8px; width:360px; max-width:94%; box-shadow:0 8px 28px rgba(0,0,0,0.2); }
+  .modal h3{ margin:0 0 8px 0; }
+  .search{ width:100%; padding:8px; border-radius:6px; border:1px solid #ddd; box-sizing:border-box; }
+  @media(max-width:900px){
+    main{ flex-direction:column; }
+    nav{ width:100%; height:auto; display:flex; gap:8px; overflow-x:auto; padding:8px; }
+    .calendar-wrap{ width:100%; }
+    .grid .cell{ min-height:80px; }
+  }
+</style>
 </head>
 <body>
 
-<nav>
-  <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
-  <a href="https://yuma873.github.io/blush-nimble/index.html" style="background:#f44336;">ログアウト</a>
-
-  <div style="margin-top:12px;">
-    <strong>表示フィルタ</strong>
-    <div style="margin-top:8px;">
-      <label><input type="checkbox" class="type-filter" value="practice" checked> 部活</label><br>
-      <label><input type="checkbox" class="type-filter" value="tournament" checked> 大会</label><br>
-      <label><input type="checkbox" class="type-filter" value="school" checked> 学校行事</label><br>
-      <label><input type="checkbox" class="type-filter" value="other" checked> その他</label>
-    </div>
+<header>
+  <h1>ポータルカレンダー</h1>
+  <div class="controls">
+    <button id="prevBtn" class="btn">前月</button>
+    <button id="todayBtn" class="btn">今日</button>
+    <button id="nextBtn" class="btn">次月</button>
   </div>
-
-  <div class="legend" style="margin-top:12px;">
-    <div><span style="background:#e74c3c"></span> 大会</div>
-    <div><span style="background:#2b8cff"></span> 部活</div>
-    <div><span style="background:#27ae60"></span> 学校行事</div>
-    <div><span style="background:#f39c12"></span> その他</div>
-  </div>
-</nav>
+</header>
 
 <main>
-  <div class="top-controls">
-    <div id="calendar-controls"></div>
-    <input id="search" class="search" placeholder="イベント検索（名前・場所）" />
-    <select id="view-select" class="filter" aria-label="表示切替">
-      <option value="dayGridMonth">月表示</option>
-      <option value="timeGridWeek">週表示</option>
-      <option value="timeGridDay">日表示</option>
-      <option value="listWeek">リスト（週）</option>
-    </select>
-    <button id="export-ics" class="export btn">ICSエクスポート</button>
-  </div>
+  <nav>
+    <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
+    <a href="https://yuma873.github.io/blush-nimble/index.html" style="background:#f44336;">ログアウト</a>
 
-  <div id="calendar"></div>
+    <div class="sidebar-section">
+      <input id="searchInput" class="search" placeholder="イベント検索（名前・場所）" />
+      <div style="margin-top:10px;">
+        <strong>表示フィルタ</strong>
+        <div style="margin-top:8px;">
+          <label><input type="checkbox" class="type-filter" value="practice" checked> 部活</label><br>
+          <label><input type="checkbox" class="type-filter" value="tournament" checked> 大会</label><br>
+          <label><input type="checkbox" class="type-filter" value="school" checked> 学校行事</label><br>
+          <label><input type="checkbox" class="type-filter" value="other" checked> その他</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <strong>凡例</strong>
+      <div class="legend">
+        <div><span style="background:#e74c3c"></span> 大会</div>
+        <div><span style="background:#2b8cff"></span> 部活</div>
+        <div><span style="background:#27ae60"></span> 学校行事</div>
+        <div><span style="background:#f39c12"></span> その他</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="calendar-wrap">
+    <div class="month-header">
+      <div class="month-title" id="monthTitle">--</div>
+      <div style="margin-left:auto;">
+        <select id="viewSelect" class="btn">
+          <option value="month">月表示</option>
+          <option value="list">リスト表示</option>
+        </select>
+        <button id="exportBtn" class="btn">ICS出力</button>
+      </div>
+    </div>
+
+    <div id="calendarArea">
+      <div class="grid" id="dowRow">
+        <div class="dow">日</div><div class="dow">月</div><div class="dow">火</div><div class="dow">水</div><div class="dow">木</div><div class="dow">金</div><div class="dow">土</div>
+      </div>
+      <div class="grid" id="calendarGrid" style="margin-top:8px;"></div>
+      <div id="listView" style="display:none; margin-top:8px;"></div>
+    </div>
+  </div>
 </main>
 
 <!-- モーダル -->
-<div id="modal-backdrop" class="modal-backdrop" role="dialog" aria-hidden="true">
-  <div class="modal" role="document" aria-labelledby="modal-title">
-    <h3 id="modal-title">イベント詳細</h3>
-    <div id="modal-body"></div>
-    <div style="margin-top:12px; text-align:right;">
-      <button id="modal-close" class="btn ghost">閉じる</button>
+<div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-hidden="true">
+  <div class="modal" role="document">
+    <h3 id="modalTitle">イベント</h3>
+    <div id="modalBody"></div>
+    <div style="text-align:right; margin-top:10px;">
+      <button id="modalClose" class="btn">閉じる</button>
     </div>
   </div>
 </div>
 
-<!-- FullCalendar JS -->
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/ja.js"></script>
-
 <script>
-/* ===========================
-   RAW EVENTS (添付ドキュメントの予定をそのまま)
-   =========================== */
+/* ============================
+   元データ（添付ドキュメントの events をそのまま）
+   ============================ */
 const RAW_EVENTS = [
 { date:'2025-10-02', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
 { date:'2025-10-07', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' },
@@ -226,315 +247,334 @@ const RAW_EVENTS = [
 { date:'2026-06-27', time:'終日', name:'(前期休校)', type:'school', location:'--' }
 ];
 
-/* ===========================
-   時刻正規化ロジック
-   - 開始と終了を厳密に設定
-   - 開始のみの場合は終了を同じに
-   - 終日の場合は allDay=true
-   - 入力は日本ローカル時間として扱う
-   =========================== */
+/* ============================
+   時刻正規化ユーティリティ
+   - 開始/終了を厳密に設定
+   - 開始のみなら終了を同じに
+   - 終日は allDay=true
+   - 出力: { start: Date or date-string, end: Date or null, allDay: bool }
+   ============================ */
 
-/**
- * parseTimeRange:
- *  入力例:
- *   - "16:00~17:15(SB17:45)" -> { startHHMM: "16:00", endHHMM: "17:15" }
- *   - "16:00" -> { startHHMM: "16:00", endHHMM: "16:00" }
- *   - "All" / "終日" -> { allDay: true }
- *   - "00:00~23:59" -> treated as allDay (keeps allDay true)
- */
-function parseTimeRange(timeStr){
+function parseTimeString(timeStr){
   if(!timeStr) return { allDay:false };
   const s = String(timeStr).trim();
   if(/^All$/i.test(s) || /^終日$/.test(s)) return { allDay:true };
-  // detect pattern HH:MM or H:MM
-  const hhmmRegex = /(\d{1,2}:\d{2})/g;
-  const matches = [...s.matchAll(hhmmRegex)].map(m=>m[1]);
+  // extract HH:MM occurrences
+  const re = /(\d{1,2}:\d{2})/g;
+  const matches = [...s.matchAll(re)].map(m=>m[1]);
   if(matches.length === 0) return { allDay:false };
-  if(matches.length === 1){
-    return { startHHMM: matches[0], endHHMM: matches[0], allDay:false };
-  }
-  // matches.length >= 2 -> first is start, second is end
-  const start = matches[0];
-  const end = matches[1];
-  // treat 00:00~23:59 as all-day
+  if(matches.length === 1) return { start:matches[0], end:matches[0], allDay:false };
+  // two or more: take first two as start/end
+  const start = matches[0], end = matches[1];
   if(start === '00:00' && end === '23:59') return { allDay:true };
-  return { startHHMM: start, endHHMM: end, allDay:false };
+  return { start:start, end:end, allDay:false };
 }
 
-/**
- * toLocalISO:
- *  - dateStr: "YYYY-MM-DD"
- *  - hhmm: "HH:MM"
- *  returns local ISO string without timezone suffix (FullCalendar accepts ISO with timezone, but we use local)
- */
-function toLocalISO(dateStr, hhmm){
-  // create local Date using components to avoid timezone shift
+function toLocalDateObj(dateStr, hhmm){
   const [y,m,d] = dateStr.split('-').map(Number);
-  if(!hhmm){
-    // return date-only ISO (allDay)
-    return `${String(y).padStart(4,'0')}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-  }
+  if(!hhmm) return new Date(y, m-1, d);
   const [hh,mm] = hhmm.split(':').map(Number);
-  const dt = new Date(y, m-1, d, hh, mm, 0, 0);
-  // return ISO string in local time (FullCalendar can accept Date object too)
-  return dt.toISOString();
+  return new Date(y, m-1, d, hh, mm, 0, 0);
 }
 
-/* convert RAW_EVENTS -> FullCalendar events with normalized start/end/allDay */
-function convertEvents(arr){
-  return arr.map((ev, idx) => {
-    const timeInfo = parseTimeRange(ev.time);
-    const date = ev.date;
-    let fc = {
-      id: `${idx}-${date}-${ev.name}`,
+/* 正規化して内部イベント配列を作る */
+function buildEvents(raw){
+  return raw.map((ev, idx) => {
+    const p = parseTimeString(ev.time);
+    const base = {
+      id: idx + '-' + ev.date + '-' + ev.name,
       title: ev.name,
-      extendedProps: {
-        raw: ev,
-        type: ev.type || 'other',
-        time: ev.time || '',
-        location: ev.location || ''
-      },
-      classNames: ['type-' + (ev.type || 'other')]
+      raw: ev,
+      type: ev.type || 'other',
+      location: ev.location || '--'
     };
-
-    if(timeInfo.allDay){
-      fc.allDay = true;
-      // FullCalendar expects allDay events to have start as date-only string
-      fc.start = `${date}`;
-      // no end (or could set end to next day if desired)
+    if(p.allDay){
+      base.allDay = true;
+      base.start = ev.date; // date-only string for all-day
+      base.end = null;
     } else {
-      // has startHHMM at least
-      const startISO = toLocalISO(date, timeInfo.startHHMM || null);
-      // If endHHMM present, use it; else set end same as start
-      const endHHMM = timeInfo.endHHMM || timeInfo.startHHMM || null;
-      const endISO = endHHMM ? toLocalISO(date, endHHMM) : startISO;
-      // Use Date objects for FullCalendar to avoid timezone display issues
-      fc.start = new Date(startISO);
-      fc.end = new Date(endISO);
-      // If start and end are identical, keep both (FullCalendar will show point event)
-      // If end <= start, add 1 minute to end to avoid zero-length issues
-      if(fc.end.getTime() <= fc.start.getTime()){
-        fc.end = new Date(fc.start.getTime() + 60*1000);
-      }
-      fc.allDay = false;
+      const start = toLocalDateObj(ev.date, p.start || null);
+      const end = toLocalDateObj(ev.date, p.end || p.start || null);
+      // if end <= start, add 1 minute to avoid zero-length
+      if(end.getTime() <= start.getTime()) end.setMinutes(end.getMinutes() + 1);
+      base.allDay = false;
+      base.start = start;
+      base.end = end;
     }
-    return fc;
+    return base;
   });
 }
 
-/* ===========================
-   カレンダー初期化
-   =========================== */
-document.addEventListener('DOMContentLoaded', function() {
-  const calendarEl = document.getElementById('calendar');
-  const initialEvents = convertEvents(RAW_EVENTS);
+/* ============================
+   カレンダー描画（シンプル月表示）
+   ============================ */
 
-  const calendar = new FullCalendar.Calendar(calendarEl, {
-    locale: 'ja',
-    initialView: 'dayGridMonth',
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: ''
-    },
-    height: 'auto',
-    navLinks: true,
-    selectable: true,
-    editable: true,
-    dayMaxEventRows: 3,
-    events: initialEvents,
-    eventClick: function(info){
-      const ev = info.event.extendedProps.raw;
-      const timeText = info.event.allDay ? '終日' : (ev.time || formatEventTime(info.event));
-      showModal(`<strong>${escapeHtml(ev.name)}</strong><br>${escapeHtml(timeText)}<br>場所: ${escapeHtml(ev.location || '--')}`);
-    },
-    eventDidMount: function(info){
-      const type = info.event.extendedProps.type || 'other';
-      const colorMap = { practice:'#2b8cff', tournament:'#e74c3c', school:'#27ae60', other:'#f39c12' };
-      const color = colorMap[type] || '#888';
-      if(info.el){
-        info.el.style.backgroundColor = color;
-        info.el.style.borderColor = color;
-        info.el.style.color = '#fff';
-      }
-    },
-    eventDrop: function(info){
-      console.log('moved', info.event.id, info.event.start);
-    },
-    selectable: true,
-    select: function(selectionInfo){
-      const startStr = selectionInfo.startStr;
-      showModal(`<strong>新規イベント</strong><br>日付: ${startStr}<br>（編集機能は追加可能です）`);
-      calendar.unselect();
-    }
-  });
+let current = new Date(); // 表示基準日
+const events = buildEvents(RAW_EVENTS);
 
-  calendar.render();
+function renderCalendar(){
+  const grid = document.getElementById('calendarGrid');
+  const listView = document.getElementById('listView');
+  const view = document.getElementById('viewSelect').value;
+  grid.innerHTML = '';
+  listView.innerHTML = '';
+  listView.style.display = view === 'list' ? 'block' : 'none';
+  document.getElementById('dowRow').style.display = view === 'list' ? 'none' : 'grid';
 
-  /* カレンダーのツールバーを外部に移動 */
-  const toolbar = calendarEl.querySelector('.fc-toolbar');
-  if(toolbar){
-    document.getElementById('calendar-controls').appendChild(toolbar);
-  }
+  const year = current.getFullYear();
+  const month = current.getMonth(); // 0-index
+  document.getElementById('monthTitle').textContent = `${year}年 ${month+1}月`;
 
-  /* ビュー切替 */
-  document.getElementById('view-select').addEventListener('change', function(){
-    calendar.changeView(this.value);
-  });
-
-  /* 検索 */
-  document.getElementById('search').addEventListener('input', function(){
-    const q = this.value.trim().toLowerCase();
-    calendar.getEvents().forEach(ev=>{
-      const raw = ev.extendedProps.raw || {};
-      const text = (raw.name + ' ' + (raw.location||'') + ' ' + (raw.time||'')).toLowerCase();
-      ev.setProp('display', (q === '' || text.indexOf(q) !== -1) ? 'auto' : 'none');
+  if(view === 'list'){
+    // リスト表示: 今月のイベントを日付順に並べる
+    const monthEvents = events.filter(e => {
+      const d = e.raw.date;
+      return d.startsWith(`${year}-${String(month+1).padStart(2,'0')}-`);
+    }).sort((a,b) => {
+      const ta = a.allDay ? new Date(a.raw.date) : a.start;
+      const tb = b.allDay ? new Date(b.raw.date) : b.start;
+      return ta - tb;
     });
-  });
-
-  /* フィルタ */
-  document.querySelectorAll('.type-filter').forEach(cb=>{
-    cb.addEventListener('change', function(){
-      const allowed = Array.from(document.querySelectorAll('.type-filter:checked')).map(x=>x.value);
-      calendar.getEvents().forEach(ev=>{
-        const t = ev.extendedProps.type || 'other';
-        ev.setProp('display', allowed.includes(t) ? 'auto' : 'none');
+    if(monthEvents.length === 0) listView.textContent = '今月の予定はありません';
+    else {
+      monthEvents.forEach(ev => {
+        const el = document.createElement('div');
+        el.style.padding = '8px';
+        el.style.marginBottom = '6px';
+        el.style.background = '#fff';
+        el.style.borderRadius = '6px';
+        el.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)';
+        el.innerHTML = `<strong>${escapeHtml(ev.title)}</strong><br>
+          ${ev.allDay ? '終日' : formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : '')}<br>
+          <small>${escapeHtml(ev.location)}</small>`;
+        el.addEventListener('click', ()=> openModal(ev));
+        listView.appendChild(el);
       });
-    });
-  });
-
-  /* ICS エクスポート（簡易） */
-  document.getElementById('export-ics').addEventListener('click', function(){
-    const events = calendar.getEvents().map(ev=>{
-      const r = ev.extendedProps.raw || {};
-      return {
-        title: r.name || ev.title,
-        start: ev.start ? ev.start.toISOString() : '',
-        end: ev.end ? ev.end.toISOString() : '',
-        description: (r.time||'') + ' ' + (r.location||'')
-      };
-    });
-    const ics = buildICS(events);
-    const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'events.ics'; a.click();
-    URL.revokeObjectURL(url);
-  });
-
-  /* モーダル操作 */
-  document.getElementById('modal-close').addEventListener('click', hideModal);
-  document.getElementById('modal-backdrop').addEventListener('click', function(e){
-    if(e.target === this) hideModal();
-  });
-
-  /* ページを開くたびに今日の予定を通知 */
-  notifyTodaysEvents(initialEvents);
-});
-
-/* ===========================
-   通知ロジック
-   - 開くたびに今日の予定を通知
-   - ブラウザの Notification API を使用
-   - 許可を求め、許可されれば通知を表示
-   - 複数件はまとめて1つの通知にする
-   =========================== */
-
-function notifyTodaysEvents(fcEvents){
-  // get today's date in local YYYY-MM-DD
-  const now = new Date();
-  const y = now.getFullYear(), m = now.getMonth()+1, d = now.getDate();
-  const todayStr = `${String(y).padStart(4,'0')}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-
-  // find events whose raw.date equals todayStr
-  const todays = fcEvents.filter(e => {
-    const raw = e.extendedProps && e.extendedProps.raw;
-    return raw && raw.date === todayStr;
-  });
-
-  if(todays.length === 0) return; // nothing to notify
-
-  // request permission if needed
-  if(!('Notification' in window)){
-    console.warn('This browser does not support notifications.');
+    }
     return;
   }
 
-  function showNotification(){
-    // Build notification title/body
+  // 月表示: 1日から最終日までセルを作る（先頭は日曜始まり）
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month + 1, 0);
+  const firstDow = first.getDay(); // 0..6
+  const totalDays = last.getDate();
+
+  // fill leading empty cells
+  for(let i=0;i<firstDow;i++){
+    const empty = document.createElement('div');
+    empty.className = 'cell';
+    empty.style.opacity = '0.4';
+    grid.appendChild(empty);
+  }
+
+  for(let d=1; d<=totalDays; d++){
+    const cell = document.createElement('div');
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    cell.className = 'cell';
+    const dow = new Date(year, month, d).getDay();
+    if(dow === 0) cell.classList.add('sunday');
+    if(dow === 6) cell.classList.add('saturday');
+    const today = new Date();
+    if(d === today.getDate() && month === today.getMonth() && year === today.getFullYear()){
+      cell.classList.add('today');
+    }
+    const dateEl = document.createElement('div');
+    dateEl.className = 'date';
+    dateEl.textContent = d;
+    cell.appendChild(dateEl);
+
+    // events for this date
+    const dayEvents = events.filter(ev => ev.raw.date === dateStr);
+    // apply search & filter
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    const allowedTypes = Array.from(document.querySelectorAll('.type-filter:checked')).map(x=>x.value);
+    dayEvents.forEach(ev => {
+      if(!allowedTypes.includes(ev.type)) return;
+      const text = (ev.title + ' ' + ev.location + ' ' + (ev.raw.time||'')).toLowerCase();
+      if(q && text.indexOf(q) === -1) return;
+      const evEl = document.createElement('span');
+      evEl.className = `event type-${ev.type}`;
+      evEl.textContent = ev.allDay ? `終日 ${ev.title}` : `${formatTimeShort(ev.start)} ${ev.title}`;
+      evEl.title = `${ev.title}\n${ev.allDay ? '終日' : formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : '')}\n場所: ${ev.location}`;
+      evEl.addEventListener('click', (e) => { e.stopPropagation(); openModal(ev); });
+      cell.appendChild(evEl);
+    });
+
+    cell.addEventListener('click', ()=> {
+      // 日付クリックでその日のイベント一覧をモーダル表示
+      const dayList = events.filter(ev => ev.raw.date === dateStr);
+      if(dayList.length === 0) {
+        openModal({ title: '予定なし', raw: { date: dateStr }, allDay: true, start: dateStr, location: '' });
+      } else {
+        openModalList(dayList, dateStr);
+      }
+    });
+
+    grid.appendChild(cell);
+  }
+
+  // fill trailing empty cells to complete week
+  const cells = grid.children.length;
+  const rem = (7 - (cells % 7)) % 7;
+  for(let i=0;i<rem;i++){
+    const empty = document.createElement('div');
+    empty.className = 'cell';
+    empty.style.opacity = '0.4';
+    grid.appendChild(empty);
+  }
+}
+
+/* ============================
+   ユーティリティ表示関数
+   ============================ */
+
+function formatDateTime(d){
+  if(!d) return '';
+  if(typeof d === 'string') return d;
+  const dt = new Date(d);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+}
+function formatTimeShort(d){
+  if(!d) return '';
+  if(typeof d === 'string') return '';
+  const dt = new Date(d);
+  return `${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+}
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ============================
+   モーダル
+   ============================ */
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalTitle = document.getElementById('modalTitle');
+const modalBody = document.getElementById('modalBody');
+document.getElementById('modalClose').addEventListener('click', hideModal);
+
+function openModal(ev){
+  modalTitle.textContent = ev.title || 'イベント';
+  const raw = ev.raw || {};
+  const timeText = ev.allDay ? '終日' : (raw.time || (ev.start ? formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : '') : ''));
+  modalBody.innerHTML = `<strong>${escapeHtml(ev.title || raw.name || '')}</strong>
+    <div style="margin-top:6px;">${escapeHtml(timeText)}</div>
+    <div style="margin-top:6px;"><small>場所: ${escapeHtml(ev.location || raw.location || '--')}</small></div>
+    <div style="margin-top:8px;"><small>元データ: ${escapeHtml(JSON.stringify(raw))}</small></div>`;
+  modalBackdrop.style.display = 'flex';
+  modalBackdrop.setAttribute('aria-hidden','false');
+}
+function openModalList(list, dateStr){
+  modalTitle.textContent = `${dateStr} の予定`;
+  modalBody.innerHTML = '';
+  list.forEach(ev => {
+    const div = document.createElement('div');
+    div.style.padding = '8px';
+    div.style.marginBottom = '6px';
+    div.style.background = '#f9f9f9';
+    div.style.borderRadius = '6px';
+    div.innerHTML = `<strong>${escapeHtml(ev.title)}</strong><br>
+      ${ev.allDay ? '終日' : formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : '')}<br>
+      <small>場所: ${escapeHtml(ev.location)}</small>`;
+    modalBody.appendChild(div);
+  });
+  modalBackdrop.style.display = 'flex';
+  modalBackdrop.setAttribute('aria-hidden','false');
+}
+function hideModal(){
+  modalBackdrop.style.display = 'none';
+  modalBackdrop.setAttribute('aria-hidden','true');
+}
+
+/* ============================
+   ナビ・検索・フィルタ・ICS出力
+   ============================ */
+
+document.getElementById('prevBtn').addEventListener('click', ()=> { current.setMonth(current.getMonth()-1); renderCalendar(); });
+document.getElementById('nextBtn').addEventListener('click', ()=> { current.setMonth(current.getMonth()+1); renderCalendar(); });
+document.getElementById('todayBtn').addEventListener('click', ()=> { current = new Date(); renderCalendar(); });
+document.getElementById('viewSelect').addEventListener('change', renderCalendar);
+document.getElementById('searchInput').addEventListener('input', renderCalendar);
+document.querySelectorAll('.type-filter').forEach(cb => cb.addEventListener('change', renderCalendar));
+
+document.getElementById('exportBtn').addEventListener('click', ()=> {
+  // 簡易ICS作成（ローカル時間をUTCに変換してDTSTART/DTENDを作る）
+  const icsEvents = events.map((e,i) => {
+    const title = e.title;
+    const desc = `${e.raw.time || ''} ${e.location || ''}`;
+    function toUTCString(dt){
+      if(!dt) return '';
+      const d = new Date(dt);
+      return d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+'T'+pad(d.getUTCHours())+pad(d.getUTCMinutes())+'00Z';
+    }
+    return {
+      uid: 'ev'+i+'@local',
+      summary: title,
+      dtstart: e.allDay ? (e.start + 'T000000Z') : toUTCString(e.start),
+      dtend: e.allDay ? (e.start + 'T235959Z') : toUTCString(e.end),
+      description: desc
+    };
+  });
+  let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SimpleCalendar//EN\r\n';
+  icsEvents.forEach(ev => {
+    ics += 'BEGIN:VEVENT\r\n';
+    ics += 'UID:' + ev.uid + '\r\n';
+    ics += 'SUMMARY:' + ev.summary.replace(/,/g,'\\,') + '\r\n';
+    if(ev.dtstart) ics += 'DTSTART:' + ev.dtstart + '\r\n';
+    if(ev.dtend) ics += 'DTEND:' + ev.dtend + '\r\n';
+    if(ev.description) ics += 'DESCRIPTION:' + ev.description.replace(/\n/g,'\\n') + '\r\n';
+    ics += 'END:VEVENT\r\n';
+  });
+  ics += 'END:VCALENDAR\r\n';
+  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'events.ics';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* ============================
+   通知: ページを開くたびに今日の予定を通知
+   - Notification API を使用
+   - 許可を求め、許可があれば通知を表示
+   ============================ */
+
+function notifyTodaysEvents(){
+  if(!('Notification' in window)) return;
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  const todays = events.filter(e => e.raw.date === todayStr);
+  if(todays.length === 0) return;
+
+  function show(){
     if(todays.length === 1){
-      const ev = todays[0].extendedProps.raw;
-      const time = (todays[0].allDay || /^(All|終日)$/i.test(ev.time)) ? '終日' : (ev.time || formatEventTime(todays[0]));
-      const title = `今日の予定: ${ev.name}`;
-      const body = `${time}\n場所: ${ev.location || '--'}`;
+      const ev = todays[0];
+      const title = `今日の予定: ${ev.title}`;
+      const body = ev.allDay ? '終日' : ( (ev.raw.time) ? ev.raw.time : (formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : '')) );
       const n = new Notification(title, { body: body, tag: 'today-event', renotify: true });
-      n.onclick = () => { window.focus(); showModal(`<strong>${escapeHtml(ev.name)}</strong><br>${escapeHtml(time)}<br>場所: ${escapeHtml(ev.location || '--')}`); };
+      n.onclick = () => { window.focus(); };
     } else {
-      // multiple events: summarize
       const title = `今日の予定 ${todays.length}件`;
-      const lines = todays.slice(0,5).map(t => {
-        const ev = t.extendedProps.raw;
-        const time = (t.allDay || /^(All|終日)$/i.test(ev.time)) ? '終日' : (ev.time || formatEventTime(t));
-        return `${time} ${ev.name}`;
-      });
-      if(todays.length > 5) lines.push(`...他 ${todays.length - 5} 件`);
-      const body = lines.join('\n');
+      const body = todays.slice(0,5).map(t => (t.allDay ? '終日' : (t.raw.time || formatTimeShort(t.start))) + ' ' + t.title).join('\n');
       const n = new Notification(title, { body: body, tag: 'today-events', renotify: true });
       n.onclick = () => { window.focus(); };
     }
   }
 
-  if(Notification.permission === 'granted'){
-    showNotification();
-  } else if(Notification.permission !== 'denied'){
-    Notification.requestPermission().then(permission => {
-      if(permission === 'granted') showNotification();
-    });
+  if(Notification.permission === 'granted') show();
+  else if(Notification.permission !== 'denied') {
+    Notification.requestPermission().then(p => { if(p === 'granted') show(); });
   }
 }
 
-/* ===========================
-   ユーティリティ関数
-   =========================== */
-
-function formatEventTime(ev){
-  // try to present a friendly time string from event object
-  const raw = ev.extendedProps && ev.extendedProps.raw;
-  if(raw && raw.time) return raw.time;
-  if(ev.start && ev.end){
-    const s = ev.start;
-    const e = ev.end;
-    const pad = n => String(n).padStart(2,'0');
-    return `${pad(s.getHours())}:${pad(s.getMinutes())}~${pad(e.getHours())}:${pad(e.getMinutes())}`;
-  }
-  return '';
-}
-
-/* 簡易 ICS ビルダー */
-function buildICS(events){
-  const pad = n => (n<10? '0'+n : n);
-  function toICSDate(iso){
-    if(!iso) return '';
-    const d = new Date(iso);
-    return d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+'T'+pad(d.getUTCHours())+pad(d.getUTCMinutes())+pad(d.getUTCSeconds())+'Z';
-  }
-  let out = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//MyCalendar//EN\r\n';
-  events.forEach((e,i)=>{
-    out += 'BEGIN:VEVENT\r\n';
-    out += 'UID:event-'+i+'@local\r\n';
-    out += 'SUMMARY:'+escapeICSText(e.title)+'\r\n';
-    if(e.start) out += 'DTSTART:'+toICSDate(e.start)+'\r\n';
-    if(e.end) out += 'DTEND:'+toICSDate(e.end)+'\r\n';
-    if(e.description) out += 'DESCRIPTION:'+escapeICSText(e.description)+'\r\n';
-    out += 'END:VEVENT\r\n';
-  });
-  out += 'END:VCALENDAR\r\n';
-  return out;
-}
-function escapeICSText(s){ return (s||'').replace(/\n/g,'\\n').replace(/,/g,'\\,'); }
-
-/* HTML エスケープ（モーダル表示用） */
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
+/* ============================
+   初期化
+   ============================ */
+document.addEventListener('DOMContentLoaded', () => {
+  renderCalendar();
+  notifyTodaysEvents();
+});
 </script>
 </body>
 </html>
