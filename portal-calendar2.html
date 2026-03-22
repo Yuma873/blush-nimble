@@ -3,8 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>[簡易]ポータルサイト - カレンダー（改良版・予定入り）</title>
+  <title>[簡易]ポータルサイト - カレンダー（時刻正規化＋通知）</title>
+
+  <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+
   <style>
     :root{
       --nav-width:240px;
@@ -12,22 +15,28 @@
       --bg:#f5f7fa;
       --card:#ffffff;
     }
-    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN",Meiryo,Arial; background:var(--bg); color:#222; }
+    html,body{ height:100%; margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN",Meiryo,Arial; background:var(--bg); color:#222; }
     nav{ position:fixed; left:0; top:0; bottom:0; width:var(--nav-width); background:#2c3e50; color:#fff; padding:16px; box-sizing:border-box; overflow:auto; }
     nav a{ display:block; color:#fff; text-decoration:none; margin:8px 0; padding:10px; background:#34495e; border-radius:6px; text-align:center; }
-    main{ margin-left:var(--nav-width); padding:18px; }
+    main{ margin-left:var(--nav-width); padding:18px; min-height:100vh; box-sizing:border-box; }
     .top-controls{ display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
     .search, .filter, .export { padding:8px 10px; border-radius:6px; border:1px solid #ddd; background:var(--card); }
-    .legend{ display:flex; gap:10px; margin-top:12px; font-size:14px; }
+    .legend{ display:flex; gap:10px; margin-top:12px; font-size:14px; flex-wrap:wrap; }
     .legend span{ display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:middle; }
     .fc .fc-toolbar-title{ font-weight:700; }
-    /* モーダル */
+    #calendar{ background:var(--card); padding:12px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+    /* modal */
     .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.4); display:none; align-items:center; justify-content:center; z-index:2000; }
     .modal{ background:var(--card); padding:16px; border-radius:8px; width:360px; max-width:94%; box-shadow:0 6px 24px rgba(0,0,0,0.2); }
-    .modal h3{ margin:0 0 8px 0; }
     .btn{ padding:8px 10px; border-radius:6px; border:none; cursor:pointer; }
     .btn.primary{ background:var(--accent); color:#fff; }
     .btn.ghost{ background:transparent; border:1px solid #ccc; }
+    /* event colors (fallback) */
+    .type-practice{ background:#2b8cff !important; border-color:#2b8cff !important; color:#fff !important; }
+    .type-tournament{ background:#e74c3c !important; border-color:#e74c3c !important; color:#fff !important; }
+    .type-school{ background:#27ae60 !important; border-color:#27ae60 !important; color:#fff !important; }
+    .type-other{ background:#f39c12 !important; border-color:#f39c12 !important; color:#fff !important; }
+
     @media(max-width:768px){
       nav{ position:relative; width:100%; height:auto; display:flex; gap:8px; overflow-x:auto; padding:8px; }
       main{ margin-left:0; margin-top:8px; }
@@ -51,10 +60,10 @@
   </div>
 
   <div class="legend" style="margin-top:12px;">
-    <div><span style="background:red"></span> 大会</div>
-    <div><span style="background:blue"></span> 部活</div>
-    <div><span style="background:green"></span> 学校行事</div>
-    <div><span style="background:orange"></span> その他</div>
+    <div><span style="background:#e74c3c"></span> 大会</div>
+    <div><span style="background:#2b8cff"></span> 部活</div>
+    <div><span style="background:#27ae60"></span> 学校行事</div>
+    <div><span style="background:#f39c12"></span> その他</div>
   </div>
 </nav>
 
@@ -62,7 +71,7 @@
   <div class="top-controls">
     <div id="calendar-controls"></div>
     <input id="search" class="search" placeholder="イベント検索（名前・場所）" />
-    <select id="view-select" class="filter">
+    <select id="view-select" class="filter" aria-label="表示切替">
       <option value="dayGridMonth">月表示</option>
       <option value="timeGridWeek">週表示</option>
       <option value="timeGridDay">日表示</option>
@@ -85,13 +94,15 @@
   </div>
 </div>
 
+<!-- FullCalendar JS -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/ja.js"></script>
+
 <script>
-/* -------------------------
-  添付ドキュメント内の events 配列をそのまま組み込みました
-------------------------- */
-window.INIT_EVENTS = [
+/* ===========================
+   RAW EVENTS (添付ドキュメントの予定をそのまま)
+   =========================== */
+const RAW_EVENTS = [
 { date:'2025-10-02', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
 { date:'2025-10-07', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' },
 { date:'2025-10-09', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
@@ -215,40 +226,108 @@ window.INIT_EVENTS = [
 { date:'2026-06-27', time:'終日', name:'(前期休校)', type:'school', location:'--' }
 ];
 
+/* ===========================
+   時刻正規化ロジック
+   - 開始と終了を厳密に設定
+   - 開始のみの場合は終了を同じに
+   - 終日の場合は allDay=true
+   - 入力は日本ローカル時間として扱う
+   =========================== */
+
+/**
+ * parseTimeRange:
+ *  入力例:
+ *   - "16:00~17:15(SB17:45)" -> { startHHMM: "16:00", endHHMM: "17:15" }
+ *   - "16:00" -> { startHHMM: "16:00", endHHMM: "16:00" }
+ *   - "All" / "終日" -> { allDay: true }
+ *   - "00:00~23:59" -> treated as allDay (keeps allDay true)
+ */
+function parseTimeRange(timeStr){
+  if(!timeStr) return { allDay:false };
+  const s = String(timeStr).trim();
+  if(/^All$/i.test(s) || /^終日$/.test(s)) return { allDay:true };
+  // detect pattern HH:MM or H:MM
+  const hhmmRegex = /(\d{1,2}:\d{2})/g;
+  const matches = [...s.matchAll(hhmmRegex)].map(m=>m[1]);
+  if(matches.length === 0) return { allDay:false };
+  if(matches.length === 1){
+    return { startHHMM: matches[0], endHHMM: matches[0], allDay:false };
+  }
+  // matches.length >= 2 -> first is start, second is end
+  const start = matches[0];
+  const end = matches[1];
+  // treat 00:00~23:59 as all-day
+  if(start === '00:00' && end === '23:59') return { allDay:true };
+  return { startHHMM: start, endHHMM: end, allDay:false };
+}
+
+/**
+ * toLocalISO:
+ *  - dateStr: "YYYY-MM-DD"
+ *  - hhmm: "HH:MM"
+ *  returns local ISO string without timezone suffix (FullCalendar accepts ISO with timezone, but we use local)
+ */
+function toLocalISO(dateStr, hhmm){
+  // create local Date using components to avoid timezone shift
+  const [y,m,d] = dateStr.split('-').map(Number);
+  if(!hhmm){
+    // return date-only ISO (allDay)
+    return `${String(y).padStart(4,'0')}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  }
+  const [hh,mm] = hhmm.split(':').map(Number);
+  const dt = new Date(y, m-1, d, hh, mm, 0, 0);
+  // return ISO string in local time (FullCalendar can accept Date object too)
+  return dt.toISOString();
+}
+
+/* convert RAW_EVENTS -> FullCalendar events with normalized start/end/allDay */
 function convertEvents(arr){
-  return arr.map(ev=>{
-    let start = ev.date;
-    let title = ev.name;
-    // try to parse start time if present (simple heuristic)
-    if(ev.time && ev.time !== 'All' && ev.time.indexOf('~')>-1){
-      const t = ev.time.split('~')[0].replace(/[^\d:]/g,'');
-      if(t){
-        // normalize to HH:MM
-        let hhmm = t;
-        if(hhmm.length === 4 && hhmm.indexOf(':')===-1) hhmm = hhmm.slice(0,2)+':'+hhmm.slice(2);
-        start = ev.date + 'T' + hhmm;
-      }
-    } else if(ev.time && ev.time !== 'All' && /^\d{1,2}:\d{2}$/.test(ev.time)){
-      start = ev.date + 'T' + ev.time;
-    }
-    return {
-      id: ev.date + '|' + ev.name + '|' + Math.random().toString(36).slice(2,8),
-      title: title,
-      start: start,
+  return arr.map((ev, idx) => {
+    const timeInfo = parseTimeRange(ev.time);
+    const date = ev.date;
+    let fc = {
+      id: `${idx}-${date}-${ev.name}`,
+      title: ev.name,
       extendedProps: {
         raw: ev,
         type: ev.type || 'other',
         time: ev.time || '',
         location: ev.location || ''
       },
-      classNames: [ev.type || 'other']
+      classNames: ['type-' + (ev.type || 'other')]
     };
+
+    if(timeInfo.allDay){
+      fc.allDay = true;
+      // FullCalendar expects allDay events to have start as date-only string
+      fc.start = `${date}`;
+      // no end (or could set end to next day if desired)
+    } else {
+      // has startHHMM at least
+      const startISO = toLocalISO(date, timeInfo.startHHMM || null);
+      // If endHHMM present, use it; else set end same as start
+      const endHHMM = timeInfo.endHHMM || timeInfo.startHHMM || null;
+      const endISO = endHHMM ? toLocalISO(date, endHHMM) : startISO;
+      // Use Date objects for FullCalendar to avoid timezone display issues
+      fc.start = new Date(startISO);
+      fc.end = new Date(endISO);
+      // If start and end are identical, keep both (FullCalendar will show point event)
+      // If end <= start, add 1 minute to end to avoid zero-length issues
+      if(fc.end.getTime() <= fc.start.getTime()){
+        fc.end = new Date(fc.start.getTime() + 60*1000);
+      }
+      fc.allDay = false;
+    }
+    return fc;
   });
 }
 
+/* ===========================
+   カレンダー初期化
+   =========================== */
 document.addEventListener('DOMContentLoaded', function() {
   const calendarEl = document.getElementById('calendar');
-  const initialEvents = convertEvents(window.INIT_EVENTS);
+  const initialEvents = convertEvents(RAW_EVENTS);
 
   const calendar = new FullCalendar.Calendar(calendarEl, {
     locale: 'ja',
@@ -262,18 +341,41 @@ document.addEventListener('DOMContentLoaded', function() {
     navLinks: true,
     selectable: true,
     editable: true,
-    dayMaxEventRows: true,
+    dayMaxEventRows: 3,
     events: initialEvents,
     eventClick: function(info){
       const ev = info.event.extendedProps.raw;
-      showModal(`<strong>${ev.name}</strong><br>${ev.time || ''}<br>場所: ${ev.location || '--'}`);
+      const timeText = info.event.allDay ? '終日' : (ev.time || formatEventTime(info.event));
+      showModal(`<strong>${escapeHtml(ev.name)}</strong><br>${escapeHtml(timeText)}<br>場所: ${escapeHtml(ev.location || '--')}`);
+    },
+    eventDidMount: function(info){
+      const type = info.event.extendedProps.type || 'other';
+      const colorMap = { practice:'#2b8cff', tournament:'#e74c3c', school:'#27ae60', other:'#f39c12' };
+      const color = colorMap[type] || '#888';
+      if(info.el){
+        info.el.style.backgroundColor = color;
+        info.el.style.borderColor = color;
+        info.el.style.color = '#fff';
+      }
     },
     eventDrop: function(info){
       console.log('moved', info.event.id, info.event.start);
+    },
+    selectable: true,
+    select: function(selectionInfo){
+      const startStr = selectionInfo.startStr;
+      showModal(`<strong>新規イベント</strong><br>日付: ${startStr}<br>（編集機能は追加可能です）`);
+      calendar.unselect();
     }
   });
 
   calendar.render();
+
+  /* カレンダーのツールバーを外部に移動 */
+  const toolbar = calendarEl.querySelector('.fc-toolbar');
+  if(toolbar){
+    document.getElementById('calendar-controls').appendChild(toolbar);
+  }
 
   /* ビュー切替 */
   document.getElementById('view-select').addEventListener('change', function(){
@@ -285,8 +387,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const q = this.value.trim().toLowerCase();
     calendar.getEvents().forEach(ev=>{
       const raw = ev.extendedProps.raw || {};
-      const text = (raw.name + ' ' + (raw.location||'')).toLowerCase();
-      if(q === '' || text.indexOf(q) !== -1) ev.setProp('display','auto'); else ev.setProp('display','none');
+      const text = (raw.name + ' ' + (raw.location||'') + ' ' + (raw.time||'')).toLowerCase();
+      ev.setProp('display', (q === '' || text.indexOf(q) !== -1) ? 'auto' : 'none');
     });
   });
 
@@ -320,31 +422,95 @@ document.addEventListener('DOMContentLoaded', function() {
     URL.revokeObjectURL(url);
   });
 
-  /* コントロールを外部に移動 */
-  const toolbar = calendarEl.querySelector('.fc-toolbar');
-  if(toolbar) document.getElementById('calendar-controls').appendChild(toolbar);
-
   /* モーダル操作 */
   document.getElementById('modal-close').addEventListener('click', hideModal);
   document.getElementById('modal-backdrop').addEventListener('click', function(e){
     if(e.target === this) hideModal();
   });
+
+  /* ページを開くたびに今日の予定を通知 */
+  notifyTodaysEvents(initialEvents);
 });
 
-/* モーダル表示 */
-function showModal(html){
-  const b = document.getElementById('modal-backdrop');
-  document.getElementById('modal-body').innerHTML = html;
-  b.style.display = 'flex';
-  b.setAttribute('aria-hidden','false');
-}
-function hideModal(){
-  const b = document.getElementById('modal-backdrop');
-  b.style.display = 'none';
-  b.setAttribute('aria-hidden','true');
+/* ===========================
+   通知ロジック
+   - 開くたびに今日の予定を通知
+   - ブラウザの Notification API を使用
+   - 許可を求め、許可されれば通知を表示
+   - 複数件はまとめて1つの通知にする
+   =========================== */
+
+function notifyTodaysEvents(fcEvents){
+  // get today's date in local YYYY-MM-DD
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth()+1, d = now.getDate();
+  const todayStr = `${String(y).padStart(4,'0')}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+  // find events whose raw.date equals todayStr
+  const todays = fcEvents.filter(e => {
+    const raw = e.extendedProps && e.extendedProps.raw;
+    return raw && raw.date === todayStr;
+  });
+
+  if(todays.length === 0) return; // nothing to notify
+
+  // request permission if needed
+  if(!('Notification' in window)){
+    console.warn('This browser does not support notifications.');
+    return;
+  }
+
+  function showNotification(){
+    // Build notification title/body
+    if(todays.length === 1){
+      const ev = todays[0].extendedProps.raw;
+      const time = (todays[0].allDay || /^(All|終日)$/i.test(ev.time)) ? '終日' : (ev.time || formatEventTime(todays[0]));
+      const title = `今日の予定: ${ev.name}`;
+      const body = `${time}\n場所: ${ev.location || '--'}`;
+      const n = new Notification(title, { body: body, tag: 'today-event', renotify: true });
+      n.onclick = () => { window.focus(); showModal(`<strong>${escapeHtml(ev.name)}</strong><br>${escapeHtml(time)}<br>場所: ${escapeHtml(ev.location || '--')}`); };
+    } else {
+      // multiple events: summarize
+      const title = `今日の予定 ${todays.length}件`;
+      const lines = todays.slice(0,5).map(t => {
+        const ev = t.extendedProps.raw;
+        const time = (t.allDay || /^(All|終日)$/i.test(ev.time)) ? '終日' : (ev.time || formatEventTime(t));
+        return `${time} ${ev.name}`;
+      });
+      if(todays.length > 5) lines.push(`...他 ${todays.length - 5} 件`);
+      const body = lines.join('\n');
+      const n = new Notification(title, { body: body, tag: 'today-events', renotify: true });
+      n.onclick = () => { window.focus(); };
+    }
+  }
+
+  if(Notification.permission === 'granted'){
+    showNotification();
+  } else if(Notification.permission !== 'denied'){
+    Notification.requestPermission().then(permission => {
+      if(permission === 'granted') showNotification();
+    });
+  }
 }
 
-/* 簡易 ICS ビルダー（イベント配列から） */
+/* ===========================
+   ユーティリティ関数
+   =========================== */
+
+function formatEventTime(ev){
+  // try to present a friendly time string from event object
+  const raw = ev.extendedProps && ev.extendedProps.raw;
+  if(raw && raw.time) return raw.time;
+  if(ev.start && ev.end){
+    const s = ev.start;
+    const e = ev.end;
+    const pad = n => String(n).padStart(2,'0');
+    return `${pad(s.getHours())}:${pad(s.getMinutes())}~${pad(e.getHours())}:${pad(e.getMinutes())}`;
+  }
+  return '';
+}
+
+/* 簡易 ICS ビルダー */
 function buildICS(events){
   const pad = n => (n<10? '0'+n : n);
   function toICSDate(iso){
@@ -366,6 +532,9 @@ function buildICS(events){
   return out;
 }
 function escapeICSText(s){ return (s||'').replace(/\n/g,'\\n').replace(/,/g,'\\,'); }
+
+/* HTML エスケープ（モーダル表示用） */
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
 </script>
 </body>
 </html>
