@@ -10,16 +10,17 @@
     --accent:#1abc9c; --accent-contrast:#fff;
     --nav:#2c3e50; --nav-contrast:#fff;
     --danger:#e74c3c; --shadow:0 6px 20px rgba(0,0,0,0.08);
+    --pill-font:13px;
   }
   [data-theme="dark"]{
-    --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#06b6d4; --accent-contrast:#042028; --nav:#071029; --nav-contrast:#cfeff6;
+    --bg:#071029; --card:#071829; --muted:#9aa4b2; --accent:#06b6d4; --accent-contrast:#042028; --nav:#02101a; --nav-contrast:#cfeff6;
   }
-  html,body{ height:100%; margin:0; font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, Arial, sans-serif; background:var(--bg); color:var(--nav-contrast); }
-  header{ display:flex; align-items:center; gap:12px; padding:12px 18px; background:var(--nav); color:var(--nav-contrast); box-shadow:var(--shadow); position:sticky; top:0; z-index:50; }
-  header h1{ margin:0; font-size:18px; font-weight:700; }
+  html,body{ height:100%; margin:0; font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, Arial, sans-serif; background:var(--bg); color:var(--nav-contrast); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  header{ display:flex; align-items:center; gap:12px; padding:12px 18px; background:var(--nav); color:var(--nav-contrast); box-shadow:var(--shadow); position:sticky; top:0; z-index:60; }
+  header h1{ margin:0; font-size:18px; font-weight:800; }
   .controls{ margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .btn{ background:var(--card); color:inherit; border:0; padding:8px 10px; border-radius:8px; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.06); }
-  .btn.primary{ background:var(--accent); color:var(--accent-contrast); font-weight:700; }
+  .btn{ background:var(--card); color:inherit; border:0; padding:8px 10px; border-radius:8px; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.06); font-weight:600; }
+  .btn.primary{ background:var(--accent); color:var(--accent-contrast); }
   .btn.ghost{ background:transparent; border:1px solid rgba(0,0,0,0.06); }
   main{ display:flex; gap:16px; padding:18px; box-sizing:border-box; min-height:calc(100vh - 64px); }
   nav{ width:260px; background:linear-gradient(180deg,var(--nav),#1f2d3a); padding:14px; border-radius:12px; box-sizing:border-box; }
@@ -35,33 +36,37 @@
   .toolbar-right{ margin-left:auto; display:flex; gap:8px; align-items:center; }
   .search{ padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); min-width:220px; }
   .grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:8px; }
-  .dow{ background:rgba(255,255,255,0.03); padding:8px; text-align:center; border-radius:8px; font-weight:700; color:var(--nav-contrast); }
+  .dow{ background:rgba(255,255,255,0.03); padding:8px; text-align:center; border-radius:8px; font-weight:800; color:var(--nav-contrast); }
   .cell{ background:var(--card); color:initial; min-height:110px; padding:8px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); position:relative; overflow:hidden; display:flex; flex-direction:column; gap:6px; }
   .cell .date{ font-weight:700; color:var(--muted); }
   .cell.sunday{ background: linear-gradient(180deg, rgba(255,240,240,0.6), var(--card)); }
   .cell.saturday{ background: linear-gradient(180deg, rgba(240,248,255,0.6), var(--card)); }
   .today{ outline:3px solid var(--accent); }
   .events-list{ overflow:auto; max-height:calc(100vh - 260px); padding-right:6px; }
-  .event-pill{ display:block; padding:6px 8px; border-radius:8px; color:#fff; font-size:13px; margin-bottom:6px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .event-pill{ display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; color:#fff; font-size:var(--pill-font); margin-bottom:6px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .event-pill .badge{ background:rgba(255,255,255,0.18); color:#fff; padding:2px 6px; border-radius:6px; font-size:11px; }
   .type-practice{ background:#2b8cff; }
   .type-tournament{ background:#e74c3c; }
   .type-school{ background:#27ae60; }
   .type-other{ background:#f39c12; color:#222; }
   .modal-backdrop{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); z-index:2000; }
-  .modal{ background:var(--card); color:initial; padding:16px; border-radius:10px; width:420px; max-width:94%; box-shadow:0 10px 40px rgba(0,0,0,0.3); }
+  .modal{ background:var(--card); color:initial; padding:16px; border-radius:10px; width:520px; max-width:96%; box-shadow:0 10px 40px rgba(0,0,0,0.3); }
   .form-row{ display:flex; gap:8px; margin-top:8px; }
-  label{ font-size:13px; color:var(--muted); }
+  label{ font-size:13px; color:var(--muted); display:block; }
   input[type="text"], input[type="date"], input[type="time"], select, textarea{ padding:8px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); width:100%; box-sizing:border-box; }
   textarea{ min-height:80px; resize:vertical; }
   .small{ font-size:13px; color:var(--muted); }
   .footer-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
   .import-area{ margin-top:8px; }
   .kbd{ background:rgba(0,0,0,0.06); padding:2px 6px; border-radius:6px; font-weight:700; font-size:12px; }
+  .print-hide{ display:inline-block; }
+  @media print{ .print-hide{ display:none !important } header, nav, .controls { display:none } body { background:#fff } .cell { box-shadow:none } }
   @media(max-width:1000px){
     main{ flex-direction:column; padding:12px; }
     nav{ width:100%; display:flex; gap:8px; overflow-x:auto; padding:8px; border-radius:8px; }
     .grid{ gap:6px; }
     .cell{ min-height:90px; }
+    .modal{ width:94% }
   }
 </style>
 </head>
@@ -75,9 +80,12 @@
       <button id="todayBtn" class="btn primary" title="今日（T）">今日</button>
       <button id="nextBtn" class="btn" title="次月（→）">▶</button>
     </div>
+
     <input id="searchInput" class="search" placeholder="イベント検索（名前・場所・時間）" aria-label="イベント検索" />
     <select id="viewSelect" class="btn" title="表示切替">
       <option value="month">月表示</option>
+      <option value="week">週表示</option>
+      <option value="day">日表示</option>
       <option value="list">リスト表示</option>
     </select>
     <button id="addEventBtn" class="btn primary" title="イベント追加（N）">＋ イベント追加</button>
@@ -90,10 +98,10 @@
 
 <main>
   <nav aria-label="サイドバー">
-    <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
-    <a href="https://yuma873.github.io/blush-nimble/index.html" style="background:#f44336;">ログアウト</a>
+    <a href="https://yuma873.github.io/blush-nimble/toppage.html" class="print-hide">トップ</a>
+    <a href="https://yuma873.github.io/blush-nimble/index.html" style="background:#f44336;" class="print-hide">ログアウト</a>
 
-    <div class="sidebar-section" style="margin-top:12px;">
+    <div class="sidebar-section">
       <strong>表示フィルタ</strong>
       <div style="margin-top:8px;">
         <label><input type="checkbox" class="type-filter" value="practice" checked> 部活</label><br>
@@ -140,11 +148,20 @@
     </div>
 
     <div id="calendarArea">
+      <!-- Month / Week / Day / List views -->
       <div id="monthView">
         <div class="grid" id="dowRow" aria-hidden="false">
           <div class="dow">日</div><div class="dow">月</div><div class="dow">火</div><div class="dow">水</div><div class="dow">木</div><div class="dow">金</div><div class="dow">土</div>
         </div>
         <div class="grid" id="calendarGrid" aria-live="polite"></div>
+      </div>
+
+      <div id="weekView" style="display:none;">
+        <div id="weekGrid" class="grid" style="grid-template-columns:repeat(7,1fr);"></div>
+      </div>
+
+      <div id="dayView" style="display:none;">
+        <div id="dayGrid" style="display:flex; gap:8px;"></div>
       </div>
 
       <div id="listView" style="display:none;">
@@ -158,7 +175,7 @@
 <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-hidden="true">
   <div class="modal" role="document" aria-labelledby="modalTitle">
     <h2 id="modalTitle">イベント</h2>
-    <div>
+    <div id="modalContent">
       <label>タイトル
         <input id="evTitle" type="text" />
       </label>
@@ -203,13 +220,9 @@
 
 <script>
 /* ============================
-   概要
-   - 外部ライブラリ不使用
-   - イベントは localStorage に保存
-   - 時刻正規化：開始/終了を厳密に扱う。開始のみなら終了=開始。終日は allDay=true。
-   - 通知：ページを開くたびに今日の予定を通知
-   - ドラッグ＆ドロップで日付移動（簡易）
-   - インポート/エクスポート（JSON/ICS）
+   改良版カレンダー（Vanilla JS）
+   - 終日イベントはタイトルに「終日」を含めない（バッジで表示）
+   - 多数の機能を追加（詳細は上部説明）
    ============================ */
 
 /* ---------- ユーティリティ ---------- */
@@ -217,52 +230,52 @@ function $(sel, ctx=document) { return ctx.querySelector(sel); }
 function $all(sel, ctx=document) { return Array.from(ctx.querySelectorAll(sel)); }
 function pad(n){ return String(n).padStart(2,'0'); }
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function formatDateKey(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function toLocalDateObj(dateStr, hhmm){
+  const [y,m,d] = dateStr.split('-').map(Number);
+  if(!hhmm) return new Date(y, m-1, d);
+  const [hh,mm] = hhmm.split(':').map(Number);
+  return new Date(y, m-1, d, hh, mm, 0, 0);
+}
+function formatDateTime(d){
+  if(!d) return '';
+  if(typeof d === 'string') return d;
+  const dt = new Date(d);
+  return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+}
+function formatTimeShort(d){
+  if(!d) return '';
+  if(typeof d === 'string') return '';
+  const dt = new Date(d);
+  return `${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+}
 
 /* ---------- データ管理 ---------- */
-const STORAGE_KEY = 'portal_calendar_events_v2';
-let events = []; // 内部表現: {id, date(YYYY-MM-DD), allDay(bool), start:Date or null, end:Date or null, title, type, location, note, rawTimeStr}
+const STORAGE_KEY = 'portal_calendar_events_v3';
+let events = []; // {id, date, allDay, start:Date|null, end:Date|null, title, type, location, note, rawTimeStr}
+function saveEvents(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(events.map(e=>({
+  id:e.id, date:e.date, allDay:e.allDay, start:e.start?e.start.toISOString():null, end:e.end?e.end.toISOString():null,
+  title:e.title, type:e.type, location:e.location, note:e.note, rawTimeStr:e.rawTimeStr
+})))) }
 function loadEvents(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){
+    try{
       const parsed = JSON.parse(raw);
-      events = parsed.map(normalizeEventFromStorage);
-    } else {
-      // 初期データ: 添付の予定をそのまま組み込む（抜粋）
-      events = normalizeEventArray(INIT_RAW_EVENTS);
-      saveEvents();
-    }
-  }catch(e){
-    console.error('loadEvents error', e);
-    events = normalizeEventArray(INIT_RAW_EVENTS);
+      events = parsed.map(p => ({
+        id:p.id, date:p.date, allDay:!!p.allDay,
+        start:p.start?new Date(p.start):null, end:p.end?new Date(p.end):null,
+        title:p.title, type:p.type||'other', location:p.location||'--', note:p.note||'', rawTimeStr:p.rawTimeStr||''
+      }));
+      return;
+    }catch(e){ console.warn('load parse error', e); }
   }
-}
-function saveEvents(){
-  const toStore = events.map(e => ({
-    id: e.id, date: e.date, allDay: e.allDay,
-    start: e.start ? e.start.toISOString() : null,
-    end: e.end ? e.end.toISOString() : null,
-    title: e.title, type: e.type, location: e.location, note: e.note, rawTimeStr: e.rawTimeStr
-  }));
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
-}
-function normalizeEventFromStorage(s){
-  return {
-    id: s.id,
-    date: s.date,
-    allDay: !!s.allDay,
-    start: s.start ? new Date(s.start) : null,
-    end: s.end ? new Date(s.end) : null,
-    title: s.title,
-    type: s.type || 'other',
-    location: s.location || '--',
-    note: s.note || '',
-    rawTimeStr: s.rawTimeStr || ''
-  };
+  // 初回ロード: use embedded initial events
+  events = normalizeEventArray(INIT_RAW_EVENTS);
+  saveEvents();
 }
 
-/* ---------- 時刻正規化（RAW -> 内部イベント） ---------- */
-/* RAW 形式: { date:'YYYY-MM-DD', time:'...', name:'...', type:'practice', location:'...' } */
+/* ---------- 時刻正規化（RAW -> 内部） ---------- */
 function parseTimeRange(timeStr){
   if(!timeStr) return { allDay:false };
   const s = String(timeStr).trim();
@@ -274,12 +287,6 @@ function parseTimeRange(timeStr){
   const start = matches[0], end = matches[1];
   if(start === '00:00' && end === '23:59') return { allDay:true };
   return { start, end, allDay:false };
-}
-function toLocalDateObj(dateStr, hhmm){
-  const [y,m,d] = dateStr.split('-').map(Number);
-  if(!hhmm) return new Date(y, m-1, d);
-  const [hh,mm] = hhmm.split(':').map(Number);
-  return new Date(y, m-1, d, hh, mm, 0, 0);
 }
 function normalizeEventArray(rawArr){
   return rawArr.map((ev, idx) => {
@@ -294,22 +301,18 @@ function normalizeEventArray(rawArr){
       rawTimeStr: ev.time || ''
     };
     if(p.allDay){
-      base.allDay = true;
-      base.start = null;
-      base.end = null;
+      base.allDay = true; base.start = null; base.end = null;
     } else {
       const start = toLocalDateObj(ev.date, p.start || null);
       const end = toLocalDateObj(ev.date, p.end || p.start || null);
-      if(end.getTime() <= start.getTime()) end.setMinutes(end.getMinutes() + 1);
-      base.allDay = false;
-      base.start = start;
-      base.end = end;
+      if(end.getTime() <= start.getTime()) end.setMinutes(end.getMinutes()+1);
+      base.allDay = false; base.start = start; base.end = end;
     }
     return base;
   });
 }
 
-/* ---------- 初期RAWイベント（添付の全予定をここに貼る） ---------- */
+/* ---------- 初期RAWイベント（添付の予定をそのまま） ---------- */
 const INIT_RAW_EVENTS = [
 { date:'2025-10-02', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
 { date:'2025-10-07', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' },
@@ -434,26 +437,149 @@ const INIT_RAW_EVENTS = [
 { date:'2026-06-27', time:'終日', name:'(前期休校)', type:'school', location:'--' }
 ];
 
-/* ---------- カレンダー描画ロジック ---------- */
-let current = new Date(); // 表示基準
+/* ---------- 描画ロジック ---------- */
+let current = new Date();
+
 function render(){
   const view = $('#viewSelect').value;
-  document.getElementById('monthTitle').textContent = `${current.getFullYear()}年 ${current.getMonth()+1}月`;
+  $('#monthTitle').textContent = `${current.getFullYear()}年 ${current.getMonth()+1}月`;
   $('#statusInfo').textContent = `イベント ${events.length} 件`;
-  if(view === 'list'){
-    $('#monthView').style.display = 'none';
-    $('#listView').style.display = 'block';
-    renderListView();
-  } else {
-    $('#monthView').style.display = 'block';
-    $('#listView').style.display = 'none';
-    renderMonthView();
-  }
+  // hide all views
+  $('#monthView').style.display = 'none';
+  $('#weekView').style.display = 'none';
+  $('#dayView').style.display = 'none';
+  $('#listView').style.display = 'none';
+  if(view === 'list'){ renderListView(); $('#listView').style.display = 'block'; }
+  else if(view === 'week'){ renderWeekView(); $('#weekView').style.display = 'block'; }
+  else if(view === 'day'){ renderDayView(); $('#dayView').style.display = 'block'; }
+  else { renderMonthView(); $('#monthView').style.display = 'block'; }
   saveEvents();
 }
+
+function renderMonthView(){
+  const grid = $('#calendarGrid'); grid.innerHTML = '';
+  const year = current.getFullYear(), month = current.getMonth();
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month+1, 0);
+  const firstDow = first.getDay();
+  const totalDays = last.getDate();
+  for(let i=0;i<firstDow;i++){ const blank=document.createElement('div'); blank.className='cell'; blank.style.opacity='0.3'; grid.appendChild(blank); }
+  for(let d=1; d<=totalDays; d++){
+    const dateStr = `${year}-${pad(month+1)}-${pad(d)}`;
+    const cell = document.createElement('div'); cell.className='cell';
+    const dow = new Date(year, month, d).getDay();
+    if(dow===0) cell.classList.add('sunday'); if(dow===6) cell.classList.add('saturday');
+    const today = new Date();
+    if(d===today.getDate() && month===today.getMonth() && year===today.getFullYear()) cell.classList.add('today');
+    const dateEl = document.createElement('div'); dateEl.className='date'; dateEl.textContent = d; cell.appendChild(dateEl);
+    const eventsContainer = document.createElement('div'); eventsContainer.className='events-list';
+    const dayEvents = events.filter(ev => ev.date === dateStr);
+    const q = $('#searchInput').value.trim().toLowerCase();
+    const allowedTypes = $all('.type-filter:checked').map(x=>x.value);
+    dayEvents.forEach(ev => {
+      if(!allowedTypes.includes(ev.type)) return;
+      const text = (ev.title + ' ' + ev.location + ' ' + (ev.rawTimeStr||'')).toLowerCase();
+      if(q && text.indexOf(q) === -1) return;
+      const pill = document.createElement('div');
+      pill.className = `event-pill type-${ev.type}`;
+      // **終日の場合はタイトルに「終日」を含めない**。代わりにバッジを表示。
+      const titleSpan = document.createElement('span'); titleSpan.textContent = ev.title; titleSpan.style.flex='1'; titleSpan.style.overflow='hidden';
+      pill.appendChild(titleSpan);
+      if(ev.allDay){
+        const badge = document.createElement('span'); badge.className='badge'; badge.textContent='終日'; pill.appendChild(badge);
+      } else {
+        const timeSpan = document.createElement('span'); timeSpan.className='small'; timeSpan.textContent = formatTimeShort(ev.start); timeSpan.style.opacity='0.9';
+        pill.insertBefore(timeSpan, titleSpan);
+      }
+      pill.title = `${ev.title}\n${ev.allDay ? '終日' : (formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : ''))}\n場所: ${ev.location}`;
+      pill.draggable = true;
+      pill.addEventListener('click', (e)=>{ e.stopPropagation(); openEditModal(ev); });
+      pill.addEventListener('dragstart', (e)=> { e.dataTransfer.setData('text/plain', ev.id); e.dataTransfer.effectAllowed='move'; });
+      eventsContainer.appendChild(pill);
+    });
+    cell.appendChild(eventsContainer);
+    // drag/drop to move event to this date
+    cell.addEventListener('dragover', (e)=> { e.preventDefault(); cell.style.outline='2px dashed rgba(0,0,0,0.12)'; });
+    cell.addEventListener('dragleave', ()=> { cell.style.outline='none'; });
+    cell.addEventListener('drop', (e)=> {
+      e.preventDefault(); cell.style.outline='none';
+      const evId = e.dataTransfer.getData('text/plain'); const ev = events.find(x=>x.id===evId);
+      if(ev){ const oldDate = ev.date; ev.date = dateStr;
+        if(!ev.allDay && ev.start){ const s = ev.start, et = ev.end; const [y,mn,dd] = dateStr.split('-').map(Number);
+          ev.start = new Date(y,mn-1,dd,s.getHours(),s.getMinutes(),0,0);
+          if(et) ev.end = new Date(y,mn-1,dd,et.getHours(),et.getMinutes(),0,0);
+        }
+        saveEvents(); render();
+      }
+    });
+    cell.addEventListener('click', ()=> {
+      const dayList = events.filter(ev => ev.date === dateStr);
+      if(dayList.length === 0) openCreateModal(dateStr);
+      else openDayListModal(dayList, dateStr);
+    });
+    grid.appendChild(cell);
+  }
+  const cells = grid.children.length; const rem = (7 - (cells % 7)) % 7;
+  for(let i=0;i<rem;i++){ const blank=document.createElement('div'); blank.className='cell'; blank.style.opacity='0.3'; grid.appendChild(blank); }
+}
+
+function renderWeekView(){
+  const container = $('#weekGrid'); container.innerHTML = '';
+  // week starting Sunday of current date's week
+  const cur = new Date(current.getFullYear(), current.getMonth(), current.getDate());
+  const sunday = new Date(cur); sunday.setDate(cur.getDate() - cur.getDay());
+  for(let i=0;i<7;i++){
+    const d = new Date(sunday); d.setDate(sunday.getDate()+i);
+    const dateStr = formatDateKey(d);
+    const col = document.createElement('div'); col.className='cell';
+    const header = document.createElement('div'); header.className='date'; header.textContent = `${d.getMonth()+1}/${d.getDate()} (${['日','月','火','水','木','金','土'][d.getDay()]})`;
+    col.appendChild(header);
+    const eventsContainer = document.createElement('div'); eventsContainer.className='events-list';
+    const dayEvents = events.filter(ev => ev.date === dateStr);
+    dayEvents.forEach(ev => {
+      const pill = document.createElement('div'); pill.className=`event-pill type-${ev.type}`;
+      const titleSpan = document.createElement('span'); titleSpan.textContent = ev.title; titleSpan.style.flex='1';
+      pill.appendChild(titleSpan);
+      if(ev.allDay){ const badge=document.createElement('span'); badge.className='badge'; badge.textContent='終日'; pill.appendChild(badge); }
+      else { const timeSpan=document.createElement('span'); timeSpan.className='small'; timeSpan.textContent = formatTimeShort(ev.start); pill.insertBefore(timeSpan, titleSpan); }
+      pill.addEventListener('click', ()=> openEditModal(ev));
+      eventsContainer.appendChild(pill);
+    });
+    col.appendChild(eventsContainer);
+    container.appendChild(col);
+  }
+}
+
+function renderDayView(){
+  const container = $('#dayGrid'); container.innerHTML = '';
+  const date = new Date(current.getFullYear(), current.getMonth(), current.getDate());
+  const dateStr = formatDateKey(date);
+  const col = document.createElement('div'); col.style.flex='1';
+  const header = document.createElement('div'); header.className='date'; header.textContent = `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;
+  col.appendChild(header);
+  const eventsContainer = document.createElement('div'); eventsContainer.className='events-list';
+  const dayEvents = events.filter(ev => ev.date === dateStr).sort((a,b)=> {
+    if(a.allDay && !b.allDay) return -1;
+    if(!a.allDay && b.allDay) return 1;
+    const ta = a.allDay ? new Date(a.date) : a.start;
+    const tb = b.allDay ? new Date(b.date) : b.start;
+    return ta - tb;
+  });
+  dayEvents.forEach(ev => {
+    const card = document.createElement('div'); card.style.padding='10px'; card.style.marginBottom='8px'; card.style.background='var(--card)'; card.style.borderRadius='8px';
+    card.innerHTML = `<strong>${escapeHtml(ev.title)}</strong> <span class="small">(${escapeHtml(ev.type)})</span><br>
+      <div class="small">${ev.allDay ? '<span class="badge">終日</span>' : (formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : ''))}</div>
+      <div class="small">場所: ${escapeHtml(ev.location)}</div>
+      <div class="small">メモ: ${escapeHtml(ev.note || '')}</div>`;
+    card.addEventListener('click', ()=> openEditModal(ev));
+    eventsContainer.appendChild(card);
+  });
+  col.appendChild(eventsContainer);
+  container.appendChild(col);
+}
+
 function renderListView(){
-  const container = $('#listContainer');
-  container.innerHTML = '';
+  const container = $('#listContainer'); container.innerHTML = '';
   const year = current.getFullYear(), month = current.getMonth()+1;
   const monthStr = `${year}-${pad(month)}`;
   const monthEvents = events.filter(e => e.date.startsWith(monthStr)).sort((a,b) => {
@@ -461,142 +587,15 @@ function renderListView(){
     const tb = b.allDay ? new Date(b.date) : b.start;
     return ta - tb;
   });
-  if(monthEvents.length === 0){
-    container.textContent = '今月の予定はありません';
-    return;
-  }
+  if(monthEvents.length === 0){ container.textContent = '今月の予定はありません'; return; }
   monthEvents.forEach(ev => {
-    const el = document.createElement('div');
-    el.style.padding = '10px';
-    el.style.marginBottom = '8px';
-    el.style.background = 'var(--card)';
-    el.style.borderRadius = '8px';
-    el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+    const el = document.createElement('div'); el.style.padding='10px'; el.style.marginBottom='8px'; el.style.background='var(--card)'; el.style.borderRadius='8px';
     el.innerHTML = `<strong>${escapeHtml(ev.title)}</strong> <span class="small">(${escapeHtml(ev.type)})</span><br>
-      <div class="small">${ev.allDay ? '終日' : (formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : ''))}</div>
+      <div class="small">${ev.allDay ? '<span class="badge">終日</span>' : (formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : ''))}</div>
       <div class="small">場所: ${escapeHtml(ev.location)}</div>`;
     el.addEventListener('click', ()=> openEditModal(ev));
     container.appendChild(el);
   });
-}
-function renderMonthView(){
-  const grid = $('#calendarGrid');
-  grid.innerHTML = '';
-  const year = current.getFullYear(), month = current.getMonth();
-  const first = new Date(year, month, 1);
-  const last = new Date(year, month+1, 0);
-  const firstDow = first.getDay();
-  const totalDays = last.getDate();
-
-  // leading blanks
-  for(let i=0;i<firstDow;i++){
-    const blank = document.createElement('div');
-    blank.className = 'cell';
-    blank.style.opacity = '0.3';
-    grid.appendChild(blank);
-  }
-
-  for(let d=1; d<=totalDays; d++){
-    const dateStr = `${year}-${pad(month+1)}-${pad(d)}`;
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-    const dow = new Date(year, month, d).getDay();
-    if(dow === 0) cell.classList.add('sunday');
-    if(dow === 6) cell.classList.add('saturday');
-    const today = new Date();
-    if(d === today.getDate() && month === today.getMonth() && year === today.getFullYear()){
-      cell.classList.add('today');
-    }
-    const dateEl = document.createElement('div');
-    dateEl.className = 'date';
-    dateEl.textContent = d;
-    cell.appendChild(dateEl);
-
-    const dayEvents = events.filter(ev => ev.date === dateStr);
-    const q = $('#searchInput').value.trim().toLowerCase();
-    const allowedTypes = $all('.type-filter:checked').map(x=>x.value);
-    const eventsContainer = document.createElement('div');
-    eventsContainer.className = 'events-list';
-    dayEvents.forEach(ev => {
-      if(!allowedTypes.includes(ev.type)) return;
-      const text = (ev.title + ' ' + ev.location + ' ' + (ev.rawTimeStr||'')).toLowerCase();
-      if(q && text.indexOf(q) === -1) return;
-      const pill = document.createElement('span');
-      pill.className = `event-pill type-${ev.type}`;
-      pill.textContent = ev.allDay ? `終日 ${ev.title}` : `${formatTimeShort(ev.start)} ${ev.title}`;
-      pill.title = `${ev.title}\n${ev.allDay ? '終日' : (formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : ''))}\n場所: ${ev.location}`;
-      pill.draggable = true;
-      pill.addEventListener('click', (e)=> { e.stopPropagation(); openEditModal(ev); });
-      // dragstart: attach event id
-      pill.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', ev.id);
-        e.dataTransfer.effectAllowed = 'move';
-      });
-      eventsContainer.appendChild(pill);
-    });
-    cell.appendChild(eventsContainer);
-
-    // cell dragover/drop for moving events
-    cell.addEventListener('dragover', (e)=> { e.preventDefault(); cell.style.outline = '2px dashed rgba(0,0,0,0.12)'; });
-    cell.addEventListener('dragleave', ()=> { cell.style.outline = 'none'; });
-    cell.addEventListener('drop', (e)=> {
-      e.preventDefault();
-      cell.style.outline = 'none';
-      const evId = e.dataTransfer.getData('text/plain');
-      const ev = events.find(x=>x.id === evId);
-      if(ev){
-        // move to this date; if event had times, keep times but change date
-        const oldDate = ev.date;
-        ev.date = dateStr;
-        if(!ev.allDay && ev.start){
-          // shift start/end to new date preserving time-of-day
-          const s = ev.start;
-          const eTime = ev.end;
-          const [y,mn,dd] = dateStr.split('-').map(Number);
-          ev.start = new Date(y, mn-1, dd, s.getHours(), s.getMinutes(), 0, 0);
-          if(eTime) ev.end = new Date(y, mn-1, dd, eTime.getHours(), eTime.getMinutes(), 0, 0);
-        }
-        saveEvents();
-        render();
-      }
-    });
-
-    // click on cell to show day's events or create new
-    cell.addEventListener('click', ()=> {
-      const dayList = events.filter(ev => ev.date === dateStr);
-      if(dayList.length === 0){
-        openCreateModal(dateStr);
-      } else {
-        openDayListModal(dayList, dateStr);
-      }
-    });
-
-    grid.appendChild(cell);
-  }
-
-  // trailing blanks
-  const cells = grid.children.length;
-  const rem = (7 - (cells % 7)) % 7;
-  for(let i=0;i<rem;i++){
-    const blank = document.createElement('div');
-    blank.className = 'cell';
-    blank.style.opacity = '0.3';
-    grid.appendChild(blank);
-  }
-}
-
-/* ---------- 表示補助 ---------- */
-function formatDateTime(d){
-  if(!d) return '';
-  if(typeof d === 'string') return d;
-  const dt = new Date(d);
-  return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
-}
-function formatTimeShort(d){
-  if(!d) return '';
-  if(typeof d === 'string') return '';
-  const dt = new Date(d);
-  return `${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
 }
 
 /* ---------- モーダル（追加/編集） ---------- */
@@ -633,41 +632,27 @@ function openEditModal(ev){
 function openDayListModal(list, dateStr){
   editingEvent = null;
   $('#modalTitle').textContent = `${dateStr} の予定`;
-  $('#evTitle').value = '';
-  $('#evDate').value = dateStr;
-  $('#evAllDay').value = 'false';
-  $('#evStartTime').value = '';
-  $('#evEndTime').value = '';
-  $('#evType').value = 'practice';
-  $('#evLocation').value = '';
-  $('#evNote').value = '';
-  $('#deleteEventBtn').style.display = 'none';
-  // build list in modalBody
-  const body = document.querySelector('#modalBackdrop .modal div');
-  const modalBody = body;
-  // replace content
+  // build list content
   const content = document.createElement('div');
   list.forEach(ev => {
-    const div = document.createElement('div');
-    div.style.padding = '8px';
-    div.style.marginBottom = '6px';
-    div.style.background = 'rgba(0,0,0,0.03)';
-    div.style.borderRadius = '6px';
-    div.innerHTML = `<strong>${escapeHtml(ev.title)}</strong><br><small>${ev.allDay ? '終日' : (formatTimeShort(ev.start) + (ev.end ? ' - ' + formatTimeShort(ev.end) : ''))}</small><br><small>場所: ${escapeHtml(ev.location)}</small>`;
-    div.addEventListener('click', ()=> { openEditModal(ev); });
+    const div = document.createElement('div'); div.style.padding='8px'; div.style.marginBottom='6px'; div.style.background='rgba(0,0,0,0.03)'; div.style.borderRadius='6px';
+    div.innerHTML = `<strong>${escapeHtml(ev.title)}</strong><br><small>${ev.allDay ? '<span class="badge">終日</span>' : (formatTimeShort(ev.start) + (ev.end ? ' - ' + formatTimeShort(ev.end) : ''))}</small><br><small>場所: ${escapeHtml(ev.location)}</small>`;
+    div.addEventListener('click', ()=> openEditModal(ev));
     content.appendChild(div);
   });
-  // replace modal content
-  modal.querySelector('.modal').replaceChild(content, modal.querySelector('.modal').children[1]);
+  // replace modal content area
+  const modalEl = modal.querySelector('.modal');
+  modalEl.replaceChild(content, modalEl.children[1]);
   showModal();
 }
 function showModal(){
-  modal.style.display = 'flex';
-  modal.setAttribute('aria-hidden','false');
+  modal.style.display = 'flex'; modal.setAttribute('aria-hidden','false');
 }
 function hideModal(){
-  // restore modal content structure if needed
+  // restore modal content (simple approach: reload page fragment)
+  const modalEl = modal.querySelector('.modal');
   const base = document.createElement('div');
+  base.id = 'modalContent';
   base.innerHTML = `
     <label>タイトル
       <input id="evTitle" type="text" />
@@ -708,30 +693,22 @@ function hideModal(){
       <button id="saveBtn" class="btn primary">保存</button>
     </div>
   `;
-  const modalEl = modal.querySelector('.modal');
-  // replace second child (content area)
   if(modalEl.children[1]) modalEl.replaceChild(base, modalEl.children[1]);
-  modal.style.display = 'none';
-  modal.setAttribute('aria-hidden','true');
+  modal.style.display = 'none'; modal.setAttribute('aria-hidden','true');
 }
 
-/* ---------- モーダル操作イベント ---------- */
-document.addEventListener('click', (e) => {
-  if(e.target === modal) hideModal();
-});
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape') hideModal();
-});
-document.addEventListener('DOMContentLoaded', () => {
-  // delegate modal buttons (rebind after content replacement)
-  document.body.addEventListener('click', (e) => {
+/* ---------- モーダル操作 ---------- */
+document.addEventListener('click', (e)=> { if(e.target === modal) hideModal(); });
+document.addEventListener('keydown', (e)=> { if(e.key === 'Escape') hideModal(); });
+document.addEventListener('DOMContentLoaded', ()=> {
+  document.body.addEventListener('click', (e)=> {
     if(e.target && e.target.id === 'cancelBtn'){ hideModal(); render(); }
     if(e.target && e.target.id === 'saveBtn'){ onSaveEvent(); }
     if(e.target && e.target.id === 'deleteEventBtn'){ onDeleteEvent(); }
   });
 });
 
-/* ---------- 保存・削除処理 ---------- */
+/* ---------- 保存・削除 ---------- */
 function onSaveEvent(){
   const title = $('#evTitle').value.trim() || '無題';
   const date = $('#evDate').value;
@@ -741,189 +718,120 @@ function onSaveEvent(){
   const type = $('#evType').value;
   const location = $('#evLocation').value.trim() || '--';
   const note = $('#evNote').value.trim();
-
-  // normalize times
-  let start = null, end = null;
-  let rawTimeStr = '';
-  if(allDay){
-    rawTimeStr = '終日';
-  } else {
-    if(startTime && endTime){
-      start = toLocalDateObj(date, startTime);
-      end = toLocalDateObj(date, endTime);
-      rawTimeStr = `${startTime}~${endTime}`;
-    } else if(startTime && !endTime){
-      start = toLocalDateObj(date, startTime);
-      end = new Date(start.getTime() + 60*1000); // 1 minute
-      rawTimeStr = `${startTime}`;
-    } else {
-      // no times provided -> treat as all-day
-      rawTimeStr = '';
-    }
-    if(start && end && end.getTime() <= start.getTime()){
-      end = new Date(start.getTime() + 60*1000);
-    }
+  let start = null, end = null, rawTimeStr = '';
+  if(allDay){ rawTimeStr = '終日'; }
+  else {
+    if(startTime && endTime){ start = toLocalDateObj(date, startTime); end = toLocalDateObj(date, endTime); rawTimeStr = `${startTime}~${endTime}`; }
+    else if(startTime && !endTime){ start = toLocalDateObj(date, startTime); end = new Date(start.getTime()+60*1000); rawTimeStr = `${startTime}`; }
+    else { rawTimeStr = ''; }
+    if(start && end && end.getTime() <= start.getTime()) end = new Date(start.getTime()+60*1000);
   }
-
   if(editingEvent){
-    // update
-    editingEvent.title = title;
-    editingEvent.date = date;
-    editingEvent.allDay = allDay;
-    editingEvent.start = start;
-    editingEvent.end = end;
-    editingEvent.type = type;
-    editingEvent.location = location;
-    editingEvent.note = note;
-    editingEvent.rawTimeStr = rawTimeStr;
+    editingEvent.title = title; editingEvent.date = date; editingEvent.allDay = allDay; editingEvent.start = start; editingEvent.end = end;
+    editingEvent.type = type; editingEvent.location = location; editingEvent.note = note; editingEvent.rawTimeStr = rawTimeStr;
   } else {
-    // create
-    const newEv = {
-      id: 'ev-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
-      title, date, allDay, start, end, type, location, note, rawTimeStr
-    };
+    const newEv = { id:'ev-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), title, date, allDay, start, end, type, location, note, rawTimeStr };
     events.push(newEv);
   }
-  saveEvents();
-  hideModal();
-  render();
+  saveEvents(); hideModal(); render();
 }
-
 function onDeleteEvent(){
   if(!editingEvent) return;
-  const idx = events.findIndex(e => e.id === editingEvent.id);
-  if(idx !== -1){
-    if(confirm('このイベントを削除しますか？')) {
-      events.splice(idx,1);
-      saveEvents();
-      hideModal();
-      render();
-    }
+  if(confirm('このイベントを削除しますか？')){
+    events = events.filter(e => e.id !== editingEvent.id);
+    saveEvents(); hideModal(); render();
   }
 }
 
 /* ---------- インポート / エクスポート ---------- */
 function exportJSON(){
-  const out = events.map(e => ({
-    id: e.id, date: e.date, allDay: e.allDay,
-    start: e.start ? e.start.toISOString() : null,
-    end: e.end ? e.end.toISOString() : null,
-    title: e.title, type: e.type, location: e.location, note: e.note, rawTimeStr: e.rawTimeStr
-  }));
-  const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
+  const out = events.map(e => ({ id:e.id, date:e.date, allDay:e.allDay, start:e.start?e.start.toISOString():null, end:e.end?e.end.toISOString():null, title:e.title, type:e.type, location:e.location, note:e.note, rawTimeStr:e.rawTimeStr }));
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'}); const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = 'events.json'; a.click(); URL.revokeObjectURL(url);
 }
 function exportICS(){
-  // simple ICS builder: convert local times to UTC timestamps
   function toICSDate(dt, allDay){
     if(!dt) return '';
-    if(allDay) {
-      // date-only YYYYMMDD
-      const d = new Date(dt);
-      return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
-    }
-    const d = new Date(dt);
-    return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
+    if(allDay){ const d = new Date(dt); return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`; }
+    const d = new Date(dt); return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
   }
   let out = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//PortalCalendar//EN\r\n';
   events.forEach((e,i) => {
     out += 'BEGIN:VEVENT\r\n';
     out += 'UID:' + (e.id || ('ev'+i)) + '\r\n';
     out += 'SUMMARY:' + (e.title || '').replace(/,/g,'\\,') + '\r\n';
-    if(e.allDay){
-      out += 'DTSTART;VALUE=DATE:' + toICSDate(e.date, true) + '\r\n';
-      out += 'DTEND;VALUE=DATE:' + toICSDate(nextDateStr(e.date), true) + '\r\n';
-    } else {
-      out += 'DTSTART:' + toICSDate(e.start, false) + '\r\n';
-      if(e.end) out += 'DTEND:' + toICSDate(e.end, false) + '\r\n';
-    }
+    if(e.allDay){ out += 'DTSTART;VALUE=DATE:' + toICSDate(e.date, true) + '\r\n'; out += 'DTEND;VALUE=DATE:' + toICSDate(nextDateStr(e.date), true) + '\r\n'; }
+    else { out += 'DTSTART:' + toICSDate(e.start, false) + '\r\n'; if(e.end) out += 'DTEND:' + toICSDate(e.end, false) + '\r\n'; }
     if(e.location) out += 'LOCATION:' + (e.location || '').replace(/,/g,'\\,') + '\r\n';
     if(e.note) out += 'DESCRIPTION:' + (e.note || '').replace(/\n/g,'\\n') + '\r\n';
     out += 'END:VEVENT\r\n';
   });
   out += 'END:VCALENDAR\r\n';
-  const blob = new Blob([out], {type:'text/calendar;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
+  const blob = new Blob([out], {type:'text/calendar;charset=utf-8'}); const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = 'events.ics'; a.click(); URL.revokeObjectURL(url);
 }
-function nextDateStr(dateStr){
-  const [y,m,d] = dateStr.split('-').map(Number);
-  const dt = new Date(y,m-1,d);
-  dt.setDate(dt.getDate()+1);
-  return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
-}
+function nextDateStr(dateStr){ const [y,m,d] = dateStr.split('-').map(Number); const dt = new Date(y,m-1,d); dt.setDate(dt.getDate()+1); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`; }
 function importJSONFile(file){
   const reader = new FileReader();
   reader.onload = function(e){
     try{
       const parsed = JSON.parse(e.target.result);
-      // basic validation
       if(Array.isArray(parsed)){
-        // convert to internal events
-        const imported = parsed.map(p => {
-          return {
-            id: p.id || ('ev-' + Date.now() + '-' + Math.random().toString(36).slice(2,6)),
-            date: p.date,
-            allDay: !!p.allDay,
-            start: p.start ? new Date(p.start) : null,
-            end: p.end ? new Date(p.end) : null,
-            title: p.title || '無題',
-            type: p.type || 'other',
-            location: p.location || '--',
-            note: p.note || '',
-            rawTimeStr: p.rawTimeStr || ''
-          };
-        });
-        // merge (append)
-        events = events.concat(imported);
-        saveEvents();
-        render();
-        alert('インポート完了: ' + imported.length + ' 件追加されました。');
-      } else {
-        alert('不正なJSON形式です。配列を期待します。');
-      }
-    }catch(err){
-      alert('読み込みエラー: ' + err.message);
-    }
+        const imported = parsed.map(p => ({ id:p.id||('ev-'+Date.now()), date:p.date, allDay:!!p.allDay, start:p.start?new Date(p.start):null, end:p.end?new Date(p.end):null, title:p.title||'無題', type:p.type||'other', location:p.location||'--', note:p.note||'', rawTimeStr:p.rawTimeStr||'' }));
+        events = events.concat(imported); saveEvents(); render(); alert('インポート完了: ' + imported.length + ' 件追加されました。');
+      } else alert('不正なJSON形式です。配列を期待します。');
+    }catch(err){ alert('読み込みエラー: ' + err.message); }
   };
   reader.readAsText(file);
 }
 
-/* ---------- 通知（今日の予定） ---------- */
+/* ---------- 通知（今日の予定・簡易リマインダー） ---------- */
 function notifyTodaysEvents(){
   if(!('Notification' in window)) return;
-  const now = new Date();
-  const todayStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  const now = new Date(); const todayStr = formatDateKey(now);
   const todays = events.filter(e => e.date === todayStr);
   if(todays.length === 0) return;
   function show(){
     if(todays.length === 1){
-      const ev = todays[0];
-      const title = `今日の予定: ${ev.title}`;
-      const body = ev.allDay ? '終日' : (ev.rawTimeStr || (formatTimeShort(ev.start) + (ev.end ? ' - ' + formatTimeShort(ev.end) : '')));
-      const n = new Notification(title, { body: body, tag: 'today-event', renotify: true });
-      n.onclick = () => { window.focus(); openEditModal(ev); };
+      const ev = todays[0]; const title = `今日の予定: ${ev.title}`; const body = ev.allDay ? '終日' : (ev.rawTimeStr || (formatTimeShort(ev.start) + (ev.end ? ' - ' + formatTimeShort(ev.end) : '')));
+      const n = new Notification(title, { body: body, tag:'today-event', renotify:true }); n.onclick = ()=>{ window.focus(); openEditModal(ev); };
     } else {
-      const title = `今日の予定 ${todays.length}件`;
-      const body = todays.slice(0,6).map(t => (t.allDay ? '終日' : (t.rawTimeStr || formatTimeShort(t.start))) + ' ' + t.title).join('\n');
-      const n = new Notification(title, { body: body, tag: 'today-events', renotify: true });
-      n.onclick = () => { window.focus(); };
+      const title = `今日の予定 ${todays.length}件`; const body = todays.slice(0,6).map(t => (t.allDay ? '終日' : (t.rawTimeStr || formatTimeShort(t.start))) + ' ' + t.title).join('\n');
+      const n = new Notification(title, { body: body, tag:'today-events', renotify:true }); n.onclick = ()=>{ window.focus(); };
     }
   }
   if(Notification.permission === 'granted') show();
-  else if(Notification.permission !== 'denied'){
-    Notification.requestPermission().then(p => { if(p === 'granted') show(); });
-  }
+  else if(Notification.permission !== 'denied') Notification.requestPermission().then(p => { if(p === 'granted') show(); });
+  // schedule near-future reminders for events within next 60 minutes (only while page open)
+  scheduleNearFutureReminders();
+}
+let reminderTimers = [];
+function scheduleNearFutureReminders(){
+  // clear existing
+  reminderTimers.forEach(t => clearTimeout(t)); reminderTimers = [];
+  const now = new Date();
+  events.forEach(ev => {
+    if(ev.allDay || !ev.start) return;
+    const diff = ev.start.getTime() - now.getTime();
+    // schedule reminder 10 minutes before event if within next 24 hours
+    const remindBefore = 10 * 60 * 1000;
+    const when = diff - remindBefore;
+    if(when > 0 && when < 24*60*60*1000){
+      const t = setTimeout(()=> {
+        if(Notification.permission === 'granted'){
+          const n = new Notification(`まもなく: ${ev.title}`, { body: `${ev.rawTimeStr || formatTimeShort(ev.start)} 場所: ${ev.location}` });
+          n.onclick = ()=> { window.focus(); openEditModal(ev); };
+        }
+      }, when);
+      reminderTimers.push(t);
+    }
+  });
 }
 
 /* ---------- イベントハンドラ初期化 ---------- */
-document.addEventListener('DOMContentLoaded', () => {
-  // load events
+document.addEventListener('DOMContentLoaded', ()=> {
   loadEvents();
   render();
-
-  // controls
   $('#prevBtn').addEventListener('click', ()=> { current.setMonth(current.getMonth()-1); render(); });
   $('#nextBtn').addEventListener('click', ()=> { current.setMonth(current.getMonth()+1); render(); });
   $('#todayBtn').addEventListener('click', ()=> { current = new Date(); render(); });
@@ -934,55 +842,35 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#themeToggle').addEventListener('click', toggleTheme);
   $('#exportJsonBtn').addEventListener('click', exportJSON);
   $('#exportIcsBtn').addEventListener('click', exportICS);
-  $('#fileInput').addEventListener('change', (e)=> {
-    const f = e.target.files[0];
-    if(!f) return;
-    if(f.name.endsWith('.json')) importJSONFile(f);
-    else if(f.name.endsWith('.ics')) { alert('ICSインポートは未実装（将来的に対応）'); }
-    e.target.value = '';
-  });
+  $('#fileInput').addEventListener('change', (e)=> { const f = e.target.files[0]; if(!f) return; if(f.name.endsWith('.json')) importJSONFile(f); else if(f.name.endsWith('.ics')) alert('ICSインポートは未実装です'); e.target.value=''; });
   $('#importBtn').addEventListener('click', ()=> $('#fileInput').click());
-
-  // keyboard shortcuts
-  document.addEventListener('keydown', (e) => {
-    if(e.key === 'n' || e.key === 'N') { openCreateModal(formatDateKey(new Date())); }
+  document.addEventListener('keydown', (e)=> {
+    if(e.key === 'n' || e.key === 'N') openCreateModal(formatDateKey(new Date()));
     if(e.key === 't' || e.key === 'T') { current = new Date(); render(); }
     if(e.key === 'ArrowLeft') { current.setMonth(current.getMonth()-1); render(); }
     if(e.key === 'ArrowRight') { current.setMonth(current.getMonth()+1); render(); }
   });
-
-  // show today's notifications
   notifyTodaysEvents();
 });
 
-/* ---------- ヘルパー ---------- */
-function formatDateKey(d){
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-}
-
-/* ---------- Drag & Drop のためのアクセシビリティ補助 ---------- */
-/* （既に pill に draggable を付け、セルで drop を受ける実装をしている） */
-
-/* ---------- 初回テーマ設定 ---------- */
+/* ---------- テーマ切替 ---------- */
 function toggleTheme(){
-  const el = document.documentElement;
   const cur = document.body.getAttribute('data-theme') || 'light';
   const next = cur === 'light' ? 'dark' : 'light';
   document.body.setAttribute('data-theme', next);
+  localStorage.setItem('portal_calendar_theme', next);
 }
-document.addEventListener('DOMContentLoaded', () => {
-  // restore theme from localStorage if present
-  const t = localStorage.getItem('portal_calendar_theme');
-  if(t) document.body.setAttribute('data-theme', t);
-  // save on toggle
-  $('#themeToggle').addEventListener('click', ()=> localStorage.setItem('portal_calendar_theme', document.body.getAttribute('data-theme')));
+document.addEventListener('DOMContentLoaded', ()=> {
+  const t = localStorage.getItem('portal_calendar_theme'); if(t) document.body.setAttribute('data-theme', t);
 });
 
-/* ---------- 初期ロード（イベントが空なら初期データを入れる） ---------- */
-if(!localStorage.getItem(STORAGE_KEY)){
-  events = normalizeEventArray(INIT_RAW_EVENTS);
-  saveEvents();
-}
+/* ---------- ヘルパー ---------- */
+function openDayListModal(list, dateStr){ /* implemented above */ }
+function showModal(){ /* implemented above */ }
+function hideModal(){ /* implemented above */ }
+
+/* ---------- 初回セットアップ ---------- */
+if(!localStorage.getItem(STORAGE_KEY)){ events = normalizeEventArray(INIT_RAW_EVENTS); saveEvents(); }
 </script>
 </body>
 </html>
