@@ -31,7 +31,6 @@ nav {
   z-index: 1000;
 }
 
-nav video { width: 100%; border-radius: 8px; margin-bottom: 10px; }
 nav a {
   display: block;
   color: white;
@@ -145,7 +144,6 @@ td.today { border: 2px solid #1abc9c; }
 @media(max-width:768px){
   nav{ width:100%; height:auto; display:flex; overflow-x:auto; white-space:nowrap; }
   nav a{ display:inline-block; margin:4px; font-size:0.9em; }
-  nav video{ display:none; }
   main{ margin-left:0; margin-top:150px; height:calc(100vh-150px); }
   table.calendar th, table.calendar td{ height:100px; }
 }
@@ -154,7 +152,6 @@ td.today { border: 2px solid #1abc9c; }
 <body>
 
 <nav>
-  <video id="randomVideo" autoplay loop muted playsinline style="width:100%; border-radius:5px; margin-bottom:10px;"></video>
   <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
   <a href="https://yuma873.github.io/blush-nimble/index.html" style="display:inline-block;padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;border-radius:5px;font-weight:bold;">ログアウト</a>
 </nav>
@@ -186,9 +183,7 @@ td.today { border: 2px solid #1abc9c; }
 </main>
 
 <script>
-// ランダム動画
-const videos=["video1.mp4","video2.mp4","video3.mp4","video5.mp4","V1.mp4","V2.mp4","V3.mp4","V4.mp4","V5.mp4","V6.mp4","V7.mp4","V8.mp4","V9.mp4","V10.mp4"];
-document.getElementById("randomVideo").src=videos[Math.floor(Math.random()*videos.length)];
+
 
 // --- 予定設定 ---
 const events=[
