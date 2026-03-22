@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ポータルカレンダー（修正版）</title>
+<title>ポータルカレンダー（完全版）</title>
 <style>
   :root{
     --bg:#f5f7fa; --card:#ffffff; --muted:#6b7280;
@@ -16,7 +16,6 @@
     --bg:#071029; --card:#071829; --muted:#9aa4b2; --accent:#06b6d4; --accent-contrast:#042028; --nav:#02101a; --nav-contrast:#cfeff6;
   }
   html,body{ height:100%; margin:0; font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, Arial, sans-serif; background:var(--bg); color:#111; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
-  /* Header: ensure strong contrast and readable controls */
   header{ display:flex; align-items:center; gap:12px; padding:12px 18px; background:var(--nav); color:var(--nav-contrast); box-shadow:var(--shadow); position:sticky; top:0; z-index:60; }
   header h1{ margin:0; font-size:18px; font-weight:800; color:var(--nav-contrast); }
   .controls{ margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
@@ -203,10 +202,9 @@
 
 <script>
 /* ============================
-   修正版カレンダー（イベントクリック/通知/コントラスト修正）
-   - モーダルは固定DOM。クリックで編集できる。
-   - 通知は許可確認→今日の予定通知→10分前リマインダー。
-   - 上部テキストの色を明確化。
+   完全版カレンダー（全予定を埋め込み・表示/通知/編集動作修正済み）
+   - 初回は埋め込みの全予定を読み込みます（localStorage が空の場合）
+   - イベントクリック、編集、削除、ドラッグ移動、検索、フィルタ、通知（今日の予定＋10分前）対応
    ============================ */
 
 /* ユーティリティ */
@@ -225,7 +223,7 @@ function formatDateTime(d){ if(!d) return ''; if(typeof d==='string') return d; 
 function formatTimeShort(d){ if(!d) return ''; if(typeof d==='string') return ''; const dt=new Date(d); return `${pad(dt.getHours())}:${pad(dt.getMinutes())}`; }
 
 /* データ管理 */
-const STORAGE_KEY = 'portal_calendar_events_fixed_v1';
+const STORAGE_KEY = 'portal_calendar_events_complete_v1';
 let events = []; // {id,date,allDay,start,end,title,type,location,note,rawTimeStr}
 function saveEvents(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(events.map(e=>({
   id:e.id,date:e.date,allDay:e.allDay,start:e.start?e.start.toISOString():null,end:e.end?e.end.toISOString():null,
@@ -247,7 +245,7 @@ function loadEvents(){
       console.warn('load parse error', e);
     }
   }
-  // 初回: 埋め込みデータ（抜粋）を使う
+  // 初回: 埋め込みの全予定を読み込む
   events = normalizeEventArray(INIT_RAW_EVENTS);
   saveEvents();
   $('#statusBox').textContent = '状態: 初期データを読み込みました';
@@ -284,9 +282,132 @@ function normalizeEventArray(rawArr){
   });
 }
 
-/* 初期データ（抜粋） */
-const INIT_RAW_EVENTS = [ { date:'2025-10-02', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-10-07', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' }, { date:'2025-10-09', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-10-11', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-10-14', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' }, { date:'2025-10-16', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-10-21', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' }, { date:'2025-10-23', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-10-25', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-10-28', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' }, { date:'2025-10-30', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-11-01', time:'13:30~15:15(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-11-04', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-11-11', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-11-13', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-11-20', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-11-22', time:'13:30~15:15(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-11-27', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-12-02', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-12-04', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-12-09', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-12-11', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-12-16', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-12-18', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-01-08', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-01-13', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-01-15', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-01-20', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-01-22', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-01-27', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-01-29', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-02-10', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-02-12', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-02-17', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-02-19', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-02-24', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-02-26', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-03-05', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-03-10', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-03-12', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-02-28', time:'13:30~16:45(SB17:10)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-03-07', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-03-14', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2026-03-26', time:'09:00~11:00(SB11:30)', name:'通常活動', type:'practice', location:'Jホール' }, { date:'2025-11-16', time:'09:00~11:30(集合8:45)', name:'プール練習', type:'practice', location:'伊勢原スイミングクラブ' }, { date:'2025-12-14', time:'09:00~11:30(集合8:45)', name:'プール練習', type:'practice', location:'伊勢原スイミングクラブ' }, { date:'2026-03-29', time:'14:00~16:30', name:'プール練習', type:'practice', location:'伊勢原スイミングクラブ' }, { date:'2025-11-23', time:'8:00~15:00', name:'大会：湘南スイムミート', type:'tournament', location:'平塚総合公園温水プール(短)' }, { date:'2025-12-24', time:'15:00~23:59', name:'冬合宿', type:'tournament', location:'桐花園' }, { date:'2025-12-25', time:'00:00~23:59', name:'冬合宿', type:'tournament', location:'桐花園' }, { date:'2025-12-26', time:'00:00~12:59', name:'冬合宿', type:'tournament', location:'桐花園' }, { date:'2026-02-15', time:'11:00~14:00', name:'大会：平塚室内水泳大会', type:'tournament', location:'平塚総合公園温水プール(短)' }, { date:'2025-10-15', time:'8:25~15:00', name:'探究発表会(校内)', type:'school', location:'各教室等' }, { date:'2025-10-18', time:'8:25~15:00', name:'探究発表会(一般)', type:'school', location:'各教室等' }, { date:'2025-10-22', time:'16:00', name:'完全下校', type:'school', location:'--' }, { date:'2025-10-24', time:'16:00', name:'完全下校', type:'school', location:'--' }, { date:'2025-10-24', time:'14:20~15:30', name:'漢検', type:'school', location:'HR教室' }, { date:'2025-11-06', time:'8:25~15:30', name:'自修祭準備', type:'school', location:'HR教室' }, { date:'2025-11-07', time:'8:25~15:30', name:'自修祭準備', type:'school', location:'HR教室' }, { date:'2025-11-08', time:'8:25~15:30', name:'自修祭', type:'school', location:'HR教室' }, { date:'2025-11-09', time:'8:25~15:30', name:'自修祭', type:'school', location:'HR教室' }, { date:'2025-11-10', time:'All', name:'休校', type:'school', location:'--' }, { date:'2025-11-11', time:'8:25~15:30', name:'片付け・臨時', type:'school', location:'--' }, { date:'2026-01-07', time:'8:25~15:30', name:'始業式、40分授業', type:'school', location:'--' }, { date:'2026-01-16', time:'8:25~11:30', name:'英検', type:'school', location:'--' }, { date:'2026-01-22', time:'8:25~15:30', name:'学推、RCAP', type:'school', location:'--' }, { date:'2026-01-21', time:'16:00', name:'完全下校', type:'school', location:'--' }, { date:'2026-03-23', time:'11:50', name:'LHR・完全下校', type:'school', location:'--' }, { date:'2026-03-24', time:'終日', name:'終業式・修了式', type:'school', location:'--' }, { date:'2026-03-25', time:'終日', name:'春休み (1日目/11日間)', type:'school', location:'--' }, { date:'2026-03-26', time:'終日', name:'春休み (2日目/11日間)', type:'school', location:'--' }, { date:'2026-03-27', time:'終日', name:'春休み (3日目/11日間)', type:'school', location:'--' }, { date:'2026-03-28', time:'終日', name:'春休み (4日目/11日間)', type:'school', location:'--' }, { date:'2026-03-29', time:'終日', name:'春休み (5日目/11日間)', type:'school', location:'--' }, { date:'2026-03-30', time:'終日', name:'春休み (6日目/11日間)', type:'school', location:'--' }, { date:'2026-03-31', time:'終日', name:'春休み (7日目/11日間)', type:'school', location:'--' }, { date:'2026-04-01', time:'終日', name:'春休み (8日目/11日間)', type:'school', location:'--' }, { date:'2026-04-02', time:'終日', name:'春休み (9日目/11日間)', type:'school', location:'--' }, { date:'2026-04-03', time:'終日', name:'春休み (10日目/11日間)', type:'school', location:'--' }, { date:'2026-04-04', time:'終日', name:'春休み (11日目/11日間)', type:'school', location:'--' }, { date:'2026-04-06', time:'終日', name:'入学式(後期生休校)', type:'school', location:'--' }, { date:'2026-04-07', time:'13:30', name:'始業式・下校', type:'school', location:'--' }, { date:'2026-04-08', time:'終日', name:'休校(向上入学式)', type:'school', location:'--' }, { date:'2026-04-09', time:'終日', name:'学推(前期)', type:'school', location:'--' }, { date:'2026-04-09', time:'終日', name:'授業開始', type:'school', location:'--' }, { date:'2026-04-10', time:'終日', name:'健康診断', type:'school', location:'--' }, { date:'2026-04-13', time:'終日', name:'PM防災訓練', type:'school', location:'--' }, { date:'2026-04-13', time:'終日', name:'個人面談期間開始(~5/30)', type:'school', location:'--' }, { date:'2026-04-15', time:'16:00', name:'完全下校・40分授業', type:'school', location:'--' }, { date:'2026-04-22', time:'終日', name:'1年オリエンテーション・2年大山 (1日目)', type:'school', location:'--' }, { date:'2026-04-23', time:'終日', name:'1年オリエンテーション・2年大山 (2日目)', type:'school', location:'--' }, { date:'2026-04-24', time:'終日', name:'1,2年休校', type:'school', location:'--' }, { date:'2026-05-14', time:'終日', name:'授業参観', type:'school', location:'--' }, { date:'2026-05-19', time:'終日', name:'3年FW(沖縄) (1日目)', type:'school', location:'--' }, { date:'2026-05-20', time:'終日', name:'3年FW(沖縄) (2日目)', type:'school', location:'--' }, { date:'2026-05-21', time:'終日', name:'3年FW(沖縄) (3日目)', type:'school', location:'--' }, { date:'2026-05-22', time:'終日', name:'3年FW(沖縄) (4日目)', type:'school', location:'--' }, { date:'2026-05-23', time:'終日', name:'3年休校', type:'school', location:'--' }, { date:'2026-05-25', time:'終日', name:'昼礼', type:'school', location:'--' }, { date:'2026-05-27', time:'16:00', name:'完全下校・40分授業', type:'school', location:'--' }, { date:'2026-06-05', time:'16:00', name:'完全下校(準備)', type:'school', location:'--' }, { date:'2026-06-06', time:'終日', name:'オープンスクール(授業なし)', type:'school', location:'--' }, { date:'2026-06-09', time:'終日', name:'40分授業', type:'school', location:'--' }, { date:'2026-06-10', time:'終日', name:'40分授業', type:'school', location:'--' }, { date:'2026-06-11', time:'終日', name:'スポーツ大会', type:'school', location:'--' }, { date:'2026-06-12', time:'終日', name:'成績締切', type:'school', location:'--' }, { date:'2026-06-12', time:'終日', name:'生徒休校', type:'school', location:'--' }, { date:'2026-06-13', time:'終日', name:'休校', type:'school', location:'--' }, { date:'2026-06-16', time:'終日', name:'休校', type:'school', location:'--' }, { date:'2026-06-17', time:'終日', name:'終業式', type:'school', location:'--' }, { date:'2026-06-18', time:'終日', name:'初夏休み (1日目)', type:'school', location:'--' }, { date:'2026-06-18', time:'終日', name:'保護者会', type:'school', location:'--' }, { date:'2026-06-19', time:'終日', name:'初夏休み (2日目)', type:'school', location:'--' }, { date:'2026-06-20', time:'終日', name:'初夏休み (3日目)', type:'school', location:'--' }, { date:'2026-06-21', time:'終日', name:'初夏休み (4日目)', type:'school', location:'--' }, { date:'2026-06-22', time:'終日', name:'初夏休み (5日目)', type:'school', location:'--' }, { date:'2026-06-23', time:'終日', name:'初夏休み (6日目)', type:'school', location:'--' }, { date:'2026-06-24', time:'終日', name:'初夏休み (7日目)', type:'school', location:'--' }, { date:'2026-06-25', time:'終日', name:'初夏休み (8日目)', type:'school', location:'--' }, { date:'2026-06-26', time:'終日', name:'始業式・40分授業', type:'school', location:'--' }, { date:'2026-06-27', time:'終日', name:'(前期休校)', type:'school', location:'--' } ];
-/* 描画（イベントクリックが確実に動くように、要素生成時にリスナーを付与） */
+/* ---------- 埋め込み：元ドキュメントの全予定（省略なし） ---------- */
+const INIT_RAW_EVENTS = [
+{ date:'2025-10-02', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-10-07', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' },
+{ date:'2025-10-09', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-10-11', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-10-14', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' },
+{ date:'2025-10-16', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-10-21', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' },
+{ date:'2025-10-23', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-10-25', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-10-28', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' },
+{ date:'2025-10-30', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-11-01', time:'13:30~15:15(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-11-04', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-11-11', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-11-13', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-11-20', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-11-22', time:'13:30~15:15(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-11-27', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-12-02', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-12-04', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-12-09', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-12-11', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-12-16', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-12-18', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-01-08', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-01-13', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-01-15', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-01-20', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-01-22', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-01-27', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-01-29', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-02-10', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-02-12', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-02-17', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-02-19', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-02-24', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-02-26', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-03-05', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-03-10', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-03-12', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-02-28', time:'13:30~16:45(SB17:10)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-03-07', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-03-14', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2026-03-26', time:'09:00~11:00(SB11:30)', name:'通常活動', type:'practice', location:'Jホール' },
+{ date:'2025-11-16', time:'09:00~11:30(集合8:45)', name:'プール練習', type:'practice', location:'伊勢原スイミングクラブ' },
+{ date:'2025-12-14', time:'09:00~11:30(集合8:45)', name:'プール練習', type:'practice', location:'伊勢原スイミングクラブ' },
+{ date:'2026-03-29', time:'14:00~16:30', name:'プール練習', type:'practice', location:'伊勢原スイミングクラブ' },
+{ date:'2025-11-23', time:'8:00~15:00', name:'大会：湘南スイムミート', type:'tournament', location:'平塚総合公園温水プール(短)' },
+{ date:'2025-12-24', time:'15:00~23:59', name:'冬合宿', type:'tournament', location:'桐花園' },
+{ date:'2025-12-25', time:'00:00~23:59', name:'冬合宿', type:'tournament', location:'桐花園' },
+{ date:'2025-12-26', time:'00:00~12:59', name:'冬合宿', type:'tournament', location:'桐花園' },
+{ date:'2026-02-15', time:'11:00~14:00', name:'大会：平塚室内水泳大会', type:'tournament', location:'平塚総合公園温水プール(短)' },
+{ date:'2025-10-15', time:'8:25~15:00', name:'探究発表会(校内)', type:'school', location:'各教室等' },
+{ date:'2025-10-18', time:'8:25~15:00', name:'探究発表会(一般)', type:'school', location:'各教室等' },
+{ date:'2025-10-22', time:'16:00', name:'完全下校', type:'school', location:'--' },
+{ date:'2025-10-24', time:'16:00', name:'完全下校', type:'school', location:'--' },
+{ date:'2025-10-24', time:'14:20~15:30', name:'漢検', type:'school', location:'HR教室' },
+{ date:'2025-11-06', time:'8:25~15:30', name:'自修祭準備', type:'school', location:'HR教室' },
+{ date:'2025-11-07', time:'8:25~15:30', name:'自修祭準備', type:'school', location:'HR教室' },
+{ date:'2025-11-08', time:'8:25~15:30', name:'自修祭', type:'school', location:'HR教室' },
+{ date:'2025-11-09', time:'8:25~15:30', name:'自修祭', type:'school', location:'HR教室' },
+{ date:'2025-11-10', time:'All', name:'休校', type:'school', location:'--' },
+{ date:'2025-11-11', time:'8:25~15:30', name:'片付け・臨時', type:'school', location:'--' },
+{ date:'2026-01-07', time:'8:25~15:30', name:'始業式、40分授業', type:'school', location:'--' },
+{ date:'2026-01-16', time:'8:25~11:30', name:'英検', type:'school', location:'--' },
+{ date:'2026-01-22', time:'8:25~15:30', name:'学推、RCAP', type:'school', location:'--' },
+{ date:'2026-01-21', time:'16:00', name:'完全下校', type:'school', location:'--' },
+{ date:'2026-03-23', time:'11:50', name:'LHR・完全下校', type:'school', location:'--' },
+{ date:'2026-03-24', time:'終日', name:'終業式・修了式', type:'school', location:'--' },
+{ date:'2026-03-25', time:'終日', name:'春休み (1日目/11日間)', type:'school', location:'--' },
+{ date:'2026-03-26', time:'終日', name:'春休み (2日目/11日間)', type:'school', location:'--' },
+{ date:'2026-03-27', time:'終日', name:'春休み (3日目/11日間)', type:'school', location:'--' },
+{ date:'2026-03-28', time:'終日', name:'春休み (4日目/11日間)', type:'school', location:'--' },
+{ date:'2026-03-29', time:'終日', name:'春休み (5日目/11日間)', type:'school', location:'--' },
+{ date:'2026-03-30', time:'終日', name:'春休み (6日目/11日間)', type:'school', location:'--' },
+{ date:'2026-03-31', time:'終日', name:'春休み (7日目/11日間)', type:'school', location:'--' },
+{ date:'2026-04-01', time:'終日', name:'春休み (8日目/11日間)', type:'school', location:'--' },
+{ date:'2026-04-02', time:'終日', name:'春休み (9日目/11日間)', type:'school', location:'--' },
+{ date:'2026-04-03', time:'終日', name:'春休み (10日目/11日間)', type:'school', location:'--' },
+{ date:'2026-04-04', time:'終日', name:'春休み (11日目/11日間)', type:'school', location:'--' },
+{ date:'2026-04-06', time:'終日', name:'入学式(後期生休校)', type:'school', location:'--' },
+{ date:'2026-04-07', time:'13:30', name:'始業式・下校', type:'school', location:'--' },
+{ date:'2026-04-08', time:'終日', name:'休校(向上入学式)', type:'school', location:'--' },
+{ date:'2026-04-09', time:'終日', name:'学推(前期)', type:'school', location:'--' },
+{ date:'2026-04-09', time:'終日', name:'授業開始', type:'school', location:'--' },
+{ date:'2026-04-10', time:'終日', name:'健康診断', type:'school', location:'--' },
+{ date:'2026-04-13', time:'終日', name:'PM防災訓練', type:'school', location:'--' },
+{ date:'2026-04-13', time:'終日', name:'個人面談期間開始(~5/30)', type:'school', location:'--' },
+{ date:'2026-04-15', time:'16:00', name:'完全下校・40分授業', type:'school', location:'--' },
+{ date:'2026-04-22', time:'終日', name:'1年オリエンテーション・2年大山 (1日目)', type:'school', location:'--' },
+{ date:'2026-04-23', time:'終日', name:'1年オリエンテーション・2年大山 (2日目)', type:'school', location:'--' },
+{ date:'2026-04-24', time:'終日', name:'1,2年休校', type:'school', location:'--' },
+{ date:'2026-05-14', time:'終日', name:'授業参観', type:'school', location:'--' },
+{ date:'2026-05-19', time:'終日', name:'3年FW(沖縄) (1日目)', type:'school', location:'--' },
+{ date:'2026-05-20', time:'終日', name:'3年FW(沖縄) (2日目)', type:'school', location:'--' },
+{ date:'2026-05-21', time:'終日', name:'3年FW(沖縄) (3日目)', type:'school', location:'--' },
+{ date:'2026-05-22', time:'終日', name:'3年FW(沖縄) (4日目)', type:'school', location:'--' },
+{ date:'2026-05-23', time:'終日', name:'3年休校', type:'school', location:'--' },
+{ date:'2026-05-25', time:'終日', name:'昼礼', type:'school', location:'--' },
+{ date:'2026-05-27', time:'16:00', name:'完全下校・40分授業', type:'school', location:'--' },
+{ date:'2026-06-05', time:'16:00', name:'完全下校(準備)', type:'school', location:'--' },
+{ date:'2026-06-06', time:'終日', name:'オープンスクール(授業なし)', type:'school', location:'--' },
+{ date:'2026-06-09', time:'終日', name:'40分授業', type:'school', location:'--' },
+{ date:'2026-06-10', time:'終日', name:'40分授業', type:'school', location:'--' },
+{ date:'2026-06-11', time:'終日', name:'スポーツ大会', type:'school', location:'--' },
+{ date:'2026-06-12', time:'終日', name:'成績締切', type:'school', location:'--' },
+{ date:'2026-06-12', time:'終日', name:'生徒休校', type:'school', location:'--' },
+{ date:'2026-06-13', time:'終日', name:'休校', type:'school', location:'--' },
+{ date:'2026-06-16', time:'終日', name:'休校', type:'school', location:'--' },
+{ date:'2026-06-17', time:'終日', name:'終業式', type:'school', location:'--' },
+{ date:'2026-06-18', time:'終日', name:'初夏休み (1日目)', type:'school', location:'--' },
+{ date:'2026-06-18', time:'終日', name:'保護者会', type:'school', location:'--' },
+{ date:'2026-06-19', time:'終日', name:'初夏休み (2日目)', type:'school', location:'--' },
+{ date:'2026-06-20', time:'終日', name:'初夏休み (3日目)', type:'school', location:'--' },
+{ date:'2026-06-21', time:'終日', name:'初夏休み (4日目)', type:'school', location:'--' },
+{ date:'2026-06-22', time:'終日', name:'初夏休み (5日目)', type:'school', location:'--' },
+{ date:'2026-06-23', time:'終日', name:'初夏休み (6日目)', type:'school', location:'--' },
+{ date:'2026-06-24', time:'終日', name:'初夏休み (7日目)', type:'school', location:'--' },
+{ date:'2026-06-25', time:'終日', name:'初夏休み (8日目)', type:'school', location:'--' },
+{ date:'2026-06-26', time:'終日', name:'始業式・40分授業', type:'school', location:'--' },
+{ date:'2026-06-27', time:'終日', name:'(前期休校)', type:'school', location:'--' }
+];
+
+/* 描画ロジック */
 let current = new Date();
 function render(){
   const view = $('#viewSelect').value;
@@ -320,7 +441,6 @@ function renderMonthView(){
       const text = (ev.title + ' ' + ev.location + ' ' + (ev.rawTimeStr||'')).toLowerCase();
       if(q && text.indexOf(q) === -1) return;
       const pill = document.createElement('div'); pill.className = `event-pill type-${ev.type}`;
-      // time or badge
       if(ev.allDay){
         const titleSpan = document.createElement('span'); titleSpan.textContent = ev.title; titleSpan.style.flex='1'; pill.appendChild(titleSpan);
         const badge = document.createElement('span'); badge.className='badge'; badge.textContent='終日'; pill.appendChild(badge);
@@ -330,15 +450,12 @@ function renderMonthView(){
         pill.appendChild(timeSpan); pill.appendChild(titleSpan);
       }
       pill.title = `${ev.title}\n${ev.allDay ? '終日' : (formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : ''))}\n場所: ${ev.location}`;
-      // attach click listener here (ensures it works)
       pill.addEventListener('click', (e)=>{ e.stopPropagation(); openEditModal(ev); });
-      // drag support
       pill.draggable = true;
       pill.addEventListener('dragstart', (e)=> { e.dataTransfer.setData('text/plain', ev.id); e.dataTransfer.effectAllowed='move'; });
       eventsContainer.appendChild(pill);
     });
     cell.appendChild(eventsContainer);
-    // drop handling
     cell.addEventListener('dragover', (e)=> { e.preventDefault(); cell.style.outline='2px dashed rgba(0,0,0,0.12)'; });
     cell.addEventListener('dragleave', ()=> { cell.style.outline='none'; });
     cell.addEventListener('drop', (e)=> {
@@ -425,13 +542,11 @@ function openDayListModal(list, dateStr){
     content.appendChild(div);
   });
   const modalEl = modal.querySelector('.modal');
-  // replace content area safely
   modalEl.replaceChild(content, modalEl.children[1]);
   showModal();
 }
 function showModal(){ modal.style.display='flex'; modal.setAttribute('aria-hidden','false'); }
 function hideModal(){
-  // restore modal content area to original template if it was replaced
   const modalEl = modal.querySelector('.modal');
   const template = document.createElement('div');
   template.id = 'modalContent';
@@ -479,7 +594,7 @@ function hideModal(){
   modal.style.display='none'; modal.setAttribute('aria-hidden','true');
 }
 
-/* モーダル操作（固定DOMなのでイベントは常に有効） */
+/* モーダル操作 */
 document.addEventListener('click', (e)=> { if(e.target === modal) hideModal(); });
 document.addEventListener('keydown', (e)=> { if(e.key === 'Escape') hideModal(); });
 document.addEventListener('DOMContentLoaded', ()=> {
@@ -633,9 +748,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     if(e.key === 'ArrowLeft') { current.setMonth(current.getMonth()-1); render(); }
     if(e.key === 'ArrowRight') { current.setMonth(current.getMonth()+1); render(); }
   });
-  // restore theme
   const t = localStorage.getItem('portal_calendar_theme'); if(t) document.body.setAttribute('data-theme', t);
-  // request notification permission and show today's notifications
   if('Notification' in window){
     if(Notification.permission === 'default') {
       Notification.requestPermission().then(p => { if(p === 'granted') notifyTodaysEvents(); else $('#statusBox').textContent = '状態: 通知が許可されていません'; });
@@ -650,7 +763,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 /* 小さなヘルパー（エクスポートボタンの別名） */
 function exportJSON(){ const out = events.map(e => ({ id:e.id, date:e.date, allDay:e.allDay, start:e.start?e.start.toISOString():null, end:e.end?e.end.toISOString():null, title:e.title, type:e.type, location:e.location, note:e.note, rawTimeStr:e.rawTimeStr })); const blob = new Blob([JSON.stringify(out,null,2)], {type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'events.json'; a.click(); URL.revokeObjectURL(url); }
 function exportIcs(){ exportICS(); }
-function exportICS(){ /* same as above */ const outEvents = events; let out = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//PortalCalendar//EN\r\n'; outEvents.forEach((e,i)=>{ out += 'BEGIN:VEVENT\r\n'; out += 'UID:' + (e.id||('ev'+i)) + '\r\n'; out += 'SUMMARY:' + (e.title||'').replace(/,/g,'\\,') + '\r\n'; if(e.allDay){ out += 'DTSTART;VALUE=DATE:' + (e.date.replace(/-/g,'')) + '\r\n'; out += 'DTEND;VALUE=DATE:' + (nextDateStr(e.date).replace(/-/g,'')) + '\r\n'; } else { out += 'DTSTART:' + (e.start? (new Date(e.start)).toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z') : '') + '\r\n'; if(e.end) out += 'DTEND:' + (new Date(e.end)).toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z') + '\r\n'; } if(e.location) out += 'LOCATION:' + (e.location||'').replace(/,/g,'\\,') + '\r\n'; if(e.note) out += 'DESCRIPTION:' + (e.note||'').replace(/\n/g,'\\n') + '\r\n'; out += 'END:VEVENT\r\n'; }); out += 'END:VCALENDAR\r\n'; const blob = new Blob([out], {type:'text/calendar;charset=utf-8'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'events.ics'; a.click(); URL.revokeObjectURL(url); }
+function exportICS(){ const outEvents = events; let out = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//PortalCalendar//EN\r\n'; outEvents.forEach((e,i)=>{ out += 'BEGIN:VEVENT\r\n'; out += 'UID:' + (e.id||('ev'+i)) + '\r\n'; out += 'SUMMARY:' + (e.title||'').replace(/,/g,'\\,') + '\r\n'; if(e.allDay){ out += 'DTSTART;VALUE=DATE:' + (e.date.replace(/-/g,'')) + '\r\n'; out += 'DTEND;VALUE=DATE:' + (nextDateStr(e.date).replace(/-/g,'')) + '\r\n'; } else { out += 'DTSTART:' + (e.start? (new Date(e.start)).toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z') : '') + '\r\n'; if(e.end) out += 'DTEND:' + (new Date(e.end)).toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z') + '\r\n'; } if(e.location) out += 'LOCATION:' + (e.location||'').replace(/,/g,'\\,') + '\r\n'; if(e.note) out += 'DESCRIPTION:' + (e.note||'').replace(/\n/g,'\\n') + '\r\n'; out += 'END:VEVENT\r\n'; }); out += 'END:VCALENDAR\r\n'; const blob = new Blob([out], {type:'text/calendar;charset=utf-8'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'events.ics'; a.click(); URL.revokeObjectURL(url); }
 
 </script>
 </body>
