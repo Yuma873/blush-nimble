@@ -687,6 +687,7 @@ function importJSONFile(file){
 
 /* 通知（今日の予定 + 10分前リマインダー） */
 function notifyTodaysEvents(){
+            icon: "favicon.png"
   if(!('Notification' in window)){ $('#statusBox').textContent = '状態: 通知非対応のブラウザです'; return; }
   const now = new Date(); const todayStr = formatDateKey(now);
   const todays = events.filter(e => e.date === todayStr);
