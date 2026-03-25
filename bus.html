@@ -1,190 +1,376 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>スクールバス発車案内（登校便）</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>スクールバス発車案内 管理付き</title>
 <style>
-body{
-  margin:0;
-  font-family:"Segoe UI","Hiragino Kaku Gothic ProN",sans-serif;
-  background:#eef2f7;
+:root{
+  --bg:#eef2f7; --card:#fff; --primary:#1e3a8a; --accent:#2563eb;
+  --ok:#16a34a; --warn:#f59e0b; --danger:#dc2626; --text:#0f172a;
+  --muted:#475569; --glass:rgba(255,255,255,0.6); --radius:12px; --gap:12px;
 }
-.header{
-  background:#1e3a8a;
-  color:white;
-  padding:20px 40px;
-  font-size:28px;
-  display:flex;
-  justify-content:space-between;
-}
-.main-card{
-  background:white;
-  margin:20px 30px;
-  padding:20px;
-  border-radius:18px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.08);
-}
-.bus{
-  border-radius:16px;
-  color:white;
-  padding:20px;
-  margin-bottom:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.bus .info{
-  display:flex;
-  flex-direction:column;
-}
-.bus .stops{
-  margin-top:6px;
-  background:#ef4444;
-  padding:4px 8px;
-  border-radius:6px;
-  font-size:14px;
-}
-.bus .eta{
-  background:#fbbf24;
-  color:#1e293b;
-  padding:6px 10px;
-  border-radius:6px;
-  font-size:16px;
-}
-.bus .note{
-  margin-top:4px;
-  background:#f97316;
-  padding:4px 6px;
-  border-radius:6px;
-  font-size:14px;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI","Hiragino Kaku Gothic ProN",sans-serif;background:linear-gradient(180deg,var(--bg),#e6eef9);color:var(--text);padding:20px;display:flex;justify-content:center}
+.container{width:100%;max-width:1100px}
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.title{background:var(--primary);color:#fff;padding:12px 16px;border-radius:10px;font-weight:700}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{background:var(--card);border:1px solid rgba(15,23,42,0.06);padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+.btn.primary{background:var(--accent);color:#fff;border:none}
+.small{padding:6px 8px;font-size:14px}
+.main-card{background:var(--card);padding:16px;border-radius:14px;box-shadow:0 10px 30px rgba(16,24,40,0.06);margin-bottom:14px}
+.meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.clock{font-weight:700;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:10px}
 
-.next-small{
-  border-radius:14px;
-  color:white;
-  padding:14px;
-  margin-top:8px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.next-small .info{display:flex;flex-direction:column;}
-.next-small .stops{margin-top:4px;background:#ef4444;padding:2px 6px;border-radius:6px;font-size:12px;}
-.next-small .eta{background:#fbbf24;color:#1e293b;padding:2px 6px;border-radius:6px;font-size:14px;}
-.next-small .note{margin-top:2px;background:#f97316;padding:2px 4px;border-radius:6px;font-size:12px;}
+/* bus card */
+.bus{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,0.04)}
+.bus.primary{box-shadow:0 6px 18px rgba(16,24,40,0.04)}
+.info{display:flex;gap:12px;align-items:flex-start}
+.time{font-size:36px;font-weight:800;min-width:110px}
+.metaInfo{display:flex;flex-direction:column;gap:6px}
+.car{font-weight:700;color:var(--muted)}
+.status{display:inline-block;padding:6px 8px;border-radius:8px;font-weight:700;color:#fff;font-size:13px}
+.status.ok{background:var(--ok)}
+.status.extra{background:var(--warn);color:#1f2937}
+.status.cancel{background:var(--danger)}
+.stops{font-size:14px;color:var(--muted)}
+.note{font-size:13px;color:#92400e}
 
-.alert{
-  animation:blink 1s infinite;
-}
-@keyframes blink{
-  50%{opacity:0.3;}
+/* right */
+.right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.eta{background:var(--glass);padding:8px 12px;border-radius:10px;font-weight:800;color:var(--text)}
+.arrival{font-size:14px;color:var(--muted)}
+
+/* admin panel */
+.admin-panel{margin-top:12px;padding:12px;border-radius:10px;background:#f8fafc;border:1px solid rgba(15,23,42,0.03)}
+.form-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.input,select,textarea{padding:8px;border-radius:8px;border:1px solid rgba(15,23,42,0.08);min-width:160px}
+.notice-list{margin-top:8px;display:flex;flex-direction:column;gap:8px}
+.notice-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,0.04)}
+.small-muted{font-size:13px;color:var(--muted)}
+.hidden{display:none}
+
+/* responsive */
+@media (max-width:720px){
+  .time{font-size:28px;min-width:80px}
+  .meta{flex-direction:column;align-items:flex-start;gap:8px}
 }
 </style>
 </head>
 <body>
+<div class="container" id="app">
+  <header class="header" role="banner">
+    <div class="title">スクールバス発車案内 管理付き</div>
+    <div class="controls" role="region" aria-label="操作">
+      <div id="clock" class="clock" aria-live="polite">--:--:--</div>
+      <button id="toggleAdmin" class="btn small" aria-pressed="false">管理画面を表示</button>
+      <button id="refreshBtn" class="btn small">更新</button>
+    </div>
+  </header>
 
-<div class="header">
-  <div>スクールバス発車案内（登校便）</div>
-  <div id="clock"></div>
-</div>
+  <main class="main-card" role="main">
+    <div class="meta">
+      <div>
+        <div id="dateDisplay" class="small-muted" aria-live="polite">--/--/--</div>
+      </div>
+      <div class="small-muted">次の発車: <span id="nextSummary">--</span></div>
+    </div>
 
-<div class="main-card">
-  <div id="dateDisplay" style="margin-bottom:10px;"></div>
-  <div id="nextBuses"></div>
+    <section id="list" class="list" aria-live="polite" aria-label="発車一覧"></section>
+
+    <!-- 管理パネル -->
+    <section id="adminPanel" class="admin-panel hidden" aria-hidden="true" aria-label="管理パネル">
+      <h3 style="margin:0 0 8px 0">管理パネル</h3>
+
+      <!-- 運行ステータス編集 -->
+      <div style="margin-bottom:10px">
+        <div class="small-muted" style="margin-bottom:6px">便のステータスを変更</div>
+        <div id="editStatusArea" class="form-row" role="form" aria-label="便ステータス編集">
+          <label for="selectBus" class="small-muted">便を選択</label>
+          <select id="selectBus" class="input" aria-label="便選択"></select>
+
+          <label for="selectStatus" class="small-muted">ステータス</label>
+          <select id="selectStatus" class="input" aria-label="ステータス選択">
+            <option value="ok">通常便</option>
+            <option value="extra">臨時便</option>
+            <option value="cancel">運休</option>
+          </select>
+
+          <button id="applyStatusBtn" class="btn">適用</button>
+        </div>
+      </div>
+
+      <!-- お知らせ登録 -->
+      <div style="margin-bottom:10px">
+        <div class="small-muted" style="margin-bottom:6px">お知らせを追加</div>
+        <div class="form-row" role="form" aria-label="お知らせ追加">
+          <input id="noticeTitle" class="input" placeholder="タイトル" aria-label="お知らせタイトル">
+          <input id="noticeWhen" class="input" placeholder="表示期間（例: 2026-03-25 〜 2026-03-26）" aria-label="表示期間">
+          <textarea id="noticeBody" class="input" placeholder="本文" style="min-width:260px;min-height:56px" aria-label="お知らせ本文"></textarea>
+          <button id="addNoticeBtn" class="btn primary">追加</button>
+        </div>
+
+        <div class="small-muted" style="margin-top:8px">現在のお知らせ</div>
+        <div id="noticeList" class="notice-list" aria-live="polite"></div>
+      </div>
+
+      <!-- 保存とリセット -->
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="saveBtn" class="btn">保存</button>
+        <button id="resetBtn" class="btn">初期化</button>
+        <div class="small-muted">変更は保存するまで反映されません（即時反映オプションは後で追加可能）</div>
+      </div>
+    </section>
+  </main>
 </div>
 
 <script>
-// 固定時刻表（平塚→学校）＋到着時刻予想（分）＋途中停留所＋備考＋ステータス
-let scheduleTemplate=[
- {time:"6:50",car:"10号車",stops:["崇善","西友","ブックオフ","大住"],eta:25,status:"ok", note:"後期生専用"},
- {time:"7:15",car:"1号車",stops:["崇善","西友","ブックオフ","大住"],eta:30,status:"ok", note:"通常便"},
- {time:"7:25",car:"2号車",stops:["崇善","西友","ブックオフ"],eta:40,status:"extra", note:"臨時便"},
- {time:"7:30",car:"4号車",stops:[],eta:40,status:"ok", note:"直行"},
- {time:"7:35",car:"7号車",stops:[],eta:35,status:"ok", note:"直行"},
- {time:"7:40",car:"8号車",stops:[],eta:30,status:"ok", note:"直行"},
- {time:"7:45",car:"9号車",stops:["崇善","西友","ブックオフ","大住"],eta:35,status:"cancel", note:"運休"},
- {time:"7:50",car:"3号車",stops:[],eta:35,status:"ok", note:"直行"}
+/* ===== データと状態 ===== */
+const defaultTemplate = [
+  {id:1,time:"6:50",car:"10号車",stops:["崇善","西友","ブックオフ","大住"],eta:25,status:"ok", note:"後期生専用"},
+  {id:2,time:"7:15",car:"1号車",stops:["崇善","西友","ブックオフ","大住"],eta:30,status:"ok", note:"通常便"},
+  {id:3,time:"7:25",car:"2号車",stops:["崇善","西友","ブックオフ"],eta:40,status:"extra", note:"臨時便"},
+  {id:4,time:"7:30",car:"4号車",stops:[],eta:40,status:"ok", note:"直行"},
+  {id:5,time:"7:35",car:"7号車",stops:[],eta:35,status:"ok", note:"直行"},
+  {id:6,time:"7:40",car:"8号車",stops:[],eta:30,status:"ok", note:"直行"},
+  {id:7,time:"7:45",car:"9号車",stops:["崇善","西友","ブックオフ","大住"],eta:35,status:"cancel", note:"運休"},
+  {id:8,time:"7:50",car:"3号車",stops:[],eta:35,status:"ok", note:"直行"}
 ];
 
-function getScheduleForDate(date){
-  return scheduleTemplate.map(b=>({...b,date:new Date(date)}));
+const STORAGE_KEY = 'schoolbus_v2';
+let schedule = [];
+let notices = [];
+let adminVisible = false;
+
+/* ===== DOM ===== */
+const clockEl = document.getElementById('clock');
+const dateEl = document.getElementById('dateDisplay');
+const listEl = document.getElementById('list');
+const nextSummaryEl = document.getElementById('nextSummary');
+
+const toggleAdminBtn = document.getElementById('toggleAdmin');
+const adminPanel = document.getElementById('adminPanel');
+const selectBus = document.getElementById('selectBus');
+const selectStatus = document.getElementById('selectStatus');
+const applyStatusBtn = document.getElementById('applyStatusBtn');
+const saveBtn = document.getElementById('saveBtn');
+const resetBtn = document.getElementById('resetBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+
+const noticeTitle = document.getElementById('noticeTitle');
+const noticeWhen = document.getElementById('noticeWhen');
+const noticeBody = document.getElementById('noticeBody');
+const addNoticeBtn = document.getElementById('addNoticeBtn');
+const noticeListEl = document.getElementById('noticeList');
+
+/* ===== 初期化と永続化 ===== */
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      schedule = parsed.schedule || JSON.parse(JSON.stringify(defaultTemplate));
+      notices = parsed.notices || [];
+    }else{
+      schedule = JSON.parse(JSON.stringify(defaultTemplate));
+      notices = [];
+    }
+  }catch(e){
+    console.warn('ロード失敗', e);
+    schedule = JSON.parse(JSON.stringify(defaultTemplate));
+    notices = [];
+  }
+}
+function saveState(){
+  const payload = {schedule, notices};
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  alert('保存しました');
 }
 
-let schedule=getScheduleForDate(new Date());
+/* ===== レンダリング ===== */
+function pad(n){return n.toString().padStart(2,'0')}
+function updateClock(){
+  const now = new Date();
+  clockEl.textContent = now.toLocaleTimeString();
+  dateEl.textContent = now.toLocaleDateString();
+}
+function getFutureBuses(){
+  const now = new Date();
+  let future = schedule.filter(b => {
+    const [h,m] = b.time.split(':').map(Number);
+    const bt = new Date(); bt.setHours(h, m, 0, 0);
+    return bt >= now;
+  });
+  if(future.length === 0) future = schedule;
+  return future;
+}
+function renderList(){
+  listEl.innerHTML = '';
+  const now = new Date();
+  const future = getFutureBuses();
+  future.slice(0,8).forEach((b, idx) => {
+    const [h,m] = b.time.split(':').map(Number);
+    const bt = new Date(); bt.setHours(h, m, 0, 0);
+    const arrival = new Date(bt.getTime() + b.eta * 60000);
+    const arrivalStr = pad(arrival.getHours()) + ':' + pad(arrival.getMinutes());
+    const diffMin = Math.round((bt - now) / 60000);
 
-function updateBoard(){
-  const now=new Date();
-  document.getElementById("clock").textContent=now.toLocaleTimeString();
-  document.getElementById("dateDisplay").textContent=now.toLocaleDateString();
+    const card = document.createElement('article');
+    card.className = 'bus' + (idx===0 ? ' primary' : '');
+    card.setAttribute('role','article');
+    card.setAttribute('aria-label', `${b.time} 発 ${b.car} ${b.status}`);
 
-  let future=schedule.filter(b=>{
-    const [h,m]=b.time.split(":").map(Number);
-    const bt=new Date(b.date);
-    bt.setHours(h);
-    bt.setMinutes(m);
-    return bt>=now; // 発車後は消える
+    const statusClass = b.status === 'cancel' ? 'cancel' : (b.status === 'extra' ? 'extra' : 'ok');
+
+    card.innerHTML = `
+      <div class="info">
+        <div class="time">${b.time}</div>
+        <div class="metaInfo">
+          <div class="car">${b.car}</div>
+          <div class="status ${statusClass}">${b.status === 'cancel' ? '運休' : (b.status === 'extra' ? '臨時便' : '学校行き')}</div>
+          ${b.stops && b.stops.length ? `<div class="stops">途中停留所: ${b.stops.join(' / ')}</div>` : ''}
+          ${b.note ? `<div class="note">備考: ${b.note}</div>` : ''}
+        </div>
+      </div>
+      <div class="right">
+        <div class="eta">到着 ${arrivalStr}</div>
+        <div class="arrival">発車まで ${diffMin} 分</div>
+      </div>
+    `;
+    listEl.appendChild(card);
   });
 
-  if(future.length===0){
-    const nextDay=new Date();
-    nextDay.setDate(now.getDate()+1);
-    schedule=getScheduleForDate(nextDay);
-    future=schedule;
+  // next summary
+  if(future.length > 0){
+    const next = future[0];
+    nextSummaryEl.textContent = `${next.time} ${next.car} ${next.status === 'cancel' ? '運休' : next.status === 'extra' ? '臨時' : '通常'}`;
+  }else{
+    nextSummaryEl.textContent = '該当なし';
   }
 
-  const container=document.getElementById("nextBuses");
-  container.innerHTML="";
-
-  future.slice(0,3).forEach((b,index)=>{
-    const [h,m]=b.time.split(":").map(Number);
-    const bt=new Date(b.date);
-    bt.setHours(h);
-    bt.setMinutes(m);
-
-    const arrival=new Date(bt.getTime()+b.eta*60000);
-    const arrivalStr=
-      arrival.getHours().toString().padStart(2,'0')+":"+
-      arrival.getMinutes().toString().padStart(2,'0');
-
-    const diff=(bt-now)/60000;
-
-    let box=document.createElement("div");
-
-    if(index===0){
-      box.className="bus";
-      box.style.background=
-        b.status==="cancel"?"#dc2626":
-        b.status==="extra"?"#f59e0b":"#16a34a";
-    }else{
-      box.className="next-small";
-      box.style.background=
-        b.status==="cancel"?"#dc2626":
-        b.status==="extra"?"#f59e0b":"#2563eb";
-    }
-
-    if(diff<=1) box.classList.add("alert");
-
-    const stopsHTML=(b.stops && b.stops.length>0)?`<div class="stops">途中停留所: ${b.stops.join(", ")}</div>`:"";
-    const noteHTML=b.note?`<div class="note">備考: ${b.note}</div>`:"";
-
-    box.innerHTML=`
-      <div class="info">
-        <div style="font-size:${index===0?'50px':'28px'};font-weight:bold;">${b.time}</div>
-        <div>${b.status==="cancel"?"運休":
-               b.status==="extra"?"臨時便":"学校行き"}</div>
-        <div>${b.car}</div>
-        ${stopsHTML}
-        ${noteHTML}
-      </div>
-      <div class="eta">到着 ${arrivalStr}</div>
-    `;
-
-    container.appendChild(box);
-  });
+  renderNotices();
+  populateBusSelect();
 }
 
-updateBoard();
-setInterval(updateBoard,1000);
+/* ===== 管理操作 ===== */
+function populateBusSelect(){
+  selectBus.innerHTML = '';
+  schedule.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.id;
+    opt.textContent = `${b.time} ${b.car} (${b.status})`;
+    selectBus.appendChild(opt);
+  });
+}
+applyStatusBtn.addEventListener('click', () => {
+  const id = Number(selectBus.value);
+  const newStatus = selectStatus.value;
+  const item = schedule.find(s => s.id === id);
+  if(item){
+    item.status = newStatus;
+    renderList();
+    alert('ステータスを更新しました（保存は別途）');
+  }
+});
+
+/* ===== お知らせ管理 ===== */
+function renderNotices(){
+  noticeListEl.innerHTML = '';
+  if(notices.length === 0){
+    noticeListEl.innerHTML = '<div class="small-muted">お知らせはありません</div>';
+    return;
+  }
+  notices.forEach((n, idx) => {
+    const el = document.createElement('div');
+    el.className = 'notice-item';
+    el.innerHTML = `
+      <div>
+        <div style="font-weight:700">${escapeHtml(n.title)}</div>
+        <div class="small-muted">${escapeHtml(n.when || '')}</div>
+        <div style="margin-top:6px">${escapeHtml(n.body)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <div class="small-muted">ID:${n.id}</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn" data-action="edit" data-idx="${idx}">編集</button>
+          <button class="btn" data-action="delete" data-idx="${idx}">削除</button>
+        </div>
+      </div>
+    `;
+    noticeListEl.appendChild(el);
+  });
+}
+addNoticeBtn.addEventListener('click', () => {
+  const title = noticeTitle.value.trim();
+  const when = noticeWhen.value.trim();
+  const body = noticeBody.value.trim();
+  if(!title || !body){
+    alert('タイトルと本文を入力してください');
+    return;
+  }
+  const id = Date.now();
+  notices.push({id, title, when, body});
+  noticeTitle.value = noticeWhen.value = noticeBody.value = '';
+  renderNotices();
+});
+noticeListEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  const action = btn.dataset.action;
+  const idx = Number(btn.dataset.idx);
+  if(action === 'delete'){
+    if(confirm('このお知らせを削除しますか？')){
+      notices.splice(idx,1);
+      renderNotices();
+    }
+  }else if(action === 'edit'){
+    const n = notices[idx];
+    const newTitle = prompt('タイトルを編集', n.title);
+    if(newTitle === null) return;
+    const newWhen = prompt('表示期間を編集', n.when || '');
+    if(newWhen === null) return;
+    const newBody = prompt('本文を編集', n.body);
+    if(newBody === null) return;
+    notices[idx] = {...n, title:newTitle.trim(), when:newWhen.trim(), body:newBody.trim()};
+    renderNotices();
+  }
+});
+
+/* ===== 保存とリセット ===== */
+saveBtn.addEventListener('click', saveState);
+resetBtn.addEventListener('click', () => {
+  if(!confirm('初期状態に戻しますか？ 保存していない変更は失われます')) return;
+  schedule = JSON.parse(JSON.stringify(defaultTemplate));
+  notices = [];
+  saveState();
+  renderList();
+});
+
+/* ===== 管理画面表示切替 ===== */
+toggleAdminBtn.addEventListener('click', () => {
+  adminVisible = !adminVisible;
+  adminPanel.classList.toggle('hidden', !adminVisible);
+  adminPanel.setAttribute('aria-hidden', String(!adminVisible));
+  toggleAdminBtn.textContent = adminVisible ? '管理画面を閉じる' : '管理画面を表示';
+  toggleAdminBtn.setAttribute('aria-pressed', String(adminVisible));
+});
+
+/* ===== ユーティリティ ===== */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ===== 初期処理 ===== */
+function init(){
+  loadState();
+  updateClock();
+  renderList();
+  setInterval(updateClock,1000);
+}
+refreshBtn.addEventListener('click', renderList);
+
+/* ===== 実行 ===== */
+init();
 </script>
 </body>
 </html>
