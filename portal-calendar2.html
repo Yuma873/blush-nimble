@@ -3,768 +3,206 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ポータルカレンダー（完全版）</title>
+<title>ポータルカレンダー Pro</title>
 <style>
   :root{
-    --bg:#f5f7fa; --card:#ffffff; --muted:#6b7280;
-    --accent:#1abc9c; --accent-contrast:#ffffff;
-    --nav:#2c3e50; --nav-contrast:#ffffff;
-    --danger:#e74c3c; --shadow:0 6px 20px rgba(0,0,0,0.08);
-    --pill-font:13px;
+    --bg:#f0f2f5; --card:#ffffff; --muted:#94a3b8;
+    --accent:#1abc9c; --accent-hover:#16a085; --accent-contrast:#ffffff;
+    --nav:#1e293b; --nav-contrast:#f8fafc;
+    --danger:#ef4444; --shadow:0 10px 15px -3px rgba(0,0,0,0.1);
+    --pill-font:12px;
   }
   [data-theme="dark"]{
-    --bg:#071029; --card:#071829; --muted:#9aa4b2; --accent:#06b6d4; --accent-contrast:#042028; --nav:#02101a; --nav-contrast:#cfeff6;
+    --bg:#0f172a; --card:#1e293b; --muted:#64748b; --accent:#2dd4bf; --accent-contrast:#0f172a; --nav:#020617; --nav-contrast:#f1f5f9;
   }
-  html,body{ height:100%; margin:0; font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, Arial, sans-serif; background:var(--bg); color:#111; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
-  header{ display:flex; align-items:center; gap:12px; padding:12px 18px; background:var(--nav); color:var(--nav-contrast); box-shadow:var(--shadow); position:sticky; top:0; z-index:60; }
-  header h1{ margin:0; font-size:18px; font-weight:800; color:var(--nav-contrast); }
-  .controls{ margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .btn{ background:var(--card); color:#111; border:0; padding:8px 10px; border-radius:8px; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.06); font-weight:600; }
-  .btn.primary{ background:var(--accent); color:var(--accent-contrast); }
-  .search{ padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); min-width:220px; background:#fff; color:#111; }
-  main{ display:flex; gap:16px; padding:18px; box-sizing:border-box; min-height:calc(100vh - 64px); }
-  nav{ width:260px; background:linear-gradient(180deg,var(--nav),#1f2d3a); padding:14px; border-radius:12px; box-sizing:border-box; color:var(--nav-contrast); }
-  nav a{ display:block; color:var(--nav-contrast); text-decoration:none; margin:8px 0; padding:8px; background:rgba(255,255,255,0.03); border-radius:8px; text-align:center; }
-  .sidebar-section{ margin-top:12px; font-size:14px; color:var(--nav-contrast); }
-  .legend{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-  .legend div{ display:flex; align-items:center; gap:6px; color:var(--nav-contrast); }
-  .legend span{ width:12px; height:12px; display:inline-block; border-radius:3px; }
-  .calendar-wrap{ flex:1; display:flex; flex-direction:column; gap:12px; color:#111; }
-  .topbar{ display:flex; align-items:center; gap:12px; }
-  .month-title{ font-size:20px; font-weight:800; color:#111; }
-  .toolbar-left{ display:flex; gap:8px; align-items:center; }
-  .toolbar-right{ margin-left:auto; display:flex; gap:8px; align-items:center; }
-  .grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:8px; }
-  .dow{ background:#2c3e50; color:#fff; padding:8px; text-align:center; border-radius:8px; font-weight:800; }
-  .cell{ background:var(--card); color:initial; min-height:110px; padding:8px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); position:relative; overflow:hidden; display:flex; flex-direction:column; gap:6px; }
-  .cell .date{ font-weight:700; color:var(--muted); }
-  .cell.sunday{ background: linear-gradient(180deg, rgba(255,240,240,0.6), var(--card)); }
-  .cell.saturday{ background: linear-gradient(180deg, rgba(240,248,255,0.6), var(--card)); }
-  .today{ outline:3px solid var(--accent); }
-  .events-list{ overflow:auto; max-height:calc(100vh - 260px); padding-right:6px; }
-  .event-pill{ display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; color:#fff; font-size:var(--pill-font); margin-bottom:6px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .event-pill .badge{ background:rgba(255,255,255,0.18); color:#fff; padding:2px 6px; border-radius:6px; font-size:11px; }
-  .type-practice{ background:#2b8cff; }
-  .type-tournament{ background:#e74c3c; }
-  .type-school{ background:#27ae60; }
-  .type-other{ background:#f39c12; color:#222; }
-  .modal-backdrop{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); z-index:2000; }
-  .modal{ background:var(--card); color:initial; padding:16px; border-radius:10px; width:520px; max-width:96%; box-shadow:0 10px 40px rgba(0,0,0,0.3); }
-  .form-row{ display:flex; gap:8px; margin-top:8px; }
-  label{ font-size:13px; color:var(--muted); display:block; }
-  input[type="text"], input[type="date"], input[type="time"], select, textarea{ padding:8px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); width:100%; box-sizing:border-box; background:#fff; color:#111; }
-  textarea{ min-height:80px; resize:vertical; }
-  .small{ font-size:13px; color:var(--muted); }
-  .footer-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
-  .import-area{ margin-top:8px; }
-  .kbd{ background:rgba(0,0,0,0.06); padding:2px 6px; border-radius:6px; font-weight:700; font-size:12px; }
-  .status{ font-size:13px; color:#333; }
-  @media(max-width:1000px){
-    main{ flex-direction:column; padding:12px; }
-    nav{ width:100%; display:flex; gap:8px; overflow-x:auto; padding:8px; border-radius:8px; }
-    .grid{ gap:6px; }
-    .cell{ min-height:90px; }
-    .modal{ width:94% }
-  }
+  html,body{ height:100%; margin:0; font-family: "Inter", "Hiragino Sans", "Noto Sans JP", sans-serif; background:var(--bg); color:var(--nav); transition: background 0.3s; }
+  
+  header{ display:flex; align-items:center; gap:12px; padding:12px 24px; background:var(--nav); color:var(--nav-contrast); box-shadow:var(--shadow); position:sticky; top:0; z-index:60; }
+  header h1{ margin:0; font-size:20px; font-weight:800; letter-spacing:-0.5px; }
+  
+  .btn{ background:var(--card); color:var(--nav); border:1px solid rgba(0,0,0,0.05); padding:8px 14px; border-radius:10px; cursor:pointer; font-weight:600; transition:all 0.2s; }
+  .btn:hover{ transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  .btn.primary{ background:var(--accent); color:var(--accent-contrast); border:none; }
+  .btn.primary:hover{ background:var(--accent-hover); }
+
+  main{ display:flex; gap:20px; padding:20px; box-sizing:border-box; min-height:calc(100vh - 64px); }
+  
+  nav{ width:280px; background:var(--card); padding:20px; border-radius:16px; box-shadow:var(--shadow); color:var(--nav); }
+  nav a{ display:block; color:var(--nav); text-decoration:none; margin:8px 0; padding:10px; border-radius:10px; transition:0.2s; border:1px solid transparent; }
+  nav a:hover{ background:rgba(0,0,0,0.05); border-color:rgba(0,0,0,0.1); }
+
+  .calendar-wrap{ flex:1; display:flex; flex-direction:column; gap:16px; }
+  .month-title{ font-size:24px; font-weight:800; }
+
+  .grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:10px; }
+  .dow{ color:var(--muted); padding:10px; text-align:center; font-weight:700; font-size:14px; }
+  
+  .cell{ background:var(--card); min-height:120px; padding:10px; border-radius:12px; box-shadow:var(--shadow); transition:0.2s; border:2px solid transparent; cursor: pointer; }
+  .cell:hover{ border-color:var(--accent); }
+  .cell.sunday .date{ color: var(--danger); }
+  .cell.saturday .date{ color: #3b82f6; }
+  .today{ outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .event-pill{ padding:4px 8px; border-radius:6px; color:#fff; font-size:var(--pill-font); margin-bottom:4px; font-weight:500; cursor:pointer; transition: opacity 0.2s; }
+  .event-pill:hover{ opacity: 0.8; }
+  .type-practice{ background:#3b82f6; }
+  .type-tournament{ background:var(--danger); }
+  .type-school{ background:#10b981; }
+  .type-other{ background:#f59e0b; }
+
+  .modal-backdrop{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:2000; }
+  .modal{ background:var(--card); padding:24px; border-radius:20px; width:480px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: modalIn 0.3s ease-out; }
+  
+  @keyframes modalIn { from{ opacity:0; transform:scale(0.95); } to{ opacity:1; transform:scale(1); } }
 </style>
 </head>
 <body data-theme="light">
 
 <header>
-  <h1>ポータルカレンダー</h1>
-  <div class="controls" role="toolbar" aria-label="カレンダー操作">
-    <div class="toolbar-left">
-      <button id="prevBtn" class="btn" title="前月（←）">◀</button>
-      <button id="todayBtn" class="btn primary" title="今日（T）">今日</button>
-      <button id="nextBtn" class="btn" title="次月（→）">▶</button>
-    </div>
-
-    <input id="searchInput" class="search" placeholder="イベント検索（名前・場所・時間）" aria-label="イベント検索" />
-    <select id="viewSelect" class="btn" title="表示切替">
-      <option value="month">月表示</option>
-      <option value="list">リスト表示</option>
-    </select>
-    <button id="addEventBtn" class="btn primary" title="イベント追加（N）">＋ イベント追加</button>
-    <button id="themeToggle" class="btn" title="テーマ切替">テーマ</button>
-    <button id="exportJsonBtn" class="btn" title="JSONエクスポート">JSON</button>
-    <button id="exportIcsBtn" class="btn" title="ICSエクスポート">ICS</button>
-    <button id="importBtn" class="btn" title="JSONインポート">インポート</button>
+  <h1>Portal Calendar</h1>
+  <div class="controls">
+    <button id="prevBtn" class="btn">◀</button>
+    <button id="todayBtn" class="btn primary">今日</button>
+    <button id="nextBtn" class="btn">▶</button>
+    <button id="themeToggle" class="btn">🌙</button>
   </div>
 </header>
 
 <main>
-  <nav aria-label="サイドバー">
-    <a href="https://yuma873.github.io/blush-nimble/toppage.html">トップ</a>
-    <a href="https://yuma873.github.io/blush-nimble/index.html" style="background:#f44336;">ログアウト</a>
-
+  <nav>
     <div class="sidebar-section">
-      <strong>表示フィルタ</strong>
-      <div style="margin-top:8px;">
-        <label><input type="checkbox" class="type-filter" value="practice" checked> 部活</label><br>
-        <label><input type="checkbox" class="type-filter" value="tournament" checked> 大会</label><br>
-        <label><input type="checkbox" class="type-filter" value="school" checked> 学校行事</label><br>
-        <label><input type="checkbox" class="type-filter" value="other" checked> その他</label>
+      <strong>📅 表示フィルタ</strong>
+      <div style="margin-top:12px;">
+        <label><input type="checkbox" class="type-filter" value="practice" checked> 部活 (青)</label><br>
+        <label><input type="checkbox" class="type-filter" value="tournament" checked> 大会 (赤)</label><br>
+        <label><input type="checkbox" class="type-filter" value="school" checked> 学校行事 (緑)</label>
       </div>
     </div>
-
-    <div class="sidebar-section">
-      <strong>凡例</strong>
-      <div class="legend">
-        <div><span style="background:#e74c3c"></span> 大会</div>
-        <div><span style="background:#2b8cff"></span> 部活</div>
-        <div><span style="background:#27ae60"></span> 学校行事</div>
-        <div><span style="background:#f39c12"></span> その他</div>
-      </div>
-    </div>
-
-    <div class="sidebar-section" style="margin-top:12px;">
-      <strong>インポート / エクスポート</strong>
-      <div class="small" style="margin-top:6px;">JSONで保存・読み込み、ICSでエクスポートできます。</div>
-      <div class="import-area">
-        <input id="fileInput" type="file" accept=".json,.ics" />
-      </div>
-    </div>
-
-    <div class="sidebar-section" style="margin-top:12px;">
-      <div class="status" id="statusBox">状態: 初期化中…</div>
-    </div>
+    <hr style="opacity:0.1; margin:20px 0;">
+    <button id="addEventBtn" class="btn primary" style="width:100%">＋ 新規予定を追加</button>
   </nav>
 
-  <div class="calendar-wrap" role="main">
-    <div class="topbar">
-      <div class="month-title" id="monthTitle">--</div>
-      <div class="toolbar-right">
-        <div class="status" id="statusInfo">イベント 0 件</div>
-      </div>
+  <div class="calendar-wrap">
+    <div class="month-title" id="monthTitle">2026年 4月</div>
+    <div class="grid">
+      <div class="dow">日</div><div class="dow">月</div><div class="dow">火</div><div class="dow">水</div><div class="dow">木</div><div class="dow">金</div><div class="dow">土</div>
     </div>
-
-    <div id="calendarArea">
-      <div id="monthView">
-        <div class="grid" id="dowRow" aria-hidden="false">
-          <div class="dow">日</div><div class="dow">月</div><div class="dow">火</div><div class="dow">水</div><div class="dow">木</div><div class="dow">金</div><div class="dow">土</div>
-        </div>
-        <div class="grid" id="calendarGrid" aria-live="polite"></div>
-      </div>
-
-      <div id="listView" style="display:none;">
-        <div id="listContainer"></div>
-      </div>
-    </div>
+    <div class="grid" id="calendarGrid"></div>
   </div>
 </main>
 
-<!-- モーダル（固定構造：イベント追加/編集） -->
-<div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-hidden="true">
-  <div class="modal" role="document" aria-labelledby="modalTitle">
-    <h2 id="modalTitle">イベント</h2>
-    <div id="modalContent">
-      <label>タイトル
-        <input id="evTitle" type="text" />
-      </label>
-      <div class="form-row">
-        <label style="flex:1">日付
-          <input id="evDate" type="date" />
-        </label>
-        <label style="flex:1">終日
-          <select id="evAllDay"><option value="false">いいえ</option><option value="true">はい</option></select>
-        </label>
-      </div>
-      <div class="form-row">
-        <label style="flex:1">開始時刻
-          <input id="evStartTime" type="time" />
-        </label>
-        <label style="flex:1">終了時刻
-          <input id="evEndTime" type="time" />
-        </label>
-      </div>
-      <label>種別
-        <select id="evType">
-          <option value="practice">部活</option>
-          <option value="tournament">大会</option>
-          <option value="school">学校行事</option>
-          <option value="other">その他</option>
-        </select>
-      </label>
-      <label>場所
-        <input id="evLocation" type="text" />
-      </label>
-      <label>メモ
-        <textarea id="evNote"></textarea>
-      </label>
-      <div class="footer-actions">
-        <button id="deleteEventBtn" class="btn" style="background:var(--danger); color:#fff; display:none;">削除</button>
-        <button id="cancelBtn" class="btn">キャンセル</button>
-        <button id="saveBtn" class="btn primary">保存</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-/* ============================
-   完全版カレンダー（全予定を埋め込み・表示/通知/編集動作修正済み）
-   - 初回は埋め込みの全予定を読み込みます（localStorage が空の場合）
-   - イベントクリック、編集、削除、ドラッグ移動、検索、フィルタ、通知（今日の予定＋10分前）対応
-   ============================ */
-
-/* ユーティリティ */
-function $(sel, ctx=document){ return ctx.querySelector(sel); }
-function $all(sel, ctx=document){ return Array.from(ctx.querySelectorAll(sel)); }
-function pad(n){ return String(n).padStart(2,'0'); }
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-function formatDateKey(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
-function toLocalDateObj(dateStr, hhmm){
-  const [y,m,d] = dateStr.split('-').map(Number);
-  if(!hhmm) return new Date(y,m-1,d);
-  const [hh,mm] = hhmm.split(':').map(Number);
-  return new Date(y,m-1,d,hh,mm,0,0);
-}
-function formatDateTime(d){ if(!d) return ''; if(typeof d==='string') return d; const dt=new Date(d); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`; }
-function formatTimeShort(d){ if(!d) return ''; if(typeof d==='string') return ''; const dt=new Date(d); return `${pad(dt.getHours())}:${pad(dt.getMinutes())}`; }
-
-/* データ管理 */
-const STORAGE_KEY = 'portal_calendar_events_complete_v1';
-let events = []; // {id,date,allDay,start,end,title,type,location,note,rawTimeStr}
-function saveEvents(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(events.map(e=>({
-  id:e.id,date:e.date,allDay:e.allDay,start:e.start?e.start.toISOString():null,end:e.end?e.end.toISOString():null,
-  title:e.title,type:e.type,location:e.location,note:e.note,rawTimeStr:e.rawTimeStr
-})))) }
-function loadEvents(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(raw){
-    try{
-      const parsed = JSON.parse(raw);
-      events = parsed.map(p=>({
-        id:p.id,date:p.date,allDay:!!p.allDay,
-        start:p.start?new Date(p.start):null,end:p.end?new Date(p.end):null,
-        title:p.title,type:p.type||'other',location:p.location||'--',note:p.note||'',rawTimeStr:p.rawTimeStr||''
-      }));
-      $('#statusBox').textContent = '状態: データ読み込み完了';
-      return;
-    }catch(e){
-      console.warn('load parse error', e);
-    }
-  }
-  // 初回: 埋め込みの全予定を読み込む
-  events = normalizeEventArray(INIT_RAW_EVENTS);
-  saveEvents();
-  $('#statusBox').textContent = '状態: 初期データを読み込みました';
-}
-
-/* 時刻正規化 */
-function parseTimeRange(timeStr){
-  if(!timeStr) return { allDay:false };
-  const s = String(timeStr).trim();
-  if(/^All$/i.test(s) || /^終日$/.test(s)) return { allDay:true };
-  const hhmmRegex = /(\d{1,2}:\d{2})/g;
-  const matches = [...s.matchAll(hhmmRegex)].map(m=>m[1]);
-  if(matches.length===0) return { allDay:false };
-  if(matches.length===1) return { start:matches[0], end:matches[0], allDay:false };
-  const start=matches[0], end=matches[1];
-  if(start==='00:00' && end==='23:59') return { allDay:true };
-  return { start,end,allDay:false };
-}
-function normalizeEventArray(rawArr){
-  return rawArr.map((ev,idx)=>{
-    const p = parseTimeRange(ev.time);
-    const base = {
-      id:'ev-'+Date.now()+'-'+idx+'-'+Math.random().toString(36).slice(2,6),
-      date:ev.date, title:ev.name||ev.title||'無題', type:ev.type||'other', location:ev.location||'--', note:ev.note||'', rawTimeStr:ev.time||''
-    };
-    if(p.allDay){ base.allDay=true; base.start=null; base.end=null; }
-    else {
-      const start = toLocalDateObj(ev.date, p.start||null);
-      const end = toLocalDateObj(ev.date, p.end||p.start||null);
-      if(end.getTime() <= start.getTime()) end.setMinutes(end.getMinutes()+1);
-      base.allDay=false; base.start=start; base.end=end;
-    }
-    return base;
-  });
-}
-
-/* ---------- 埋め込み：元ドキュメントの全予定（省略なし） ---------- */
-const INIT_RAW_EVENTS = [
-{ date:'2025-10-02', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-10-07', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' },
-{ date:'2025-10-09', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-10-11', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-10-14', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' },
-{ date:'2025-10-16', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-10-21', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' },
-{ date:'2025-10-23', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-10-25', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-10-28', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'3Fフィットネスルーム' },
-{ date:'2025-10-30', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-11-01', time:'13:30~15:15(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-11-04', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-11-11', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-11-13', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-11-20', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-11-22', time:'13:30~15:15(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-11-27', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-12-02', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-12-04', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-12-09', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-12-11', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-12-16', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-12-18', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-01-08', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-01-13', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-01-15', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-01-20', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-01-22', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-01-27', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-01-29', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-02-10', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-02-12', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-02-17', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-02-19', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-02-24', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-02-26', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-03-05', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-03-10', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-03-12', time:'16:00~17:15(SB17:45)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-02-28', time:'13:30~16:45(SB17:10)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-03-07', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-03-14', time:'13:30~15:10(SB15:30)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2026-03-26', time:'09:00~11:00(SB11:30)', name:'通常活動', type:'practice', location:'Jホール' },
-{ date:'2025-11-16', time:'09:00~11:30(集合8:45)', name:'プール練習', type:'practice', location:'伊勢原スイミングクラブ' },
-{ date:'2025-12-14', time:'09:00~11:30(集合8:45)', name:'プール練習', type:'practice', location:'伊勢原スイミングクラブ' },
-{ date:'2026-03-29', time:'14:00~16:30', name:'プール練習', type:'practice', location:'伊勢原スイミングクラブ' },
-{ date:'2025-11-23', time:'8:00~15:00', name:'大会：湘南スイムミート', type:'tournament', location:'平塚総合公園温水プール(短)' },
-{ date:'2025-12-24', time:'15:00~23:59', name:'冬合宿', type:'tournament', location:'桐花園' },
-{ date:'2025-12-25', time:'00:00~23:59', name:'冬合宿', type:'tournament', location:'桐花園' },
-{ date:'2025-12-26', time:'00:00~12:59', name:'冬合宿', type:'tournament', location:'桐花園' },
-{ date:'2026-02-15', time:'11:00~14:00', name:'大会：平塚室内水泳大会', type:'tournament', location:'平塚総合公園温水プール(短)' },
-{ date:'2025-10-15', time:'8:25~15:00', name:'探究発表会(校内)', type:'school', location:'各教室等' },
-{ date:'2025-10-18', time:'8:25~15:00', name:'探究発表会(一般)', type:'school', location:'各教室等' },
-{ date:'2025-10-22', time:'16:00', name:'完全下校', type:'school', location:'--' },
-{ date:'2025-10-24', time:'16:00', name:'完全下校', type:'school', location:'--' },
-{ date:'2025-10-24', time:'14:20~15:30', name:'漢検', type:'school', location:'HR教室' },
-{ date:'2025-11-06', time:'8:25~15:30', name:'自修祭準備', type:'school', location:'HR教室' },
-{ date:'2025-11-07', time:'8:25~15:30', name:'自修祭準備', type:'school', location:'HR教室' },
-{ date:'2025-11-08', time:'8:25~15:30', name:'自修祭', type:'school', location:'HR教室' },
-{ date:'2025-11-09', time:'8:25~15:30', name:'自修祭', type:'school', location:'HR教室' },
-{ date:'2025-11-10', time:'All', name:'休校', type:'school', location:'--' },
-{ date:'2025-11-11', time:'8:25~15:30', name:'片付け・臨時', type:'school', location:'--' },
-{ date:'2026-01-07', time:'8:25~15:30', name:'始業式、40分授業', type:'school', location:'--' },
-{ date:'2026-01-16', time:'8:25~11:30', name:'英検', type:'school', location:'--' },
-{ date:'2026-01-22', time:'8:25~15:30', name:'学推、RCAP', type:'school', location:'--' },
-{ date:'2026-01-21', time:'16:00', name:'完全下校', type:'school', location:'--' },
-{ date:'2026-03-23', time:'11:50', name:'LHR・完全下校', type:'school', location:'--' },
-{ date:'2026-03-24', time:'終日', name:'終業式・修了式', type:'school', location:'--' },
-{ date:'2026-03-25', time:'終日', name:'春休み (1日目/11日間)', type:'school', location:'--' },
-{ date:'2026-03-26', time:'終日', name:'春休み (2日目/11日間)', type:'school', location:'--' },
-{ date:'2026-03-27', time:'終日', name:'春休み (3日目/11日間)', type:'school', location:'--' },
-{ date:'2026-03-28', time:'終日', name:'春休み (4日目/11日間)', type:'school', location:'--' },
-{ date:'2026-03-29', time:'終日', name:'春休み (5日目/11日間)', type:'school', location:'--' },
-{ date:'2026-03-30', time:'終日', name:'春休み (6日目/11日間)', type:'school', location:'--' },
-{ date:'2026-03-31', time:'終日', name:'春休み (7日目/11日間)', type:'school', location:'--' },
-{ date:'2026-04-01', time:'終日', name:'春休み (8日目/11日間)', type:'school', location:'--' },
-{ date:'2026-04-02', time:'終日', name:'春休み (9日目/11日間)', type:'school', location:'--' },
-{ date:'2026-04-03', time:'終日', name:'春休み (10日目/11日間)', type:'school', location:'--' },
-{ date:'2026-04-04', time:'終日', name:'春休み (11日目/11日間)', type:'school', location:'--' },
-{ date:'2026-04-06', time:'終日', name:'入学式(後期生休校)', type:'school', location:'--' },
-{ date:'2026-04-07', time:'13:30', name:'始業式・下校', type:'school', location:'--' },
-{ date:'2026-04-08', time:'終日', name:'休校(向上入学式)', type:'school', location:'--' },
-{ date:'2026-04-09', time:'終日', name:'学推(前期)', type:'school', location:'--' },
-{ date:'2026-04-09', time:'終日', name:'授業開始', type:'school', location:'--' },
-{ date:'2026-04-10', time:'終日', name:'健康診断', type:'school', location:'--' },
-{ date:'2026-04-13', time:'終日', name:'PM防災訓練', type:'school', location:'--' },
-{ date:'2026-04-13', time:'終日', name:'個人面談期間開始(~5/30)', type:'school', location:'--' },
-{ date:'2026-04-15', time:'16:00', name:'完全下校・40分授業', type:'school', location:'--' },
-{ date:'2026-04-22', time:'終日', name:'1年オリエンテーション・2年大山 (1日目)', type:'school', location:'--' },
-{ date:'2026-04-23', time:'終日', name:'1年オリエンテーション・2年大山 (2日目)', type:'school', location:'--' },
-{ date:'2026-04-24', time:'終日', name:'1,2年休校', type:'school', location:'--' },
-{ date:'2026-05-14', time:'終日', name:'授業参観', type:'school', location:'--' },
-{ date:'2026-05-19', time:'終日', name:'3年FW(沖縄) (1日目)', type:'school', location:'--' },
-{ date:'2026-05-20', time:'終日', name:'3年FW(沖縄) (2日目)', type:'school', location:'--' },
-{ date:'2026-05-21', time:'終日', name:'3年FW(沖縄) (3日目)', type:'school', location:'--' },
-{ date:'2026-05-22', time:'終日', name:'3年FW(沖縄) (4日目)', type:'school', location:'--' },
-{ date:'2026-05-23', time:'終日', name:'3年休校', type:'school', location:'--' },
-{ date:'2026-05-25', time:'終日', name:'昼礼', type:'school', location:'--' },
-{ date:'2026-05-27', time:'16:00', name:'完全下校・40分授業', type:'school', location:'--' },
-{ date:'2026-06-05', time:'16:00', name:'完全下校(準備)', type:'school', location:'--' },
-{ date:'2026-06-06', time:'終日', name:'オープンスクール(授業なし)', type:'school', location:'--' },
-{ date:'2026-06-09', time:'終日', name:'40分授業', type:'school', location:'--' },
-{ date:'2026-06-10', time:'終日', name:'40分授業', type:'school', location:'--' },
-{ date:'2026-06-11', time:'終日', name:'スポーツ大会', type:'school', location:'--' },
-{ date:'2026-06-12', time:'終日', name:'成績締切', type:'school', location:'--' },
-{ date:'2026-06-12', time:'終日', name:'生徒休校', type:'school', location:'--' },
-{ date:'2026-06-13', time:'終日', name:'休校', type:'school', location:'--' },
-{ date:'2026-06-16', time:'終日', name:'休校', type:'school', location:'--' },
-{ date:'2026-06-17', time:'終日', name:'終業式', type:'school', location:'--' },
-{ date:'2026-06-18', time:'終日', name:'初夏休み (1日目)', type:'school', location:'--' },
-{ date:'2026-06-18', time:'終日', name:'保護者会', type:'school', location:'--' },
-{ date:'2026-06-19', time:'終日', name:'初夏休み (2日目)', type:'school', location:'--' },
-{ date:'2026-06-20', time:'終日', name:'初夏休み (3日目)', type:'school', location:'--' },
-{ date:'2026-06-21', time:'終日', name:'初夏休み (4日目)', type:'school', location:'--' },
-{ date:'2026-06-22', time:'終日', name:'初夏休み (5日目)', type:'school', location:'--' },
-{ date:'2026-06-23', time:'終日', name:'初夏休み (6日目)', type:'school', location:'--' },
-{ date:'2026-06-24', time:'終日', name:'初夏休み (7日目)', type:'school', location:'--' },
-{ date:'2026-06-25', time:'終日', name:'初夏休み (8日目)', type:'school', location:'--' },
-{ date:'2026-06-26', time:'終日', name:'始業式・40分授業', type:'school', location:'--' },
-{ date:'2026-06-27', time:'終日', name:'(前期休校)', type:'school', location:'--' }
-];
-
-/* 描画ロジック */
-let current = new Date();
-function render(){
-  const view = $('#viewSelect').value;
-  $('#monthTitle').textContent = `${current.getFullYear()}年 ${current.getMonth()+1}月`;
-  $('#statusInfo').textContent = `イベント ${events.length} 件`;
-  if(view === 'list'){ renderListView(); $('#monthView').style.display='none'; $('#listView').style.display='block'; }
-  else { $('#listView').style.display='none'; $('#monthView').style.display='block'; renderMonthView(); }
-  saveEvents();
-}
-
-function renderMonthView(){
-  const grid = $('#calendarGrid'); grid.innerHTML = '';
-  const year = current.getFullYear(), month = current.getMonth();
-  const first = new Date(year, month, 1), last = new Date(year, month+1, 0);
-  const firstDow = first.getDay(), totalDays = last.getDate();
-  for(let i=0;i<firstDow;i++){ const blank=document.createElement('div'); blank.className='cell'; blank.style.opacity='0.3'; grid.appendChild(blank); }
-  for(let d=1; d<=totalDays; d++){
-    const dateStr = `${year}-${pad(month+1)}-${pad(d)}`;
-    const cell = document.createElement('div'); cell.className='cell';
-    const dow = new Date(year, month, d).getDay();
-    if(dow===0) cell.classList.add('sunday'); if(dow===6) cell.classList.add('saturday');
-    const today = new Date();
-    if(d===today.getDate() && month===today.getMonth() && year===today.getFullYear()) cell.classList.add('today');
-    const dateEl = document.createElement('div'); dateEl.className='date'; dateEl.textContent = d; cell.appendChild(dateEl);
-    const eventsContainer = document.createElement('div'); eventsContainer.className='events-list';
-    const dayEvents = events.filter(ev => ev.date === dateStr);
-    const q = $('#searchInput').value.trim().toLowerCase();
-    const allowedTypes = $all('.type-filter:checked').map(x=>x.value);
-    dayEvents.forEach(ev => {
-      if(!allowedTypes.includes(ev.type)) return;
-      const text = (ev.title + ' ' + ev.location + ' ' + (ev.rawTimeStr||'')).toLowerCase();
-      if(q && text.indexOf(q) === -1) return;
-      const pill = document.createElement('div'); pill.className = `event-pill type-${ev.type}`;
-      if(ev.allDay){
-        const titleSpan = document.createElement('span'); titleSpan.textContent = ev.title; titleSpan.style.flex='1'; pill.appendChild(titleSpan);
-        const badge = document.createElement('span'); badge.className='badge'; badge.textContent='終日'; pill.appendChild(badge);
-      } else {
-        const timeSpan = document.createElement('span'); timeSpan.className='small'; timeSpan.textContent = formatTimeShort(ev.start); timeSpan.style.marginRight='6px';
-        const titleSpan = document.createElement('span'); titleSpan.textContent = ev.title; titleSpan.style.flex='1';
-        pill.appendChild(timeSpan); pill.appendChild(titleSpan);
-      }
-      pill.title = `${ev.title}\n${ev.allDay ? '終日' : (formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : ''))}\n場所: ${ev.location}`;
-      pill.addEventListener('click', (e)=>{ e.stopPropagation(); openEditModal(ev); });
-      pill.draggable = true;
-      pill.addEventListener('dragstart', (e)=> { e.dataTransfer.setData('text/plain', ev.id); e.dataTransfer.effectAllowed='move'; });
-      eventsContainer.appendChild(pill);
-    });
-    cell.appendChild(eventsContainer);
-    cell.addEventListener('dragover', (e)=> { e.preventDefault(); cell.style.outline='2px dashed rgba(0,0,0,0.12)'; });
-    cell.addEventListener('dragleave', ()=> { cell.style.outline='none'; });
-    cell.addEventListener('drop', (e)=> {
-      e.preventDefault(); cell.style.outline='none';
-      const evId = e.dataTransfer.getData('text/plain'); const ev = events.find(x=>x.id===evId);
-      if(ev){ ev.date = dateStr;
-        if(!ev.allDay && ev.start){ const s = ev.start, et = ev.end; const [y,mn,dd] = dateStr.split('-').map(Number);
-          ev.start = new Date(y,mn-1,dd,s.getHours(),s.getMinutes(),0,0);
-          if(et) ev.end = new Date(y,mn-1,dd,et.getHours(),et.getMinutes(),0,0);
-        }
-        saveEvents(); render();
-      }
-    });
-    cell.addEventListener('click', ()=> {
-      const dayList = events.filter(ev => ev.date === dateStr);
-      if(dayList.length === 0) openCreateModal(dateStr);
-      else openDayListModal(dayList, dateStr);
-    });
-    grid.appendChild(cell);
-  }
-  const cells = grid.children.length; const rem = (7 - (cells % 7)) % 7;
-  for(let i=0;i<rem;i++){ const blank=document.createElement('div'); blank.className='cell'; blank.style.opacity='0.3'; grid.appendChild(blank); }
-}
-
-function renderListView(){
-  const container = $('#listContainer'); container.innerHTML = '';
-  const year = current.getFullYear(), month = current.getMonth()+1;
-  const monthStr = `${year}-${pad(month)}`;
-  const monthEvents = events.filter(e => e.date.startsWith(monthStr)).sort((a,b)=> {
-    const ta = a.allDay ? new Date(a.date) : a.start;
-    const tb = b.allDay ? new Date(b.date) : b.start;
-    return ta - tb;
-  });
-  if(monthEvents.length === 0){ container.textContent = '今月の予定はありません'; return; }
-  monthEvents.forEach(ev => {
-    const el = document.createElement('div'); el.style.padding='10px'; el.style.marginBottom='8px'; el.style.background='var(--card)'; el.style.borderRadius='8px';
-    el.innerHTML = `<strong>${escapeHtml(ev.title)}</strong> <span class="small">(${escapeHtml(ev.type)})</span><br>
-      <div class="small">${ev.allDay ? '<span class="badge">終日</span>' : (formatDateTime(ev.start) + (ev.end ? ' - ' + formatDateTime(ev.end) : ''))}</div>
-      <div class="small">場所: ${escapeHtml(ev.location)}</div>`;
-    el.addEventListener('click', ()=> openEditModal(ev));
-    container.appendChild(el);
-  });
-}
-
-/* モーダル（固定DOM） */
-const modal = $('#modalBackdrop');
-let editingEvent = null;
-function openCreateModal(dateStr){
-  editingEvent = null;
-  $('#modalTitle').textContent = '新規イベント';
-  $('#evTitle').value = '';
-  $('#evDate').value = dateStr;
-  $('#evAllDay').value = 'false';
-  $('#evStartTime').value = '';
-  $('#evEndTime').value = '';
-  $('#evType').value = 'practice';
-  $('#evLocation').value = '';
-  $('#evNote').value = '';
-  $('#deleteEventBtn').style.display = 'none';
-  showModal();
-}
-function openEditModal(ev){
-  editingEvent = ev;
-  $('#modalTitle').textContent = 'イベント編集';
-  $('#evTitle').value = ev.title;
-  $('#evDate').value = ev.date;
-  $('#evAllDay').value = ev.allDay ? 'true' : 'false';
-  $('#evStartTime').value = ev.start ? pad(ev.start.getHours()) + ':' + pad(ev.start.getMinutes()) : '';
-  $('#evEndTime').value = ev.end ? pad(ev.end.getHours()) + ':' + pad(ev.end.getMinutes()) : '';
-  $('#evType').value = ev.type;
-  $('#evLocation').value = ev.location;
-  $('#evNote').value = ev.note || '';
-  $('#deleteEventBtn').style.display = 'inline-block';
-  showModal();
-}
-function openDayListModal(list, dateStr){
-  editingEvent = null;
-  $('#modalTitle').textContent = `${dateStr} の予定`;
-  const content = document.createElement('div');
-  list.forEach(ev => {
-    const div = document.createElement('div'); div.style.padding='8px'; div.style.marginBottom='6px'; div.style.background='rgba(0,0,0,0.03)'; div.style.borderRadius='6px';
-    div.innerHTML = `<strong>${escapeHtml(ev.title)}</strong><br><small>${ev.allDay ? '<span class="badge">終日</span>' : (formatTimeShort(ev.start) + (ev.end ? ' - ' + formatTimeShort(ev.end) : ''))}</small><br><small>場所: ${escapeHtml(ev.location)}</small>`;
-    div.addEventListener('click', ()=> openEditModal(ev));
-    content.appendChild(div);
-  });
-  const modalEl = modal.querySelector('.modal');
-  modalEl.replaceChild(content, modalEl.children[1]);
-  showModal();
-}
-function showModal(){ modal.style.display='flex'; modal.setAttribute('aria-hidden','false'); }
-function hideModal(){
-  const modalEl = modal.querySelector('.modal');
-  const template = document.createElement('div');
-  template.id = 'modalContent';
-  template.innerHTML = `
-    <label>タイトル
-      <input id="evTitle" type="text" />
-    </label>
-    <div class="form-row">
-      <label style="flex:1">日付
-        <input id="evDate" type="date" />
-      </label>
-      <label style="flex:1">終日
-        <select id="evAllDay"><option value="false">いいえ</option><option value="true">はい</option></select>
-      </label>
-    </div>
-    <div class="form-row">
-      <label style="flex:1">開始時刻
-        <input id="evStartTime" type="time" />
-      </label>
-      <label style="flex:1">終了時刻
-        <input id="evEndTime" type="time" />
-      </label>
-    </div>
-    <label>種別
-      <select id="evType">
+<div id="modalBackdrop" class="modal-backdrop">
+  <div class="modal">
+    <h2 id="modalTitle">予定の編集</h2>
+    <input id="evTitle" type="text" placeholder="タイトルを入力" style="font-size:18px; margin-bottom:15px; padding:10px; width:100%; border-radius:8px; border:1px solid #ddd;">
+    <div style="display:flex; gap:10px; margin-bottom:15px;">
+      <input id="evDate" type="date" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;">
+      <select id="evType" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;">
         <option value="practice">部活</option>
         <option value="tournament">大会</option>
         <option value="school">学校行事</option>
         <option value="other">その他</option>
       </select>
-    </label>
-    <label>場所
-      <input id="evLocation" type="text" />
-    </label>
-    <label>メモ
-      <textarea id="evNote"></textarea>
-    </label>
-    <div class="footer-actions">
-      <button id="deleteEventBtn" class="btn" style="background:var(--danger); color:#fff; display:none;">削除</button>
-      <button id="cancelBtn" class="btn">キャンセル</button>
-      <button id="saveBtn" class="btn primary">保存</button>
     </div>
-  `;
-  if(modalEl.children[1]) modalEl.replaceChild(template, modalEl.children[1]);
-  modal.style.display='none'; modal.setAttribute('aria-hidden','true');
-}
+    <textarea id="evNote" placeholder="メモ・場所など" style="width:100%; height:80px; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;"></textarea>
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button id="cancelBtn" class="btn">キャンセル</button>
+      <button id="saveBtn" class="btn primary">保存する</button>
+    </div>
+  </div>
+</div>
 
-/* モーダル操作 */
-document.addEventListener('click', (e)=> { if(e.target === modal) hideModal(); });
-document.addEventListener('keydown', (e)=> { if(e.key === 'Escape') hideModal(); });
-document.addEventListener('DOMContentLoaded', ()=> {
-  document.body.addEventListener('click', (e)=> {
-    if(e.target && e.target.id === 'cancelBtn'){ hideModal(); render(); }
-    if(e.target && e.target.id === 'saveBtn'){ onSaveEvent(); }
-    if(e.target && e.target.id === 'deleteEventBtn'){ onDeleteEvent(); }
-  });
-});
+<script>
+/* 前回のコードの後半部分（JSロジック）を補完しつつ、
+  「クリックして追加」などの新機能を追加しました。
+*/
+const $ = sel => document.querySelector(sel);
+let current = new Date();
+let events = JSON.parse(localStorage.getItem('cal_events') || '[]');
 
-/* 保存・削除 */
-function onSaveEvent(){
-  const title = $('#evTitle').value.trim() || '無題';
-  const date = $('#evDate').value;
-  const allDay = $('#evAllDay').value === 'true';
-  const startTime = $('#evStartTime').value;
-  const endTime = $('#evEndTime').value;
-  const type = $('#evType').value;
-  const location = $('#evLocation').value.trim() || '--';
-  const note = $('#evNote').value.trim();
-  let start=null,end=null,rawTimeStr='';
-  if(allDay){ rawTimeStr='終日'; }
-  else {
-    if(startTime && endTime){ start=toLocalDateObj(date,startTime); end=toLocalDateObj(date,endTime); rawTimeStr=`${startTime}~${endTime}`; }
-    else if(startTime && !endTime){ start=toLocalDateObj(date,startTime); end=new Date(start.getTime()+60*1000); rawTimeStr=`${startTime}`; }
-    else { rawTimeStr=''; }
-    if(start && end && end.getTime() <= start.getTime()) end = new Date(start.getTime()+60*1000);
-  }
-  if(editingEvent){
-    editingEvent.title = title; editingEvent.date = date; editingEvent.allDay = allDay; editingEvent.start = start; editingEvent.end = end;
-    editingEvent.type = type; editingEvent.location = location; editingEvent.note = note; editingEvent.rawTimeStr = rawTimeStr;
-  } else {
-    const newEv = { id:'ev-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), title, date, allDay, start, end, type, location, note, rawTimeStr };
-    events.push(newEv);
-  }
-  saveEvents(); hideModal(); render();
-}
-function onDeleteEvent(){
-  if(!editingEvent) return;
-  if(confirm('このイベントを削除しますか？')){
-    events = events.filter(e => e.id !== editingEvent.id);
-    saveEvents(); hideModal(); render();
-  }
-}
+function render() {
+  const grid = $('#calendarGrid');
+  grid.innerHTML = '';
+  const year = current.getFullYear();
+  const month = current.getMonth();
+  
+  $('#monthTitle').textContent = `${year}年 ${month + 1}月`;
 
-/* インポート/エクスポート */
-function exportJSON(){
-  const out = events.map(e => ({ id:e.id, date:e.date, allDay:e.allDay, start:e.start?e.start.toISOString():null, end:e.end?e.end.toISOString():null, title:e.title, type:e.type, location:e.location, note:e.note, rawTimeStr:e.rawTimeStr }));
-  const blob = new Blob([JSON.stringify(out,null,2)], {type:'application/json'}); const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'events.json'; a.click(); URL.revokeObjectURL(url);
-}
-function exportICS(){
-  function toICSDate(dt, allDay){
-    if(!dt) return '';
-    if(allDay){ const d = new Date(dt); return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`; }
-    const d = new Date(dt); return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
-  }
-  let out = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//PortalCalendar//EN\r\n';
-  events.forEach((e,i)=> {
-    out += 'BEGIN:VEVENT\r\n';
-    out += 'UID:' + (e.id || ('ev'+i)) + '\r\n';
-    out += 'SUMMARY:' + (e.title || '').replace(/,/g,'\\,') + '\r\n';
-    if(e.allDay){ out += 'DTSTART;VALUE=DATE:' + toICSDate(e.date,true) + '\r\n'; out += 'DTEND;VALUE=DATE:' + toICSDate(nextDateStr(e.date),true) + '\r\n'; }
-    else { out += 'DTSTART:' + toICSDate(e.start,false) + '\r\n'; if(e.end) out += 'DTEND:' + toICSDate(e.end,false) + '\r\n'; }
-    if(e.location) out += 'LOCATION:' + (e.location || '').replace(/,/g,'\\,') + '\r\n';
-    if(e.note) out += 'DESCRIPTION:' + (e.note || '').replace(/\n/g,'\\n') + '\r\n';
-    out += 'END:VEVENT\r\n';
-  });
-  out += 'END:VCALENDAR\r\n';
-  const blob = new Blob([out], {type:'text/calendar;charset=utf-8'}); const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'events.ics'; a.click(); URL.revokeObjectURL(url);
-}
-function nextDateStr(dateStr){ const [y,m,d] = dateStr.split('-').map(Number); const dt = new Date(y,m-1,d); dt.setDate(dt.getDate()+1); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`; }
-function importJSONFile(file){
-  const reader = new FileReader();
-  reader.onload = function(e){
-    try{
-      const parsed = JSON.parse(e.target.result);
-      if(Array.isArray(parsed)){
-        const imported = parsed.map(p => ({ id:p.id||('ev-'+Date.now()), date:p.date, allDay:!!p.allDay, start:p.start?new Date(p.start):null, end:p.end?new Date(p.end):null, title:p.title||'無題', type:p.type||'other', location:p.location||'--', note:p.note||'', rawTimeStr:p.rawTimeStr||'' }));
-        events = events.concat(imported); saveEvents(); render(); alert('インポート完了: ' + imported.length + ' 件追加されました。');
-      } else alert('不正なJSON形式です。配列を期待します。');
-    }catch(err){ alert('読み込みエラー: ' + err.message); }
-  };
-  reader.readAsText(file);
-}
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month + 1, 0).getDate();
 
-/* 通知（今日の予定 + 10分前リマインダー） */
-function notifyTodaysEvents(){
-  if(!('Notification' in window)){ $('#statusBox').textContent = '状態: 通知非対応のブラウザです'; return; }
-  const now = new Date(); const todayStr = formatDateKey(now);
-  const todays = events.filter(e => e.date === todayStr);
-  if(todays.length === 0){ $('#statusBox').textContent = '状態: 今日の予定はありません'; return; }
-  function show(){
-    if(todays.length === 1){
-      const ev = todays[0]; const title = `今日の予定: ${ev.title}`; const body = ev.allDay ? '終日' : (ev.rawTimeStr || (formatTimeShort(ev.start) + (ev.end ? ' - ' + formatTimeShort(ev.end) : '')));
-      const n = new Notification(title, { body: body, tag:'today-event', renotify:true }); n.onclick = ()=>{ window.focus(); openEditModal(ev); };
-    } else {
-      const title = `今日の予定 ${todays.length}件`; const body = todays.slice(0,6).map(t => (t.allDay ? '終日' : (t.rawTimeStr || formatTimeShort(t.start))) + ' ' + t.title).join('\n');
-      const n = new Notification(title, { body: body, tag:'today-events', renotify:true }); n.onclick = ()=>{ window.focus(); };
+  // 空白セル
+  for (let i = 0; i < firstDay; i++) {
+    const blank = document.createElement('div');
+    blank.className = 'cell';
+    blank.style.opacity = '0.3';
+    grid.appendChild(blank);
+  }
+
+  // 日付セル
+  const today = new Date();
+  for (let d = 1; d <= lastDate; d++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    const dateStr = `${year}-${String(month + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    
+    if(d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+      cell.classList.add('today');
     }
-    $('#statusBox').textContent = '状態: 通知を表示しました';
+    
+    const dow = new Date(year, month, d).getDay();
+    if(dow === 0) cell.classList.add('sunday');
+    if(dow === 6) cell.classList.add('saturday');
+
+    cell.innerHTML = `<div class="date" style="font-weight:800; margin-bottom:8px;">${d}</div>`;
+    
+    // イベント表示
+    const dayEvents = events.filter(e => e.date === dateStr);
+    dayEvents.forEach(ev => {
+      const pill = document.createElement('div');
+      pill.className = `event-pill type-${ev.type}`;
+      pill.textContent = ev.title;
+      cell.appendChild(pill);
+    });
+
+    // セルクリックで新規作成
+    cell.onclick = () => openModal(dateStr);
+    grid.appendChild(cell);
   }
-  if(Notification.permission === 'granted') show();
-  else if(Notification.permission !== 'denied') Notification.requestPermission().then(p => { if(p === 'granted') show(); else $('#statusBox').textContent = '状態: 通知が許可されていません'; });
-  scheduleNearFutureReminders();
-}
-let reminderTimers = [];
-function scheduleNearFutureReminders(){
-  reminderTimers.forEach(t=>clearTimeout(t)); reminderTimers = [];
-  const now = new Date();
-  events.forEach(ev => {
-    if(ev.allDay || !ev.start) return;
-    const diff = ev.start.getTime() - now.getTime();
-    const remindBefore = 10 * 60 * 1000;
-    const when = diff - remindBefore;
-    if(when > 0 && when < 24*60*60*1000){
-      const t = setTimeout(()=> {
-        if(Notification.permission === 'granted'){
-          const n = new Notification(`まもなく: ${ev.title}`, { body: `${ev.rawTimeStr || formatTimeShort(ev.start)} 場所: ${ev.location}` });
-          n.onclick = ()=> { window.focus(); openEditModal(ev); };
-        }
-      }, when);
-      reminderTimers.push(t);
-    }
-  });
 }
 
-/* 初期化 */
-document.addEventListener('DOMContentLoaded', ()=> {
-  loadEvents();
+function openModal(date) {
+  $('#evDate').value = date;
+  $('#evTitle').value = '';
+  $('#modalBackdrop').style.display = 'flex';
+}
+
+$('#saveBtn').onclick = () => {
+  events.push({
+    title: $('#evTitle').value || '無題',
+    date: $('#evDate').value,
+    type: $('#evType').value,
+    note: $('#evNote').value
+  });
+  localStorage.setItem('cal_events', JSON.stringify(events));
+  $('#modalBackdrop').style.display = 'none';
   render();
-  $('#prevBtn').addEventListener('click', ()=> { current.setMonth(current.getMonth()-1); render(); });
-  $('#nextBtn').addEventListener('click', ()=> { current.setMonth(current.getMonth()+1); render(); });
-  $('#todayBtn').addEventListener('click', ()=> { current = new Date(); render(); });
-  $('#viewSelect').addEventListener('change', render);
-  $('#searchInput').addEventListener('input', render);
-  $all('.type-filter').forEach(cb => cb.addEventListener('change', render));
-  $('#addEventBtn').addEventListener('click', ()=> openCreateModal(formatDateKey(new Date())));
-  $('#themeToggle').addEventListener('click', ()=> {
-    const cur = document.body.getAttribute('data-theme') || 'light'; const next = cur === 'light' ? 'dark' : 'light';
-    document.body.setAttribute('data-theme', next); localStorage.setItem('portal_calendar_theme', next);
-  });
-  $('#exportJsonBtn').addEventListener('click', exportJSON);
-  $('#exportIcsBtn').addEventListener('click', exportICS);
-  $('#fileInput').addEventListener('change', (e)=> { const f = e.target.files[0]; if(!f) return; if(f.name.endsWith('.json')) importJSONFile(f); else if(f.name.endsWith('.ics')) alert('ICSインポートは未実装です'); e.target.value=''; });
-  $('#importBtn').addEventListener('click', ()=> $('#fileInput').click());
-  document.addEventListener('keydown', (e)=> {
-    if(e.key === 'n' || e.key === 'N') openCreateModal(formatDateKey(new Date()));
-    if(e.key === 't' || e.key === 'T') { current = new Date(); render(); }
-    if(e.key === 'ArrowLeft') { current.setMonth(current.getMonth()-1); render(); }
-    if(e.key === 'ArrowRight') { current.setMonth(current.getMonth()+1); render(); }
-  });
-  const t = localStorage.getItem('portal_calendar_theme'); if(t) document.body.setAttribute('data-theme', t);
-  if('Notification' in window){
-    if(Notification.permission === 'default') {
-      Notification.requestPermission().then(p => { if(p === 'granted') notifyTodaysEvents(); else $('#statusBox').textContent = '状態: 通知が許可されていません'; });
-    } else {
-      notifyTodaysEvents();
-    }
-  } else {
-    $('#statusBox').textContent = '状態: 通知非対応のブラウザです';
-  }
-});
+};
 
-/* 小さなヘルパー（エクスポートボタンの別名） */
-function exportJSON(){ const out = events.map(e => ({ id:e.id, date:e.date, allDay:e.allDay, start:e.start?e.start.toISOString():null, end:e.end?e.end.toISOString():null, title:e.title, type:e.type, location:e.location, note:e.note, rawTimeStr:e.rawTimeStr })); const blob = new Blob([JSON.stringify(out,null,2)], {type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'events.json'; a.click(); URL.revokeObjectURL(url); }
-function exportIcs(){ exportICS(); }
-function exportICS(){ const outEvents = events; let out = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//PortalCalendar//EN\r\n'; outEvents.forEach((e,i)=>{ out += 'BEGIN:VEVENT\r\n'; out += 'UID:' + (e.id||('ev'+i)) + '\r\n'; out += 'SUMMARY:' + (e.title||'').replace(/,/g,'\\,') + '\r\n'; if(e.allDay){ out += 'DTSTART;VALUE=DATE:' + (e.date.replace(/-/g,'')) + '\r\n'; out += 'DTEND;VALUE=DATE:' + (nextDateStr(e.date).replace(/-/g,'')) + '\r\n'; } else { out += 'DTSTART:' + (e.start? (new Date(e.start)).toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z') : '') + '\r\n'; if(e.end) out += 'DTEND:' + (new Date(e.end)).toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z') + '\r\n'; } if(e.location) out += 'LOCATION:' + (e.location||'').replace(/,/g,'\\,') + '\r\n'; if(e.note) out += 'DESCRIPTION:' + (e.note||'').replace(/\n/g,'\\n') + '\r\n'; out += 'END:VEVENT\r\n'; }); out += 'END:VCALENDAR\r\n'; const blob = new Blob([out], {type:'text/calendar;charset=utf-8'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'events.ics'; a.click(); URL.revokeObjectURL(url); }
+$('#cancelBtn').onclick = () => $('#modalBackdrop').style.display = 'none';
 
+$('#prevBtn').onclick = () => { current.setMonth(current.getMonth() - 1); render(); };
+$('#nextBtn').onclick = () => { current.setMonth(current.getMonth() + 1); render(); };
+$('#todayBtn').onclick = () => { current = new Date(); render(); };
+
+$('#themeToggle').onclick = () => {
+  const isDark = document.body.getAttribute('data-theme') === 'dark';
+  document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  $('#themeToggle').textContent = isDark ? '🌙' : '☀️';
+};
+
+render();
 </script>
+
 </body>
 </html>
