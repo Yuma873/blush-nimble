@@ -3,133 +3,142 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pool Monitor Pro v7</title>
+  <title>Pool Monitor Pro v8</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --safe: #28a745; --danger: #dc3545; --warn: #f39c12; --gray: #6c757d; --dark: #1a252f;
       --bg: #f4f7f6;
     }
-    body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
-    .container { max-width: 500px; margin: 0 auto; padding-bottom: 60px; }
+    body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
     
-    /* Header & Alerts */
-    .header { background: var(--dark); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; position: relative; }
-    .deadman-alert { background: #000; color: #ff0; padding: 10px; border-radius: 8px; font-weight: bold; margin-bottom: 15px; display: none; text-align: center; border: 2px solid #ff0; }
+    /* 横幅を広げる（最大800px） */
+    .container { max-width: 800px; margin: 0 auto; padding-bottom: 60px; }
+    
+    .header { background: var(--dark); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
+    .deadman-alert { background: #000; color: #ff0; padding: 12px; border-radius: 8px; font-weight: bold; margin-bottom: 15px; display: none; text-align: center; border: 2px solid #ff0; }
 
-    /* Main Decision Card */
-    #judgeCard { text-align: center; padding: 25px 15px; border-radius: 15px; font-weight: bold; font-size: 26px; margin-bottom: 15px; transition: 0.3s; border-bottom: 6px solid rgba(0,0,0,0.1); }
+    /* メイン判定 */
+    #judgeCard { text-align: center; padding: 30px 15px; border-radius: 15px; font-weight: bold; font-size: 32px; margin-bottom: 15px; transition: 0.3s; border-bottom: 6px solid rgba(0,0,0,0.1); }
     .st-safe { background: #fff; color: var(--safe); border: 3px solid var(--safe); }
     .st-danger { background: #fff; color: var(--danger); border: 3px solid var(--danger); }
     .st-warn { background: #fff; color: var(--warn); border: 3px solid var(--warn); }
     .st-loading { background: #eee; color: var(--gray); border: 3px solid var(--gray); }
 
-    /* Value Grid */
-    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-    .card { background: white; border-radius: 12px; padding: 12px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
-    .label { font-size: 11px; color: var(--gray); font-weight: bold; margin-bottom: 4px; }
-    .value { font-size: 22px; font-weight: bold; }
-    .diff { font-size: 11px; font-weight: bold; margin-top: 4px; height: 1.2em; }
+    /* 数値グリッド */
+    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+    .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
+    .label { font-size: 13px; color: var(--gray); font-weight: bold; margin-bottom: 6px; }
+    .value { font-size: 28px; font-weight: bold; }
+    .diff { font-size: 13px; font-weight: bold; margin-top: 6px; min-height: 1.2em; }
     .up { color: var(--danger); } .down { color: #007bff; }
 
-    /* Info Boxes */
-    .info-box { font-size: 14px; line-height: 1.6; background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .advice { border-left: 5px solid var(--gray); }
-    .msg-box { border-left: 5px solid #3498db; }
-    .box-title { font-size: 11px; font-weight: bold; color: var(--gray); display: block; margin-bottom: 5px; }
+    /* 情報ボックス */
+    .info-box { font-size: 15px; line-height: 1.6; background: #fff; padding: 18px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .advice { border-left: 6px solid var(--gray); }
+    .msg-box { border-left: 6px solid #3498db; background: #ebf5fb; }
+    .box-title { font-size: 12px; font-weight: bold; color: var(--gray); display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* テキスト履歴テーブル */
+    .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+    .history-table th, .history-table td { padding: 10px; text-align: center; border-bottom: 1px solid #eee; }
+    .history-table th { color: var(--gray); font-size: 12px; }
 
     .blinking { animation: blink 1.5s infinite; }
     @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-    
-    canvas { margin-top: 10px; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- デッドマンスイッチ（5時間以上更新がない場合に表示） -->
   <div id="deadman" class="deadman-alert blinking">⚠️ 警告: データが5時間以上更新されていません</div>
 
-  <div class="header">
-    <div style="font-size: 18px; font-weight: bold;">Pool Monitor <span style="color:var(--warn)">PRO</span></div>
-    <div id="lastUpdate" style="font-size: 11px; opacity: 0.8; margin-top: 4px;">--</div>
+  <!-- 今日のお知らせを上部に移動 -->
+  <div class="info-box msg-box" id="msgBox">
+    <span class="box-title">📢 今日のお知らせ</span>
+    <span id="todayMsgContent">お知らせを読み込み中...</span>
   </div>
 
-  <!-- メイン判定エリア -->
+  <div class="header">
+    <div style="font-size: 20px; font-weight: bold;">Pool Monitor <span style="color:var(--warn)">PRO</span></div>
+    <div id="lastUpdate" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">--</div>
+  </div>
+
   <div id="judgeCard" class="st-loading">判定中...</div>
 
-  <!-- 数値グリッド（気温・水温・WBGT） -->
   <div class="grid">
     <div class="card">
       <div class="label">🌡 気温</div>
       <div class="value" id="airVal">--</div>
-      <div id="airDiff" class="diff">--</div>
+      <div id="airDiff" class="diff">初回測定</div> <!-- --を具体的な文字に変更 -->
     </div>
     <div class="card">
       <div class="label">💧 水温</div>
       <div class="value" id="waterVal">--</div>
-      <div id="waterDiff" class="diff">--</div>
+      <div id="waterDiff" class="diff">初回測定</div>
     </div>
     <div class="card">
       <div class="label">🔥 指数(WBGT)</div>
       <div class="value" id="wbgtVal">--</div>
-      <div id="wbgtDiff" class="diff">--</div>
+      <div id="wbgtDiff" class="diff">初回測定</div>
     </div>
   </div>
 
-  <!-- 判定理由・行動指針 -->
   <div class="info-box advice" id="adviceBox">
-    <span class="box-title">【判定理由・行動指針】</span>
-    <span id="adviceContent">判定を待機しています...</span>
+    <span class="box-title">🚩 判定理由・行動指針</span>
+    <span id="adviceContent">判定中...</span>
   </div>
 
-  <!-- 今日のお知らせ -->
-  <div class="info-box msg-box" id="msgBox">
-    <span class="box-title">【今日のお知らせ】</span>
-    <span id="todayMsgContent">読み込み中...</span>
-  </div>
-
-  <!-- 履歴グラフ -->
-  <div class="card" style="text-align: left; padding: 15px;">
-    <div class="label">📈 水温推移（履歴）</div>
-    <canvas id="tempChart" height="150"></canvas>
+  <!-- 履歴セクション（グラフとテキスト） -->
+  <div class="card" style="text-align: left; padding: 20px;">
+    <div class="label">📉 水温推移（グラフ）</div>
+    <canvas id="tempChart" height="100"></canvas>
+    
+    <div class="label" style="margin-top: 30px;">📋 過去の記録（直近10件）</div>
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>時刻</th>
+          <th>水温</th>
+          <th>気温</th>
+          <th>WBGT</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody">
+        <!-- ここにテキスト履歴が追加されます -->
+      </tbody>
+    </table>
   </div>
 </div>
 
 <script>
   // ==========================================
-  // 【設定エリア】ここを書き換えて保存してください
+  // 【設定エリア】
   // ==========================================
   const SETTING = {
-    air: 28.5,           // 気温
-    water: 25.2,         // 水温
-    wbgt: 29.1,          // 暑さ指数(WBGT)
-    
-    // 時刻設定 (表示とデッドマン判定に使用)
+    air: 28.5,           
+    water: 25.2,         
+    wbgt: 29.1,          
     updatedAt: "2026/05/08 19:30", 
 
-    // アラート設定: "OFF" / "CAUTION" (注意) / "ON" (警報・中止)
     thunder: "OFF", 
     wind: "OFF",
-    other: "ON", 
+    other: "OFF", 
 
-    // テキスト設定
-    manualReason: "水温計未設置", // otherがONの時の理由
-    todayMessage: "テスト表示中です" 
+    manualReason: "施設点検のため",
+    todayMessage: "本日の練習は予定通り実施します。熱中症に十分注意してください。" 
   };
 
-  const WATER_LIMIT = 22.0; // 最低水温の基準
+  const WATER_LIMIT = 22.0;
   // ==========================================
 
   function init() {
     const updateTime = new Date(SETTING.updatedAt);
     const now = new Date();
     
-    // 表示用時刻の整形
     const timeStr = `${updateTime.getMonth()+1}/${updateTime.getDate()} ${String(updateTime.getHours()).padStart(2,'0')}:${String(updateTime.getMinutes()).padStart(2,'0')}`;
     document.getElementById("lastUpdate").textContent = "最終更新: " + timeStr;
 
-    // デッドマン判定 (5時間 = 18,000,000ms)
     if ((now.getTime() - updateTime.getTime()) > 18000000) {
       document.getElementById("deadman").style.display = "block";
     }
@@ -139,7 +148,6 @@
   }
 
   function updateDisplay() {
-    // 数値の反映
     document.getElementById("airVal").textContent = SETTING.air + "℃";
     document.getElementById("waterVal").textContent = SETTING.water + "℃";
     document.getElementById("wbgtVal").textContent = SETTING.wbgt;
@@ -153,7 +161,6 @@
     let title = "✅ 入泳可能";
     let msg = "条件は良好です。熱中症に注意して練習を行ってください。";
 
-    // 1. 環境数値による自動判定
     if (SETTING.water < WATER_LIMIT) {
       status = "danger"; title = "🚫 水温不足"; msg = `水温が${WATER_LIMIT}℃未満です。練習を中止してください。`;
     } else if ((SETTING.air + SETTING.water) < 50) {
@@ -164,7 +171,6 @@
       status = "warn"; title = "⚠ 厳重警戒"; msg = "熱中症リスクが高いです。こまめに休憩と水分補給をしてください。";
     }
 
-    // 2. 注意アラート（CAUTION）による上書き
     if (SETTING.thunder === "CAUTION" || SETTING.wind === "CAUTION") {
       status = "warn"; title = "⚠ 注意喚起";
       let cMsg = "";
@@ -173,7 +179,6 @@
       msg = cMsg;
     }
 
-    // 3. 重大アラート（ON）による最優先上書き
     if (SETTING.thunder === "ON" || SETTING.wind === "ON" || SETTING.other === "ON") {
       status = "danger"; title = "🚫 利用中止";
       let eMsg = "<b>【緊急指示】</b> ";
@@ -183,7 +188,6 @@
       msg = eMsg;
     }
 
-    // 判定カードへの反映
     card.textContent = title;
     card.className = "st-" + status + (status === "danger" ? " blinking" : "");
     advice.innerHTML = msg;
@@ -191,22 +195,21 @@
   }
 
   function processHistory() {
-    let hist = JSON.parse(localStorage.getItem("pool_v7_manual_data") || "[]");
+    let hist = JSON.parse(localStorage.getItem("pool_v8_manual") || "[]");
     const currentTs = new Date(SETTING.updatedAt).getTime();
 
-    // 履歴の保存（最新の時刻が異なる場合のみ追加）
     if (hist.length === 0 || hist[0].ts !== currentTs) {
       hist.unshift({ 
         ts: currentTs, 
         air: SETTING.air, 
         water: SETTING.water, 
         wbgt: SETTING.wbgt,
-        label: SETTING.updatedAt.split(" ")[1] // 時刻部分のみ
+        timeLabel: SETTING.updatedAt.split(" ")[1]
       });
-      localStorage.setItem("pool_v7_manual_data", JSON.stringify(hist.slice(0, 10)));
+      localStorage.setItem("pool_v8_manual", JSON.stringify(hist.slice(0, 10)));
     }
 
-    // 前回比の計算と表示
+    // 前回比の計算
     if (hist.length >= 2) {
       const prev = hist[1];
       const getDiff = (cur, old) => {
@@ -220,12 +223,23 @@
       document.getElementById("wbgtDiff").innerHTML = getDiff(SETTING.wbgt, prev.wbgt);
     }
 
-    // グラフの描画
+    // テキスト履歴の生成
+    const historyBody = document.getElementById("historyBody");
+    historyBody.innerHTML = hist.map(d => `
+      <tr>
+        <td>${d.timeLabel}</td>
+        <td style="font-weight:bold; color:#3498db;">${d.water}℃</td>
+        <td>${d.air}℃</td>
+        <td>${d.wbgt}</td>
+      </tr>
+    `).join('');
+
+    // グラフ
     const chartData = [...hist].reverse();
     new Chart(document.getElementById('tempChart'), {
       type: 'line',
       data: {
-        labels: chartData.map(d => d.label),
+        labels: chartData.map(d => d.timeLabel),
         datasets: [{ 
           label: '水温', 
           data: chartData.map(d => d.water), 
@@ -242,7 +256,6 @@
     });
   }
 
-  // 起動
   init();
 </script>
 </body>
