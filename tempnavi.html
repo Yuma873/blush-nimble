@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pool Monitor Pro v5</title>
+  <title>Pool Monitor Pro v6</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -26,7 +26,7 @@
 
     /* Value Grid */
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-    .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; }
+    .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     .label { font-size: 12px; color: var(--gray); font-weight: bold; }
     .value { font-size: 28px; font-weight: bold; margin: 5px 0; }
     .diff { font-size: 13px; font-weight: bold; }
@@ -35,14 +35,11 @@
     /* Detail Box */
     .detail-box { font-size: 14px; line-height: 1.6; background: #fff; padding: 15px; border-radius: 12px; border-left: 5px solid #ddd; margin-bottom: 15px; }
 
-    /* Admin Panel */
-    #adminToggle { position: fixed; bottom: 20px; right: 20px; background: var(--dark); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; }
-    #adminPanel { display: none; background: white; border-radius: 15px; padding: 20px; margin-top: 15px; border: 2px solid var(--dark); max-height: 80vh; overflow-y: auto; }
-    .admin-item { margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-    select, input[type="number"] { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+    /* Admin Toggle */
+    #adminToggle { position: fixed; bottom: 20px; right: 20px; background: var(--dark); color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.3; }
 
     .blinking { animation: blink 1.5s infinite; }
-    @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+    @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
   </style>
 </head>
 <body>
@@ -61,209 +58,145 @@
     <div class="card">
       <div class="label">🌡 気温</div>
       <div class="value" id="airVal">--</div>
-      <div class="diff" id="airDiff">--</div>
+      <div id="airDiff" class="diff">--</div>
     </div>
     <div class="card">
       <div class="label">💧 水温</div>
       <div class="value" id="waterVal">--</div>
-      <div class="diff" id="waterDiff">--</div>
+      <div id="waterDiff" class="diff">--</div>
     </div>
   </div>
 
-  <div class="detail-box" id="adviceBox">判定を待機しています...</div>
+  <div class="detail-box" id="adviceBox">データを読み込み中...</div>
 
   <div class="card">
     <div class="label">📈 水温推移（直近10件）</div>
     <canvas id="tempChart" height="150"></canvas>
   </div>
-
-  <div id="adminToggle" onclick="toggleAdmin()">🔑</div>
-
-  <div id="adminPanel">
-    <h3 style="margin-top:0">管理者一時設定</h3>
-    <div class="admin-item">
-      <span>落雷アラート</span>
-      <select id="checkThunder" onchange="updateLogic()">
-        <option value="OFF">OFF</option>
-        <option value="CAUTION">注意</option>
-        <option value="ON">警報(停止)</option>
-      </select>
-    </div>
-    <div class="admin-item">
-      <span>強風アラート</span>
-      <select id="checkWind" onchange="updateLogic()">
-        <option value="OFF">OFF</option>
-        <option value="CAUTION">注意</option>
-        <option value="ON">警報(停止)</option>
-      </select>
-    </div>
-    <div class="admin-item">
-      <span>その他異常</span>
-      <select id="checkOther" onchange="updateLogic()">
-        <option value="OFF">なし</option>
-        <option value="ON">異常あり(中止)</option>
-      </select>
-    </div>
-    <div class="admin-item">
-      <span>水温基準 (℃)</span>
-      <input type="number" id="limitWater" value="22" step="0.5" onchange="updateLogic()">
-    </div>
-    <button onclick="toggleAdmin()" style="width:100%; padding:10px; background:#eee; border:none; border-radius:5px;">設定を閉じる</button>
-  </div>
 </div>
 
 <script>
   // ==========================================
-  // 【設定エリア】ここを書き換えて保存してください
+  // 【設定エリア】ここを書き換えるだけで全てが変わります
   // ==========================================
   const SETTING = {
-    air: 28.5,           // 気温
-    water: 25.2,         // 水温
-    wbgt: 29.5,          // 暑さ指数
+    // 1. 基本数値
+    air: 28.0,           
+    water: 25.5,         
+    wbgt: 29.0,          
     
-    // 時刻設定（ここを書き換えると表示とデッドマンが同時に更新されます）
+    // 2. 時刻設定 (表示とデッドマン判定に自動使用)
     updatedAt: "2026/05/08 19:30", 
 
-    // 各種アラート設定: "OFF" / "CAUTION" (注意) / "ON" (警報・中止)
-    codeThunder: "OFF", 
-    codeWind: "OFF",
-    codeOther: "OFF"
+    // 3. アラート設定: "OFF" / "CAUTION" (注意) / "ON" (警報・中止)
+    thunder: "OFF", 
+    wind: "OFF",
+    other: "OFF", 
+
+    // 4. その他（otherを"ON"にした時の理由など）
+    manualReason: "ろ過装置の緊急点検のため"
   };
 
-  const ADMIN_PASS = "1234"; 
+  const WATER_LIMIT = 22.0; // 最低水温基準
   // ==========================================
-
-  let isAdmin = false;
 
   function init() {
     const updateTime = new Date(SETTING.updatedAt);
-    const now = new Date().getTime();
+    const now = new Date();
     
-    // デッドマン判定 (5時間 = 18,000,000ms)
-    if ((now - updateTime.getTime()) > 18000000) {
+    // 最終更新時刻の表示
+    const timeStr = `${updateTime.getMonth()+1}/${updateTime.getDate()} ${String(updateTime.getHours()).padStart(2,'0')}:${String(updateTime.getMinutes()).padStart(2,'0')}`;
+    document.getElementById("lastUpdate").textContent = "最終更新: " + timeStr;
+
+    // デッドマン判定 (5時間 = 18000000ms)
+    if ((now.getTime() - updateTime.getTime()) > 18000000) {
       document.getElementById("deadman").style.display = "block";
     }
 
-    // コードの設定値を管理者パネルの初期値に反映
-    document.getElementById("checkThunder").value = SETTING.codeThunder;
-    document.getElementById("checkWind").value = SETTING.codeWind;
-    document.getElementById("checkOther").value = SETTING.codeOther;
-
     updateDisplay();
-    saveHistory();
-    renderChart();
+    saveAndRender();
   }
 
   function updateDisplay() {
     document.getElementById("airVal").textContent = SETTING.air + "℃";
     document.getElementById("waterVal").textContent = SETTING.water + "℃";
-    // 表示用時刻を見やすく整形
-    const dateObj = new Date(SETTING.updatedAt);
-    const timeStr = `${dateObj.getMonth()+1}/${dateObj.getDate()} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
-    document.getElementById("lastUpdate").textContent = "最終更新: " + timeStr;
     
-    updateLogic();
-    calcDiff();
-  }
-
-  function updateLogic() {
     const card = document.getElementById("judgeCard");
     const advice = document.getElementById("adviceBox");
-    
-    const thunder = document.getElementById("checkThunder").value;
-    const wind = document.getElementById("checkWind").value;
-    const other = document.getElementById("checkOther").value;
-    const waterLimit = parseFloat(document.getElementById("limitWater").value);
 
     let status = "safe";
     let title = "✅ 入泳可能";
-    let msg = "<b>【指示】</b> 条件は良好です。安全に気をつけて利用してください。";
+    let msg = "<b>【指示】</b> 条件は良好です。熱中症に注意して練習を行ってください。";
 
-    // 1. 環境判定 (水温・WBGT)
-    if (SETTING.water < waterLimit) {
-      status = "danger"; title = "🚫 水温不足"; 
-      msg = `<b>【理由】</b> 水温が${waterLimit}℃未満です。入泳を中止してください。`;
+    // --- A. 数値による自動判定 ---
+    if (SETTING.water < WATER_LIMIT) {
+      status = "danger"; title = "🚫 水温不足"; msg = `<b>【理由】</b> 水温が${WATER_LIMIT}℃未満です。練習を中止してください。`;
     } else if ((SETTING.air + SETTING.water) < 50) {
-      status = "danger"; title = "🚫 低温注意"; 
-      msg = "<b>【理由】</b> 気温と水温の合計が50℃未満です。寒いため中止を推奨します。";
+      status = "danger"; title = "🚫 低温注意"; msg = "<b>【理由】</b> 気温と水温の合計が50℃に達していません。中止を推奨します。";
     } else if (SETTING.wbgt >= 31) {
-      status = "danger"; title = "🔥 運動中止"; 
-      msg = "<b>【理由】</b> WBGTが31を超えています。熱中症の危険が極めて高いです。";
+      status = "danger"; title = "🔥 運動中止"; msg = "<b>【理由】</b> 暑さ指数が危険レベルです。練習を中止してください。";
     } else if (SETTING.wbgt >= 28) {
-      status = "warn"; title = "⚠ 厳重警戒"; 
-      msg = "<b>【指示】</b> 熱中症リスクが高いです。30分おきに休憩をとり、水分補給を徹底してください。";
+      status = "warn"; title = "⚠ 厳重警戒"; msg = "<b>【指示】</b> 熱中症リスクが高いです。こまめに休憩と水分補給をしてください。";
     }
 
-    // 2. 特殊アラート (注意レベル)
-    if (thunder === "CAUTION" || wind === "CAUTION") {
-      status = "warn"; title = "⚠ 注意";
+    // --- B. CAUTION（注意）による上書き ---
+    if (SETTING.thunder === "CAUTION" || SETTING.wind === "CAUTION") {
+      status = "warn";
+      title = "⚠ 注意喚起";
       msg = "<b>【警戒】</b> ";
-      if(thunder === "CAUTION") msg += "雷雲が接近している可能性があります。空の様子に注意してください。*雷雲アラート使用* ";
-      if(wind === "CAUTION") msg += "風が強まっています。注意してください。";
+      if(SETTING.thunder === "CAUTION") msg += "雷雲が接近している可能性があります。空の様子に注意してください。*雷雲アラート使用* ";
+      if(SETTING.wind === "CAUTION") msg += "風が強まっています。注意してください。";
     }
 
-    // 3. 重大アラート (警報レベル: 上書き)
-    if (thunder === "ON" || wind === "ON" || other === "ON") {
-      status = "danger"; title = "🚫 利用中止";
+    // --- C. ON（警報・中止）による最優先上書き ---
+    if (SETTING.thunder === "ON" || SETTING.wind === "ON" || SETTING.other === "ON") {
+      status = "danger";
+      title = "🚫 利用中止";
       msg = "<b>【緊急指示】</b> ";
-      if(thunder === "ON") msg += "周辺で落雷が検知されています。練習を中止してください ";
-      if(wind === "ON") msg += "大変強い風が吹いています。十分注意してください。 ";
-      if(other === "ON") msg += "現在、泳げない状況にあります。";
+      if(SETTING.thunder === "ON") msg += "周辺で落雷が検知されています。練習を中止してください。 ";
+      if(SETTING.wind === "ON") msg += "大変強い風が吹いています。十分注意してください。 ";
+      if(SETTING.other === "ON") msg += SETTING.manualReason + "（現在、泳げない状況にあります）";
     }
 
+    // 反映
     card.textContent = title;
     card.className = "st-" + status + (status === "danger" ? " blinking" : "");
     advice.innerHTML = msg;
     advice.style.borderLeftColor = `var(--${status})`;
   }
 
-  function calcDiff() {
-    const hist = JSON.parse(localStorage.getItem("pool_v5_manual") || "[]");
-    if (hist.length < 2) return;
-    const prev = hist[1]; 
-    const updateDiff = (id, cur, old) => {
-      const d = (cur - old).toFixed(1);
-      const el = document.getElementById(id);
-      if (d > 0) el.innerHTML = `<span class="up">▲ ${d}</span>`;
-      else if (d < 0) el.innerHTML = `<span class="down">▼ ${Math.abs(d)}</span>`;
-      else el.innerHTML = `<span style="color:#ccc">±0</span>`;
-    };
-    updateDiff("airDiff", SETTING.air, prev.air);
-    updateDiff("waterDiff", SETTING.water, prev.water);
-  }
-
-  function saveHistory() {
-    let hist = JSON.parse(localStorage.getItem("pool_v5_manual") || "[]");
+  function saveAndRender() {
+    // 履歴保存
+    let hist = JSON.parse(localStorage.getItem("pool_v6_data") || "[]");
     const currentTs = new Date(SETTING.updatedAt).getTime();
     if (hist.length === 0 || hist[0].ts !== currentTs) {
-      hist.unshift({ ts: currentTs, time: SETTING.updatedAt, air: SETTING.air, water: SETTING.water });
-      localStorage.setItem("pool_v5_manual", JSON.stringify(hist.slice(0, 10)));
+      hist.unshift({ ts: currentTs, air: SETTING.air, water: SETTING.water });
+      localStorage.setItem("pool_v6_data", JSON.stringify(hist.slice(0, 10)));
     }
-  }
 
-  function renderChart() {
-    const hist = JSON.parse(localStorage.getItem("pool_v5_manual") || "[]").reverse();
-    if (hist.length === 0) return;
+    // 昨日（前回）比の計算
+    if (hist.length >= 2) {
+      const diff = (cur, old) => {
+        const d = (cur - old).toFixed(1);
+        return d > 0 ? `<span class="up">▲ ${d}</span>` : d < 0 ? `<span class="down">▼ ${Math.abs(d)}</span>` : `<span style="color:#ccc">±0</span>`;
+      };
+      document.getElementById("airDiff").innerHTML = diff(SETTING.air, hist[1].air);
+      document.getElementById("waterDiff").innerHTML = diff(SETTING.water, hist[1].water);
+    }
+
+    // グラフ描画
+    const chartData = [...hist].reverse();
     new Chart(document.getElementById('tempChart'), {
       type: 'line',
       data: {
-        labels: hist.map(h => h.time.split(" ")[1]),
-        datasets: [{ label: '水温', data: hist.map(h => h.water), borderColor: '#3498db', tension: 0.3, fill: true, backgroundColor: 'rgba(52,152,219,0.1)' }]
+        labels: chartData.map(d => {
+          const dt = new Date(d.ts);
+          return `${dt.getHours()}:${String(dt.getMinutes()).padStart(2,'0')}`;
+        }),
+        datasets: [{ label: '水温', data: chartData.map(d => d.water), borderColor: '#3498db', backgroundColor: 'rgba(52,152,219,0.1)', fill: true, tension: 0.3 }]
       },
       options: { plugins: { legend: { display: false } }, scales: { y: { min: 15, max: 35 } } }
     });
-  }
-
-  function toggleAdmin() {
-    if (!isAdmin) {
-      if (prompt("管理者パスワードを入力してください") === ADMIN_PASS) {
-        isAdmin = true;
-        document.getElementById("adminPanel").style.display = "block";
-      }
-    } else {
-      isAdmin = false;
-      document.getElementById("adminPanel").style.display = "none";
-    }
   }
 
   init();
