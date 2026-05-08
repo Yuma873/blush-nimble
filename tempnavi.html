@@ -4,12 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ﾓﾆﾀﾘﾝｸﾞｼｽﾃﾑ for Pool</title>
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="shortcut icon" href="tempf.png" type="image/png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --safe: #28a745; --danger: #dc3545; --warn: #f39c12; --extreme: #9b59b6; --gray: #6c757d; --dark: #1a252f;
       --bg: #f4f7f6;
+      
     }
+    body {
+  /* 文字選択を禁止してアプリっぽくする */
+  -webkit-user-select: none;
+  user-select: none;
+  /* タップ時のハイライトを消す */
+  -webkit-tap-highlight-color: transparent;
+  /* 画面のバウンス（引っ張り更新）を防止 */
+  overscroll-behavior-y: contain;
+}
     body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
     .container { max-width: 800px; margin: 0 auto; padding-bottom: 60px; }
     
