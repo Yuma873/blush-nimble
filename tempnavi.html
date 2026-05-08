@@ -61,17 +61,19 @@
 
   <div id="deadman" class="deadman-alert blinking">⚠️ 警告: データが5時間以上更新されていません</div>
 
-  
 
   <div class="header">
-    <div style="font-size: 18px; font-weight: bold;">Pool Monitor System <span style="color:var(--warn)">ULTIMATE Pro</span></div>
+    <div style="font-size: 18px; font-weight: bold;">Pool Monitor <span style="color:var(--warn)">ULTIMATE Pro</span></div>
     <div id="lastUpdate" style="font-size: 11px; opacity: 0.8; margin-top: 4px;">--</div>
   </div>
   
-<div class="info-box msg-box">
+  <div class="info-box msg-box">
     <span class="box-title">📢 今日のお知らせ</span>
     <span id="todayMsgContent">読み込み中...</span>
   </div>
+
+  
+
   <div class="grid">
     <div class="card">
       <div class="label">🌡 気温</div>
@@ -94,11 +96,8 @@
       <div id="uvSub" class="sub-label">--</div>
     </div>
   </div>
-
-  
   <div id="judgeCard" class="st-loading">判定中...</div>
 
-  
   <div class="info-box advice" id="adviceBox">
     <span class="box-title">🚩 総合判定・アクションガイド</span>
     <div id="adviceContent">判定中...</div>
@@ -119,17 +118,17 @@
   // 【ユーザー設定エリア】
   // ==========================================
   const SETTING = {
-    water: 26.5,                // ★現場で計測した水温を入力
-    updatedAt: "2026/05/08 20:45", // ★更新した時間を入力
+    water: null,                // ★欠測時は null を指定
+    updatedAt: "2026/05/08 20:58", // ★更新した時間を入力
     
     // 緊急アラートスイッチ ("ON" / "CAUTION" / "OFF")
     thunder: "OFF", 
     wind: "OFF",
     other: "OFF", 
-    manualReason: "ろ過装置メンテナンス中",
+    manualReason: "メンテナンス中",
 
-    todayMessage: "自動気象連動中。気温＋水温の50度ルール適用済みです。",
-    lat: 35.33, lon: 139.40     // 取得地点（茅ヶ崎市付近）
+    todayMessage: "現在テスト運用中です。あらかじめご了承ください。",
+    lat: 35.33, lon: 139.40     // 取得地点
   };
 
   const WATER_LIMIT = 22.0;     // 水温の絶対下限
@@ -162,10 +161,9 @@
 
   function updateDisplay(air, wbgt, uv, airMax) {
     const water = SETTING.water;
-    const tempSum = air + water;
+    const isWaterMissing = (water === null || water === undefined);
     
     document.getElementById("airVal").textContent = air + "℃";
-    document.getElementById("waterVal").textContent = water + "℃";
     document.getElementById("wbgtVal").textContent = wbgt;
     document.getElementById("uvVal").textContent = uv;
     document.getElementById("todayMsgContent").textContent = SETTING.todayMessage;
@@ -176,17 +174,12 @@
     const adviceBox = document.getElementById("adviceBox");
 
     let status = "safe";
-    let title = "✅ 入泳可能";
-    let msgList = [`気温＋水温：${tempSum.toFixed(1)}℃`];
+    let title = "◎ 利用に最適です";
+    let msgList = [];
 
-    // --- 【新機能】スマート・アクションラベルのロジック ---
+    // --- 各数値カードのスマートラベル処理 ---
     const airSub = document.getElementById("airSub");
     airSub.innerHTML = `<span style="color:var(--gray)">最高予測: ${airMax}℃</span>`;
-
-    const waterSub = document.getElementById("waterSub");
-    if (water >= 26 && water <= 28) { waterSub.innerHTML = "✨ 練習に最適"; waterSub.style.color = "var(--safe)"; }
-    else if (water > 28) { waterSub.innerHTML = "⚠️ のぼせ注意"; waterSub.style.color = "var(--warn)"; }
-    else { waterSub.innerHTML = "❄️ アップ長めに"; waterSub.style.color = "#007bff"; }
 
     const wbgtSub = document.getElementById("wbgtSub");
     if (wbgt >= 31) { wbgtSub.textContent = "運動は原則中止"; wbgtSub.style.color = "var(--extreme)"; }
@@ -199,31 +192,55 @@
     else if (uv >= 3) { uvSub.textContent = "対策を推奨"; uvSub.style.color = "var(--warn)"; }
     else { uvSub.textContent = "対策不要"; uvSub.style.color = "var(--safe)"; }
 
-    // --- 総合判定ロジック ---
-    if (water < WATER_LIMIT) {
-      status = "danger"; title = "🚫 水温不足"; msgList.push("水温が22℃未満のため利用禁止。");
-    } else if (tempSum < 50) {
-      status = "warn"; title = "⚠ 温度不足"; msgList.push("50℃ルール未満。低体温症に注意が必要です。");
+    // --- 水温判定ロジック（欠測対応） ---
+    const waterSub = document.getElementById("waterSub");
+    if (isWaterMissing) {
+      document.getElementById("waterVal").textContent = "欠測";
+      waterSub.innerHTML = "データなし";
+      waterSub.style.color = "var(--gray)";
+      msgList.push("水温データがないため、50度ルール等の総合判定を保留しています。");
+      
+      status = "loading";
+      title = "⏸ 判定保留(水温欠測)";
+    } else {
+      document.getElementById("waterVal").textContent = water + "℃";
+      const tempSum = air + water;
+      msgList.push(`気温＋水温：${tempSum.toFixed(1)}℃`);
+
+      if (water >= 26 && water <= 30) { waterSub.innerHTML = "✨ 練習に最適"; waterSub.style.color = "var(--safe)"; }
+      else if (water > 30) { waterSub.innerHTML = "⚠️ のぼせ注意"; waterSub.style.color = "var(--warn)"; }
+      else { waterSub.innerHTML = "❄️ アップ長めに"; waterSub.style.color = "#007bff"; }
+
+      if (water < WATER_LIMIT) {
+        status = "danger"; title = "🚫 水温不足"; msgList.push("水温が22℃未満のため利用禁止。");
+      } else if (tempSum < 50) {
+        status = "warn"; title = "⚠ 温度不足"; msgList.push("ルール未満。低体温症に注意が必要です。");
+      }
+      if (air < water) { msgList.push("【注意】外気の方が寒いためヒートショックに十分注意。"); }
     }
 
-    if (wbgt >= 31) { status = "extreme"; title = "🚫 運動中止"; msgList.push("危険な暑さです。中止を推奨。"); }
-    else if (wbgt >= 28 && status === "safe") { status = "danger"; title = "⚠ 厳重警戒"; msgList.push("熱中症の危険が高い状態。"); }
+    // --- WBGTによる上書き判定（水温欠測時でも有効） ---
+    if (wbgt >= 31) { 
+      status = "extreme"; title = "🚫 運動中止"; msgList.push("危険な暑さです。中止を推奨。"); 
+    } else if (wbgt >= 28 && (status === "safe" || status === "loading")) { 
+      status = "danger"; title = "⚠ 厳重警戒"; msgList.push("熱中症の危険が高い状態。"); 
+    }
 
-    if (air < water) { msgList.push("【注意】外気の方が寒いためヒートショック注意。"); }
-
-    // 手動アラート最優先
+    // --- 手動アラートによる最優先上書き ---
     if (SETTING.thunder === "ON" || SETTING.wind === "ON" || SETTING.other === "ON") {
       status = "danger"; title = "🚫 利用中止";
       if(SETTING.thunder === "ON") msgList.push("落雷検知。直ちに避難！");
+      if(SETTING.wind === "ON") msgList.push("強風のため利用は厳重注意");
       if(SETTING.other === "ON") msgList.push(SETTING.manualReason);
     } else if (SETTING.thunder === "CAUTION") {
-      status = "warn"; title = "⚠ 雷注意報"; msgList.push("雷雲が接近中。即時避難の準備を。");
+      if (status === "safe" || status === "loading") status = "warn";
+      title = "⚠ 雷注意報"; msgList.push("雷雲が接近中。*雷雲探知機使用**");
     }
 
     card.textContent = title;
     card.className = "st-" + status + (status === "danger" || status === "extreme" ? " blinking" : "");
     advice.innerHTML = msgList.map(m => `<div>・${m}</div>`).join('');
-    adviceBox.style.borderLeftColor = `var(--${status})`;
+    adviceBox.style.borderLeftColor = status === "loading" ? "var(--gray)" : `var(--${status})`;
 
     // デッドマン判定
     const diff = new Date().getTime() - new Date(SETTING.updatedAt).getTime();
@@ -231,21 +248,34 @@
   }
 
   function processHistory(air, wbgt) {
-    let hist = JSON.parse(localStorage.getItem("pool_ultimate_data") || "[]");
+    let hist = JSON.parse(localStorage.getItem("pool_ultimate_v15_data") || "[]");
     const currentTs = new Date(SETTING.updatedAt).getTime();
 
     if (hist.length === 0 || hist[0].ts !== currentTs) {
       hist.unshift({ ts: currentTs, air, water: SETTING.water, wbgt, label: SETTING.updatedAt.split(" ")[1] });
-      localStorage.setItem("pool_ultimate_data", JSON.stringify(hist.slice(0, 10)));
+      localStorage.setItem("pool_ultimate_v15_data", JSON.stringify(hist.slice(0, 10)));
     }
 
-    document.getElementById("historyBody").innerHTML = hist.map(d => `<tr><td>${d.label}</td><td style="color:#3498db;font-weight:bold;">${d.water}℃</td><td>${d.air}℃</td><td>${d.wbgt}</td></tr>`).join('');
+    // 履歴テーブルの表示 (欠測対応)
+    document.getElementById("historyBody").innerHTML = hist.map(d => {
+      const wText = d.water === null ? `<span style="color:var(--gray)">欠測</span>` : `<span style="color:#3498db;font-weight:bold;">${d.water}℃</span>`;
+      return `<tr><td>${d.label}</td><td>${wText}</td><td>${d.air}℃</td><td>${d.wbgt}</td></tr>`;
+    }).join('');
 
+    // グラフ描画 (欠測データは線を繋がずにスキップ)
     new Chart(document.getElementById('tempChart'), {
       type: 'line',
       data: {
         labels: [...hist].reverse().map(d => d.label),
-        datasets: [{ label: '水温推移', data: [...hist].reverse().map(d => d.water), borderColor: '#3498db', backgroundColor: 'rgba(52, 152, 219, 0.1)', fill: true, tension: 0.3 }]
+        datasets: [{ 
+          label: '水温推移', 
+          data: [...hist].reverse().map(d => d.water), 
+          borderColor: '#3498db', 
+          backgroundColor: 'rgba(52, 152, 219, 0.1)', 
+          fill: true, 
+          tension: 0.3,
+          spanGaps: false // データ欠損時は線を途切れさせる
+        }]
       },
       options: { plugins: { legend: { display: false } }, scales: { y: { min: 15, max: 35 } } }
     });
