@@ -1,261 +1,539 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ポータルサイト - PDF閲覧</title>
   <link rel="shortcut icon" href="favicon4.png" type="image/png">
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      display: flex;
-      background-color: #f5f5f5;
-      height: 100vh;
-      overflow: hidden;
+    :root{
+      --nav-width: 240px;
+      --bg: #f5f7f9;
+      --nav-bg: #2c3e50;
+      --nav-accent: #1abc9c;
+      --card-bg: #ffffff;
+      --muted: #6b7280;
+      --shadow: 0 4px 18px rgba(16,24,40,0.08);
+      --radius: 10px;
+      --max-content-width: 1100px;
+      --focus: 3px solid rgba(26,188,156,0.18);
+      --text: #1f2937;
+      --success: #16a34a;
+      --danger: #ef4444;
     }
 
-    /* ===== 左ナビ固定・動画付き ===== */
-    nav {
-      width: 230px;
-      background-color: #2c3e50;
-      color: white;
-      padding: 10px;
-      box-sizing: border-box;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      overflow-y: auto;
-      z-index: 10;
+    /* Reset / base */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      display:flex;
+      min-height:100vh;
+      overflow:hidden;
     }
 
-    
-    nav a {
-      display: block;
-      width: 100%;
-      color: white;
-      text-decoration: none;
-      text-align: center;
-      padding: 12px;
-      margin: 6px 0;
-      background-color: #34495e;
-      border-radius: 6px;
-      transition: background-color 0.3s;
-      box-sizing: border-box;
+    /* ===== NAV (left) ===== */
+    .nav{
+      width:var(--nav-width);
+      background:var(--nav-bg);
+      color:#fff;
+      padding:18px 14px;
+      position:fixed;
+      left:0;
+      top:0;
+      bottom:0;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      z-index:30;
+      overflow:auto;
     }
 
-    nav a:hover {
-      background-color: #1abc9c;
+    .nav__brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:6px;
     }
 
-    nav img {
-      display: block;
-      width: 120px;
-      border-radius: 6px;
-      margin: 8px auto;
+    .nav__brand img{width:110px;border-radius:6px;display:block}
+    .nav__title{font-weight:700;font-size:1rem;color:#ecf8f6}
+
+    .nav__list{
+      list-style:none;
+      padding:0;
+      margin:8px 0 0 0;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
     }
 
-    main {
-      flex: 1;
-      padding: 25px 40px 80px;
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-      overflow-y: auto;
-      margin-left: 250px;
+    .nav__item a{
+      display:block;
+      padding:10px 12px;
+      border-radius:8px;
+      text-decoration:none;
+      color:#fff;
+      background:transparent;
+      transition:background .18s, transform .08s;
+      font-weight:600;
+      text-align:center;
     }
 
-    .pdf-viewer-section {
-      background-color: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-      width: 100%;
-      margin: 0 auto;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
+    .nav__item a:hover,
+    .nav__item a:focus{background:rgba(255,255,255,0.06); outline:none; transform:translateY(-1px)}
+
+    .nav__item--primary a{background:#34495e}
+    .nav__item--danger a{background:#f44336; font-weight:700}
+
+    .nav__footer{
+      margin-top:auto;
+      font-size:0.85rem;
+      color:rgba(255,255,255,0.85);
+      text-align:center;
     }
 
-    .pdf-viewer-section header {
-      font-size: 1.6em;
-      margin-bottom: 25px;
-      color: #34495e;
-      border-bottom: 2px solid #1abc9c;
-      padding-bottom: 10px;
+    /* ===== MAIN ===== */
+    .main{
+      margin-left:var(--nav-width);
+      padding:28px;
+      width:100%;
+      overflow:auto;
+      display:flex;
+      justify-content:center;
     }
 
-    select {
-      padding: 10px;
-      font-size: 1em;
-      margin-bottom: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      max-width: 400px;
+    .container{
+      width:100%;
+      max-width:var(--max-content-width);
+      display:flex;
+      gap:20px;
+      flex-direction:column;
     }
 
-    .iframe-container {
-      flex: 1;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      overflow: hidden;
-      height: 80vh;
-      margin-bottom: 10px;
+    .card{
+      background:var(--card-bg);
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow:var(--shadow);
     }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+    .viewer__header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:3px solid var(--nav-accent);
+      padding-bottom:12px;
+      margin-bottom:16px;
     }
 
-    .fallback-link {
-      margin-top: 10px;
-      font-size: 0.95em;
-      color: #555;
+    .viewer__title{font-size:1.25rem;font-weight:700;color:#2b3a42}
+    .viewer__controls{display:flex;gap:10px;align-items:center}
+
+    select, button{
+      font-size:1rem;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid #d1d5db;
+      background:#fff;
+      color:var(--text);
     }
 
-    .fallback-link a {
-      color: #1abc9c;
-      font-weight: bold;
-      text-decoration: none;
+    select:focus, button:focus{outline:none; box-shadow:var(--focus)}
+
+    .viewer__body{
+      display:flex;
+      gap:18px;
+      align-items:flex-start;
+      flex-direction:column;
     }
 
-    .fallback-link a:hover {
-      text-decoration: underline;
+    .iframe-wrap{
+      width:100%;
+      border-radius:8px;
+      overflow:hidden;
+      border:1px solid #e6e9ee;
+      position:relative;
+      min-height:60vh;
+      background:linear-gradient(180deg,#fff,#fbfdff);
     }
 
-    .ticker-wrap {
-      width: 100%;
-      overflow: hidden;
-      background-color: #2c3e50;
-      color: white;
-      padding: 8px 0;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      z-index: 9999;
+    iframe.pdf-iframe{
+      width:100%;
+      height:80vh;
+      border:0;
+      display:block;
     }
 
-    .ticker {
-      display: inline-block;
-      white-space: nowrap;
-      animation: tickerScroll 25s linear infinite;
-      padding-left: 100%;
+    /* Loading overlay */
+    .overlay{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(255,255,255,0.6);
+      backdrop-filter: blur(2px);
+      transition:opacity .18s;
     }
 
-    @keyframes tickerScroll {
-      from { transform: translateX(0%); }
-      to { transform: translateX(-100%); }
+    .spinner{
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      border:4px solid rgba(0,0,0,0.08);
+      border-top-color:var(--nav-accent);
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .status{
+      position:absolute;
+      left:12px;
+      bottom:12px;
+      background:rgba(0,0,0,0.6);
+      color:#fff;
+      padding:8px 10px;
+      border-radius:8px;
+      font-size:0.9rem;
     }
 
-    /* ===== スマホ対応 ===== */
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-        overflow: visible;
+    .fallback{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:0.95rem;
+    }
+    .fallback a{color:var(--nav-accent); font-weight:700; text-decoration:none}
+    .fallback a:hover{text-decoration:underline}
+
+    /* Ticker (bottom) */
+    .ticker-wrap{
+      position:fixed;
+      left:var(--nav-width);
+      right:0;
+      bottom:0;
+      background:var(--nav-bg);
+      color:#fff;
+      padding:8px 12px;
+      z-index:40;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      overflow:hidden;
+    }
+    .ticker{
+      white-space:nowrap;
+      display:inline-block;
+      animation:ticker 22s linear infinite;
+      padding-left:100%;
+    }
+    @keyframes ticker{from{transform:translateX(0)} to{transform:translateX(-100%)}}
+
+    /* Responsive */
+    @media (max-width:900px){
+      :root{--nav-width:100%}
+      .nav{
+        position:relative;
+        flex-direction:row;
+        flex-wrap:wrap;
+        align-items:center;
+        gap:8px;
+        padding:10px;
+        height:auto;
       }
+      .nav__brand{flex:1}
+      .nav__list{flex-direction:row; gap:6px; width:100%; justify-content:center; order:2}
+      .main{margin-left:0; padding:16px}
+      .iframe-wrap{min-height:50vh}
+      iframe.pdf-iframe{height:60vh}
+      .ticker-wrap{left:0}
+    }
 
-      nav {
-        position: relative;
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
+    /* Accessibility helpers */
+    .visually-hidden{
+      position:absolute!important;
+      height:1px;width:1px;
+      overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;
+    }
 
-     
-
-      main {
-        margin-left: 0;
-        padding: 15px;
-      }
+    /* small screens: make select full width */
+    @media (max-width:480px){
+      select, button{width:100%}
+      .viewer__controls{flex-direction:column; align-items:stretch}
     }
   </style>
 </head>
 <body>
-  <nav>
+  <nav class="nav" aria-label="メインナビゲーション">
+    <div class="nav__brand">
+      <img src="favicon4.png" alt="サイトロゴ">
+      <div>
+        <div class="nav__title">ポータルサイト</div>
+        <div style="font-size:0.82rem; color:rgba(255,255,255,0.8)">資料閲覧</div>
+      </div>
+    </div>
 
-  <a href="https://yuma873.github.io/blush-nimble/index.html">トップ</a>
-    </a>
-    <a href="https://yuma873.github.io/blush-nimble/index.html" style="background-color:#f44336;font-weight:bold;">ログアウト</a>
-    
+    <ul class="nav__list" role="menu" aria-label="主要リンク">
+      <li class="nav__item nav__item--primary" role="none">
+        <a role="menuitem" href="https://yuma873.github.io/blush-nimble/index.html">トップ</a>
+      </li>
+      <li class="nav__item nav__item--danger" role="none">
+        <!-- ログアウトはGETではなく本来はPOSTで処理するのが望ましい -->
+        <a role="menuitem" href="/logout" aria-label="ログアウト">ログアウト</a>
+      </li>
+      <li class="nav__item" role="none">
+        <a role="menuitem" href="portal-pdf-chrome.html">Chromeで表示されない場合</a>
+      </li>
+    </ul>
 
-    
-
-
+    <div class="nav__footer" aria-hidden="false">
+      <div style="font-size:0.85rem">© 2026 ポータル</div>
+    </div>
   </nav>
 
-  <main>
-    <section class="pdf-viewer-section">
-      <header>📄 資料閲覧</header>
-      <label for="pdfSelector">表示するPDFを選択:</label>
-      <select id="pdfSelector">
-        <option value="" selected disabled>
-    選択してください
-</option>        
-        <option value="https://yuma873.github.io/blush-nimble/pdf-seigen.pdf">【後期】各大会制限記録</option>
-        <optgroup label="0523-0524 春季記録会 @横浜M(長)">
-                <option value="https://yuma873.github.io/blush-nimble/pdf-shunki.pdf">大会要項</option>
-                          <option value="https://yuma873.github.io/blush-nimble/shunki-2nd.pdf">2次要項</option>
-        </optgroup>
-                <optgroup label="0614 夏季記録会 @平塚(長)">
-                        <option value="https://yuma873.github.io/blush-nimble/pdf-kaki.pdf">大会要項</option>
-                </optgroup>
-        <optgroup label="0619-0621 県総体 @横浜M(長)">
-                <option value="https://yuma873.github.io/blush-nimble/pdf-kensotai.pdf">大会要項</option>
-      </optgroup>
-                <optgroup label="0711 北相地区大会 @町田(長)">
-                        <option value="https://yuma873.github.io/blush-nimble/pdf-hokuso.pdf">大会要項</option>
-                </optgroup>
-        <optgroup label="0829 北相新人 @横浜M(長)">
-                  <option value="https://yuma873.github.io/blush-nimble/pdf-hokusoushinjin.pdf">大会要項</option>
-        </optgroup>
-        <optgroup label="0905-0906 県新人 @横浜M(長)">
-        <option value="https://yuma873.github.io/blush-nimble/pdf-kenshinjin.pdf">大会要項</option>
-        </optgroup>
-      </select>
+  <main class="main" id="main" tabindex="-1">
+    <div class="container">
+      <section class="card viewer" aria-labelledby="viewerTitle">
+        <div class="viewer__header">
+          <h1 id="viewerTitle" class="viewer__title">📄 資料閲覧</h1>
 
-      <div class="iframe-container">
-        <iframe id="pdfViewer" src="https://yuma873.github.io/blush-nimble/pdf-notice.pdf"></iframe>
-      </div>
+          <div class="viewer__controls" role="region" aria-label="PDF選択と操作">
+            <label for="pdfSelector" class="visually-hidden">表示するPDFを選択</label>
+            <select id="pdfSelector" aria-describedby="pdfHelp" aria-label="閲覧するPDFを選択">
+              <option value="" selected>選択してください</option>
+            </select>
 
-      <p class="fallback-link">
-        表示されない場合は
-        <a id="openInNewTab" href="https://yuma873.github.io/blush-nimble/pdf-kokosotai.pdf" target="_blank" rel="noopener">
-          こちら
-        </a> をクリックして開いてください。
-      </p>
+            <button id="openBtn" type="button" aria-label="新しいタブで開く">新しいタブで開く</button>
+          </div>
+        </div>
 
-      <div style="text-align: right; margin-top: 10px;">
-        <a href="portal-pdf-chrome.html" style="color: #005bac; font-weight: bold; text-decoration: none;">
-          Chrome等を利用の場合で、ファイル内部が表示されない方 ▶
-        </a>
-      </div>
-    </section>
+        <div class="viewer__body">
+          <div class="iframe-wrap" id="iframeWrap" aria-live="polite">
+            <div class="overlay" id="overlay" style="display:none" aria-hidden="true">
+              <div style="text-align:center">
+                <div class="spinner" aria-hidden="true"></div>
+                <div style="margin-top:8px; font-weight:600; color:#0f172a">読み込み中…</div>
+              </div>
+            </div>
+
+            <iframe id="pdfViewer" class="pdf-iframe" title="PDFビューア" src="about:blank"></iframe>
+
+            <div class="status" id="status" aria-hidden="true">未選択</div>
+          </div>
+
+          <p class="fallback" id="fallback">
+            表示されない場合は
+            <a id="openInNewTab" href="#" target="_blank" rel="noopener">こちら</a>
+            をクリックして開いてください。
+          </p>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="helpTitle">
+        <h2 id="helpTitle" style="margin-top:0">使い方と注意</h2>
+        <ul>
+          <li>PDFを選択するとプレビューが表示されます。ブラウザによっては内部表示できない場合があります。</li>
+          <li>表示されない場合は「新しいタブで開く」を利用してください。</li>
+          <li>ログアウトはセキュアな方法で実装してください（POST推奨）。</li>
+        </ul>
+      </section>
+    </div>
   </main>
 
- 
+  <div class="ticker-wrap" role="status" aria-live="off">
+    <div class="ticker" aria-hidden="true">重要: 次回大会の申込締切は 2026-06-15 です。; 新着: 県総体の要項を更新しました。; お知らせ: ChromeでPDFが表示されない場合はヘルプを参照してください。</div>
+  </div>
 
   <script>
-   
-    // ===== PDF切り替え =====
+    // ===== PDFリスト（保守しやすい形でここにまとめる） =====
+    const pdfCatalog = [
+      { group: "お知らせ", items: [
+        { label: "初期案内（通知）", url: "https://yuma873.github.io/blush-nimble/pdf-notice.pdf" }
+      ]},
+      { group: "後期", items: [
+        { label: "【後期】各大会制限記録", url: "https://yuma873.github.io/blush-nimble/pdf-seigen.pdf" }
+      ]},
+      { group: "0523-0524 春季記録会 @横浜M(長)", items: [
+        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-shunki.pdf" },
+        { label: "2次要項", url: "https://yuma873.github.io/blush-nimble/shunki-2nd.pdf" }
+      ]},
+      { group: "0614 夏季記録会 @平塚(長)", items: [
+        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-kaki.pdf" }
+      ]},
+      { group: "0619-0621 県総体 @横浜M(長)", items: [
+        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-kensotai.pdf" }
+      ]},
+      { group: "0711 北相地区大会 @町田(長)", items: [
+        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-hokuso.pdf" }
+      ]},
+      { group: "0829 北相新人 @横浜M(長)", items: [
+        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-hokusoushinjin.pdf" }
+      ]},
+      { group: "0905-0906 県新人 @横浜M(長)", items: [
+        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-kenshinjin.pdf" }
+      ]}
+    ];
+
+    // Elements
     const pdfSelector = document.getElementById('pdfSelector');
     const pdfViewer = document.getElementById('pdfViewer');
     const openInNewTab = document.getElementById('openInNewTab');
+    const openBtn = document.getElementById('openBtn');
+    const overlay = document.getElementById('overlay');
+    const status = document.getElementById('status');
 
-    pdfSelector.addEventListener('change', function () {
-      const selectedUrl = this.value;
-      pdfViewer.src = selectedUrl;
-      openInNewTab.href = selectedUrl;
+    // Build select options with optgroup
+    function buildOptions(catalog){
+      catalog.forEach(group => {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = group.group;
+        group.items.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = item.url;
+          opt.textContent = item.label;
+          optgroup.appendChild(opt);
+        });
+        pdfSelector.appendChild(optgroup);
+      });
+    }
+
+    // Show loading overlay
+    function showLoading(msg = "読み込み中…"){
+      overlay.style.display = "flex";
+      overlay.setAttribute('aria-hidden','false');
+      status.style.display = "block";
+      status.setAttribute('aria-hidden','false');
+      status.textContent = msg;
+    }
+
+    function hideLoading(msg = "表示中"){
+      overlay.style.display = "none";
+      overlay.setAttribute('aria-hidden','true');
+      status.textContent = msg;
+    }
+
+    // Check if URL is reachable (HEAD) with timeout
+    async function checkUrl(url, timeout = 8000){
+      try{
+        const controller = new AbortController();
+        const id = setTimeout(()=>controller.abort(), timeout);
+        const res = await fetch(url, { method: 'HEAD', mode: 'cors', signal: controller.signal });
+        clearTimeout(id);
+        return res.ok;
+      }catch(e){
+        return false;
+      }
+    }
+
+    // Load PDF into iframe with graceful fallback
+    async function loadPdf(url){
+      if(!url) return;
+      showLoading("読み込み中…");
+      // Try HEAD first to detect CORS / 404 quickly
+      const ok = await checkUrl(url);
+      if(!ok){
+        hideLoading("読み込み失敗");
+        // set fallback link but do not set iframe src to avoid browser error page
+        openInNewTab.href = url;
+        openInNewTab.textContent = "別タブで開く（直接リンク）";
+        pdfViewer.src = "about:blank";
+        status.textContent = "読み込みに失敗しました。下のリンクから開いてください。";
+        status.style.background = "rgba(239,68,68,0.9)";
+        return;
+      }
+
+      // If reachable, set iframe src
+      openInNewTab.href = url;
+      openInNewTab.textContent = "別タブで開く（直接リンク）";
+      // Use a small delay to show spinner for UX
+      setTimeout(()=>{
+        pdfViewer.src = url;
+      }, 150);
+
+      // Wait for iframe load event
+      const onLoad = () => {
+        hideLoading("表示中");
+        pdfViewer.removeEventListener('load', onLoad);
+        status.style.background = "rgba(0,0,0,0.6)";
+      };
+
+      // Add a timeout in case iframe fails to load
+      let loaded = false;
+      const loadTimeout = setTimeout(()=>{
+        if(!loaded){
+          hideLoading("読み込みタイムアウト");
+          status.textContent = "読み込みに時間がかかっています。別タブで開いてください。";
+        }
+      }, 12000);
+
+      pdfViewer.addEventListener('load', function handler(){
+        loaded = true;
+        clearTimeout(loadTimeout);
+        onLoad();
+      });
+    }
+
+    // Initialize
+    (function init(){
+      buildOptions(pdfCatalog);
+
+      // Restore last selection if exists
+      const last = localStorage.getItem('lastPdf');
+      if(last){
+        // try to set selected option
+        const opt = Array.from(pdfSelector.options).find(o => o.value === last);
+        if(opt){ opt.selected = true; loadPdf(last); }
+      } else {
+        // default initial notice
+        const notice = pdfCatalog[0].items[0];
+        openInNewTab.href = notice.url;
+        openInNewTab.textContent = "別タブで開く（通知）";
+        status.textContent = "未選択";
+      }
+    })();
+
+    // Event listeners
+    pdfSelector.addEventListener('change', function(){
+      const url = this.value;
+      if(!url) return;
+      localStorage.setItem('lastPdf', url);
+      loadPdf(url);
     });
+
+    openBtn.addEventListener('click', function(){
+      const url = pdfSelector.value || openInNewTab.href;
+      if(!url || url === "#" || url === "about:blank") return;
+      window.open(url, '_blank', 'noopener');
+    });
+
+    // Keyboard accessibility: Enter on select opens in new tab
+    pdfSelector.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){
+        const url = this.value;
+        if(url) window.open(url, '_blank', 'noopener');
+      }
+    });
+
+    // Fallback link initial
+    openInNewTab.addEventListener('click', function(){
+      // no-op; link opens in new tab by default
+    });
+
+    // Global error handling for iframe (best-effort)
+    window.addEventListener('message', (ev) => {
+      // placeholder for future PDF.js integration or messages
+    });
+
+    // Optional: detect if running inside restrictive browser (very basic)
+    (function detectPdfSupport(){
+      // Some browsers block embedding PDFs; we keep fallback link visible
+      // No heavy detection here to avoid false positives
+    })();
   </script>
 </body>
 </html>
