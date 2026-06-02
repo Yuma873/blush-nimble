@@ -8,6 +8,20 @@
 <link rel="shortcut icon" href="favicon-log.png" type="image/png">
 
 <style>
+  .progress-container {
+  width: 280px;
+  height: 8px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: white;
+  border-radius: 999px;
+}
   .dots {
   display: flex;
   gap: 8px;
@@ -272,12 +286,10 @@ button:disabled {
 </div>
 
 <div class="loading" id="loading">
-  <div class="dots">
-    <span></span>
-    <span></span>
-    <span></span>
+  <div class="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
   </div>
-  <p>読込中...</p>
+  <p>ログイン中...</p>
 </div>
 
 <div style="margin-top: 25px; text-align: center;">
@@ -464,9 +476,24 @@ function handleLogin() {
     return;
   }
 
-  loading.style.display = "flex";
-  loginBtn.disabled = true;
+loading.style.display = "flex";
+loginBtn.disabled = true;
 
+// ここから追加
+const bar = document.getElementById("progress-bar");
+let progress = 0;
+
+const interval = setInterval(() => {
+  progress += 5;
+  bar.style.width = progress + "%";
+
+  if (progress >= 100) {
+    clearInterval(interval);
+  }
+}, 100);
+// ここまで追加
+
+const deviceInfo = navigator.userAgent;
   const deviceInfo = navigator.userAgent;
   const now = new Date();
   let infoText = `${deviceInfo} - ${now.toLocaleString()}`;
@@ -511,7 +538,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 任意で数秒後に自動で消す場合
     setTimeout(() => {
         loading.style.display = "none";
-    }, 6000000); // 30秒後に非表示
+    }, 4000); // 30秒後に非表示
 });
 const savedDevice = localStorage.getItem("lastDeviceInfo");
 if(savedDevice){
