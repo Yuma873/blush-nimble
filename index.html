@@ -286,12 +286,22 @@ button:disabled {
 </div>
 
 <div class="loading" id="loading">
+
+  <div class="dots">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div style="height:20px;"></div>
+
   <div class="progress-container">
     <div class="progress-bar" id="progress-bar"></div>
   </div>
-  <p>ログイン中...</p>
-</div>
 
+  <p>ログイン中...</p>
+
+</div>
 <div style="margin-top: 25px; text-align: center;">
 <nobr>
 <table border="0" cellspacing="0" cellpadding="0">
@@ -557,7 +567,7 @@ const interval = setInterval(() => {
         clearInterval(interval);
         loading.style.display = "none";
     }
-}, 50);
+}, 1000);
 
 });
 
