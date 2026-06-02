@@ -490,11 +490,16 @@ const interval = setInterval(() => {
   if (progress >= 100) {
     clearInterval(interval);
   }
-}, 100);
-// ここまで追加
+}, 100000);
+
+
+
+
+
+  
+// ここまで追加、10秒（500）
 
 const deviceInfo = navigator.userAgent;
-  const deviceInfo = navigator.userAgent;
   const now = new Date();
   let infoText = `${deviceInfo} - ${now.toLocaleString()}`;
 
@@ -519,7 +524,10 @@ const deviceInfo = navigator.userAgent;
   setTimeout(() => {
     loading.style.display = "none";
     window.location.href = user.link;
-  }, 2000);
+  }, 600000);
+
+
+        
 }
 
 /* ===== オンライン/オフライン判定 ===== */
@@ -532,14 +540,27 @@ updateOnlineStatus();
 
 /* ===== 初期化 ===== */
   // ページ読み込み直後に loading を表示
-document.addEventListener("DOMContentLoaded", () => {
-    loading.style.display = "flex";
 
-    // 任意で数秒後に自動で消す場合
-    setTimeout(() => {
+document.addEventListener("DOMContentLoaded", () => {
+loading.style.display = "flex";
+
+const bar = document.getElementById("progress-bar");
+bar.style.width = "0%";
+
+let progress = 0;
+
+const interval = setInterval(() => {
+    progress += 5;
+    bar.style.width = progress + "%";
+
+    if (progress >= 100) {
+        clearInterval(interval);
         loading.style.display = "none";
-    }, 4000); // 30秒後に非表示
+    }
+}, 50);
+
 });
+
 const savedDevice = localStorage.getItem("lastDeviceInfo");
 if(savedDevice){
     lastDevice.textContent = savedDevice;
