@@ -295,8 +295,12 @@
   <div>
     <h1 id="viewerTitle" class="viewer__title">📄 資料閲覧</h1>
     <div id="currentPdf" style="margin-top:6px;color:#6b7280;">
-      資料未選択
-    </div>
+  資料未選択
+</div>
+
+<div id="updateDate" style="font-size:0.85rem;color:#9ca3af;">
+</div>
+    
   </div>
           <div class="viewer__controls" role="region" aria-label="PDF選択と操作">
             <label for="pdfSelector" class="visually-hidden">表示するPDFを選択</label>
@@ -343,27 +347,27 @@
       ]},
       
       { group: "後期", items: [
-        { label: "【後期】各大会制限記録", url: "https://yuma873.github.io/blush-nimble/pdf-seigen.pdf" }
+        { label: "【後期】各大会制限記録", url: "https://yuma873.github.io/blush-nimble/pdf-seigen.pdf",  updated: "2026-01-01" }
       ]},
       { group: "0523-0524 春季記録会 @横浜M(長)", items: [
-        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-shunki.pdf" }
+        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-shunki.pdf",  updated: "2026-05-01" }
       ]},
       { group: "0614 夏季記録会 @平塚(長)", items: [
-        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-kaki.pdf" }
+        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-kaki.pdf",  updated: "2026-05-10" }
       ]},
       { group: "0619-0621 県総体 @横浜M(長)", items: [
-        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-kensotai.pdf" },
-        { label: "2次要項", url: "https://yuma873.github.io/blush-nimble/kensotai-2nd.pdf" },
-        { label: "タイムテーブル", url: "https://yuma873.github.io/blush-nimble/kensotai-timetable.pdf" }
+        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-kensotai.pdf",  updated: "2026-05-20" },
+        { label: "2次要項", url: "https://yuma873.github.io/blush-nimble/kensotai-2nd.pdf",  updated: "2026-06-15" },
+        { label: "タイムテーブル", url: "https://yuma873.github.io/blush-nimble/kensotai-timetable.pdf",  updated: "2026-06-15" }
       ]},
       { group: "0711 北相地区大会 @町田(長)", items: [
-        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-hokuso.pdf" }
+        { label: "大会要項", url: "https://yuma873.github.io/blush-nimble/pdf-hokuso.pdf" ,  updated: "2026-06-10"}
       ]},
       { group: "0829 北相新人 @横浜M(長)", items: [
-        { label:  "大会要項", url: "https://yuma873.github.io/blush-nimble/hokuso-shinjin.pdf" }
+        { label:  "大会要項", url: "https://yuma873.github.io/blush-nimble/hokuso-shinjin.pdf",  updated: "2026-06-17" }
       ]},
       { group: "0905-0906 県新人 @横浜M(長)", items: [
-        { label: "大会要項" , url: "https://yuma873.github.io/blush-nimble/kenshinjin.pdf" }
+        { label: "大会要項" , url: "https://yuma873.github.io/blush-nimble/kenshinjin.pdf" ,  updated: "2026-06-18"}
       ]}
     ];
 
@@ -375,6 +379,33 @@
     const overlay = document.getElementById('overlay');
     const status = document.getElementById('status');
 
+    function findPdfInfo(url){
+  for(const group of pdfCatalog){
+    for(const item of group.items){
+      if(item.url === url){
+        return {
+          group: group.group,
+          ...item
+        };
+      }
+    }
+  }
+  return null;
+}
+    
+    function getUpdateStatus(dateString){
+  const updated = new Date(dateString);
+  const today = new Date();
+
+  const diffDays =
+    (today - updated) / (1000 * 60 * 60 * 24);
+
+  if(diffDays <= 7) return "🆕";
+  if(diffDays <= 14) return "🟡";
+
+  return "";
+}
+    
     // Build select options with optgroup
     function buildOptions(catalog){
       catalog.forEach(group => {
@@ -383,7 +414,13 @@
         group.items.forEach(item => {
           const opt = document.createElement('option');
           opt.value = item.url;
-          opt.textContent = item.label;
+          const status = getUpdateStatus(item.updated);
+
+opt.textContent =
+  status
+    ? `${item.label} ${status}`
+    : item.label;
+          
           optgroup.appendChild(opt);
         });
         pdfSelector.appendChild(optgroup);
@@ -470,8 +507,8 @@
 (function init(){
   buildOptions(pdfCatalog);
 
-  const last = localStorage.getItem('lastPdf');
-
+const info = findPdfInfo(last);
+  
   if(last){
 
     const opt = Array.from(pdfSelector.options)
@@ -482,7 +519,14 @@
 
       document.getElementById('currentPdf').innerHTML =
         `<strong>${opt.parentElement.label}</strong><br>${opt.text}`;
+const info = findPdfInfo(url);
 
+if(info){
+  document.getElementById('updateDate').textContent =
+    `更新日：${info.updated}`;
+  
+}
+      
       loadPdf(last);
     }
 
@@ -495,7 +539,7 @@
 
   }
 })();
-pdfSelector.addEventListener('change', function(){
+    pdfSelector.addEventListener('change', function(){
   const url = this.value;
   if(!url) return;
 
@@ -503,6 +547,13 @@ pdfSelector.addEventListener('change', function(){
 
   document.getElementById('currentPdf').innerHTML =
     `<strong>${option.parentElement.label}</strong><br>${option.text}`;
+
+  const info = findPdfInfo(url);
+
+  if(info){
+    document.getElementById('updateDate').textContent =
+      `📅 更新日：${info.updated}`;
+  }
 
   localStorage.setItem('lastPdf', url);
   loadPdf(url);
