@@ -291,9 +291,13 @@
   <main class="main" id="main" tabindex="-1">
     <div class="container">
       <section class="card viewer" aria-labelledby="viewerTitle">
-        <div class="viewer__header">
-          <h1 id="viewerTitle" class="viewer__title">📄 資料閲覧</h1>
-
+       <div class="viewer__header">
+  <div>
+    <h1 id="viewerTitle" class="viewer__title">📄 資料閲覧</h1>
+    <div id="currentPdf" style="margin-top:6px;color:#6b7280;">
+      資料未選択
+    </div>
+  </div>
           <div class="viewer__controls" role="region" aria-label="PDF選択と操作">
             <label for="pdfSelector" class="visually-hidden">表示するPDFを選択</label>
             <select id="pdfSelector" aria-describedby="pdfHelp" aria-label="閲覧するPDFを選択">
@@ -466,6 +470,13 @@
     (function init(){
       buildOptions(pdfCatalog);
 
+      const option = Array.from(pdfSelector.options)
+  .find(o => o.value === last);
+
+if(option){
+  document.getElementById('currentPdf').innerHTML =
+    `<strong>${option.parentElement.label}</strong><br>${option.text}`;
+}
       // Restore last selection if exists
       const last = localStorage.getItem('lastPdf');
       if(last){
@@ -480,15 +491,19 @@
         status.textContent = "未選択";
       }
     })();
+pdfSelector.addEventListener('change', function(){
+  const url = this.value;
+  if(!url) return;
 
-    // Event listeners
-    pdfSelector.addEventListener('change', function(){
-      const url = this.value;
-      if(!url) return;
-      localStorage.setItem('lastPdf', url);
-      loadPdf(url);
-    });
+  const option = this.options[this.selectedIndex];
 
+  document.getElementById('currentPdf').innerHTML =
+    `<strong>${option.parentElement.label}</strong><br>${option.text}`;
+
+  localStorage.setItem('lastPdf', url);
+  loadPdf(url);
+});
+    
     openBtn.addEventListener('click', function(){
       const url = pdfSelector.value || openInNewTab.href;
       if(!url || url === "#" || url === "about:blank") return;
