@@ -507,8 +507,8 @@ opt.textContent =
 (function init(){
   buildOptions(pdfCatalog);
 
-const info = findPdfInfo(last);
-  
+  const last = localStorage.getItem('lastPdf');
+
   if(last){
 
     const opt = Array.from(pdfSelector.options)
@@ -519,14 +519,14 @@ const info = findPdfInfo(last);
 
       document.getElementById('currentPdf').innerHTML =
         `<strong>${opt.parentElement.label}</strong><br>${opt.text}`;
-const info = findPdfInfo(url);
 
-if(info){
-  document.getElementById('updateDate').textContent =
-    `更新日：${info.updated}`;
-  
-}
-      
+      const info = findPdfInfo(last);
+
+      if(info){
+        document.getElementById('updateDate').textContent =
+          `📅 更新日：${info.updated}`;
+      }
+
       loadPdf(last);
     }
 
