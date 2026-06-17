@@ -467,30 +467,34 @@
     }
 
     // Initialize
-    (function init(){
-      buildOptions(pdfCatalog);
+(function init(){
+  buildOptions(pdfCatalog);
 
-      const option = Array.from(pdfSelector.options)
-  .find(o => o.value === last);
+  const last = localStorage.getItem('lastPdf');
 
-if(option){
-  document.getElementById('currentPdf').innerHTML =
-    `<strong>${option.parentElement.label}</strong><br>${option.text}`;
-}
-      // Restore last selection if exists
-      const last = localStorage.getItem('lastPdf');
-      if(last){
-        // try to set selected option
-        const opt = Array.from(pdfSelector.options).find(o => o.value === last);
-        if(opt){ opt.selected = true; loadPdf(last); }
-      } else {
-        // default initial notice
-        const notice = pdfCatalog[0].items[0];
-        openInNewTab.href = notice.url;
-        openInNewTab.textContent = "別タブで開く（通知）";
-        status.textContent = "未選択";
-      }
-    })();
+  if(last){
+
+    const opt = Array.from(pdfSelector.options)
+      .find(o => o.value === last);
+
+    if(opt){
+      opt.selected = true;
+
+      document.getElementById('currentPdf').innerHTML =
+        `<strong>${opt.parentElement.label}</strong><br>${opt.text}`;
+
+      loadPdf(last);
+    }
+
+  } else {
+
+    const notice = pdfCatalog[0].items[0];
+    openInNewTab.href = notice.url;
+    openInNewTab.textContent = "別タブで開く（通知）";
+    status.textContent = "未選択";
+
+  }
+})();
 pdfSelector.addEventListener('change', function(){
   const url = this.value;
   if(!url) return;
